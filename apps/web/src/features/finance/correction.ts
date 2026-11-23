@@ -30,12 +30,19 @@ export interface CorrectionIntent {
   correction: CashCorrection;
   request: Omit<RequestCollectionCorrectApply, "request_id">;
 }
-async function movement(scope: ClientScope, selection: FinanceSelection, id: string) {
+async function movement(
+  scope: ClientScope,
+  selection: FinanceSelection,
+  id: string,
+  onFirstPage?: (view: Awaited<ReturnType<typeof readFinancePage>>) => void,
+  firstPage?: Awaited<ReturnType<typeof readFinancePage>>,
+) {
   const seen = new Set<string>();
   let cursor: string | undefined;
   do {
-    const data = await readFinancePage(scope, selection, cursor),
-      row = data.movements.items.find((x) => x.id === id);
+    const data = (!cursor && firstPage) || (await readFinancePage(scope, selection, cursor));
+    if (!cursor) onFirstPage?.(data);
+    const row = data.movements.items.find((x) => x.id === id);
     if (row) return { data, row };
     cursor = data.movements.next_cursor ?? undefined;
     if (cursor && seen.has(cursor)) throw new Error("FINANCE_SOURCE_UNAVAILABLE");
@@ -209,10 +216,18 @@ export async function readCorrectionReceipt(intent: CorrectionIntent) {
     throw new Error("FINANCE_RECEIPT_UNAVAILABLE");
   return receipt;
 }
-export async function readCorrectionResult(intent: CorrectionIntent, id?: string) {
+export async function readCorrectionResult(
+  intent: CorrectionIntent,
+  id?: string,
+  onFirstPage?: (view: Awaited<ReturnType<typeof readFinancePage>>) => void,
+) {
   z.uuid().parse(id);
   if (id === intent.base.movement.id) throw new Error("FINANCE_RESULT_UNAVAILABLE");
-  const { data, row } = await movement(intent.scope, intent.selection, id!);
+  let firstPage: Awaited<ReturnType<typeof readFinancePage>> | undefined;
+  const { data, row } = await movement(intent.scope, intent.selection, id!, (page) => {
+    firstPage = page;
+    onFirstPage?.(page);
+  });
   if (
     row.previous_id !== intent.base.movement.id ||
     row.kind !==
@@ -222,7 +237,9 @@ export async function readCorrectionResult(intent: CorrectionIntent, id?: string
     Date.parse(row.occurred_at) !== Date.parse(intent.correction.occurred_at)
   )
     throw new Error("FINANCE_RESULT_UNAVAILABLE");
-  const original = (await movement(intent.scope, intent.selection, intent.base.movement.id)).row;
+  const original = (
+    await movement(intent.scope, intent.selection, intent.base.movement.id, undefined, firstPage)
+  ).row;
   if (
     original.kind !== "collection" ||
     original.amount_minor !== intent.base.movement.amount_minor ||

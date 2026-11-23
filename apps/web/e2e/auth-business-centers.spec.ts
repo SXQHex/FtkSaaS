@@ -798,6 +798,10 @@ test("a Business organization manager can create a center without opening the ow
   ).toBeVisible();
   expect(f.calls.filter(({ op }) => op === "center_create_v1")).toHaveLength(1);
   expect(f.calls.filter(({ op }) => op === "subscription_get_v1")).toEqual([]);
+  const writeAt = f.calls.findIndex(({ op }) => op === "center_create_v1");
+  expect(
+    f.calls.slice(writeAt + 1).filter(({ op }) => op === "organizations_list_v1"),
+  ).toHaveLength(1);
   await page.getByRole("tab", { name: text.tabs.people, exact: true }).click();
   await expect(page.getByRole("grid", { name: text.tabs.people })).toBeVisible();
   await expect(page.getByRole("heading", { name: text.mergeSuggestions.title })).toHaveCount(0);

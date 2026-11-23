@@ -11,6 +11,9 @@ import { EventCommandNotice } from "../events/event-command-notice";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { SettingsReviewDialog } from "../settings/settings-review-dialog";
 import { settingsSubscriptionQuery } from "../settings/settings-subscription";
+import { cacheVerifiedReadback, invalidateCachedFamilies } from "../../lib/cache-invalidation";
+import { refreshWorkspace, workspaceKeys } from "../workspace/workspace-query";
+import { workspaceAccessLost } from "../auth/query-access-recovery";
 import {
   centerCreateIntent,
   centerCreateReceipt,
@@ -54,9 +57,18 @@ export function BusinessCenterCreate({
     readReceipt: centerCreateReceipt,
     readResult: readCreatedCenter,
     onAccessLost: () => false,
-    onRefresh: async () => {
+    onRefresh: async ({ workspace }, assertCurrent) => {
+      const key = workspaceKeys.projection(scope.accountId, scope.orgId);
+      await invalidateCachedFamilies(client, [key, workspaceKeys.projection(scope.accountId)]);
+      assertCurrent();
+      if (workspaceAccessLost(client.getQueryData<typeof workspace>(key), workspace)) {
+        // Let the normal workspace observer reconcile any concurrent revocation.
+        await refreshWorkspace(client, scope.accountId, scope.orgId);
+      } else {
+        await cacheVerifiedReadback(client, key, workspace);
+      }
+      assertCurrent();
       setSaved(true);
-      await client.invalidateQueries({ queryKey: ["workspace", scope.accountId] });
       // The live quota is refreshed when the confirmation closes, after the command lock clears.
     },
   });

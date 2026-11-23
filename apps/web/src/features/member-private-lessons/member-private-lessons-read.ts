@@ -1,3 +1,4 @@
+import { queryBackendRead } from "../../lib/backend";
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
@@ -17,18 +18,23 @@ export async function readOwnRequests(
 ) {
   z.uuid().parse(personId);
   const backend = await scopedBackend(scope, undefined, readContext);
-  const page = await backend.call("management_state_get_v1", {
-    ...common(scope),
-    operation: "lesson_request_create_v1",
-    selector: {
+  const page = await queryBackendRead(
+    backend,
+    "management_state_get_v1",
+    {
+      ...common(scope),
       operation: "lesson_request_create_v1",
-      key: {
-        person_id: personId,
-        ...(requestId ? { lesson_request_id: z.uuid().parse(requestId) } : {}),
+      selector: {
+        operation: "lesson_request_create_v1",
+        key: {
+          person_id: personId,
+          ...(requestId ? { lesson_request_id: z.uuid().parse(requestId) } : {}),
+        },
       },
+      page: { limit: 20, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
     },
-    page: { limit: 20, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
-  });
+    readContext?.signal,
+  );
   const items = page.items.map((row) => requestDetail(row, scope, "lesson_request_create_v1"));
   if (
     items.length > 20 ||
@@ -74,15 +80,20 @@ export async function readOwnRequestChoices(
     cursors = new Set<string>();
   let cursor: string | undefined;
   do {
-    const page = await backend.call("management_state_get_v1", {
-      ...common(scope),
-      operation: "lesson_request_create_v1",
-      selector: {
+    const page = await queryBackendRead(
+      backend,
+      "management_state_get_v1",
+      {
+        ...common(scope),
         operation: "lesson_request_create_v1",
-        key: { person_id: personId, catalog: kind },
+        selector: {
+          operation: "lesson_request_create_v1",
+          key: { person_id: personId, catalog: kind },
+        },
+        page: { limit: 50, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
       },
-      page: { limit: 50, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
-    });
+      readContext?.signal,
+    );
     if (page.items.length > 50) throw new Error("OWN_REQUEST_CHOICES_UNAVAILABLE");
     for (const row of page.items) {
       const values =

@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { ManagementSelectorPublicApplicationReviewV1 } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
+import { capturePrivateReadback } from "../../lib/cache-invalidation";
 
 import { readOverviewWork } from "../overview/overview-work";
 import { LeadsView, type LeadTab } from "./leads-view";
@@ -234,13 +235,16 @@ export function LeadsContent({
           ? t(($) => $.leads.sources.whatsapp)
           : source;
   async function refresh() {
+    const assertCurrent = capturePrivateReadback(queries);
     await invalidateLeadPages(queries, scope);
+    assertCurrent();
     await queries.fetchQuery({
       queryKey: ["leads", scope.accountId, scope.orgId, scope.centerId, query, filters, undefined],
       queryFn: () => readLeadsPage(scope, query, undefined, filters),
       staleTime: 0,
       retry: false,
     });
+    assertCurrent();
     if (tab === "tasks") {
       if (followupKind === "manual") {
         await queries.fetchQuery({
@@ -288,7 +292,17 @@ export function LeadsContent({
         retry: false,
       });
     }
-    await workSummary.refetch();
+    assertCurrent();
+    const summary = await workSummary.refetch();
+    if (
+      summary.error &&
+      !(
+        summary.error instanceof BackendError &&
+        ["FORBIDDEN", "PLAN_FEATURE_UNAVAILABLE"].includes(summary.error.code)
+      )
+    )
+      throw summary.error;
+    assertCurrent();
     setCursors([undefined]);
     setIndex(0);
     setFollowupCursors([undefined]);

@@ -16,7 +16,7 @@ import {
 } from "@ftksaas/ui/components/table";
 import { Textarea } from "@ftksaas/ui/components/textarea";
 import type { ContentTemplateView, DocumentDirectoryDocument } from "@ftksaas/api-contracts";
-import { cacheVerifiedReadback } from "../../lib/cache-invalidation";
+import { readIntoCurrentQuery } from "../../lib/cache-invalidation";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { EventCommandNotice } from "../events/event-command-notice";
 import { useMemberCommand } from "../member-profile/use-member-command";
@@ -73,10 +73,10 @@ export function DocumentCatalogPanel({
   });
   const command = useMemberCommand({
     write: writeCatalogIntent,
-    readResult: readCatalogResult,
+    readResult: (intent: DocumentCatalogIntent, id) =>
+      readIntoCurrentQuery(queries, key, () => readCatalogResult(intent, id)),
     onAccessLost,
-    onRefresh: async (rows) => {
-      await cacheVerifiedReadback(queries, key, rows);
+    onRefresh: async () => {
       setSaved(review?.request.action);
       setDraft(undefined);
     },

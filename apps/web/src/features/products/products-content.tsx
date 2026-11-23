@@ -1,5 +1,9 @@
 import { affectedProductQueryFamilies, productsKeys } from "./products-query";
-import { invalidateAndReadFirstPage } from "../../lib/cache-invalidation";
+import {
+  capturePrivateReadback,
+  cacheVerifiedReadback,
+  invalidateAndReadFirstPage,
+} from "../../lib/cache-invalidation";
 import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -12,15 +16,14 @@ import {
   productDraft,
   productIntent,
   productStateIntent,
-  readProductHistory,
   readProductsManagementPage,
   type ProductPublishIntent,
 } from "./products";
-import { useProductCommand } from "./use-product-command";
+import { useProductCommand, type ProductReadback } from "./use-product-command";
 import { readDisciplineCatalog } from "../settings/discipline-reader";
 import { workspaceRoles } from "../workspace/workspace";
 import type { ClientScope } from "../../lib/scoped-backend";
-import type { ProductManagementEntry, ProductView } from "@ftksaas/api-contracts";
+import type { ProductManagementEntry } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
 import { formatMinorAmount } from "../../lib/money";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
@@ -231,7 +234,7 @@ export function ProductsContent({
           onClose={() => setEditor(null)}
           onLockChange={onLockChange}
           onAccessLost={accessLost}
-          onRefresh={async (result) => {
+          onRefresh={async (result, historyPage, assertCurrent) => {
             const updated = result?.terms ?? editor.base?.terms;
             const publishedProductId =
               result && editor.base && result.version_id !== editor.base.version_id
@@ -263,18 +266,13 @@ export function ProductsContent({
               ],
               readFirstPage: () => readProductsManagementPage(scope, filter, searchQuery),
             });
-            if (publishedProductId)
-              await queries.fetchQuery({
-                queryKey: [
-                  ...productsKeys.history(scope, publishedProductId),
-                  "versions",
-                  undefined,
-                ],
-                queryFn: (context) =>
-                  readProductHistory(scope, publishedProductId, "versions", undefined, context),
-                staleTime: 0,
-                retry: false,
-              });
+            assertCurrent();
+            if (publishedProductId && historyPage)
+              await cacheVerifiedReadback(
+                queries,
+                [...productsKeys.history(scope, publishedProductId), "versions", undefined],
+                historyPage,
+              );
             setCursors([undefined]);
             setPageIndex(0);
           }}
@@ -298,11 +296,12 @@ function ProductEditorController({
   canWrite: boolean;
   usageCenters: { id: string; name: string }[];
   onClose: () => void;
-  onRefresh: (result?: ProductView) => Promise<void>;
+  onRefresh: ProductReadback;
   onAccessLost: (error: unknown) => boolean;
   onLockChange: (locked: boolean) => void;
 }) {
   const { t } = useTranslation();
+  const queries = useQueryClient();
   const [draft, setDraft] = useState<ProductDraft>(() => productDraft(base)),
     [stage, setStage] = useState<"edit" | "review">("edit"),
     [accepted, setAccepted] = useState(false),
@@ -319,8 +318,9 @@ function ProductEditorController({
   });
   const command = useProductCommand({
     onAccessLost,
-    onRefresh: async (result) => {
-      await onRefresh(result);
+    onRefresh: async (result, historyPage, assertCurrent) => {
+      await onRefresh(result, historyPage, assertCurrent);
+      assertCurrent();
       setHistoryRevision((value) => value + 1);
     },
   });
@@ -359,7 +359,7 @@ function ProductEditorController({
   }
   const status = command.state;
   function reloadSource() {
-    void onRefresh()
+    void onRefresh(undefined, undefined, capturePrivateReadback(queries))
       .then(onClose)
       .catch((error: unknown) => {
         if (!onAccessLost(error)) setInvalid(true);

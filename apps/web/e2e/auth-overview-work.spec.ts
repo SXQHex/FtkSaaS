@@ -69,6 +69,7 @@ async function setup(page: Page, mode: "normal" | "retry" | "receipt" | "ackUnre
     globalTotal = 3;
   const lists: Record<string, unknown>[] = [],
     writes: Record<string, unknown>[] = [];
+  let applicationResultReads = 0;
   const receipts = new Map<string, { id: string; type: string; operation: string }>();
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
     const operation = new URL(route.request().url()).pathname.split("/").at(-1)!,
@@ -123,6 +124,7 @@ async function setup(page: Page, mode: "normal" | "retry" | "receipt" | "ackUnre
         type = app ? "public_applications" : "crm_activities",
         version = app ? 2 + Number(appClosed) : 2 + Number(completed);
       const entity = { type, id: rowId };
+      if (app && appClosed) applicationResultReads++;
       return send({
         items: [
           {
@@ -228,6 +230,7 @@ async function setup(page: Page, mode: "normal" | "retry" | "receipt" | "ackUnre
     tasks,
     lists,
     writes,
+    applicationResultReads: () => applicationResultReads,
     setDenied: () => {
       denied = true;
     },
@@ -284,7 +287,15 @@ test("denied work source hides its old details and reload distinguishes denial f
   await expect(dialog.getByRole("alert")).toContainText("İş kaynağı okunamadı");
   await expect(dialog.getByText("Özgün takip notu", { exact: true })).toHaveCount(0);
   state.setDenied();
+  const readsBeforeClose = state.lists.length;
   await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(state.card.getByText("Merkez takip kaydı", { exact: true })).toBeVisible();
+  expect(state.lists).toHaveLength(readsBeforeClose);
+  await state.card
+    .getByRole("button", { name: "İş listesini yeniden oku", exact: true })
+    .last()
+    .click();
   await expect(state.card.getByRole("alert")).toBeVisible();
   await expect(state.card.getByText("Merkez takip kaydı", { exact: true })).toHaveCount(0);
   state.setEmpty();
@@ -373,5 +384,6 @@ test("application work opens the existing review writer and rereads the queue af
   ).toBeVisible();
   await dialog.getByRole("button", { name: "Kapat", exact: true }).click();
   await expect(state.card.getByText("Bekleyen örnek başvuru", { exact: true })).toHaveCount(0);
+  expect(state.applicationResultReads()).toBe(1);
   expect(state.writes).toHaveLength(1);
 });

@@ -75,7 +75,7 @@ async function readEventCancelResult(intent: EventCancelIntent, id?: string) {
   const row = await readEventRegistration(intent);
   if (row.state !== "cancelled" || row.version <= intent.version)
     throw new Error("SALE_EVENT_RESULT_UNAVAILABLE");
-  return row;
+  return { scope: intent.scope, eventId: intent.eventId };
 }
 export function SaleEventCancellation({
   scope,
@@ -90,7 +90,10 @@ export function SaleEventCancellation({
   disabled: boolean;
   onLockChange: (value: boolean) => void;
   onAccessLost: (error: unknown) => boolean;
-  onRefresh: () => Promise<void>;
+  onRefresh: (
+    target: Awaited<ReturnType<typeof readEventCancelResult>>,
+    assertCurrent: () => void,
+  ) => Promise<void>;
 }) {
   const { t } = useTranslation(),
     [reason, setReason] = useState(""),
@@ -104,9 +107,7 @@ export function SaleEventCancellation({
     readReceipt: readEventCancelReceipt,
     readResult: readEventCancelResult,
     onAccessLost,
-    onRefresh: async () => {
-      await onRefresh();
-    },
+    onRefresh,
   });
   const locked = busy || command.locked;
   useEffect(() => {

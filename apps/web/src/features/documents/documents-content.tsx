@@ -5,6 +5,7 @@ import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-quer
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { BackendError } from "../../lib/backend";
+import { capturePrivateReadback } from "../../lib/cache-invalidation";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { DocumentDirectoryDocument } from "@ftksaas/api-contracts";
 
@@ -99,6 +100,7 @@ export function DocumentsContent({
     refetchOnWindowFocus: false,
   });
   const versionRows = versions.data?.pages.flatMap(directoryVersions);
+  const sharedFirstPage = tab === "documents" && !query.trim() && index === 0;
   const page = useQuery({
     queryKey: [
       "document-directory",
@@ -124,7 +126,8 @@ export function DocumentsContent({
         },
         context,
       ),
-    enabled: active && (tab === "documents" || (tab === "acceptance" && !!documentId)),
+    enabled:
+      active && !sharedFirstPage && (tab === "documents" || (tab === "acceptance" && !!documentId)),
     retry: false,
     // After a native readback, returning from an old cursor to page one must
     // reuse that just-verified page rather than issuing the same request again.
@@ -174,8 +177,14 @@ export function DocumentsContent({
         ].includes(error.code)) ||
       (error instanceof Error && ["AUTH_REQUIRED", "ACCOUNT_CHANGED"].includes(error.message)),
   );
+  const visibleError = sharedFirstPage ? catalog.isError : page.isError;
+  const visibleFetching = sharedFirstPage ? catalog.isFetching : page.isFetching;
   const readable =
-    active && !page.isError && (tab === "documents" || !!documentId) ? page.data : undefined;
+    active && !visibleError && (tab === "documents" || !!documentId)
+      ? sharedFirstPage
+        ? catalog.data?.pages[0]
+        : page.data
+      : undefined;
   const date = (value: string) =>
     new Intl.DateTimeFormat("tr-TR", {
       timeZone: timezone!,
@@ -259,9 +268,11 @@ export function DocumentsContent({
     (tab === "catalog" || (tab === "acceptance" && !documentId)
       ? catalog.data?.pages[0]?.summary
       : undefined);
-  const invalid = page.isError || catalog.isError || catalogInvalid || lost || workspace.isError;
+  const invalid = visibleError || catalog.isError || catalogInvalid || lost || workspace.isError;
   async function refresh(publishedScope: "center" | "organization") {
+    const assertCurrent = capturePrivateReadback(queries);
     await invalidateDocumentDirectoryViews(queries, scope, publishedScope);
+    assertCurrent();
     // The catalog and an unfiltered document page have the same native input.
     // Share its verified first page; keep filtered and acceptance reads distinct.
     const visibleDocuments = active && tab === "documents";
@@ -304,11 +315,9 @@ export function DocumentsContent({
     ]);
     if (catalogResult.isError || versionsResult?.isError)
       throw Error("DOCUMENT_DIRECTORY_UNAVAILABLE");
-    if (shareCatalogPage) {
-      const firstPage = catalogResult.data?.pages[0];
-      if (!firstPage) throw Error("DOCUMENT_DIRECTORY_UNAVAILABLE");
-      queries.setQueryData(firstPageKey, firstPage);
-    }
+    if (shareCatalogPage && !catalogResult.data?.pages[0])
+      throw Error("DOCUMENT_DIRECTORY_UNAVAILABLE");
+    assertCurrent();
     setCursors([undefined]);
     setIndex(0);
   }
@@ -316,13 +325,18 @@ export function DocumentsContent({
     setLost(false);
     reset();
     void workspace.refetch();
-    void page.refetch();
+    if (
+      !sharedFirstPage &&
+      index === 0 &&
+      (tab === "documents" || (tab === "acceptance" && documentId))
+    )
+      void page.refetch();
     void catalog.refetch();
   }
   return (
     <>
       <DocumentsView
-        loading={active && page.isPending}
+        loading={active && (sharedFirstPage ? catalog.isPending : page.isPending)}
         acceptancePrompt={
           tab === "acceptance" && !documentId ? t(($) => $.documents.chooseDocument) : undefined
         }
@@ -545,7 +559,7 @@ export function DocumentsContent({
             <Button
               variant="outline"
               size="sm"
-              isDisabled={locked || index === 0 || page.isFetching}
+              isDisabled={locked || index === 0 || visibleFetching}
               onPress={() => setIndex((value) => value - 1)}
             >
               {t(($) => $.earnings.previousPage)}
@@ -553,7 +567,7 @@ export function DocumentsContent({
             <Button
               variant="outline"
               size="sm"
-              isDisabled={locked || !readable?.next_cursor || page.isFetching}
+              isDisabled={locked || !readable?.next_cursor || visibleFetching}
               onPress={() => {
                 if (!readable?.next_cursor) return;
                 setCursors((values) => [...values.slice(0, index + 1), readable.next_cursor!]);

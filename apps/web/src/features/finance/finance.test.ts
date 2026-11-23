@@ -1,5 +1,6 @@
 import { beforeEach, expect, it, vi } from "vitest";
 import type { FinanceView } from "@ftksaas/api-contracts";
+import { readFinanceResult } from "./finance-command";
 import { BackendError } from "../../lib/backend";
 const { call } = vi.hoisted(() => ({ call: vi.fn() }));
 vi.mock("../../lib/scoped-backend", () => ({ scopedBackend: vi.fn(async () => ({ call })) }));
@@ -178,4 +179,15 @@ it("accepts RFC3339 offset timestamps from the native financial projection", asy
   call.mockResolvedValue(data);
   const intent = await collectionIntent(scope, selection, "Europe/Istanbul", draft());
   expect(await readCollectionResult(intent, cashId)).toEqual(data);
+});
+
+it("retains the confirmed first page when the acknowledged movement is on a continuation", async () => {
+  const intent = await collectionIntent(scope, selection, "Europe/Istanbul", draft());
+  const first = source();
+  first.movements = { ...first.movements, items: [], next_cursor: "next" };
+  call.mockResolvedValueOnce(first).mockResolvedValueOnce(source());
+  expect(await readFinanceResult(intent, cashId)).toEqual(first);
+  expect(call).toHaveBeenCalledTimes(2);
+  expect(call.mock.calls[0]![1].page).not.toHaveProperty("cursor");
+  expect(call.mock.calls[1]![1].page.cursor).toBe("next");
 });

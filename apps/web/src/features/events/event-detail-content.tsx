@@ -1,12 +1,11 @@
 import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
-import { invalidateEarningsViews } from "../earnings/earnings-query";
+import { capturePrivateReadback } from "../../lib/cache-invalidation";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { v7 as uuidv7 } from "uuid";
-import { BackendError } from "../../lib/backend";
+import { BackendError, queryBackendRead } from "../../lib/backend";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import type { EventView } from "@ftksaas/api-contracts";
 import { getTemporal } from "../../lib/temporal";
@@ -18,9 +17,9 @@ import { EventDetailView, type EventDetailAction } from "./event-detail-view";
 import { EventAttendanceView, type EventAttendanceAction } from "./event-attendance-view";
 import { EventActionController, type EventActionSelection } from "./event-action-controller";
 import { EventEditor } from "./event-editor";
-import { readEventRooms } from "./events-read";
-import { readDetailedEvent } from "./event-registration-read";
+import { studioRoomsQuery } from "../studio/studio-rooms-query";
 import { EventRegistrationController } from "./event-registration-controller";
+import { eventDetailQuery, invalidateEventViews } from "./event-query";
 
 export function EventDetailContent({
   scope,
@@ -51,48 +50,45 @@ export function EventDetailContent({
     (!workspace.isError || preservePending) && workspace.data?.selected?.id === scope.orgId
       ? workspace.data.centers.find((row) => row.id === scope.centerId && row.accessible)
       : undefined;
-  const prefix = ["event-detail", scope.accountId, scope.orgId, scope.centerId, eventId];
   const source = useQuery({
-    queryKey: prefix,
-    queryFn: (readContext) => readDetailedEvent(scope, eventId, readContext),
+    ...eventDetailQuery(scope, eventId),
     enabled: !!center,
-    retry: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
+    refetchOnMount: "always",
   });
-  const event = !source.isError || locked ? source.data : undefined;
+  const event =
+    center && !workspace.isError && !source.isError && source.isFetchedAfterMount
+      ? source.data
+      : undefined;
+  const eventUnavailable = !event;
   const rooms = useQuery({
-    queryKey: ["event-choices", scope.accountId, scope.orgId, scope.centerId, "rooms"],
-    queryFn: (readContext) => readEventRooms(scope, readContext),
-    enabled: !!center,
-    retry: false,
+    ...studioRoomsQuery(scope),
+    enabled: event?.venue.kind === "internal" && !!event.venue.room_id,
   });
-  const presentation = useQuery({
-    queryKey: [...prefix, "presentation", event],
-    enabled: !!event,
+  const scopeIds = [scope.accountId, scope.orgId, scope.centerId] as const;
+  const dutyIds = [...new Set((event?.duties ?? []).map((row) => row.person_id))].sort();
+  const dutyNames = useQuery({
+    queryKey: ["event-duty-persons", ...scopeIds, eventId, dutyIds],
+    enabled: dutyIds.length > 0,
     retry: false,
     queryFn: async (readContext) => {
-      const T = await getTemporal(),
-        value = event!;
-      const fmt = new Intl.DateTimeFormat("tr-TR", {
-        dateStyle: "medium",
-        timeStyle: "short",
-        timeZone: value.timezone,
-      });
-      const names = new Map<string, string>(),
-        backend = await scopedBackend(scope, undefined, readContext);
-      // Only the event's known duty subjects, not the organization directory.
-      const ids = [...new Set((value.duties ?? []).map((row) => row.person_id))];
-      for (let index = 0; index < ids.length; index += 4)
+      const names = new Map<string, string>();
+      const backend = await scopedBackend(scope, undefined, readContext);
+      // Only the event's known duty subjects, never the complete organization directory.
+      for (let index = 0; index < dutyIds.length; index += 4)
         await Promise.all(
-          ids.slice(index, index + 4).map(async (id) => {
+          dutyIds.slice(index, index + 4).map(async (id) => {
             try {
-              const person = await backend.call("person_get_v1", {
-                client_api_version: 1,
-                request_id: uuidv7(),
-                org_id: scope.orgId,
-                person_id: id,
-              });
+              const person = await queryBackendRead(
+                backend,
+                "person_get_v1",
+                {
+                  client_api_version: 1,
+                  request_id: uuidv7(),
+                  org_id: scope.orgId,
+                  person_id: id,
+                },
+                readContext.signal,
+              );
               if (person.id !== id) throw new Error("EVENT_PERSON_UNAVAILABLE");
               names.set(id, person.display_name);
             } catch (cause) {
@@ -103,8 +99,30 @@ export function EventDetailContent({
             }
           }),
         );
+      return names;
+    },
+  });
+  const presentation = useQuery({
+    queryKey: [
+      "event-times",
+      ...scopeIds,
+      eventId,
+      event?.timezone,
+      event?.interval.starts_at,
+      event?.interval.ends_at,
+      event?.actual_started_at,
+    ],
+    enabled: !!event,
+    retry: false,
+    queryFn: async () => {
+      const T = await getTemporal(),
+        value = event!;
+      const fmt = new Intl.DateTimeFormat("tr-TR", {
+        dateStyle: "medium",
+        timeStyle: "short",
+        timeZone: value.timezone,
+      });
       return {
-        names,
         planned: fmt.format(new Date(value.interval.starts_at)),
         end: fmt.format(new Date(value.interval.ends_at)),
         actual: value.actual_started_at
@@ -134,9 +152,9 @@ export function EventDetailContent({
     [queries, router, scope.accountId],
   );
   useEffect(() => {
-    for (const cause of [workspace.error, source.error, presentation.error])
+    for (const cause of [workspace.error, source.error, rooms.error, dutyNames.error])
       if (cause) accessLost(cause);
-  }, [workspace.error, source.error, presentation.error, accessLost]);
+  }, [workspace.error, source.error, rooms.error, dutyNames.error, accessLost]);
   const setPending = useCallback(
     (value: boolean) => {
       setLocked(value);
@@ -144,31 +162,16 @@ export function EventDetailContent({
     },
     [onLockChange],
   );
-  async function refresh(afterWrite?: { finance?: boolean; earnings?: boolean }) {
-    const scopeIds = [scope.accountId, scope.orgId, scope.centerId];
-    const affected: (readonly unknown[])[] = [["events", ...scopeIds]];
-    if (afterWrite)
-      affected.push(
-        ["schedule-range", ...scopeIds],
-        ["event-registration-payment", ...scopeIds, eventId],
-        ["registered-event-payment", ...scopeIds, eventId],
-      );
-    if (afterWrite?.finance) {
-      for (const name of [
-        "finance-directory",
-        "finance-directory-credit-debts",
-        "finance",
-        "profile-rights",
-        "member-entitlements",
-        "event-registration-rights",
-      ])
-        affected.push([name, ...scopeIds]);
-    }
-    await Promise.all([
-      queries.refetchQueries({ queryKey: prefix, exact: true }, { throwOnError: true }),
-      invalidateCachedFamilies(queries, affected),
-      ...(afterWrite?.earnings ? [invalidateEarningsViews(queries, scope)] : []),
-    ]);
+  async function refresh(afterWrite: {
+    finance?: boolean;
+    earnings?: boolean;
+    detailVerified?: boolean;
+  }) {
+    const assertCurrent = capturePrivateReadback(queries);
+    await invalidateEventViews(queries, scope, eventId, afterWrite);
+    assertCurrent();
+    if (!afterWrite.detailVerified) await source.refetch({ throwOnError: true });
+    assertCurrent();
     setAttendanceDraft(undefined);
   }
   function choose(selection: EventActionSelection) {
@@ -219,37 +222,17 @@ export function EventDetailContent({
         ...(allowed && event.attendance_state === "open" ? (["close_attendance"] as const) : []),
         ...(event.attendance_state === "closed" ? (["correct_attendance"] as const) : []),
       ];
-  if (!event)
+  function renderDetail(event: EventView) {
+    const pendingTime = presentation.isError ? unknown : t(($) => $.studio.loading);
+    const enabledActions: EventDetailAction[] = [
+      "edit",
+      ...(event.state === "draft" ? (["publish"] as const) : []),
+      ...(event.state === "published" ? (["complete", "register"] as const) : []),
+      ...(event.state !== "cancelled" ? (["cancel", "cancel_registration"] as const) : []),
+      ...(event.state === "occurred" ? (["verify_duty"] as const) : []),
+      "payment",
+    ];
     return (
-      <div className="flex flex-col gap-4">
-        <h1 className="text-2xl font-semibold">{t(($) => $.eventDetail.title)}</h1>
-        <Alert variant={source.isError || presentation.isError ? "destructive" : "default"}>
-          <AlertDescription>
-            {source.isError || presentation.isError
-              ? t(($) => $.events.sourceError)
-              : t(($) => $.studio.loading)}
-          </AlertDescription>
-        </Alert>
-        <Button
-          onPress={() => {
-            void source.refetch();
-          }}
-        >
-          {t(($) => $.events.reload)}
-        </Button>
-      </div>
-    );
-  const pendingTime = presentation.isError ? unknown : t(($) => $.studio.loading);
-  const enabledActions: EventDetailAction[] = [
-    "edit",
-    ...(event.state === "draft" ? (["publish"] as const) : []),
-    ...(event.state === "published" ? (["complete", "register"] as const) : []),
-    ...(event.state !== "cancelled" ? (["cancel", "cancel_registration"] as const) : []),
-    ...(event.state === "occurred" ? (["verify_duty"] as const) : []),
-    "payment",
-  ];
-  return (
-    <>
       <EventDetailView
         name={event.name}
         state={event.state}
@@ -266,7 +249,9 @@ export function EventDetailContent({
             value:
               event.venue.kind === "external"
                 ? event.venue.name || unknown
-                : (rooms.data?.find((room) => room.id === event.venue.room_id)?.name ?? unknown),
+                : ((!rooms.isError ? rooms.data : undefined)?.find(
+                    (room) => room.active && room.id === event.venue.room_id,
+                  )?.name ?? unknown),
           },
           { label: t(($) => $.events.editor.timezone), value: event.timezone },
         ]}
@@ -306,7 +291,7 @@ export function EventDetailContent({
         duties={
           event.duties?.map((row) => ({
             id: row.id,
-            name: info?.names.get(row.person_id) ?? unknown,
+            name: (!dutyNames.isError ? dutyNames.data?.get(row.person_id) : undefined) ?? unknown,
             duty:
               row.duty === "instructor"
                 ? t(($) => $.events.editor.instructor)
@@ -423,27 +408,55 @@ export function EventDetailContent({
           </>
         }
       />
-      {edit && (
+    );
+  }
+  return (
+    <>
+      {event ? (
+        renderDetail(event)
+      ) : (
+        <div className="flex flex-col gap-4">
+          <h1 className="text-2xl font-semibold">{t(($) => $.eventDetail.title)}</h1>
+          <Alert variant={source.isError || presentation.isError ? "destructive" : "default"}>
+            <AlertDescription>
+              {source.isError || presentation.isError
+                ? t(($) => $.events.sourceError)
+                : t(($) => $.studio.loading)}
+            </AlertDescription>
+          </Alert>
+          <Button
+            onPress={() => {
+              void source.refetch();
+            }}
+          >
+            {t(($) => $.events.reload)}
+          </Button>
+        </div>
+      )}
+      {edit && (event || locked) && (
         <EventEditor
           scope={scope}
           target={eventId}
-          timezone={event.timezone}
+          timezone={event?.timezone ?? source.data?.timezone ?? "UTC"}
+          recoveryOnly={eventUnavailable}
           onClose={() => setEdit(false)}
           onSaved={() => refresh({})}
           onLockChange={setPending}
           onAccessLost={accessLost}
         />
       )}
-      {action && (
+      {action && (event || locked) && (
         <EventActionController
           scope={scope}
           before={action.before}
           selection={action.selection}
+          recoveryOnly={eventUnavailable}
           onClose={() => {
-            if (!locked) {
-              setAction(undefined);
-              void refresh();
-            }
+            if (!locked) setAction(undefined);
+          }}
+          onReload={() => {
+            setAction(undefined);
+            void source.refetch();
           }}
           onSaved={() =>
             refresh({
@@ -467,19 +480,17 @@ export function EventDetailContent({
           onAccessLost={accessLost}
         />
       )}
-      {registration && (
+      {registration && (event || locked) && (
         <EventRegistrationController
           scope={scope}
           before={registration.event}
           registrationId={registration.id}
+          recoveryOnly={eventUnavailable}
           selfPersonId={center ? workspace.data?.selected?.self_context?.person_id : undefined}
           onClose={() => {
-            if (!locked) {
-              setRegistration(undefined);
-              void refresh();
-            }
+            if (!locked) setRegistration(undefined);
           }}
-          onSaved={() => refresh({ finance: true })}
+          onSaved={(detailVerified) => refresh({ finance: true, detailVerified })}
           onLockChange={setPending}
           onAccessLost={accessLost}
         />

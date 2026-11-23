@@ -1,5 +1,5 @@
 import { useWorkspaceQuery } from "../workspace/workspace-query";
-import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
+import { capturePrivateReadback, invalidateCachedFamilies } from "../../lib/cache-invalidation";
 import { saveDownload } from "../../lib/save-download";
 import { useCallback, useEffect, useState } from "react";
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -329,13 +329,17 @@ export function ReportsContent({
         : [],
     );
   async function refresh(kind?: "imports" | "exports") {
-    const nextAnchor = freshReportAnchor();
-    await invalidateCachedFamilies(queries, [
-      ["report-view", scope],
-      ["report-finance-summary", scope],
-      ["report-export-directory", scope],
-      ["report-import-directory", scope],
-    ]);
+    const assertCurrent = capturePrivateReadback(queries);
+    const nextAnchor = kind ? anchor : freshReportAnchor();
+    const importFamily = ["report-import-directory", scope];
+    const exportFamily = ["report-export-directory", scope];
+    await invalidateCachedFamilies(
+      queries,
+      kind
+        ? [kind === "imports" ? importFamily : exportFamily]
+        : [["report-view", scope], ["report-finance-summary", scope], exportFamily, importFamily],
+    );
+    assertCurrent();
     const firstPages = kind ? [kind] : tab === "files" ? (["imports", "exports"] as const) : [];
     await Promise.all(
       firstPages.map((item) =>
@@ -361,8 +365,12 @@ export function ReportsContent({
             }),
       ),
     );
-    setPages({});
-    setAnchor(nextAnchor);
+    assertCurrent();
+    if (kind) setPages((current) => ({ ...current, [kind]: { index: 0, cursors: [undefined] } }));
+    else {
+      setPages({});
+      setAnchor(nextAnchor);
+    }
     setFileError(false);
   }
   async function file(id: string, action: ReportFileRow["action"]) {

@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { AutomationJobView, JobState } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
-import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
+import { capturePrivateReadback, invalidateCachedFamilies } from "../../lib/cache-invalidation";
 
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { EventActionDialog } from "../events/event-action-dialog";
@@ -152,12 +152,14 @@ export function AutomationContent({
     [onLockChange],
   );
   async function refresh(segmentWritten = false) {
+    const assertCurrent = capturePrivateReadback(queries);
     const choicesKey = ["automation-segment-choices", scope.accountId, scope.orgId, scope.centerId];
     await invalidateCachedFamilies(
       queries,
       [prefix, choicesKey],
       segmentWritten ? [choicesKey] : [],
     );
+    assertCurrent();
     // Every cursor family is stale; validate only the visible tab's first page.
     if (tab === "automations") {
       await queries.fetchQuery({
@@ -182,6 +184,7 @@ export function AutomationContent({
         retry: false,
       });
     }
+    assertCurrent();
     setAutoCursors([undefined]);
     setAutoIndex(0);
     setSegmentCursors([undefined]);
@@ -552,10 +555,12 @@ export function AutomationContent({
           centerName={center.name}
           onSaved={() => refresh(selection.kind === "segment")}
           onClose={() => {
-            if (!locked) {
-              setSelection(undefined);
-              void refresh();
-            }
+            if (!locked) setSelection(undefined);
+          }}
+          onReload={() => {
+            if (locked) return;
+            setSelection(undefined);
+            void refresh().catch(accessLost);
           }}
           onLockChange={pending}
           onAccessLost={accessLost}
@@ -570,10 +575,12 @@ export function AutomationContent({
           retryJob={action.retry}
           onSaved={refresh}
           onClose={() => {
-            if (!locked) {
-              setAction(undefined);
-              void refresh();
-            }
+            if (!locked) setAction(undefined);
+          }}
+          onReload={() => {
+            if (locked) return;
+            setAction(undefined);
+            void refresh().catch(accessLost);
           }}
           onLockChange={pending}
           onAccessLost={accessLost}
@@ -589,6 +596,7 @@ function AutomationAction({
   retryJob,
   onSaved,
   onClose,
+  onReload,
   onLockChange,
   onAccessLost,
 }: {
@@ -598,6 +606,7 @@ function AutomationAction({
   retryJob?: AutomationJobView;
   onSaved: () => Promise<void>;
   onClose: () => void;
+  onReload: () => void;
   onLockChange: (value: boolean) => void;
   onAccessLost: (cause: unknown) => boolean;
 }) {
@@ -681,7 +690,7 @@ function AutomationAction({
       locked={locked}
       disabled={command.state !== "ready"}
       error={error}
-      notice={<EventCommandNotice command={command} onReload={onClose} />}
+      notice={<EventCommandNotice command={command} onReload={onReload} />}
     />
   );
 }

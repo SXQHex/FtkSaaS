@@ -1,5 +1,5 @@
 import type { AccountReadContext } from "../../lib/scoped-backend";
-import { readStudioResources, type StudioScope } from "./studio";
+import { readStudioResources, type readStudioRooms, type StudioScope } from "./studio";
 import {
   readStudioAgreements,
   readStudioClosures,
@@ -14,9 +14,10 @@ export async function readStudioSnapshot(
   scope: StudioScope,
   readPlan?: () => Promise<SubscriptionView>,
   readContext?: AccountReadContext,
+  readRooms?: () => ReturnType<typeof readStudioRooms>,
 ) {
   const [resources, instructors] = await Promise.all([
-    readStudioResources(scope, readContext),
+    readStudioResources(scope, readContext, readRooms),
     readStudioInstructors(scope, undefined, readContext),
   ]);
   const personIds = [...new Set(instructors.map((item) => item.person.id))];

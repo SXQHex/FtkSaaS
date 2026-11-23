@@ -218,7 +218,7 @@ function PeopleContent({
     async (person: PersonView) => {
       await invalidateAndReadFirstPage({
         queries,
-        families: [peopleKeys.center(scope)],
+        families: [peopleKeys.center(scope), peopleKeys.picker(scope)],
         firstPageKey: [
           "people",
           scope.accountId,

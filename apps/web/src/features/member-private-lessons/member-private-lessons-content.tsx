@@ -9,6 +9,7 @@ import { BackendError } from "../../lib/backend";
 import { ScheduleTimeError } from "../schedule/schedule-time";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { invalidateAndReadFirstPage } from "../../lib/cache-invalidation";
+import { overviewWorkKey } from "../overview/overview-work";
 import { memberPrivateLessonKeys } from "./member-private-lessons-query";
 import {
   readOwnRequests,
@@ -76,14 +77,20 @@ export function MemberPrivateLessonsContent({
     ...(requestId ? { staleTime: 0 } : {}),
     retry: false,
   });
+  const creating = target?.mode === "create";
+  const showInstructors =
+    creating ||
+    (!list.isError && Boolean(list.data?.items.some((row) => row.preferred_instructor_id)));
   const disciplines = useQuery({
     queryKey: [...prefix, "disciplines"],
     queryFn: (readContext) => readOwnRequestChoices(scope, personId, "disciplines", readContext),
+    enabled: creating,
     retry: false,
   });
   const instructors = useQuery({
     queryKey: [...prefix, "instructors"],
     queryFn: (readContext) => readOwnRequestChoices(scope, personId, "instructors", readContext),
+    enabled: showInstructors,
     retry: false,
   });
   const accessLost = useCallback(
@@ -106,7 +113,13 @@ export function MemberPrivateLessonsContent({
     onRefresh: async (result) => {
       await invalidateAndReadFirstPage({
         queries,
-        families: [[...memberPrivateLessonKeys.person(scope, personId), "list"]],
+        families: [
+          [...prefix, "list"],
+          ["lesson-requests", scope.accountId, scope.orgId, scope.centerId],
+          ["lesson-request-editor", scope.accountId, scope.orgId, scope.centerId, result.id],
+          ["lead-work-summary", scope.accountId, scope.orgId, scope.centerId],
+          overviewWorkKey(scope),
+        ],
         firstPageKey: [...prefix, "list", undefined, requestId],
         readFirstPage: () => readOwnRequests(scope, personId, undefined, requestId),
       });
@@ -249,8 +262,10 @@ export function MemberPrivateLessonsContent({
             title: [
               t(($) => $.memberPrivateLessons.title),
               row.preferred_instructor_id
-                ? (instructors.data?.find((person) => person.id === row.preferred_instructor_id)
-                    ?.name ?? t(($) => $.memberPrivateLessons.unknownInstructor))
+                ? (!instructors.isError &&
+                    instructors.data?.find((person) => person.id === row.preferred_instructor_id)
+                      ?.name) ||
+                  t(($) => $.memberPrivateLessons.unknownInstructor)
                 : t(($) => $.memberPrivateLessons.noInstructor),
             ].join(" · "),
             metadata: date.format(new Date(row.requested_start)),
@@ -298,7 +313,7 @@ export function MemberPrivateLessonsContent({
           })) ?? null
         }
         onCreate={() => open("create")}
-        disabled={locked || Boolean(target) || !choicesReady || list.isPending || list.isError}
+        disabled={locked || Boolean(target) || list.isPending || list.isError}
         pagination={
           <div className="flex flex-wrap gap-2">
             <Button
@@ -346,8 +361,7 @@ export function MemberPrivateLessonsContent({
               }
               onPress={() => {
                 void list.refetch();
-                void disciplines.refetch();
-                void instructors.refetch();
+                if (showInstructors) void instructors.refetch();
               }}
             >
               {t(($) => $.memberPrivateLessons.retry)}
@@ -400,6 +414,13 @@ export function MemberPrivateLessonsContent({
           }
           notice={
             <>
+              {creating && (disciplines.isError || instructors.isError) && (
+                <Alert>
+                  <AlertDescription>
+                    {t(($) => $.memberPrivateLessons.catalogUnread)}
+                  </AlertDescription>
+                </Alert>
+              )}
               {error && (
                 <Alert variant="destructive">
                   <AlertDescription>{error}</AlertDescription>
@@ -439,6 +460,18 @@ export function MemberPrivateLessonsContent({
                   {t(($) => $.finance.retrySame)}
                 </Button>
               )}
+              {creating && (disciplines.isError || instructors.isError) && (
+                <Button
+                  variant="outline"
+                  isDisabled={locked || disciplines.isFetching || instructors.isFetching}
+                  onPress={() => {
+                    if (disciplines.isError) void disciplines.refetch();
+                    if (instructors.isError) void instructors.refetch();
+                  }}
+                >
+                  {t(($) => $.memberPrivateLessons.retry)}
+                </Button>
+              )}
               {["stale", "rejected"].includes(command.state) && (
                 <Button
                   variant="outline"
@@ -447,8 +480,7 @@ export function MemberPrivateLessonsContent({
                     command.reset();
                     setTarget(undefined);
                     void list.refetch();
-                    void disciplines.refetch();
-                    void instructors.refetch();
+                    if (showInstructors) void instructors.refetch();
                   }}
                 >
                   {t(($) => $.memberPrivateLessons.retry)}

@@ -108,7 +108,7 @@ function SessionDetailPage({
             )}
             {selection.organizationId === orgId && selection.centerId === centerId ? (
               <SessionDetailContent
-                key={`${account.id}:${selection.organizationId}:${selection.centerId}`}
+                key={`${account.id}:${selection.organizationId}:${selection.centerId}:${sessionId}`}
                 scope={{
                   accountId: account.id,
                   orgId: selection.organizationId,

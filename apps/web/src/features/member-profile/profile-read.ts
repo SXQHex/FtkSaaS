@@ -5,6 +5,9 @@ import type { EntitlementView, ProductView, DisciplineView } from "@ftksaas/api-
 import { getTemporal } from "../../lib/temporal";
 import { readProductsPage } from "../products/products";
 
+export const profileRightsKey = (scope: ClientScope, personId: string) =>
+  ["profile-rights", scope.accountId, scope.orgId, scope.centerId, personId] as const;
+
 export async function readProfileRights(
   scope: ClientScope,
   personId: string,

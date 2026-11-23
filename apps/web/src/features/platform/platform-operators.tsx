@@ -12,6 +12,7 @@ import { usePlatformActivity } from "./platform-activity-context";
 import { PlatformActionReview } from "./platform-action-review";
 import { billingReason } from "./platform-payment";
 import { PlatformReadError } from "./platform-read-error";
+import { cacheVerifiedReadback } from "../../lib/cache-invalidation";
 import {
   confirmOperator,
   operatorIntent,
@@ -330,12 +331,15 @@ export function PlatformOperators({
                 roster.find((row) => row.account_id === review.intent.target)?.display_name ??
                 undefined,
             });
-            client.setQueryData(key, current);
+            await cacheVerifiedReadback(client, key, current);
             setEmail("");
             setLookup(undefined);
             setReason("");
           }}
           onClose={() => {
+            setReview(undefined);
+          }}
+          onReload={() => {
             setReview(undefined);
             void roster.refetch();
           }}

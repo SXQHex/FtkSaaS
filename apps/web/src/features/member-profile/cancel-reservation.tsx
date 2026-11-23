@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useBlocker } from "@tanstack/react-router";
-import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
+import { capturePrivateReadback, invalidateCachedFamilies } from "../../lib/cache-invalidation";
 import { invalidateMemberReservationViews } from "../member-reservations/member-reservations-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -38,6 +38,7 @@ export function CancelReservation({
   sessionId,
   label,
   sourceAvailable,
+  recoveryOnly = false,
   onClose,
   onRefresh,
   onLockChange,
@@ -49,8 +50,9 @@ export function CancelReservation({
   sessionId: string;
   label: string;
   sourceAvailable: boolean;
+  recoveryOnly?: boolean;
   onClose: (saved: boolean) => void;
-  onRefresh: (result: CancellationResult) => Promise<void>;
+  onRefresh: (result: CancellationResult, assertCurrent: () => void) => Promise<void>;
   onLockChange: (locked: boolean) => void;
   onAccessLost: (error: unknown) => boolean;
 }) {
@@ -86,7 +88,7 @@ export function CancelReservation({
   }, [locked, onLockChange]);
   const { accountId, orgId, centerId } = scope;
   const load = useCallback(async () => {
-    if (terminal.current || executing.current) return;
+    if (recoveryOnly || terminal.current || executing.current) return;
     try {
       const next = await readCancellation(
         { accountId, orgId, centerId },
@@ -108,8 +110,19 @@ export function CancelReservation({
       } else setError(t(($) => $.memberProfile.cancelUnavailable));
       setState("rejected");
     }
-  }, [accountId, orgId, centerId, personId, reservationId, sessionId, onAccessLost, t]);
+  }, [
+    accountId,
+    orgId,
+    centerId,
+    personId,
+    reservationId,
+    sessionId,
+    onAccessLost,
+    t,
+    recoveryOnly,
+  ]);
   useEffect(() => {
+    if (recoveryOnly || intent.current) return;
     let active = true;
     void readCancellation({ accountId, orgId, centerId }, personId, reservationId, sessionId)
       .then((next) => {
@@ -131,10 +144,22 @@ export function CancelReservation({
     return () => {
       active = false;
     };
-  }, [accountId, orgId, centerId, personId, reservationId, sessionId, onAccessLost, t]);
+  }, [
+    accountId,
+    orgId,
+    centerId,
+    personId,
+    reservationId,
+    sessionId,
+    onAccessLost,
+    t,
+    recoveryOnly,
+  ]);
   async function reread() {
     if (!intent.current || !ack.current) return;
+    const assertCurrent = capturePrivateReadback(queries);
     const result = await readCancellationResult(intent.current, primary.current);
+    assertCurrent();
     if (!mounted.current || terminal.current) return;
     const subject = [accountId, orgId, centerId, personId] as const;
     await Promise.all([
@@ -144,7 +169,9 @@ export function CancelReservation({
         ["profile-rights", ...subject],
       ]),
     ]);
-    await onRefresh(result);
+    assertCurrent();
+    await onRefresh(result, assertCurrent);
+    assertCurrent();
     if (mounted.current && !terminal.current) setState("saved");
   }
   function failed(failure: unknown) {
@@ -271,14 +298,14 @@ export function CancelReservation({
   return (
     <MemberStateDialog
       action="cancelReservation"
-      name={label}
-      reason={reason}
-      reasonError={reasonError}
+      name={recoveryOnly ? "" : label}
+      reason={recoveryOnly ? "" : reason}
+      reasonError={recoveryOnly ? undefined : reasonError}
       pending={locked}
-      readOnly={state === "saved"}
+      readOnly={recoveryOnly || state === "saved"}
       completed={state === "saved"}
       onReason={(value) => {
-        if (!locked && state !== "saved") {
+        if (!recoveryOnly && !locked && state !== "saved") {
           setReason(value);
           setReasonError(undefined);
         }
@@ -286,7 +313,7 @@ export function CancelReservation({
       onClose={() => {
         if (!locked) onClose(state === "saved");
       }}
-      onConfirm={state === "ready" && sourceAvailable ? confirm : undefined}
+      onConfirm={!recoveryOnly && state === "ready" && sourceAvailable ? confirm : undefined}
       notice={
         <>
           <p className="text-sm text-muted-foreground">
@@ -321,7 +348,7 @@ export function CancelReservation({
               )}
             </div>
           )}
-          {["stale", "rejected"].includes(state) && (
+          {!recoveryOnly && ["stale", "rejected"].includes(state) && (
             <Button
               variant="outline"
               isDisabled={!sourceAvailable}

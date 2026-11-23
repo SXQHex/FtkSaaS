@@ -59,6 +59,7 @@ it("hydrates only visible upcoming session intervals, retaining cursor and nativ
   expect(reservations).toHaveBeenCalledWith(scope, person, "current", "upcoming", {
     sort: "starts_at_asc",
     includeSourceSummary: true,
+    includeAttendance: false,
   });
   expect(discovery).toHaveBeenCalledExactlyOnceWith(scope, {
     starts_at: session.starts_at,
@@ -88,7 +89,12 @@ it("shares the Query identity through the visible reservation, discovery and hea
     person,
     "current",
     "upcoming",
-    { sort: "starts_at_asc", includeSourceSummary: true },
+    {
+      sort: "starts_at_asc",
+      includeSourceSummary: true,
+      includeAttendance: false,
+      sessionId: undefined,
+    },
     readContext,
   );
   expect(discovery).toHaveBeenCalledExactlyOnceWith(
@@ -131,4 +137,23 @@ it("preserves revoked and transient errors rather than fabricating a policy", as
     discovery.mockRejectedValueOnce(error);
     await expect(readOwnReservations(scope, person, "upcoming")).rejects.toBe(error);
   }
+});
+
+it("shares one exact discovery interval for two different upcoming lessons", async () => {
+  const second = { ...session, id: id(77) };
+  reservations.mockResolvedValueOnce({
+    items: [
+      { reservation: { id: id(6), session_id: session.id, version: 2 }, session },
+      { reservation: { id: id(76), session_id: second.id, version: 2 }, session: second },
+    ],
+    nextCursor: null,
+    asOf: "2026-11-16T12:00:00Z",
+  });
+  discovery.mockResolvedValueOnce([
+    native(),
+    { ...native(), id: second.id, title: "İkinci görünür ders" },
+  ]);
+  const result = await readOwnReservations(scope, person, "upcoming");
+  expect(discovery).toHaveBeenCalledTimes(1);
+  expect(result.items.map((item) => item.title)).toEqual(["Görünür ders", "İkinci görünür ders"]);
 });

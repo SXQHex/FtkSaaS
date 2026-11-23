@@ -83,6 +83,10 @@ it("updates only the native student relation version and requires a newer matchi
   await expect(readStudentDisciplineResult(intent)).resolves.toMatchObject({
     discipline_relationships: person.discipline_relationships,
   });
+  expect(personRead).toHaveBeenLastCalledWith(scope, person.id, {
+    membershipDate: true,
+    memberSummary: true,
+  });
   expect(person.discipline_relationships[0]!.version).toBe(2);
   expect(person.discipline_relationships[1]!.version).toBe(8);
 });

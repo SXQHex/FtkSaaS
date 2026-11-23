@@ -15,7 +15,8 @@ import { scheduleBackendError } from "../schedule/schedule-presentation";
 import { EventRegistrationSheet } from "./event-registration-sheet";
 import { EventPaymentPanel } from "./event-payment-panel";
 import { EventActionDialog } from "./event-action-dialog";
-import { EventCommandNotice } from "./event-command-notice";
+import { EventCommandNotice, EventCommandRecovery } from "./event-command-notice";
+import { eventDetailKey } from "./event-query";
 import { EventPreviewEffects } from "./event-preview-effects";
 import {
   readDetailedEvent,
@@ -50,7 +51,8 @@ type RegistrationControllerProps = {
   registrationId?: string;
   selfPersonId?: string;
   onClose: () => void;
-  onSaved: () => Promise<void>;
+  onSaved: (detailVerified?: boolean) => Promise<void>;
+  recoveryOnly?: boolean;
   onLockChange: (value: boolean) => void;
   onAccessLost: (cause: unknown) => boolean;
 };
@@ -67,6 +69,7 @@ function NewEventRegistrationController({
   before,
   selfPersonId,
   onClose,
+  recoveryOnly = false,
   onSaved,
   onLockChange,
   onAccessLost,
@@ -75,7 +78,8 @@ function NewEventRegistrationController({
   before: EventView;
   selfPersonId?: string;
   onClose: () => void;
-  onSaved: () => Promise<void>;
+  onSaved: (detailVerified?: boolean) => Promise<void>;
+  recoveryOnly?: boolean;
   onLockChange: (value: boolean) => void;
   onAccessLost: (error: unknown) => boolean;
 }) {
@@ -108,7 +112,7 @@ function NewEventRegistrationController({
   const rights = useQuery({
     queryKey: ["event-registration-rights", scope.accountId, scope.orgId, scope.centerId, personId],
     queryFn: (readContext) => readProfileRights(scope, personId!, undefined, readContext),
-    enabled: !!personId,
+    enabled: !!personId && !recoveryOnly,
     retry: false,
   });
   const paymentKey = [
@@ -124,7 +128,7 @@ function NewEventRegistrationController({
     queryKey: paymentKey,
     queryFn: (readContext) =>
       readRegistrationPayment(scope, before.id, personId!, undefined, readContext),
-    enabled: !!personId,
+    enabled: !!personId && !recoveryOnly,
     retry: false,
     staleTime: 0,
     refetchOnMount: "always",
@@ -152,7 +156,13 @@ function NewEventRegistrationController({
       readIntoCurrentQuery(
         queries,
         paymentKey,
-        () => readRegistrationResult(intent, id),
+        () =>
+          readIntoCurrentQuery(
+            queries,
+            eventDetailKey(scope, before.id),
+            () => readRegistrationResult(intent, id),
+            (result) => result.event,
+          ),
         (result): RegistrationPayment =>
           result.outcome === "capacity_closed"
             ? { kind: "available", value: result.payment }
@@ -161,7 +171,7 @@ function NewEventRegistrationController({
     onAccessLost,
     onRefresh: async (result) => {
       if (result.outcome === "capacity_closed") setCapacityClosed(true);
-      await onSaved();
+      await onSaved(true);
     },
   });
   const prepareCommand = useMemberCommand({
@@ -332,6 +342,14 @@ function NewEventRegistrationController({
       />
     </>
   );
+  if (recoveryOnly)
+    return (
+      <EventCommandRecovery locked={locked} onClose={onClose}>
+        <EventCommandNotice command={registerCommand} onReload={onClose} />
+        <EventCommandNotice command={prepareCommand} onReload={onClose} />
+        <EventCommandNotice command={collectionCommand} onReload={onClose} />
+      </EventCommandRecovery>
+    );
   const facts = payment
     ? [
         {

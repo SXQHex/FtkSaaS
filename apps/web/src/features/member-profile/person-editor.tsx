@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useContext, useEffect, useId, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { PersonView } from "@ftksaas/api-contracts";
@@ -14,6 +14,7 @@ import { Field, FieldLabel, FieldDescription, FieldGroup } from "@ftksaas/ui/com
 import { Input } from "@ftksaas/ui/components/input";
 import { Button } from "@ftksaas/ui/components/button";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
+import { PrivateSessionRevision } from "../auth/private-session-revision";
 import { SettingsReviewDialog } from "../settings/settings-review-dialog";
 import { readPerson } from "../people/people";
 import { writablePersonField } from "../studio/instructor-identity";
@@ -25,6 +26,7 @@ import {
   writePersonEdit,
   personEditReceipt,
   readPersonEditResult,
+  type PersonEditDraft,
   type PersonEditIntent,
 } from "./person-edit";
 
@@ -35,11 +37,15 @@ interface Props {
   onClose: () => void;
   onLockChange: (value: boolean) => void;
   onAccessLost: (error: unknown) => boolean;
-  onRefresh: (person: PersonView) => Promise<void>;
+  onRefresh: (person: PersonView, assertCurrent: () => void) => Promise<void>;
 }
 export function PersonEditor(props: Props) {
-  const { t } = useTranslation();
   const { onAccessLost } = props;
+  const { t } = useTranslation(),
+    id = useId(),
+    form = useRef<HTMLFormElement>(null),
+    errorFocus = useRef<HTMLDivElement>(null);
+  const sessionRevision = useContext(PrivateSessionRevision);
   const query = useQuery({
     queryKey: [
       "person-editor",
@@ -47,6 +53,7 @@ export function PersonEditor(props: Props) {
       props.scope.orgId,
       props.scope.centerId,
       props.personId,
+      sessionRevision,
     ],
     queryFn: (readContext) => readPerson(props.scope, props.personId, undefined, readContext),
     retry: false,
@@ -57,61 +64,28 @@ export function PersonEditor(props: Props) {
   useEffect(() => {
     if (query.error) onAccessLost(query.error);
   }, [query.error, onAccessLost]);
-  if (query.data && !query.isError && !query.isFetching)
-    return <PersonEditForm {...props} person={query.data} />;
-  return (
-    <Sheet
-      isOpen
-      onOpenChange={(open) => {
-        if (!open) props.onClose();
-      }}
-      showCloseButton={false}
-    >
-      <SheetHeader>
-        <SheetTitle>{t(($) => $.personEdit.title)}</SheetTitle>
-        <SheetDescription>{t(($) => $.personEdit.description)}</SheetDescription>
-      </SheetHeader>
-      <div className="px-6 py-4" role={query.isError ? "alert" : "status"}>
-        {query.isError ? t(($) => $.personEdit.sourceError) : t(($) => $.people.loading)}
-      </div>
-      <SheetFooter>
-        <Button variant="outline" onPress={props.onClose}>
-          {t(($) => $.memberProfile.close)}
-        </Button>
-        {query.isError && (
-          <Button
-            onPress={() => {
-              void query.refetch();
-            }}
-          >
-            {t(($) => $.people.retry)}
-          </Button>
-        )}
-      </SheetFooter>
-    </Sheet>
-  );
-}
-function PersonEditForm({ person, ...props }: Props & { person: PersonView }) {
-  const { t } = useTranslation(),
-    id = useId(),
-    form = useRef<HTMLFormElement>(null),
-    errorFocus = useRef<HTMLDivElement>(null);
-  const [draft, setDraft] = useState(() => personEditDraft(person)),
+  const person =
+    props.sourceAvailable && !query.isError && !query.isFetching ? query.data : undefined;
+  const [edit, setEdit] = useState<{ revision: number; draft: PersonEditDraft }>(),
     [preparing, setPreparing] = useState(false),
     [error, setError] = useState<"invalid" | "sourceError" | "same">(),
-    [review, setReview] = useState<PersonEditIntent>(),
+    [prepared, setPrepared] = useState<{ revision: number; value: PersonEditIntent }>(),
     [accepted, setAccepted] = useState(false);
+  const draft = edit?.revision === sessionRevision ? edit.draft : person && personEditDraft(person);
+  const setDraft = (value: PersonEditDraft) => setEdit({ revision: sessionRevision, draft: value });
   const command = useMemberCommand({
     write: writePersonEdit,
     readReceipt: personEditReceipt,
     readResult: readPersonEditResult,
     onRefresh: props.onRefresh,
-    onAccessLost: props.onAccessLost,
+    onAccessLost,
   });
   const { onLockChange } = props;
   const commandState = command.state;
-  const locked = preparing || command.locked,
-    disabled = locked || !!review || !props.sourceAvailable;
+  const locked = preparing || command.locked;
+  const currentReview = prepared?.revision === sessionRevision;
+  const review = currentReview || command.state !== "ready" ? prepared?.value : undefined;
+  const disabled = locked || !!review || !person;
   useEffect(() => {
     onLockChange(locked);
     return () => onLockChange(false);
@@ -120,7 +94,7 @@ function PersonEditForm({ person, ...props }: Props & { person: PersonView }) {
     if (error) errorFocus.current?.focus();
   }, [error]);
   async function prepare() {
-    if (disabled) return;
+    if (disabled || !person || !draft) return;
     if (!form.current?.reportValidity()) return;
     try {
       personEditPatch(person, draft);
@@ -131,10 +105,11 @@ function PersonEditForm({ person, ...props }: Props & { person: PersonView }) {
     setPreparing(true);
     setError(undefined);
     try {
-      setReview(await preparePersonEdit(props.scope, person, draft));
+      const value = await preparePersonEdit(props.scope, person, draft);
+      setPrepared({ revision: sessionRevision, value });
       setAccepted(false);
     } catch (failure) {
-      if (!props.onAccessLost(failure))
+      if (!onAccessLost(failure))
         setError(
           failure instanceof Error && failure.message === "PERSON_EDIT_NO_CHANGE"
             ? "same"
@@ -161,102 +136,123 @@ function PersonEditForm({ person, ...props }: Props & { person: PersonView }) {
           <SheetTitle id={id + "-title"}>{t(($) => $.personEdit.title)}</SheetTitle>
           <SheetDescription>{t(($) => $.personEdit.description)}</SheetDescription>
         </SheetHeader>
-        <form
-          ref={form}
-          id={id}
-          method="post"
-          aria-labelledby={id + "-title"}
-          className="flex min-h-0 flex-1 flex-col gap-4 overflow-auto px-6 py-4"
-          onSubmit={(event) => {
-            event.preventDefault();
-            void prepare();
-          }}
-        >
-          <FieldDescription id={id + "-policy"}>{t(($) => $.personEdit.readonly)}</FieldDescription>
-          <FieldGroup>
-            <Field>
-              <FieldLabel htmlFor={id + "-name"}>{t(($) => $.people.fullName)}</FieldLabel>
-              <Input
-                id={id + "-name"}
-                name="display_name"
-                autoComplete="off"
-                required
-                autoFocus
-                value={draft.name}
-                disabled={disabled}
-                readOnly={!writablePersonField(person.field_policy?.display_name)}
-                aria-describedby={id + "-policy"}
-                onChange={(event) => {
-                  setDraft({ ...draft, name: event.target.value });
-                  setError(undefined);
-                }}
-              />
-            </Field>
-            {draft.contacts.map((contact, index) => (
-              <Field key={index}>
-                <FieldLabel htmlFor={`${id}-contact-${index}`}>
-                  {label(contact.kind)} {index + 1}
-                </FieldLabel>
+        {person && draft ? (
+          <form
+            ref={form}
+            id={id}
+            method="post"
+            aria-labelledby={id + "-title"}
+            className="flex min-h-0 flex-1 flex-col gap-4 overflow-auto px-6 py-4"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void prepare();
+            }}
+          >
+            <FieldDescription id={id + "-policy"}>
+              {t(($) => $.personEdit.readonly)}
+            </FieldDescription>
+            <FieldGroup>
+              <Field>
+                <FieldLabel htmlFor={id + "-name"}>{t(($) => $.people.fullName)}</FieldLabel>
                 <Input
-                  id={`${id}-contact-${index}`}
-                  name={`contact-${index}`}
-                  type={contact.kind === "email" ? "email" : "tel"}
+                  id={id + "-name"}
+                  name="display_name"
                   autoComplete="off"
-                  autoCapitalize="none"
-                  spellCheck={false}
-                  value={contact.value}
+                  required
+                  autoFocus
+                  value={draft.name}
                   disabled={disabled}
-                  readOnly={
-                    index < (person.contacts?.length ?? 0) &&
-                    !writablePersonField(person.contacts?.[index]?.field_policy)
-                  }
+                  readOnly={!writablePersonField(person.field_policy?.display_name)}
                   aria-describedby={id + "-policy"}
                   onChange={(event) => {
-                    setDraft({
-                      ...draft,
-                      contacts: draft.contacts.map((row, i) =>
-                        i === index ? { ...row, value: event.target.value } : row,
-                      ),
-                    });
+                    setDraft({ ...draft, name: event.target.value });
                     setError(undefined);
                   }}
                 />
               </Field>
-            ))}
-          </FieldGroup>
-          <div className="flex flex-wrap gap-2">
-            {(["email", "phone"] as const).map((kind) => (
-              <Button
-                key={kind}
-                type="button"
-                variant="outline"
-                isDisabled={disabled || !person.contacts}
-                onPress={() => {
-                  setDraft({ ...draft, contacts: [...draft.contacts, { kind, value: "" }] });
-                  setError(undefined);
-                }}
-              >
-                {kind === "email"
-                  ? t(($) => $.personEdit.addEmail)
-                  : t(($) => $.personEdit.addPhone)}
-              </Button>
-            ))}
-          </div>
-          {error && (
-            <div ref={errorFocus} tabIndex={-1}>
-              <Alert role="alert" variant={error === "same" ? "default" : "destructive"}>
-                <AlertDescription>{t(($) => $.personEdit[error])}</AlertDescription>
-              </Alert>
+              {draft.contacts.map((contact, index) => (
+                <Field key={index}>
+                  <FieldLabel htmlFor={`${id}-contact-${index}`}>
+                    {label(contact.kind)} {index + 1}
+                  </FieldLabel>
+                  <Input
+                    id={`${id}-contact-${index}`}
+                    name={`contact-${index}`}
+                    type={contact.kind === "email" ? "email" : "tel"}
+                    autoComplete="off"
+                    autoCapitalize="none"
+                    spellCheck={false}
+                    value={contact.value}
+                    disabled={disabled}
+                    readOnly={
+                      index < (person.contacts?.length ?? 0) &&
+                      !writablePersonField(person.contacts?.[index]?.field_policy)
+                    }
+                    aria-describedby={id + "-policy"}
+                    onChange={(event) => {
+                      setDraft({
+                        ...draft,
+                        contacts: draft.contacts.map((row, i) =>
+                          i === index ? { ...row, value: event.target.value } : row,
+                        ),
+                      });
+                      setError(undefined);
+                    }}
+                  />
+                </Field>
+              ))}
+            </FieldGroup>
+            <div className="flex flex-wrap gap-2">
+              {(["email", "phone"] as const).map((kind) => (
+                <Button
+                  key={kind}
+                  type="button"
+                  variant="outline"
+                  isDisabled={disabled || !person.contacts}
+                  onPress={() => {
+                    setDraft({ ...draft, contacts: [...draft.contacts, { kind, value: "" }] });
+                    setError(undefined);
+                  }}
+                >
+                  {kind === "email"
+                    ? t(($) => $.personEdit.addEmail)
+                    : t(($) => $.personEdit.addPhone)}
+                </Button>
+              ))}
             </div>
-          )}
-        </form>
+            {error && (
+              <div ref={errorFocus} tabIndex={-1}>
+                <Alert role="alert" variant={error === "same" ? "default" : "destructive"}>
+                  <AlertDescription>{t(($) => $.personEdit[error])}</AlertDescription>
+                </Alert>
+              </div>
+            )}
+          </form>
+        ) : (
+          <div
+            className="px-6 py-4"
+            role={query.isError || !props.sourceAvailable ? "alert" : "status"}
+          >
+            {query.isError || !props.sourceAvailable
+              ? t(($) => $.personEdit.sourceError)
+              : t(($) => $.people.loading)}
+          </div>
+        )}
         <SheetFooter>
           <Button type="button" variant="outline" isDisabled={locked} onPress={props.onClose}>
             {t(($) => $.memberProfile.close)}
           </Button>
-          <Button type="submit" form={id} isDisabled={disabled}>
-            {t(($) => $.personEdit.review)}
-          </Button>
+          {person ? (
+            <Button type="submit" form={id} isDisabled={disabled}>
+              {t(($) => $.personEdit.review)}
+            </Button>
+          ) : (
+            query.isError && (
+              <Button isDisabled={command.busy} onPress={() => void query.refetch()}>
+                {t(($) => $.people.retry)}
+              </Button>
+            )
+          )}
         </SheetFooter>
       </Sheet>
       {review && (
@@ -264,37 +260,43 @@ function PersonEditForm({ person, ...props }: Props & { person: PersonView }) {
           open
           title={t(($) => $.personEdit.review)}
           description={t(($) => $.personEdit.description)}
-          rows={[
-            {
-              id: "before",
-              title: t(($) => $.personEdit.before),
-              detail: info(review.before.name, review.before.contacts),
-            },
-            {
-              id: "after",
-              title: t(($) => $.personEdit.after),
-              detail: info(
-                review.patch.display_name ?? review.before.name,
-                review.patch.contacts ?? review.before.contacts,
-              ),
-            },
-          ]}
-          accepted={accepted}
+          rows={
+            person && currentReview
+              ? [
+                  {
+                    id: "before",
+                    title: t(($) => $.personEdit.before),
+                    detail: info(review.before.name, review.before.contacts),
+                  },
+                  {
+                    id: "after",
+                    title: t(($) => $.personEdit.after),
+                    detail: info(
+                      review.patch.display_name ?? review.before.name,
+                      review.patch.contacts ?? review.before.contacts,
+                    ),
+                  },
+                ]
+              : []
+          }
+          accepted={Boolean(person && currentReview && accepted)}
           locked={locked}
-          onAccepted={command.state === "ready" ? setAccepted : undefined}
+          onAccepted={
+            person && currentReview && command.state === "ready" ? setAccepted : undefined
+          }
           onClose={
             command.state === "saved"
               ? props.onClose
               : () => {
                   if (!locked) {
-                    setReview(undefined);
+                    setPrepared(undefined);
                     setAccepted(false);
                     command.reset();
                   }
                 }
           }
           onApply={
-            accepted && command.state === "ready"
+            person && currentReview && accepted && command.state === "ready"
               ? () => {
                   void command.start(review);
                 }

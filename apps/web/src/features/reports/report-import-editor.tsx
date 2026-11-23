@@ -12,6 +12,11 @@ import type {
   ImportRowState,
 } from "@ftksaas/api-contracts";
 import { formatMinorAmount } from "../../lib/money";
+import {
+  cacheVerifiedReadback,
+  capturePrivateReadback,
+  invalidateCachedFamilies,
+} from "../../lib/cache-invalidation";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { invalidatePeoplePages } from "../people/people-query";
 import { invalidateLeadPages } from "../leads/leads-query";
@@ -151,8 +156,10 @@ export function ReportImportEditor({
     readReceipt: reportJobReceipt,
     readResult: readReportJob,
     onAccessLost: lost,
-    onRefresh: async (job) => {
-      queries.setQueryData(["report-import-job", scope, job.id], job);
+    onRefresh: async (job, assertCurrent) => {
+      assertCurrent();
+      await cacheVerifiedReadback(queries, ["report-import-job", scope, job.id], job);
+      assertCurrent();
       setJob(job.id);
       setRowsOnly(false);
       setCursors([undefined]);
@@ -179,7 +186,7 @@ export function ReportImportEditor({
   });
   const job = useQuery({
     queryKey: ["report-import-job", scope, jobId],
-    queryFn: () => readJob(scope, jobId!),
+    queryFn: (context) => readJob(scope, jobId!, context),
     enabled: !!jobId && !unavailable,
     retry: false,
     refetchOnWindowFocus: false,
@@ -193,7 +200,7 @@ export function ReportImportEditor({
       : undefined;
   const preview = useQuery({
     queryKey: ["report-import-preview", scope, previewId],
-    queryFn: () => readImportPreview(scope, previewId!),
+    queryFn: (context) => readImportPreview(scope, previewId!, context),
     enabled: !!previewId && !unavailable,
     retry: false,
     refetchOnWindowFocus: false,
@@ -202,15 +209,16 @@ export function ReportImportEditor({
   const state = filter === "all" ? undefined : (filter as ImportRowState);
   const applyFinished =
     phase === "apply" && (currentJob?.state === "succeeded" || currentJob?.state === "failed");
+  const rowsEnabled = Boolean(currentJob && (phase === "preview" || applyFinished));
   const rows = useQuery({
-    queryKey: ["report-import-rows", scope, jobId, state, cursors[index], applyFinished],
+    queryKey: ["report-import-rows", scope, jobId, state, cursors[index], phase],
     queryFn: (context) =>
-      readImportRows(scope, jobId!, state, cursors[index], applyFinished, context),
-    enabled: !!jobId && !unavailable,
+      readImportRows(scope, jobId!, state, cursors[index], phase === "apply", context),
+    enabled: rowsEnabled,
     retry: false,
     refetchOnWindowFocus: false,
   });
-  const currentRows = !rows.isError && !unavailable ? rows.data : undefined;
+  const currentRows = rowsEnabled && !rows.isError ? rows.data : undefined;
   const knownValid = useRef(new Set<number>());
   useEffect(() => {
     if (currentRows)
@@ -232,7 +240,14 @@ export function ReportImportEditor({
       return;
     refreshedImport.current = jobId;
     void (kind === "students"
-      ? invalidatePeoplePages(queries, scope)
+      ? Promise.all([
+          invalidatePeoplePages(queries, scope),
+          invalidateCachedFamilies(queries, [
+            ["report-view", scope, "weeks", "sales"],
+            ["report-view", scope, "products", "sales"],
+            ["report-finance-summary", scope],
+          ]),
+        ])
       : invalidateLeadPages(queries, scope));
   }, [applySummary, job.fetchStatus, jobId, kind, queries, rows.fetchStatus, scope]);
   useEffect(() => {
@@ -375,13 +390,22 @@ export function ReportImportEditor({
     await command.start(applyIntent.current);
   }
   async function refresh() {
+    const assertCurrent = capturePrivateReadback(queries);
     setError(false);
     try {
+      const { data: latest } = await job.refetch({ throwOnError: true });
+      if (!latest || latest.id !== jobId) throw Error("REPORT_JOB_INVALID");
+      assertCurrent();
       await Promise.all([
-        job.refetch({ throwOnError: true }),
-        rows.refetch({ throwOnError: true }),
-        ...(previewId ? [preview.refetch({ throwOnError: true })] : []),
+        ...(rowsEnabled &&
+        (phase === "preview" || latest.state === "succeeded" || latest.state === "failed")
+          ? [rows.refetch({ throwOnError: true })]
+          : []),
+        ...(previewId && latest.state === "succeeded" && latest.result_reference?.id === previewId
+          ? [preview.refetch({ throwOnError: true })]
+          : []),
       ]);
+      assertCurrent();
       await onSaved();
     } catch (cause) {
       if (mounted.current && !lost(cause)) setError(true);

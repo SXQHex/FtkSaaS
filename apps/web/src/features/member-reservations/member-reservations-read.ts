@@ -20,6 +20,7 @@ export async function readOwnReservations(
     {
       sort: filter === "upcoming" ? "starts_at_asc" : "created_at_desc",
       includeSourceSummary: true,
+      ...(filter === "upcoming" ? { includeAttendance: false } : {}),
       sessionId,
     },
     ...(readContext ? ([readContext] as const) : []),
@@ -30,6 +31,7 @@ export async function readOwnReservations(
     ).values(),
   ];
   const titles = new Map<string, string>();
+  const discoveryReads = new Map<string, ReturnType<typeof readMemberClasses>>();
   const details = new Map<
     string,
     { instructors: string[]; rooms: string[]; cancellation: MemberLessonCancellation }
@@ -39,16 +41,18 @@ export async function readOwnReservations(
       sessions.slice(index, index + 4).map(async (session) => {
         try {
           if (filter === "upcoming" && session.state === "planned") {
-            const native = (
-              await readMemberClasses(
+            const interval = { starts_at: session.starts_at, ends_at: session.ends_at };
+            const intervalKey = interval.starts_at + "/" + interval.ends_at;
+            let read = discoveryReads.get(intervalKey);
+            if (!read) {
+              read = readMemberClasses(
                 scope,
-                {
-                  starts_at: session.starts_at,
-                  ends_at: session.ends_at,
-                },
+                interval,
                 ...(readContext ? ([readContext] as const) : []),
-              )
-            ).find((row) => row.id === session.id);
+              );
+              discoveryReads.set(intervalKey, read);
+            }
+            const native = (await read).find((row) => row.id === session.id);
             if (native) {
               titles.set(session.id, native.title);
               const own = native.member_lesson.own_reservation;

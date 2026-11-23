@@ -56,7 +56,7 @@ export async function scopedBackend(
     const call: typeof backend.call = async (operation, body) => {
       await currentSession();
       try {
-        return await backend.call(operation, body);
+        return await backend.read(operation, body, context.signal);
       } finally {
         // A late denial from an old bearer must not revoke the new session.
         await currentSession();
@@ -65,7 +65,7 @@ export async function scopedBackend(
     const read: typeof backend.read = async (operation, body, readSignal) => {
       await currentSession();
       try {
-        return await backend.read(operation, body, readSignal);
+        return await backend.read(operation, body, readSignal ?? context.signal);
       } finally {
         await currentSession();
       }

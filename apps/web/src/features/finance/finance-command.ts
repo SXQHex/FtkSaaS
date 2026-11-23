@@ -1,3 +1,4 @@
+import type { FinanceView } from "@ftksaas/api-contracts";
 import {
   writeCollection,
   readCollectionReceipt,
@@ -44,16 +45,26 @@ export function readFinanceReceipt(intent: FinanceIntent) {
       return readDebtReceipt(intent);
   }
 }
-export function readFinanceResult(intent: FinanceIntent, id?: string) {
+export async function readFinanceResult(intent: FinanceIntent, id?: string) {
+  let firstPage: FinanceView | undefined;
+  const remember = (page: FinanceView) => {
+    firstPage = page;
+  };
   switch (intent.operation) {
     case "collection_record_v1":
-      return readCollectionResult(intent, id);
+      await readCollectionResult(intent, id, remember);
+      break;
     case "collection_correct_apply_v1":
-      return readCorrectionResult(intent, id);
+      await readCorrectionResult(intent, id, remember);
+      break;
     case "student_credit_refund_v1":
-      return readCreditRefundResult(intent, id);
+      await readCreditRefundResult(intent, id, remember);
+      break;
     case "student_credit_offset_v1":
     case "debt_adjust_v1":
-      return readDebtResult(intent, id);
+      await readDebtResult(intent, id, remember);
+      break;
   }
+  if (!firstPage) throw new Error("FINANCE_FIRST_PAGE_UNAVAILABLE");
+  return firstPage;
 }

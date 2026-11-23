@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { SessionBookingSheet, type SessionBookingDraft } from "./session-detail-panels";
+import {
+  SessionBookingSheet,
+  SessionCommandRecovery,
+  type SessionBookingDraft,
+} from "./session-detail-panels";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { SessionView } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
@@ -11,6 +15,10 @@ import { readPeoplePage } from "../people/people";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { readScheduleSession } from "../schedule/schedule-read";
 import { scheduleBackendError } from "../schedule/schedule-presentation";
+import {
+  invalidateMemberReservationViews,
+  memberReservationKeys,
+} from "../member-reservations/member-reservations-query";
 import { readSessionParticipants } from "./session-detail-read";
 import {
   readBookingRights,
@@ -25,6 +33,7 @@ export function SessionBookingEditor({
   scope,
   session,
   title,
+  recoveryOnly = false,
   onClose,
   onLockChange,
   onAccessLost,
@@ -33,12 +42,14 @@ export function SessionBookingEditor({
   scope: ClientScope;
   session: SessionView;
   title: string;
+  recoveryOnly?: boolean;
   onClose: () => void;
   onLockChange: (value: boolean) => void;
   onAccessLost: (error: unknown) => boolean;
   onRefresh: () => Promise<void>;
 }) {
   const { t } = useTranslation();
+  const queries = useQueryClient();
   const [draft, setDraft] = useState<SessionBookingDraft>({
     query: "",
     personId: "",
@@ -67,21 +78,21 @@ export function SessionBookingEditor({
     queryKey: [...prefix, "people", query, cursors[page]],
     queryFn: (readContext) =>
       readPeoplePage(scope, query!, cursors[page], "active", undefined, undefined, readContext),
-    enabled: query !== undefined,
+    enabled: !recoveryOnly && query !== undefined,
     retry: false,
   });
   const rights = useQuery({
-    queryKey: [...prefix, "rights", draft.personId, draft.mode],
+    queryKey: memberReservationKeys.bookingRights(scope, draft.personId, session.id, draft.mode),
     queryFn: (readContext) =>
       readBookingRights(scope, draft.personId, session.id, draft.mode, readContext),
-    enabled: Boolean(draft.personId),
+    enabled: !recoveryOnly && Boolean(draft.personId),
     retry: false,
   });
   const override = useQuery({
     queryKey: [...prefix, "override", draft.personId, draft.saleId],
     queryFn: (readContext) =>
       readCapacityOverride(scope, draft.personId, session.id, draft.saleId, readContext),
-    enabled: Boolean(draft.personId && draft.saleId),
+    enabled: !recoveryOnly && Boolean(draft.personId && draft.saleId),
     retry: false,
   });
   const command = useMemberCommand({
@@ -101,8 +112,11 @@ export function SessionBookingEditor({
     readReceipt: readSessionBookingReceipt,
     readResult: readSessionBookingResult,
     onAccessLost,
-    onRefresh: async () => {
+    onRefresh: async (result, assertCurrent) => {
+      await invalidateMemberReservationViews(queries, scope, result.reservation.person_id);
+      assertCurrent();
       await onRefresh();
+      assertCurrent();
       await rights.refetch({ throwOnError: true });
     },
   });
@@ -201,6 +215,50 @@ export function SessionBookingEditor({
     if (query !== undefined) await people.refetch();
   }
   const stateText = t(($) => $.sessionDetail.bookingStates[command.state]);
+  const recovery = (
+    <div className="flex flex-wrap gap-2">
+      {["unknown", "pending", "saved-unread"].includes(command.state) && (
+        <Button
+          variant="outline"
+          isDisabled={command.busy}
+          onPress={() => {
+            void command.readReceipt();
+          }}
+        >
+          {t(($) => $.sessionDetail.readReceipt)}
+        </Button>
+      )}
+      {command.state === "unknown" && (
+        <Button
+          variant="outline"
+          isDisabled={command.busy}
+          onPress={() => {
+            void command.retry();
+          }}
+        >
+          {t(($) => $.sessionDetail.retryWrite)}
+        </Button>
+      )}
+      {["stale", "rejected"].includes(command.state) && (
+        <Button
+          variant="outline"
+          isDisabled={locked}
+          onPress={() => {
+            void refresh();
+          }}
+        >
+          {t(($) => $.sessionDetail.readSources)}
+        </Button>
+      )}
+    </div>
+  );
+  if (recoveryOnly)
+    return locked ? (
+      <SessionCommandRecovery>
+        {stateText && <p role="status">{stateText}</p>}
+        {recovery}
+      </SessionCommandRecovery>
+    ) : null;
   return (
     <SessionBookingSheet
       open
@@ -310,43 +368,7 @@ export function SessionBookingEditor({
           {stateText && <p role="status">{stateText}</p>}
         </>
       }
-      recovery={
-        <div className="flex flex-wrap gap-2">
-          {["unknown", "pending", "saved-unread"].includes(command.state) && (
-            <Button
-              variant="outline"
-              isDisabled={command.busy}
-              onPress={() => {
-                void command.readReceipt();
-              }}
-            >
-              {t(($) => $.sessionDetail.readReceipt)}
-            </Button>
-          )}
-          {command.state === "unknown" && (
-            <Button
-              variant="outline"
-              isDisabled={command.busy}
-              onPress={() => {
-                void command.retry();
-              }}
-            >
-              {t(($) => $.sessionDetail.retryWrite)}
-            </Button>
-          )}
-          {["stale", "rejected"].includes(command.state) && (
-            <Button
-              variant="outline"
-              isDisabled={locked}
-              onPress={() => {
-                void refresh();
-              }}
-            >
-              {t(($) => $.sessionDetail.readSources)}
-            </Button>
-          )}
-        </div>
-      }
+      recovery={recovery}
     />
   );
 }

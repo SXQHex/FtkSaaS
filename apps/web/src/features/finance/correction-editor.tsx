@@ -10,7 +10,7 @@ import {
   type CorrectionReview,
 } from "./correction";
 import { financeDraft, type FinanceSelection } from "./finance";
-import { useFinanceCommand } from "./use-finance-command";
+import { useFinanceCommand, type FinanceReadback } from "./use-finance-command";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
 import { Button } from "@ftksaas/ui/components/button";
@@ -35,7 +35,7 @@ export function CorrectionEditor({
   personLabel: string;
   sourceAvailable: boolean;
   onClose: () => void;
-  onRefresh: () => Promise<void>;
+  onRefresh: FinanceReadback;
   onLockChange: (locked: boolean) => void;
   onAccessLost: (error: unknown) => boolean;
 }) {
@@ -56,9 +56,7 @@ export function CorrectionEditor({
   });
   const command = useFinanceCommand({
     onAccessLost,
-    onRefresh: async () => {
-      await onRefresh();
-    },
+    onRefresh,
   });
   const locked = reading || preparing || command.locked;
   useEffect(() => {

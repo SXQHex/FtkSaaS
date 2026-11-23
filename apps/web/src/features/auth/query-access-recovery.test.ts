@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { QueryClient } from "@tanstack/react-query";
 import { BackendError } from "../../lib/backend";
+import { advancePrivateQueryRevision, capturePrivateReadback } from "../../lib/cache-invalidation";
 import type { SafeError } from "@ftksaas/api-contracts";
 import { accountQueryKeys } from "./account-query";
 import { workspaceKeys, workspaceQuery } from "../workspace/workspace-query";
@@ -454,6 +455,80 @@ describe("M06: cross-feature access reconciliation", () => {
     ).rejects.toThrow("AUTH_REQUIRED");
     await vi.waitFor(() => expect(actions.showLogin).toHaveBeenCalledOnce());
     expect(queries.getQueryCache().getAll()).toHaveLength(0);
+    stop();
+  });
+
+  it.each(["denial", "success"] as const)(
+    "ignores an old authority %s after a same-actor session handoff",
+    async (response) => {
+      const { queries, actions } = fixture();
+      let release!: () => void;
+      workspaceRead.mockImplementationOnce(
+        () =>
+          new Promise<Workspace>((resolve, reject) => {
+            release = () =>
+              response === "success"
+                ? resolve(view({ manager: false, accessible: false }))
+                : reject(error("SESSION_REVOKED"));
+          }),
+      );
+      const stop = observeQueryAccessFailures(queries, actions);
+      const key = workspaceKeys.projection(accountId, orgId);
+      await expect(
+        queries.fetchQuery({
+          queryKey: ["lead-applications", accountId, orgId, centerId],
+          queryFn: async () => {
+            throw error("FORBIDDEN");
+          },
+        }),
+      ).rejects.toThrow("FORBIDDEN");
+      await vi.waitFor(() => expect(workspaceRead).toHaveBeenCalledOnce());
+      advancePrivateQueryRevision(queries);
+      queries.removeQueries();
+      queries.setQueryData(accountQueryKeys.projection("native-a"), { id: accountId });
+      queries.setQueryData(key, view());
+      release();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(queries.getQueryData(key)).toEqual(view());
+      expect(actions.showLogin).not.toHaveBeenCalled();
+      expect(actions.invalidateRoute).not.toHaveBeenCalled();
+      stop();
+    },
+  );
+
+  it("recovers a later permission loss after an account change with one native recheck", async () => {
+    const { queries, actions } = fixture();
+    const stop = observeQueryAccessFailures(queries, actions);
+    const fail = (key: string, reason: Error) =>
+      queries.fetchQuery({
+        queryKey: [key, accountId, orgId, centerId],
+        queryFn: async () => {
+          throw reason;
+        },
+      });
+
+    await expect(fail("people", new Error("ACCOUNT_CHANGED"))).rejects.toThrow("ACCOUNT_CHANGED");
+    await vi.waitFor(() => expect(actions.onChecking).toHaveBeenLastCalledWith(false));
+    queries.setQueryData(accountQueryKeys.projection("native-a"), { id: accountId });
+    queries.setQueryData(workspaceKeys.projection(accountId, orgId), view());
+    const assertReadback = capturePrivateReadback(queries);
+    let release!: () => void;
+    workspaceRead.mockImplementationOnce(
+      () =>
+        new Promise<Workspace>((resolve) => {
+          release = () => resolve(view({ manager: false, accessible: false }));
+        }),
+    );
+    await Promise.all([
+      expect(fail("people", error("FORBIDDEN"))).rejects.toThrow("FORBIDDEN"),
+      expect(fail("leads", error("FORBIDDEN"))).rejects.toThrow("FORBIDDEN"),
+    ]);
+    await vi.waitFor(() => expect(workspaceRead).toHaveBeenCalledOnce());
+    release();
+    await vi.waitFor(() => expect(actions.invalidateRoute).toHaveBeenCalledTimes(2));
+    expect(workspaceRead).toHaveBeenCalledOnce();
+    expect(assertReadback).toThrow("PRIVATE_QUERY_CHANGED");
+    expect(actions.showLogin).not.toHaveBeenCalled();
     stop();
   });
 });

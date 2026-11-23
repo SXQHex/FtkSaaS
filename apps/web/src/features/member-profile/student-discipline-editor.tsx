@@ -49,7 +49,7 @@ export function StudentDisciplineEditor({
   onClose: () => void;
   onLockChange: (value: boolean) => void;
   onAccessLost: (error: unknown) => boolean;
-  onRefresh: (person: PersonView) => Promise<void>;
+  onRefresh: (person: PersonView, assertCurrent: () => void) => Promise<void>;
 }) {
   const { t } = useTranslation(),
     id = useId(),

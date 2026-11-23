@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useBlocker } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { BackendError } from "../../lib/backend";
+import { capturePrivateReadback } from "../../lib/cache-invalidation";
 import { StudioResourceForm, type ResourceSelection } from "./resource-form";
 import {
   eligibleDisciplines,
@@ -46,6 +48,7 @@ export function StudioResourceEditor({
   onLockChange?: (locked: boolean) => void;
 }) {
   const { t } = useTranslation();
+  const queries = useQueryClient();
   const [base, setBase] = useState<ResourceRecord>();
   const [initial, setInitial] = useState(() => resourceDraft());
   const [revision, setRevision] = useState(0);
@@ -73,9 +76,11 @@ export function StudioResourceEditor({
     mounted.current = true;
     let active = true;
     if (id) {
+      const assertCurrent = capturePrivateReadback(queries);
       void readStudioResource({ accountId, orgId, centerId }, kind, id)
         .then((value) => {
           if (!active) return;
+          assertCurrent();
           setBase(value);
           setInitial(resourceDraft(value));
           setRevision((value) => value + 1);
@@ -89,17 +94,20 @@ export function StudioResourceEditor({
       active = false;
       mounted.current = false;
     };
-  }, [accountId, orgId, centerId, kind, id]);
+  }, [accountId, orgId, centerId, kind, id, queries]);
 
   async function reload() {
     if (locked.current) return;
     locked.current = true;
     setBusy(true);
     try {
+      const assertCurrent = capturePrivateReadback(queries);
       const next = selection.id
         ? await readStudioResource(scope, selection.kind, selection.id)
         : undefined;
+      assertCurrent();
       await onRefresh();
+      assertCurrent();
       if (!mounted.current) return;
       setBase(next);
       setInitial(resourceDraft(next));
@@ -116,7 +124,9 @@ export function StudioResourceEditor({
   }
 
   async function reread() {
+    const assertCurrent = capturePrivateReadback(queries);
     const next = await onRefresh();
+    assertCurrent();
     const items = selection.kind === "room" ? next.rooms : next.classes;
     if (!acceptedId.current || !items.some((item) => item.id === acceptedId.current))
       throw new Error("STUDIO_UNAVAILABLE");
@@ -146,7 +156,11 @@ export function StudioResourceEditor({
     setBusy(true);
     setFailureCode(undefined);
     try {
-      const result = await saveStudioResource(intent);
+      const assertCurrent = capturePrivateReadback(queries);
+      const result = await saveStudioResource(intent).catch((error: unknown) => {
+        assertCurrent();
+        throw error;
+      });
       acceptedId.current = result.primary_id!;
       pending.current = undefined;
       if (mounted.current) setNotice("saved-unread");

@@ -13,7 +13,11 @@ import { BackendError } from "../../lib/backend";
 import { formatMinorAmount } from "../../lib/money";
 import { SessionAttendance } from "./session-detail-view";
 import { AttendanceCorrectionRequests } from "./attendance-correction-requests";
-import { SessionAttendanceStart, SessionAttendanceClose } from "./session-detail-panels";
+import {
+  SessionAttendanceStart,
+  SessionAttendanceClose,
+  SessionCommandRecovery,
+} from "./session-detail-panels";
 import { SettingsReviewDialog } from "../settings/settings-review-dialog";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { scheduleBackendError } from "../schedule/schedule-presentation";
@@ -45,6 +49,7 @@ export function SessionAttendanceController({
   instructors,
   timezone,
   disabled,
+  recoveryOnly = false,
   onLockChange,
   onAccessLost,
   onRefresh,
@@ -61,6 +66,7 @@ export function SessionAttendanceController({
   instructors: { id: string; name: string }[];
   timezone?: string;
   disabled: boolean;
+  recoveryOnly?: boolean;
   onLockChange: (value: boolean) => void;
   onAccessLost: (failure: unknown) => boolean;
   onRefresh: () => Promise<void>;
@@ -213,6 +219,16 @@ export function SessionAttendanceController({
       )}
     </div>
   );
+  if (recoveryOnly)
+    return children({
+      panel: null,
+      overlays: locked && (
+        <SessionCommandRecovery>
+          <p role="status">{message}</p>
+          {recovery}
+        </SessionCommandRecovery>
+      ),
+    });
   const corrections: AttendanceCorrection[] =
     attendance?.entries.flatMap((entry) => {
       const result = results[entry.reservation_id];

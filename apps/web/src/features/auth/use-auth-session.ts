@@ -3,6 +3,7 @@ import type { Session } from "@supabase/supabase-js";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { getSupabaseClient } from "../../lib/supabase";
+import { advancePrivateQueryRevision } from "../../lib/cache-invalidation";
 import { nativeSessionId } from "./native-session-id";
 
 type NativeIdentity = { userId: string; sessionId: string | undefined };
@@ -60,6 +61,7 @@ export function useAuthSession(enabled = true, onSessionHandoff?: (pending: bool
       if (event === "SIGNED_OUT" || changed) sessionStorage.removeItem("ftk-recovery-account");
       if (!changed && event !== "SIGNED_OUT" && event !== "PASSWORD_RECOVERY") return;
       const next = ++revision;
+      advancePrivateQueryRevision(queries);
       onSessionHandoff?.(sameActorHandoff);
       setReady(false);
       if (sameActorHandoff) {

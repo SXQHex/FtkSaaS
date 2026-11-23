@@ -1,3 +1,4 @@
+import { cacheVerifiedReadback } from "../../lib/cache-invalidation";
 import { invalidateWorkspace, useWorkspaceQuery } from "../workspace/workspace-query";
 import { WorkCalendarEditor } from "./work-calendar-editor";
 import { PreparationManagement } from "./preparation-management";
@@ -32,7 +33,11 @@ import { SettingsChangeCancelEditor } from "./settings-change-cancel-editor";
 import { SettingsPeriodEditor } from "./settings-period-editor";
 import { SettingsPaymentEditor } from "./settings-payment-editor";
 import { SubscriptionRenewalEditor } from "./subscription-renewal-editor";
-import type { SettingsSubscriptionSource } from "./settings-subscription";
+import {
+  settingsSubscriptionProjection,
+  settingsSubscriptionQuery,
+  type SettingsSubscriptionSource,
+} from "./settings-subscription";
 import { useSettingsSubscription } from "./use-settings-subscription";
 import { useSettingsHistory } from "./use-settings-history";
 import { useSettingsRooms } from "./use-settings-rooms";
@@ -518,7 +523,11 @@ function SettingsManagement({
     },
   };
   async function refreshSubscription(result: SettingsSubscriptionSource) {
-    queries.setQueryData(["settings-subscription", scope.accountId, scope.orgId], result);
+    await cacheVerifiedReadback(
+      queries,
+      settingsSubscriptionQuery(scope).queryKey,
+      settingsSubscriptionProjection(result),
+    );
     await invalidateWorkspace(queries, scope.accountId, { throwOnError: true });
   }
   async function refresh() {
@@ -684,7 +693,7 @@ function SettingsManagement({
           onLockChange={publishLock}
           onSaved={async () => {
             await Promise.all([
-              invalidateWorkspace(queries, scope.accountId),
+              invalidateWorkspace(queries, scope.accountId, { throwOnError: true }),
               queries.invalidateQueries({
                 queryKey: ["settings-subscription", scope.accountId, scope.orgId],
               }),

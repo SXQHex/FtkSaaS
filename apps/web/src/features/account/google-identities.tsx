@@ -3,6 +3,7 @@ import { CheckIcon } from "lucide-react";
 import type { UserIdentity } from "@supabase/supabase-js";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { capturePrivateReadback } from "../../lib/cache-invalidation";
 import { readIdentities, linkGoogle, unlinkGoogle } from "./identities";
 import { Button } from "@ftksaas/ui/components/button";
 import { Badge } from "@ftksaas/ui/components/badge";
@@ -30,25 +31,30 @@ function GoogleUnlink({
 }: {
   identity: UserIdentity;
   disabled: boolean;
-  onChanged: (removedId?: string) => Promise<void>;
+  onChanged: () => Promise<void>;
 }) {
   const { t } = useTranslation();
+  const queries = useQueryClient();
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
   const [failed, setFailed] = useState(false);
   async function remove() {
     setPending(true);
     setFailed(false);
-    let removedId: string | undefined;
+    const assertCurrent = capturePrivateReadback(queries);
     try {
-      await unlinkGoogle(identity);
-      removedId = identity.identity_id;
-      setOpen(false);
-    } catch {
-      setFailed(true);
+      try {
+        await unlinkGoogle(identity);
+        assertCurrent();
+        setOpen(false);
+      } catch {
+        assertCurrent();
+        setFailed(true);
+      }
+      await onChanged();
+    } finally {
+      setPending(false);
     }
-    await onChanged(removedId);
-    setPending(false);
   }
   return (
     <>
@@ -95,7 +101,7 @@ function GoogleUnlink({
             variant="destructive"
             isDisabled={pending || disabled}
             onPress={() => {
-              void remove();
+              void remove().catch(() => {});
             }}
           >
             {t(($) => $.googleIdentity.confirm)}
@@ -113,7 +119,6 @@ export function GoogleIdentities({
   onChanged: () => Promise<void>;
 }) {
   const { t } = useTranslation();
-  const queries = useQueryClient();
   const [linking, setLinking] = useState(false);
   const [failed, setFailed] = useState(false);
   const identities = useQuery({
@@ -121,12 +126,9 @@ export function GoogleIdentities({
     queryFn: readIdentities,
     staleTime: 0,
   });
-  const google = identities.data?.filter((identity) => identity.provider === "google") ?? [];
-  async function refresh(removedId?: string) {
-    if (removedId)
-      queries.setQueryData<UserIdentity[]>(["account-identities", accountId], (current) =>
-        current?.filter((identity) => identity.identity_id !== removedId),
-      );
+  const current = identities.isError ? undefined : identities.data;
+  const google = current?.filter((identity) => identity.provider === "google") ?? [];
+  async function refresh() {
     await Promise.all([identities.refetch(), onChanged()]);
   }
   async function link() {
@@ -146,7 +148,7 @@ export function GoogleIdentities({
       {identities.isPending ? (
         <Skeleton role="listitem" className="h-16 w-full" />
       ) : (
-        identities.data && (
+        current && (
           <>
             {google.length ? (
               google.map((identity) => (
@@ -163,14 +165,14 @@ export function GoogleIdentities({
                     {typeof identity.identity_data?.email === "string" && (
                       <ItemDescription>{identity.identity_data.email}</ItemDescription>
                     )}
-                    {identities.data.length < 2 && (
+                    {current.length < 2 && (
                       <ItemDescription>{t(($) => $.googleIdentity.lastMethod)}</ItemDescription>
                     )}
                   </ItemContent>
                   <ItemActions>
                     <GoogleUnlink
                       identity={identity}
-                      disabled={disabled || identities.data.length < 2}
+                      disabled={disabled || current.length < 2}
                       onChanged={refresh}
                     />
                   </ItemActions>
@@ -209,6 +211,11 @@ export function GoogleIdentities({
               {identities.isError
                 ? t(($) => $.googleIdentity.readError)
                 : t(($) => $.googleIdentity.linkError)}{" "}
+              {identities.isError && identities.data && (
+                <Button variant="outline" size="sm" isDisabled>
+                  {t(($) => $.googleIdentity.link)}
+                </Button>
+              )}
               <Button
                 variant="outline"
                 size="sm"

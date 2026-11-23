@@ -44,7 +44,7 @@ export function RightAdjustmentEditor({
   timezone: string;
   sourceAvailable: boolean;
   onClose: () => void;
-  onRefresh: (result: RightAdjustmentResult) => Promise<void>;
+  onRefresh: (result: RightAdjustmentResult, assertCurrent: () => void) => Promise<void>;
   onLockChange: (value: boolean) => void;
   onAccessLost: (error: unknown) => boolean;
 }) {

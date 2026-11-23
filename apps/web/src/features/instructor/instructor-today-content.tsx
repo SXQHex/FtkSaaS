@@ -1,17 +1,16 @@
 import { useWorkspaceQuery } from "../workspace/workspace-query";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
 import type { ClientScope } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
-import { getTemporal } from "../../lib/temporal";
+import { instructorCalendarQuery } from "./instructor-query";
 import { formatMinorAmount } from "../../lib/money";
 import {
   instructorPeriod,
   instructorRoomLabel,
-  readInstructorCalendar,
   readInstructorEarnings,
   readInstructorAttendance,
   instructorReadStatus,
@@ -37,7 +36,16 @@ export function InstructorTodayContent({
 }) {
   const { t } = useTranslation(),
     router = useRouter();
-  const [now, setNow] = useState(() => new Date().toISOString());
+  const [now, setNow] = useState(Date.now);
+  useEffect(() => {
+    const update = () => setNow(Date.now());
+    const timer = setInterval(update, 60_000);
+    document.addEventListener("visibilitychange", update);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", update);
+    };
+  }, []);
   const workspace = useWorkspaceQuery(scope.accountId, scope.orgId, false);
   const current =
     !workspace.isError && workspace.data?.selected?.id === scope.orgId ? workspace.data : undefined;
@@ -49,42 +57,62 @@ export function InstructorTodayContent({
     ? identity.person_id
     : undefined;
   const enabled = Boolean(center && personId && weekStart);
+  const timezone = center?.timezone;
+  const localDate = useMemo(
+    () =>
+      center
+        ? new Intl.DateTimeFormat("sv-SE", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            timeZone: center.timezone,
+          })
+        : undefined,
+    [center],
+  );
+  const dateKey = localDate?.format(now);
+  const period = useQuery({
+    queryKey: ["instructor-day", timezone, weekStart, dateKey],
+    queryFn: () => instructorPeriod(timezone!, weekStart!, new Date(now).toISOString()),
+    enabled,
+    retry: false,
+    staleTime: Infinity,
+  });
   const query = useQuery({
+    ...instructorCalendarQuery(scope, personId, period.data?.interval),
+    enabled: enabled && !!period.data && !period.isError,
+  });
+  const calendar = query.isError ? undefined : query.data;
+  const items = useMemo(
+    () =>
+      calendar?.map((row) => ({
+        ...row,
+        day: localDate?.format(new Date(row.session.starts_at)) ?? "",
+      })),
+    [calendar, localDate],
+  );
+  const localToday = period.data?.today;
+  const todayItems = items?.filter((row) => row.day === localToday);
+  const attendanceQuery = useQuery({
     queryKey: [
-      "instructor-today",
+      "instructor-today-attendance",
       scope.accountId,
       scope.orgId,
       scope.centerId,
       personId,
-      center?.timezone,
-      weekStart,
-      now,
+      todayItems?.map(({ session }) => [session.id, session.version, session.attendance_state]),
     ],
-    enabled,
+    enabled: enabled && !!todayItems?.length && !query.isError && !period.isError,
     retry: false,
     queryFn: async (readContext) => {
-      const period = await instructorPeriod(center!.timezone, weekStart!, now);
-      const entries = await readInstructorCalendar(scope, personId!, period.interval, readContext);
-      const T = await getTemporal();
-      const items = entries.map((row) => ({
-        ...row,
-        day: T.Instant.from(row.session.starts_at)
-          .toZonedDateTimeISO(period.timezone)
-          .toPlainDate()
-          .toString(),
-      }));
-      const attendance = new Map<string, Awaited<ReturnType<typeof readInstructorAttendance>>>();
-      const today = items.filter((row) => row.day === period.today);
-      for (let i = 0; i < today.length; i += 4)
+      const readings = new Map<string, Awaited<ReturnType<typeof readInstructorAttendance>>>();
+      for (let index = 0; index < todayItems!.length; index += 4)
         await Promise.all(
-          today.slice(i, i + 4).map(async (row) => {
-            attendance.set(
-              row.session.id,
-              await readInstructorAttendance(scope, row.session, readContext),
-            );
+          todayItems!.slice(index, index + 4).map(async ({ session }) => {
+            readings.set(session.id, await readInstructorAttendance(scope, session, readContext));
           }),
         );
-      return { period, items, attendance };
+      return readings;
     },
   });
   const earnings = useQuery({
@@ -94,20 +122,15 @@ export function InstructorTodayContent({
       scope.orgId,
       scope.centerId,
       personId,
-      query.data?.period.month.starts_at,
+      period.data?.month.starts_at,
     ],
-    enabled: enabled && Boolean(query.data) && !query.isError,
+    enabled: enabled && !!period.data && !period.isError && !!calendar,
     retry: false,
     queryFn: async (readContext) => {
       try {
         return {
           status: "available" as const,
-          totals: await readInstructorEarnings(
-            scope,
-            personId!,
-            query.data!.period.month,
-            readContext,
-          ),
+          totals: await readInstructorEarnings(scope, personId!, period.data!.month, readContext),
         };
       } catch (error) {
         return { status: instructorReadStatus(error) };
@@ -126,11 +149,12 @@ export function InstructorTodayContent({
     [router],
   );
   useEffect(() => {
-    if (query.error) accessLost(query.error);
-    if (earnings.error) accessLost(earnings.error);
-  }, [query.error, earnings.error, accessLost]);
+    for (const error of [query.error, attendanceQuery.error, earnings.error])
+      if (error) accessLost(error);
+  }, [query.error, attendanceQuery.error, earnings.error, accessLost]);
   const unknown = t(($) => $.instructorToday.unknown);
-  const source = enabled && !query.isError ? query.data : undefined;
+  const source =
+    enabled && period.data && !period.isError && items ? { period: period.data, items } : undefined;
   const time = center
     ? new Intl.DateTimeFormat("tr-TR", {
         hour: "2-digit",
@@ -157,11 +181,11 @@ export function InstructorTodayContent({
     (row) =>
       row.session.state !== "cancelled" &&
       row.session.attendance_state === "open" &&
-      Date.parse(row.session.ends_at) > Date.parse(now),
+      Date.parse(row.session.ends_at) > now,
   )?.session.id;
   function rows(items: NonNullable<typeof today>): InstructorSessionRow[] {
     return items.map(({ item, session, day }) => {
-      const reading = source?.attendance.get(session.id);
+      const reading = !attendanceQuery.isError ? attendanceQuery.data?.get(session.id) : undefined;
       const attendance = reading?.status === "available" ? reading.attendance : undefined;
       const state =
         session.state === "cancelled"
@@ -170,7 +194,7 @@ export function InstructorTodayContent({
             ? t(($) => $.instructorToday.states.closed)
             : attendance?.actual_started_at
               ? t(($) => $.instructorToday.states.started)
-              : reading && reading.status !== "available"
+              : day === localToday && reading?.status !== "available"
                 ? t(($) => $.instructorToday.attendanceUnread)
                 : t(($) => $.instructorToday.states.planned);
       return {
@@ -278,12 +302,16 @@ export function InstructorTodayContent({
   return (
     <InstructorTodayView
       data={data}
-      calendarLoading={enabled && query.isLoading}
+      calendarLoading={enabled && (query.isLoading || period.isLoading)}
       onSchedule={source ? onSchedule : undefined}
       onOpen={source ? onOpen : undefined}
       notice={
         <>
-          {(!enabled || query.isError || earnings.isError) && (
+          {(!enabled ||
+            query.isError ||
+            period.isError ||
+            attendanceQuery.isError ||
+            earnings.isError) && (
             <Alert variant="destructive">
               <AlertDescription>
                 {!center || !weekStart
@@ -296,12 +324,17 @@ export function InstructorTodayContent({
           )}
           <Button
             variant="outline"
-            isDisabled={!enabled || query.isFetching || earnings.isFetching}
+            isDisabled={
+              !enabled || query.isFetching || attendanceQuery.isFetching || earnings.isFetching
+            }
             onPress={() => {
-              const next = new Date().toISOString();
-              if (next === now) void query.refetch();
-              else setNow(next);
-              if (query.data && !query.isError) void earnings.refetch();
+              const next = Date.now();
+              setNow(next);
+              if (localDate?.format(next) !== dateKey) return;
+              if (period.isError) void period.refetch();
+              else void query.refetch();
+              if (todayItems?.length) void attendanceQuery.refetch();
+              if (calendar && period.data) void earnings.refetch();
             }}
           >
             {t(($) => $.instructorToday.retry)}

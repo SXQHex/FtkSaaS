@@ -1,5 +1,8 @@
 import { beforeEach, expect, it, vi } from "vitest";
+import { QueryClient } from "@tanstack/react-query";
 import {
+  inboxKey,
+  organizationInboxReadKeys,
   readInbox,
   readNotificationState,
   notificationReadIntent,
@@ -11,6 +14,19 @@ const call = vi.hoisted(() => vi.fn());
 vi.mock("../../lib/scoped-backend", () => ({ scopedBackend: async () => ({ call }) }));
 const id = (n: number) => `019ab7b0-0000-7000-8000-${String(n).padStart(12, "0")}`;
 const scope = { accountId: id(1), orgId: id(2), centerId: id(3) };
+it("marks cached inbox state and lists across the member's organization only", () => {
+  const queries = new QueryClient();
+  const ownList = [...inboxKey(scope), "list", "", "all"];
+  const otherCenterState = [...inboxKey({ ...scope, centerId: id(5) }), "state", id(7)];
+  const source = [...inboxKey(scope), "work", id(7)];
+  const otherOrg = [...inboxKey({ ...scope, orgId: id(8) }), "list"];
+  const otherActor = [...inboxKey({ ...scope, accountId: id(9) }), "state", id(7)];
+  for (const key of [ownList, otherCenterState, source, otherOrg, otherActor])
+    queries.setQueryData(key, { cached: true });
+
+  expect(organizationInboxReadKeys(queries, scope)).toEqual([ownList, otherCenterState]);
+  queries.clear();
+});
 const notification = {
   id: id(4),
   kind: "synthetic",

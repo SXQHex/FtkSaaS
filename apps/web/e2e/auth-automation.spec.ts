@@ -414,7 +414,10 @@ test("automation segment chooser reads a valid continuation again after a segmen
   await expect(segment).toContainText("Hakkı azalanlar");
   await more.click();
   await expect(second).toHaveText("İkinci sentetik segment");
+  const readsBeforeClose = state.reads;
   await close.click();
+  await expect(dialog).toHaveCount(0);
+  expect(state.reads).toBe(readsBeforeClose);
 
   await page.getByRole("tab", { name: "Segmentler", exact: true }).click();
   await page

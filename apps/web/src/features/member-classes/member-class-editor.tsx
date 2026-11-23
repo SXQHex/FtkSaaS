@@ -1,3 +1,4 @@
+import { memberReservationKeys } from "../member-reservations/member-reservations-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -111,15 +112,7 @@ export function MemberClassEditor({
     if (error) alert.current?.focus();
   }, [error]);
   const rights = useQuery({
-    queryKey: [
-      "member-class-rights",
-      scope.accountId,
-      scope.orgId,
-      scope.centerId,
-      personId,
-      before.id,
-      draft.mode,
-    ],
+    queryKey: memberReservationKeys.bookingRights(scope, personId, before.id, draft.mode),
     queryFn: (readContext) =>
       readBookingRights(scope, personId, before.id, draft.mode, readContext),
     enabled: action === "book" || action === "accept",

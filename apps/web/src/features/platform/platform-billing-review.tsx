@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { cacheVerifiedReadback } from "../../lib/cache-invalidation";
 import { usePlatformActivity } from "./platform-activity-context";
 import { PlatformActionReview } from "./platform-action-review";
 import { platformOrganizationsKey } from "./platform-directory";
@@ -49,7 +50,7 @@ export function PlatformBillingReview({
                 : "paymentDeclined",
           subject: data.organization?.name,
         });
-        queries.setQueryData(sourceKey, data);
+        await cacheVerifiedReadback(queries, sourceKey, data);
         await Promise.all([
           queries.invalidateQueries({ queryKey: platformPaymentsKey(intent.accountId) }),
           queries.invalidateQueries({ queryKey: platformOrganizationsKey(intent.accountId) }),
@@ -58,9 +59,10 @@ export function PlatformBillingReview({
           }),
         ]);
       }}
-      onClose={() => {
-        void queries.invalidateQueries({ queryKey: sourceKey });
+      onClose={onClose}
+      onReload={() => {
         onClose();
+        void queries.invalidateQueries({ queryKey: sourceKey, exact: true });
       }}
       onDenied={onDenied}
     />

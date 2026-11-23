@@ -32,6 +32,7 @@ export function OverviewWorkPanel({
   scope,
   task,
   onClose,
+  onReload,
   onSaved,
   onLockChange,
   onAccessLost,
@@ -39,6 +40,7 @@ export function OverviewWorkPanel({
   scope: ClientScope;
   task: ManagementWorkView;
   onClose: () => void;
+  onReload: () => void;
   onSaved: () => Promise<void>;
   onLockChange: (locked: boolean) => void;
   onAccessLost: (cause: unknown) => boolean;
@@ -163,11 +165,11 @@ export function OverviewWorkPanel({
         recoveryActions={
           <>
             {error && !locked && (
-              <Button type="button" variant="outline" onPress={onClose}>
+              <Button type="button" variant="outline" onPress={onReload}>
                 {t(($) => $.overview.workReload)}
               </Button>
             )}
-            <EventCommandNotice command={command} onReload={onClose} />
+            <EventCommandNotice command={command} onReload={onReload} />
           </>
         }
       />

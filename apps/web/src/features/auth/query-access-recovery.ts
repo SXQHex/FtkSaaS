@@ -3,6 +3,7 @@ import { readWorkspace } from "../workspace/workspace";
 import { workspaceKeys } from "../workspace/workspace-query";
 import { accountQueryKeys, verifiedWorkspaceAccount } from "./account-query";
 import { BackendError } from "../../lib/backend";
+import { clearPrivateQueries, privateQueryRevision } from "../../lib/cache-invalidation";
 
 type Workspace = Awaited<ReturnType<typeof readWorkspace>>;
 type AccessFailure = "session" | "actor" | "permission";
@@ -138,7 +139,7 @@ function activeWorkspace(queries: QueryClient, accountId: string, failedKey: Que
   const matched = candidates.find(([, view]) =>
     view?.selected?.id ? keyHasOrganization(failedKey, view.selected.id) : false,
   );
-  return matched?.[1];
+  return matched;
 }
 
 export interface AccessRecoveryActions {
@@ -152,26 +153,38 @@ export async function reconcileQueryAccessFailure(
   failedKey: QueryKey,
   failure: unknown,
   actions: AccessRecoveryActions,
+  active = () => true,
 ) {
+  if (!active()) return;
   const kind = classifyAccessFailure(failure);
   if (!kind) return;
   if (kind !== "permission") {
     // Cancel late private reads as well as removing successfully cached ones.
-    queries.clear();
+    clearPrivateQueries(queries);
     if (kind === "session") await actions.showLogin();
     else await actions.invalidateRoute();
     return;
   }
 
   const accountId = knownAccountId(queries);
-  const previous = accountId ? activeWorkspace(queries, accountId, failedKey) : undefined;
-  if (!accountId || !previous?.selected?.id) {
+  const match = accountId ? activeWorkspace(queries, accountId, failedKey) : undefined;
+  const previous = match?.[1];
+  if (!accountId || !match || !previous?.selected?.id) {
     // FORBIDDEN is an operation-specific denial unless an organization
     // authority actually changed. Preserve platform/user error screens.
     return;
   }
 
   const orgId = previous.selected.id;
+  const cache = queries.getQueryCache();
+  const filter = { queryKey: match[0], exact: true };
+  const projection = cache.find(filter);
+  const revision = privateQueryRevision(queries);
+  const currentProjection = () =>
+    active() &&
+    privateQueryRevision(queries) === revision &&
+    cache.find(filter) === projection &&
+    projection?.state.data === previous;
   let current: Workspace;
   try {
     // An independent native recheck cannot reuse a cached Query success or
@@ -180,12 +193,13 @@ export async function reconcileQueryAccessFailure(
       verifiedWorkspaceAccount(queries, session.user.id),
     );
   } catch (error) {
-    queries.clear();
+    if (!currentProjection()) return;
+    clearPrivateQueries(queries);
     if (classifyAccessFailure(error) === "session") await actions.showLogin();
     else await actions.invalidateRoute();
     return;
   }
-  if (!workspaceAccessLost(previous, current)) {
+  if (!currentProjection() || !workspaceAccessLost(previous, current)) {
     // A feature-specific FORBIDDEN (or newly granted capabilities) must not
     // evict unrelated authorized data or a pending native command.
     return;
@@ -193,7 +207,7 @@ export async function reconcileQueryAccessFailure(
 
   // Actual role/center loss: evict every private continuation and in-flight
   // read, not only the Query that happened to return FORBIDDEN first.
-  queries.clear();
+  clearPrivateQueries(queries);
   queries.setQueryData(workspaceKeys.projection(accountId, orgId), current);
   await actions.invalidateRoute();
 }
@@ -222,22 +236,20 @@ export function observeQueryAccessFailures(queries: QueryClient, actions: Access
     }
   }
 
+  let revision = privateQueryRevision(queries);
   let checking = false;
   let terminated = false;
-  // Once native identity is rejected, no queued workspace read may restore it.
-  const safeActions: AccessRecoveryActions = {
-    ...actions,
-    showLogin: async () => {
-      terminated = true;
-      await actions.showLogin();
-    },
-  };
+  let disposed = false;
   // Concurrent feature failures must not disappear behind the first
   // permission recheck: a later SESSION_REVOKED outranks a benign FORBIDDEN.
   const pending = new Map<string, () => Promise<unknown>>();
-  const run = (id: string, work: () => Promise<unknown>) => {
+  const checkingOrganizations = new Set<string>();
+  const run = (id: string, work: (active: () => boolean) => Promise<unknown>) => {
+    const started = revision;
+    const active = () => !disposed && privateQueryRevision(queries) === started;
+    const task = () => (active() ? work(active) : Promise.resolve());
     if (checking) {
-      pending.set(id, work);
+      pending.set(id, task);
       return;
     }
     checking = true;
@@ -246,14 +258,15 @@ export function observeQueryAccessFailures(queries: QueryClient, actions: Access
       try {
         await next();
       } catch {
+        if (!active() || terminated) return;
         // Never expose a stale private screen when route reconciliation fails.
-        queries.clear();
+        clearPrivateQueries(queries);
         await actions.invalidateRoute();
       }
     };
     void (async () => {
-      await execute(work);
-      while (pending.size) {
+      await execute(task);
+      while (active() && pending.size) {
         const next = pending.entries().next().value;
         if (!next) break;
         pending.delete(next[0]);
@@ -261,16 +274,29 @@ export function observeQueryAccessFailures(queries: QueryClient, actions: Access
       }
     })()
       .catch(() => {
-        queries.clear();
-        return safeActions.showLogin();
+        if (!active()) return;
+        clearPrivateQueries(queries);
+        return actions.showLogin();
       })
       .finally(() => {
+        if (!active()) return;
         checking = false;
         actions.onChecking(false);
       });
   };
 
-  return cache.subscribe((event) => {
+  const unsubscribe = cache.subscribe((event) => {
+    const nextRevision = privateQueryRevision(queries);
+    if (nextRevision !== revision) {
+      revision = nextRevision;
+      pending.clear();
+      handled.clear();
+      authorities.clear();
+      checkingOrganizations.clear();
+      terminated = false;
+      if (checking) actions.onChecking(false);
+      checking = false;
+    }
     if (event.type === "added") {
       // A selected workspace can be created with automatic-scope initialData.
       // Capture that previous authority before its first real backend success.
@@ -304,10 +330,16 @@ export function observeQueryAccessFailures(queries: QueryClient, actions: Access
       ) {
         run(`workspace:${query.queryHash}`, async () => {
           // A queued role refresh must never rehydrate an actor after logout.
-          if (terminated || !knownAccountId(queries)) return;
+          if (
+            terminated ||
+            !knownAccountId(queries) ||
+            cache.find({ queryKey: query.queryKey, exact: true }) !== query ||
+            query.state.data !== current
+          )
+            return;
           // An externally revoked role must invalidate every scoped feature,
           // including cached history pages and still pending responses.
-          queries.clear();
+          clearPrivateQueries(queries);
           queries.setQueryData(query.queryKey, current);
           await actions.invalidateRoute();
         });
@@ -317,18 +349,42 @@ export function observeQueryAccessFailures(queries: QueryClient, actions: Access
     if (event.action.type !== "error") return;
     const kind = classifyAccessFailure(query.state.error);
     if (!kind) return;
-    if (kind !== "permission") terminated = true;
+    if (kind === "session") terminated = true;
     else if (terminated) return;
     if (handled.has(query.queryHash)) return;
     handled.add(query.queryHash);
     const key = query.queryKey;
     const error = query.state.error;
-    run(`query:${query.queryHash}`, () => {
+    const accountId = kind === "permission" ? knownAccountId(queries) : undefined;
+    const organizationId = accountId
+      ? activeWorkspace(queries, accountId, key)?.[1]?.selected?.id
+      : undefined;
+    if (kind === "permission" && !organizationId) return;
+    if (organizationId && checkingOrganizations.has(organizationId)) return;
+    if (organizationId) checkingOrganizations.add(organizationId);
+    run(`query:${query.queryHash}`, async (active) => {
       // Another concurrent revocation may already have purged this feature.
       // Still process terminal session/actor errors after their Query vanishes.
-      if (kind === "permission" && (terminated || !cache.find({ queryKey: key, exact: true })))
-        return Promise.resolve();
-      return reconcileQueryAccessFailure(queries, key, error, safeActions);
+      try {
+        await reconcileQueryAccessFailure(
+          queries,
+          key,
+          error,
+          actions,
+          () =>
+            active() &&
+            (kind !== "permission" ||
+              (!terminated && cache.find({ queryKey: key, exact: true }) === query)),
+        );
+      } finally {
+        if (organizationId && active()) checkingOrganizations.delete(organizationId);
+      }
     });
   });
+  return () => {
+    disposed = true;
+    pending.clear();
+    unsubscribe();
+    if (checking) actions.onChecking(false);
+  };
 }

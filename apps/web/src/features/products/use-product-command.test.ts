@@ -7,6 +7,11 @@ const { write, receipt, result } = vi.hoisted(() => ({
   receipt: vi.fn(),
   result: vi.fn(),
 }));
+vi.mock("@tanstack/react-query", async (importOriginal) => {
+  const { QueryClient } = await importOriginal<typeof import("@tanstack/react-query")>();
+  const client = new QueryClient();
+  return { useQueryClient: () => client };
+});
 vi.mock("@tanstack/react-router", () => ({ useBlocker: vi.fn() }));
 vi.mock("./products", async (importOriginal) => ({
   ...(await importOriginal<typeof import("./products")>()),

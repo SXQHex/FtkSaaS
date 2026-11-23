@@ -70,7 +70,8 @@ export interface SessionOfferRow {
 }
 export function SessionDetailView({
   title,
-  initialTab = "participants",
+  tab,
+  onTab,
   badges,
   facts,
   capacity,
@@ -80,10 +81,12 @@ export function SessionDetailView({
   participants,
   attendance,
   waitlist,
+  fallback,
   overlays,
 }: {
   title: string;
-  initialTab?: "participants" | "attendance" | "waitlist";
+  tab: "participants" | "attendance" | "waitlist";
+  onTab: (tab: "participants" | "attendance" | "waitlist") => void;
   badges: string[];
   facts: { label: string; value: string }[];
   capacity: SessionCapacityView;
@@ -99,10 +102,11 @@ export function SessionDetailView({
   participants: ReactNode;
   attendance: ReactNode;
   waitlist: ReactNode;
+  fallback?: ReactNode;
   overlays?: ReactNode;
 }) {
   const { t } = useTranslation();
-  return (
+  const detail = (
     <div className="flex min-w-0 flex-col gap-5 p-4 md:p-6">
       <LinkButton href={scheduleHref} variant="ghost" size="sm" className="self-start">
         <ArrowLeftIcon data-icon="inline-start" />
@@ -156,7 +160,14 @@ export function SessionDetailView({
       </Card>
       <div className="grid min-w-0 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_18rem]">
         <Card className="min-w-0">
-          <Tabs defaultSelectedKey={initialTab} keyboardActivation="manual" className="min-w-0">
+          <Tabs
+            selectedKey={tab}
+            onSelectionChange={(key) => {
+              if (key === "participants" || key === "attendance" || key === "waitlist") onTab(key);
+            }}
+            keyboardActivation="manual"
+            className="min-w-0"
+          >
             <CardHeader className="min-w-0 border-b">
               <div className="max-w-full overflow-x-auto p-1">
                 <TabsList
@@ -272,8 +283,13 @@ export function SessionDetailView({
           </Card>
         </aside>
       </div>
-      {overlays}
     </div>
+  );
+  return (
+    <>
+      {fallback ?? detail}
+      {overlays}
+    </>
   );
 }
 

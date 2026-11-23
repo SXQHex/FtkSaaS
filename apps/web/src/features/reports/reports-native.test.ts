@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+import { QueryClient } from "@tanstack/react-query";
 import { reportInterval, readReport, readImportDirectory } from "./reports-read";
 import { reportMoney, reportCount, salesPoints } from "./reports-presentation";
 import {
@@ -8,14 +9,19 @@ import {
   writeReportJob,
   reportJobReceipt,
   readReportJob,
+  readJob,
   downloadReport,
   downloadSkippedImportRows,
   type ReportJobIntent,
 } from "./reports-command";
 import { readImportRows, readImportPreview } from "./import-read";
 import { i18n } from "../../i18n";
-const call = vi.hoisted(() => vi.fn());
-vi.mock("../../lib/scoped-backend", () => ({ scopedBackend: async () => ({ call }) }));
+const { call, read, scoped } = vi.hoisted(() => {
+  const call = vi.fn(),
+    read = vi.fn();
+  return { call, read, scoped: vi.fn(async () => ({ call, read })) };
+});
+vi.mock("../../lib/scoped-backend", () => ({ scopedBackend: scoped }));
 vi.mock("../../lib/supabase", () => ({
   getSupabaseClient: () => ({
     auth: {
@@ -61,8 +67,26 @@ const view = () => ({
 });
 beforeEach(() => {
   call.mockReset();
+  read.mockReset();
+  scoped.mockClear();
   vi.unstubAllGlobals();
   vi.unstubAllEnvs();
+});
+
+it("shares report status, preview and row authority with the owning cancellable Query", async () => {
+  const context = { client: new QueryClient(), signal: new AbortController().signal };
+  const failure = Error("MOCK_READ_FAILED");
+  read.mockRejectedValue(failure);
+  await expect(readJob(scope, id(9), context)).rejects.toBe(failure);
+  await expect(readImportPreview(scope, id(10), context)).rejects.toBe(failure);
+  await expect(readImportRows(scope, id(9), undefined, undefined, true, context)).rejects.toBe(
+    failure,
+  );
+  expect(scoped.mock.calls).toEqual(Array.from({ length: 3 }, () => [scope, undefined, context]));
+  expect(read).toHaveBeenNthCalledWith(1, "job_status_get_v1", expect.anything(), context.signal);
+  expect(read).toHaveBeenNthCalledWith(2, "preview_get_v1", expect.anything(), context.signal);
+  expect(read).toHaveBeenNthCalledWith(3, "import_rows_list_v1", expect.anything(), context.signal);
+  expect(call).not.toHaveBeenCalled();
 });
 it("builds inclusive date selections into exact half-open center-local intervals through DST", async () => {
   expect(

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { QueryClient } from "@tanstack/react-query";
 import type { CalendarItem, EarningView, SessionView } from "@ftksaas/api-contracts";
 const mock = vi.hoisted(() => ({ call: vi.fn(), session: vi.fn() }));
 vi.mock("../../lib/scoped-backend", () => ({ scopedBackend: async () => ({ call: mock.call }) }));
@@ -11,6 +12,7 @@ import {
   readInstructorEarnings,
   readInstructorSession,
 } from "./instructor-read";
+import { instructorCalendarQuery } from "./instructor-query";
 const id = (n: number) => `019a7b00-0000-7000-8000-${String(n).padStart(12, "0")}`;
 const scope = { accountId: id(1), orgId: id(2), centerId: id(3) };
 const interval = { starts_at: "2026-11-15T21:00:00Z", ends_at: "2026-11-22T21:00:00Z" };
@@ -44,6 +46,27 @@ const calendar: CalendarItem = {
 };
 beforeEach(() => vi.clearAllMocks());
 describe("instructor bounded self reads", () => {
+  it("shares the same exact week and self scope between Today and Schedule", async () => {
+    mock.call.mockResolvedValue({ items: [calendar], next_cursor: null });
+    mock.session.mockResolvedValue(session);
+    const queries = new QueryClient();
+    await queries.fetchQuery({
+      ...instructorCalendarQuery(scope, id(6), interval),
+      staleTime: 30_000,
+    });
+    await queries.fetchQuery({
+      ...instructorCalendarQuery(scope, id(6), {
+        starts_at: "2026-11-15T21:00:00.000Z",
+        ends_at: "2026-11-22T21:00:00.000Z",
+      }),
+      staleTime: 30_000,
+    });
+    expect(mock.call).toHaveBeenCalledTimes(1);
+    expect(mock.session).toHaveBeenCalledTimes(1);
+    expect(instructorCalendarQuery(scope, id(7), interval).queryKey).not.toEqual(
+      instructorCalendarQuery(scope, id(6), interval).queryKey,
+    );
+  });
   it("uses IANA local week and month boundaries across a DST transition", async () => {
     const period = await instructorPeriod("America/New_York", "sunday", "2027-11-08T02:00:00Z");
     expect(period.today).toBe("2027-11-07");

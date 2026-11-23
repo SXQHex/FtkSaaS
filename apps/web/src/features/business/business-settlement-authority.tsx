@@ -1,3 +1,4 @@
+import { cacheVerifiedReadback, invalidateCachedFamilies } from "../../lib/cache-invalidation";
 import { useEffect, useId, useState } from "react";
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -96,8 +97,10 @@ export function BusinessSettlementAuthority({
     readResult: readAuthorityResult,
     onAccessLost: () => false,
     onRefresh: async (data) => {
-      client.setQueryData(key, data);
-      await client.invalidateQueries({ queryKey: ["business-settlement"] });
+      await cacheVerifiedReadback(client, key, data);
+      await invalidateCachedFamilies(client, [
+        ["business-settlement", scope.accountId, scope.orgId],
+      ]);
     },
   });
   useEffect(() => {

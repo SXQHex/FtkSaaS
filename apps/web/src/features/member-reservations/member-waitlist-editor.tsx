@@ -1,3 +1,4 @@
+import { memberReservationKeys } from "./member-reservations-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -71,14 +72,7 @@ export function MemberWaitlistEditor({
     onLockChange(locked);
   }, [locked, onLockChange]);
   const rights = useQuery({
-    queryKey: [
-      "member-offer-doc-rights",
-      scope.accountId,
-      scope.orgId,
-      scope.centerId,
-      personId,
-      before.session.id,
-    ],
+    queryKey: memberReservationKeys.bookingRights(scope, personId, before.session.id, "flexible"),
     queryFn: (readContext) =>
       readBookingRights(scope, personId, before.session.id, "flexible", readContext),
     enabled: action === "accept",

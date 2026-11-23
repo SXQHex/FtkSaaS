@@ -7,7 +7,7 @@ import { useMemberCommand } from "../member-profile/use-member-command";
 import { scheduleBackendError } from "../schedule/schedule-presentation";
 import { scheduleTimeChoices, ScheduleTimeError } from "../schedule/schedule-time";
 import { EventActionDialog } from "./event-action-dialog";
-import { EventCommandNotice } from "./event-command-notice";
+import { EventCommandNotice, EventCommandRecovery } from "./event-command-notice";
 import {
   EventCorrectionFields,
   EventDutyVerificationFields,
@@ -32,7 +32,9 @@ export function EventActionController({
   scope,
   before,
   selection,
+  recoveryOnly = false,
   onClose,
+  onReload,
   onSaved,
   onLockChange,
   onAccessLost,
@@ -40,7 +42,9 @@ export function EventActionController({
   scope: ClientScope;
   before: EventView;
   selection: EventActionSelection;
+  recoveryOnly?: boolean;
   onClose: () => void;
+  onReload: () => void;
   onSaved: () => Promise<void>;
   onLockChange: (value: boolean) => void;
   onAccessLost: (error: unknown) => boolean;
@@ -74,6 +78,12 @@ export function EventActionController({
     onLockChange(locked);
     return () => onLockChange(false);
   }, [locked, onLockChange]);
+  if (recoveryOnly)
+    return (
+      <EventCommandRecovery locked={locked} onClose={onClose}>
+        <EventCommandNotice command={command} onReload={onReload} />
+      </EventCommandRecovery>
+    );
   function change(value: EventActionSelection) {
     if (locked) return;
     setInput(value);
@@ -211,7 +221,7 @@ export function EventActionController({
         (input.action === "correct_attendance" && !input.id)
       }
       error={error}
-      notice={<EventCommandNotice command={command} onReload={onClose} />}
+      notice={<EventCommandNotice command={command} onReload={onReload} />}
       extra={
         <>
           {preview && <EventPreviewEffects preview={preview} />}

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { EventRegistrationView } from "@ftksaas/api-contracts";
+import type { EventRegistrationView, EventView } from "@ftksaas/api-contracts";
 import type { ClientScope, AccountReadContext } from "../../lib/scoped-backend";
 import { readDetailedEvent } from "./event-registration-read";
 import {
@@ -28,6 +28,9 @@ export async function readRegisteredPayment(
   readContext?: AccountReadContext,
 ) {
   const event = await readDetailedEvent(scope, eventId, readContext);
+  return checkedRegisteredPayment(event, id, personId);
+}
+export function checkedRegisteredPayment(event: EventView, id: string, personId: string) {
   const row = event.registrations?.find((row) => row.id === id && row.person_id === personId);
   if (!row?.payment_summary) throw Error("EVENT_REGISTRATION_PAYMENT_UNAVAILABLE");
   return row;
@@ -92,13 +95,24 @@ export async function confirmEventCollectionReceipt(intent: CollectionIntent, id
   )
     throw Error("EVENT_COLLECTION_RECEIPT_UNAVAILABLE");
 }
-export async function readRegisteredCollectionResult(
+export function readRegisteredCollectionResult(
   intent: RegisteredCollectionIntent,
   id?: string,
+): Promise<EventRegistrationView>;
+export function readRegisteredCollectionResult<Result>(
+  intent: RegisteredCollectionIntent,
+  id: string | undefined,
+  project: (event: EventView) => Result,
+): Promise<Result>;
+export async function readRegisteredCollectionResult<Result>(
+  intent: RegisteredCollectionIntent,
+  id?: string,
+  project?: (event: EventView) => Result,
 ) {
   await confirmEventCollectionReceipt(intent, id);
   const source = intent.registration;
-  const row = await readRegisteredPayment(intent.scope, source.eventId, source.id, source.personId);
+  const event = await readDetailedEvent(intent.scope, source.eventId);
+  const row = checkedRegisteredPayment(event, source.id, source.personId);
   const payment = row.payment_summary!;
   if (
     payment.status !== "available" ||
@@ -107,5 +121,5 @@ export async function readRegisteredCollectionResult(
     source.debtIds.some((id) => !payment.debts.some((debt) => debt.id === id))
   )
     throw Error("EVENT_REGISTRATION_PAYMENT_UNAVAILABLE");
-  return row;
+  return project ? project(event) : row;
 }

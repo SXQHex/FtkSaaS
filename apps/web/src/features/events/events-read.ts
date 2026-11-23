@@ -166,31 +166,6 @@ export async function readEvent(
     id,
   );
 }
-export async function readEventRooms(scope: ClientScope, readContext?: AccountReadContext) {
-  const backend = await scopedBackend(scope, undefined, readContext);
-  const rows = await studioPages((cursor) =>
-    backend.call("management_state_get_v1", {
-      ...common(scope),
-      request_id: uuidv7(),
-      operation: "room_save_v1",
-      selector: { operation: "room_save_v1", key: { include_details: true } },
-      page: { limit: 50, ...(cursor ? { cursor } : {}) },
-    }),
-  );
-  return rows
-    .filter((row) => row.state === "active")
-    .map((row) => {
-      const values = row.current?.operation === "room_save_v1" ? row.current.values : undefined;
-      if (
-        !row.exists ||
-        row.entity?.type !== "rooms" ||
-        values?.room_id !== row.entity.id ||
-        !values.name
-      )
-        throw new Error("EVENT_ROOMS_UNAVAILABLE");
-      return { id: z.uuid().parse(row.entity.id), name: values.name, capacity: values.capacity };
-    });
-}
 export async function readEventDisciplines(scope: ClientScope, readContext?: AccountReadContext) {
   const backend = await scopedBackend(scope, undefined, readContext);
   return studioPages((cursor) =>

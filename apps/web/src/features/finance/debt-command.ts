@@ -165,7 +165,11 @@ export async function readDebtReceipt(intent: DebtIntent) {
     throw new Error("FINANCE_RECEIPT_UNAVAILABLE");
   return result;
 }
-export async function readDebtResult(intent: DebtIntent, id?: string): Promise<FinanceView> {
+export async function readDebtResult(
+  intent: DebtIntent,
+  id?: string,
+  onFirstPage?: (view: Awaited<ReturnType<typeof readFinancePage>>) => void,
+): Promise<FinanceView> {
   // The ACK/receipt identifies the mutation fact. Finance publishes the known
   // debt projection, not the private adjustment/credit fact as a cash movement.
   z.uuid().parse(id);
@@ -178,5 +182,6 @@ export async function readDebtResult(intent: DebtIntent, id?: string): Promise<F
     debt.version! <= intent.base.debt.version
   )
     throw new Error("FINANCE_RESULT_UNAVAILABLE");
+  onFirstPage?.(data);
   return data;
 }

@@ -46,7 +46,11 @@ export function OverviewContent({
       scope.accountId,
       scope.orgId,
       scope.centerId,
-      entries?.map((r) => [r.session.id, r.session.version]),
+      entries?.map((r) => [
+        r.session.id,
+        r.session.version,
+        r.session.room_labels?.map(({ room_id, name }) => [room_id, name]),
+      ]),
     ],
     queryFn: (context) => readOverviewLabels(scope, entries!, context),
     enabled: !!entries,

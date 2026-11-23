@@ -140,6 +140,38 @@ test("acknowledged booking with a failed result read permits read recovery only"
   ).toBeVisible();
   expect(state.writes).toHaveLength(1);
 });
+test("failed upper session read preserves acknowledged booking recovery without stale content", async ({
+  page,
+}) => {
+  const state = await booking(page);
+  let sessionReadsAfterWrite = 0;
+  await page.route("**/functions/v1/backend-v1/session_get_v1", async (route) => {
+    if (state.writes.length && ++sessionReadsAfterWrite === 2) return route.abort("failed");
+    return route.fallback();
+  });
+  await approveBooking(state.panel);
+
+  const recovery = page.getByRole("dialog", { name: "Seans detayı", exact: true });
+  await expect(recovery).toContainText(
+    "Kayıt alındı; güncel rezervasyon, hak ve seans henüz okunamadı. Yeniden yazmadan sonucu oku.",
+  );
+  await expect(page.getByText("Sentetik seans", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("Örnek öğrenci", { exact: true })).toHaveCount(0);
+  await expect(
+    recovery.getByRole("button", { name: "Aynı isteği tekrar dene", exact: true }),
+  ).toHaveCount(0);
+  expect(state.writes).toHaveLength(1);
+
+  await recovery.getByRole("button", { name: "İşlem sonucunu oku", exact: true }).click();
+  await expect(
+    state.panel.getByText("Rezervasyon kaydedildi; güncel rezervasyon, haklar ve seans okundu.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  expect(state.writes).toHaveLength(1);
+  await state.panel.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Sentetik seans", exact: true })).toBeVisible();
+});
 test("native attendance uses reservation versions then closes and corrects through explicit preview approval", async ({
   page,
 }) => {

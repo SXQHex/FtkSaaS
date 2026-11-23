@@ -212,3 +212,15 @@ it("uses server lesson order and the same opted-in source summary on continuatio
   expect(result.nextCursor).toBe("native-next");
   expect(JSON.stringify(result)).not.toContain("other@example.invalid");
 });
+
+it("omits attendance when upcoming reservations have no attendance consumer", async () => {
+  const result = await readMemberReservations(scope, personId, undefined, "upcoming", {
+    includeAttendance: false,
+  });
+  expect(call.mock.calls.map(([operation]) => operation)).toEqual([
+    "reservation_list_v1",
+    "session_get_v1",
+  ]);
+  expect(result.items[0]!.session?.id).toBe(nativeSession.id);
+  expect(result.partial).toBe(false);
+});

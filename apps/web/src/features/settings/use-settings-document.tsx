@@ -1,3 +1,4 @@
+import { cacheVerifiedReadback } from "../../lib/cache-invalidation";
 import { invalidateWorkspace } from "../workspace/workspace-query";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -146,7 +147,7 @@ export function useSettingsDocument({
     readResult: readSettingsDocumentResult,
     onAccessLost: loseAccess,
     onRefresh: async (result) => {
-      queries.setQueryData(key, result);
+      await cacheVerifiedReadback(queries, key, result);
       setDraft((previous) =>
         Object.fromEntries(
           Object.entries(previous).filter(

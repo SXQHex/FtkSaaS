@@ -205,13 +205,18 @@ export async function readCollectionReceipt(intent: CollectionIntent) {
     throw new Error("FINANCE_RECEIPT_UNAVAILABLE");
   return receipt;
 }
-export async function readCollectionResult(intent: CollectionIntent, id?: string) {
+export async function readCollectionResult(
+  intent: CollectionIntent,
+  id?: string,
+  onFirstPage?: (view: Awaited<ReturnType<typeof readFinancePage>>) => void,
+) {
   z.uuid().parse(id);
   const cursors = new Set<string>();
   let cursor: string | undefined;
   do {
     const data = await readFinancePage(intent.scope, intent.selection, cursor),
       row = data.movements.items.find((item) => item.id === id);
+    if (!cursor) onFirstPage?.(data);
     if (row) {
       if (
         row.kind !== "collection" ||

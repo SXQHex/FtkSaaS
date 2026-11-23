@@ -422,12 +422,13 @@ test("a closed product publishes a renamed immutable version and rereads history
   page,
 }) => {
   const state = await productsFixture(page, false, true, "inactive");
+  const historyReads = () => state.managementReads.filter((request) => request.view === "versions");
+  const previousReads = historyReads().length;
   await page.getByText(seedProduct.terms.name, { exact: true }).click();
   const editor = page.getByRole("dialog");
   const versions = editor.getByRole("region", { name: "Sürümler", exact: true });
   await expect(versions.getByText(seedProduct.terms.name, { exact: true })).toBeVisible();
-  const historyReads = () => state.managementReads.filter((request) => request.view === "versions");
-  const previousReads = historyReads().length;
+  expect(historyReads()).toHaveLength(previousReads + 1);
   await editor.getByLabel("Paket adı", { exact: true }).fill("Yeni sürüm adı");
   await editor.getByRole("button", { name: "Değişiklikleri incele", exact: true }).click();
   await editor.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");

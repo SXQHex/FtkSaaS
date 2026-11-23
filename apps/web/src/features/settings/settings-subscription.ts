@@ -57,10 +57,17 @@ export async function readSettingsSubscription(
   return { scope: { ...scope }, subscription, readAt: Date.now() };
 }
 export type SettingsSubscriptionSource = Awaited<ReturnType<typeof readSettingsSubscription>>;
+export function settingsSubscriptionProjection({
+  subscription,
+  readAt,
+}: SettingsSubscriptionSource) {
+  return { subscription, readAt };
+}
 export function settingsSubscriptionQuery(scope: ClientScope) {
   return queryOptions({
     queryKey: ["settings-subscription", scope.accountId, scope.orgId],
-    queryFn: (context) => readSettingsSubscription(scope, context),
+    queryFn: async (context) =>
+      settingsSubscriptionProjection(await readSettingsSubscription(scope, context)),
     retry: false,
     // Plan, entitlement and role limits may change outside this SPA.
     // Revalidate stale subscription projections after focus/reconnect.
