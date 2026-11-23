@@ -1,7 +1,6 @@
 import { queryOptions, type QueryClient } from "@tanstack/react-query";
 import { readAccount } from "../../lib/account";
 import { getSupabaseClient } from "../../lib/supabase";
-import { nativeSessionId } from "./native-session-id";
 
 type Account = Awaited<ReturnType<typeof readAccount>>;
 
@@ -28,12 +27,8 @@ export function accountQuery(nativeUserId: string, includePlatformScope = false)
     queryFn: async () => {
       const session = await verifiedSession(nativeUserId);
       const account = await readAccount(includePlatformScope, session.access_token);
-      // Actor equality alone cannot distinguish two sessions of one user.
-      // Reject a late result from the old session without treating a normal
-      // bearer refresh (same session_id) as a new login.
-      const latest = await verifiedSession(nativeUserId);
-      if (nativeSessionId(session) !== nativeSessionId(latest))
-        throw new Error("ACCOUNT_CHANGED");
+      // Prevent a late response from being accepted for the next signed-in actor.
+      await verifiedSession(nativeUserId);
       return account;
     },
     staleTime: accountStaleTime,

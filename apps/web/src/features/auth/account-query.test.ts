@@ -113,4 +113,60 @@ describe("shared account projections", () => {
     await expect(queries.query(accountQuery("native-a"))).rejects.toThrow("ACCOUNT_CHANGED");
     expect(queries.getQueryData(accountQueryKeys.projection("native-a"))).toBeUndefined();
   });
+
+  it("rejects a late account read from the previous native session of the same actor", async () => {
+    const encoded = (sessionId: string) =>
+      btoa(JSON.stringify({ sub: "native-a", session_id: sessionId }))
+        .replaceAll("+", "-")
+        .replaceAll("/", "_")
+        .replace(/=+$/, "");
+    const oldSession = {
+      data: {
+        session: {
+          user: { id: "native-a" },
+          access_token: `fixture.${encoded("019a7b00-0000-7000-8000-000000000101")}.old`,
+        },
+      },
+      error: null,
+    };
+    const newSession = {
+      data: {
+        session: {
+          user: { id: "native-a" },
+          access_token: `fixture.${encoded("019a7b00-0000-7000-8000-000000000102")}.new`,
+        },
+      },
+      error: null,
+    };
+    const queries = new QueryClient();
+    native.getSession.mockResolvedValueOnce(oldSession).mockResolvedValue(newSession);
+    await expect(queries.query(accountQuery("native-a"))).rejects.toThrow("ACCOUNT_CHANGED");
+    expect(reader).toHaveBeenCalledWith(false, oldSession.data.session.access_token);
+    expect(queries.getQueryData(accountQueryKeys.projection("native-a"))).toBeUndefined();
+  });
+
+  it("accepts a refreshed bearer when the native session_id is unchanged", async () => {
+    const encoded = btoa(
+      JSON.stringify({
+        sub: "native-a",
+        session_id: "019a7b00-0000-7000-8000-000000000103",
+      }),
+    ).replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/, "");
+    const original = {
+      data: {
+        session: { user: { id: "native-a" }, access_token: `fixture.${encoded}.old` },
+      },
+      error: null,
+    };
+    const refreshed = {
+      data: {
+        session: { user: { id: "native-a" }, access_token: `fixture.${encoded}.new` },
+      },
+      error: null,
+    };
+    native.getSession.mockResolvedValueOnce(original).mockResolvedValue(refreshed);
+    const queries = new QueryClient();
+    expect(await queries.query(accountQuery("native-a"))).toMatchObject({ id: "account-a" });
+    expect(reader).toHaveBeenCalledExactlyOnceWith(false, original.data.session.access_token);
+  });
 });

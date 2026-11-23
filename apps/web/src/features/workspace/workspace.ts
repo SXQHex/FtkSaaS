@@ -2,7 +2,6 @@ import { v7 as uuidv7 } from "uuid";
 import type { Session } from "@supabase/supabase-js";
 import { BackendError, createBackend } from "../../lib/backend";
 import { getSupabaseClient } from "../../lib/supabase";
-import { nativeSessionId } from "../auth/native-session-id";
 import type { OrganizationView, CenterView, RoleView } from "@ftksaas/api-contracts";
 
 export async function readWorkspace(
@@ -114,12 +113,7 @@ export async function readWorkspace(
   if (readVerifiedAccount) {
     const latest = await getSupabaseClient().auth.getSession();
     if (latest.error) throw latest.error;
-    const startedSessionId = nativeSessionId(data.session);
-    if (
-      !latest.data.session ||
-      latest.data.session.user.id !== data.session.user.id ||
-      (startedSessionId && nativeSessionId(latest.data.session) !== startedSessionId)
-    )
+    if (!latest.data.session || latest.data.session.user.id !== data.session.user.id)
       throw new Error("ACCOUNT_CHANGED");
   }
   signal?.throwIfAborted();

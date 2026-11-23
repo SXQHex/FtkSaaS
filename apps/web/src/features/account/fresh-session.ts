@@ -1,5 +1,5 @@
 import { v7 as uuidv7 } from "uuid";
-import { nativeSessionId } from "../auth/native-session-id";
+import { z } from "zod";
 import type { Session } from "@supabase/supabase-js";
 import { getSupabaseClient } from "../../lib/supabase";
 import { BackendError, getBackend } from "../../lib/backend";
@@ -13,6 +13,21 @@ const replacementSchema = z.object({
   replacement: z.uuid(),
   operationKey: z.uuid(),
 });
+const sessionClaims = z.object({ sub: z.uuid(), session_id: z.uuid() });
+
+function sessionId(session: Session) {
+  try {
+    const payload = session.access_token.split(".")[1];
+    const claims = sessionClaims.parse(
+      JSON.parse(atob(payload.replaceAll("-", "+").replaceAll("_", "/"))),
+    );
+    // These claims identify the local session. The backend verifies auth and ownership.
+    if (claims.sub === session.user.id) return claims.session_id;
+  } catch {
+    return undefined;
+  }
+}
+
 function pendingReplacement() {
   try {
     return replacementSchema.parse(JSON.parse(localStorage.getItem(replacementKey) ?? "null"));
@@ -27,7 +42,7 @@ function replacementFor(session: Session) {
     pending &&
     pending.actor === session.user?.id &&
     pending.replacement !== pending.previous &&
-    pending.replacement === nativeSessionId(session)
+    pending.replacement === sessionId(session)
   )
     return pending;
 }
@@ -70,7 +85,7 @@ async function replacePasswordSession(password: string) {
   const before = await auth.getSession();
   if (before.error) throw before.error;
   const existing = before.data.session;
-  const previous = existing?.user.id === user.id ? nativeSessionId(existing) : undefined;
+  const previous = existing?.user.id === user.id ? sessionId(existing) : undefined;
   if (!existing || !previous) throw new Error("AUTH_REQUIRED");
   if (replacementFor(existing)) {
     await requirePasswordSessionAssurance(existing);
@@ -79,7 +94,7 @@ async function replacePasswordSession(password: string) {
   const { data, error } = await auth.signInWithPassword({ email: user.email, password });
   if (error) throw error;
   if (!data.session || data.user?.id !== user.id) throw new Error("AUTH_REQUIRED");
-  const replacement = nativeSessionId(data.session);
+  const replacement = sessionId(data.session);
   if (!replacement || data.session.user.id !== user.id) throw new Error("AUTH_REQUIRED");
   if (replacement !== previous)
     localStorage.setItem(
