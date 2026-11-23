@@ -1,5 +1,20 @@
 # Güncel kaynak ve kabul
 
+<a id="hosted-api-gecikmesi"></a>
+## Hosted API gecikmesi ve organizasyon okuma kilidi
+
+24 Kasım 2026. Taban `dedffbe1eef138403aa97fb5aba71f009bcf98bb`. [Aynı kaynak main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/45279079041) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/45279194941) başarılı.
+
+23 Kasım 01.17–24 Kasım 01.17 TSİ aralığında Türkiye istemcilerinin Frankfurt Edge v108 başarılı POST örnekleri incelendi. `account_get_v1` 40 çağrıda 693 ms medyan ve 10.100 ms tepe, `people_list_v1` 19 çağrıda 393 ms medyan ve 4.631 ms tepe verdi. Etkin ayar, ayar kataloğu ve abonelik özeti medyanları sırasıyla 1.169, 1.304 ve 1.182 ms oldu. Bu üç örneklemde çağrı sayısı 6, 6 ve 5'tir. PostgREST günlüğünde `account_get_v1` 10.007 ms'ye ulaştı. Hesap çağrısının saniyelik bekleyişini açıklayan PostgreSQL işlem kaydı elde edilmedi.
+
+PostgreSQL, `people_list_v1` için `core.organizations` satırındaki işlem kilidinde 1.152,6 ms bekleme kaydetti. Ayrı iki olayda P05 ve P06 cron işlemlerinin aynı organizasyon kilidinde birbirini beklediği PID ve cron geçmişiyle doğrulandı. Kişi listesi olayındaki tutan süreç PostgREST bağlantısıydı. Tutan RPC'nin adı logdan belirlenemedi.
+
+Migration, kişi, rol ve merkez listeleri ile abonelik özeti, etkin ayar ve ayar kataloğunda organizasyon satırını `FOR SHARE` ile okur. Düz merkez listesi ve kurulum özeti aynı kilit modunu kullanır. Yazma ve yetki iptali mevcut `FOR UPDATE` kilidini alır.
+
+Supabase'in sabitlenmiş PostgreSQL 17.11 dağıtımında 217 taban migration uygulandı. Aynı sentetik kişi listesi isteği dört dönüşümlü blokta, koşul ve sürüm başına 20 kez ölçüldü. Başka bir okuma organizasyon satırını 200 ms tuttuğunda SQL RPC medyanı 211,78 → 9,33 ms, p95 233,45 → 11,22 ms oldu. Eşzamanlı işlem yokken medyan 10,31 → 10,70 ms oldu. Altı RPC'nin yedi istek biçiminde yanıttaki iş verileri eşleşti ve çağrıya özgü ölçüm zamanlarının geçerliliği doğrulandı. Kapsam dışı kullanıcı reddi ve yazmanın okuma tamamlanmadan özel kilit alamaması doğrulandı. Ölçüm izole SQL RPC yolunu kapsar.
+
+Backend `verify` 467 + 150 + 10 testte sıfır hata ve atlama ile geçti. Yerel kalite kontrolü 10/10 ve sıfır bulgu verdi. CLI için sabit PostgreSQL paketi alternatif sağlayıcı yolları denendikten sonra SHA256 doğrulamasıyla alındı. Yerel Supabase stack'i Unix socket bind sırasında `Operation not permitted` nedeniyle başlamadı. İzole SQL deneyi döngü adresinden TCP kullandı. Aday native CI, dağıtım ve aynı canlı akışın tekrar ölçümü [kalan kabulde](remaining-work.md#hosted-api-gecikmesi) izlenir.
+
 <a id="ci503-native-baslangic"></a>
 ## CI503 — Boş runtime yanıtı ve native başlangıç maliyeti
 
