@@ -1,7 +1,7 @@
 import { type QueryClient, type QueryKey } from "@tanstack/react-query";
-import type { readWorkspace } from "../workspace/workspace";
-import { workspaceKeys, workspaceQuery } from "../workspace/workspace-query";
-import { accountQueryKeys } from "./account-query";
+import { readWorkspace } from "../workspace/workspace";
+import { workspaceKeys } from "../workspace/workspace-query";
+import { accountQueryKeys, verifiedWorkspaceAccount } from "./account-query";
 import { BackendError } from "../../lib/backend";
 
 type Workspace = Awaited<ReturnType<typeof readWorkspace>>;
@@ -121,19 +121,22 @@ export async function reconcileQueryAccessFailure(
   try {
     // An older in-flight workspace response must not defeat this permission check.
     await queries.cancelQueries({ queryKey: workspaceKeys.account(accountId) });
-    // Force an authoritative read even when this workspace projection is still
-    // within its regular Query freshness window.
-    current = await queries.fetchQuery({
-      ...workspaceQuery(queries, accountId, orgId),
-      staleTime: 0,
-    });
+    // An independent native recheck cannot reuse a cached Query success or
+    // turn a denied feature query into another privileged cache read.
+    current = await readWorkspace(accountId, orgId, (session) =>
+      verifiedWorkspaceAccount(queries, session.user.id),
+    );
   } catch (error) {
     queries.clear();
     if (classifyAccessFailure(error) === "session") await actions.showLogin();
     else await actions.invalidateRoute();
     return;
   }
-  if (workspaceAuthority(previous) === workspaceAuthority(current)) return;
+  if (workspaceAuthority(previous) === workspaceAuthority(current)) {
+    // A feature-specific FORBIDDEN must not evict unrelated authorized data.
+    queries.setQueryData(workspaceKeys.projection(accountId, orgId), current);
+    return;
+  }
 
   // Actual role/center loss: evict every private continuation and in-flight
   // read, not only the Query that happened to return FORBIDDEN first.
@@ -184,6 +187,14 @@ export function observeQueryAccessFailures(queries: QueryClient, actions: Access
   };
 
   return cache.subscribe((event) => {
+    if (event.type === "added") {
+      // A selected workspace can be created with automatic-scope initialData.
+      // Capture that previous authority before its first real backend success.
+      if (isWorkspaceProjection(event.query.queryKey)) {
+        remember(event.query.queryHash, event.query.state.data as Workspace | undefined);
+      }
+      return;
+    }
     if (event.type === "removed") {
       authorities.delete(event.query.queryHash);
       handled.delete(event.query.queryHash);
