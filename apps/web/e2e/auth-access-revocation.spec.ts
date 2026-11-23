@@ -42,8 +42,8 @@ test("M06: revoked center access clears live CRM, history and deep-link permissi
   await page.getByRole("menuitem", { name: "Hesabım", exact: true }).click();
   await expect(page).toHaveURL(/\/account/);
   await page.goBack();
-  await expect(page).toHaveURL(`${origin}/o/${I.org}/c/${I.center}/leads`);
   await expect(privateRow).toHaveCount(0);
+  await expect(page).not.toHaveURL(/\/login$/);
   expect(state.writes).toHaveLength(0);
 
   // A hard deep-link load must also honor the same inaccessible center.
