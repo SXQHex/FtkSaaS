@@ -1,8 +1,10 @@
 import { I18nProvider, RouterProvider as AriaRouterProvider } from "react-aria-components";
 import { useTranslation } from "react-i18next";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Outlet, useRouter, useRouterState } from "@tanstack/react-router";
 import { useAuthSession } from "../features/auth/use-auth-session";
+import { observeQueryAccessFailures } from "../features/auth/query-access-recovery";
 import { RoutePendingPage } from "../features/states/route-state-pages";
 import { NetworkNotice } from "../features/states/network-notice";
 
@@ -15,6 +17,8 @@ const StateGallery = isDevelopment ? lazy(() => import("../examples/state-galler
 export function RootLayout() {
   const { i18n } = useTranslation();
   const router = useRouter();
+  const queries = useQueryClient();
+  const [checkingAccess, setCheckingAccess] = useState(false);
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const anonymousProgram = pathname.startsWith("/public/");
   const authReady = useAuthSession(!anonymousProgram);
@@ -23,6 +27,14 @@ export function RootLayout() {
     ["/", "/login", "/signup", "/verify-email", "/forgot-password", "/auth/callback"].includes(
       pathname,
     );
+  useEffect(() => {
+    if (publicRoute) return;
+    return observeQueryAccessFailures(queries, {
+      onChecking: setCheckingAccess,
+      invalidateRoute: () => router.invalidate({ sync: true }),
+      showLogin: () => router.navigate({ to: "/login", replace: true }),
+    });
+  }, [publicRoute, queries, router]);
   const showExample =
     isDevelopment && new URLSearchParams(window.location.search).has("__form_example");
   const showStates =
@@ -36,17 +48,28 @@ export function RootLayout() {
         }}
       >
         <NetworkNotice />
-        <Suspense fallback={<RoutePendingPage />}>
-          {!authReady && !publicRoute ? (
+        <div
+          className={checkingAccess && !publicRoute ? "invisible pointer-events-none contents" : "contents"}
+          inert={checkingAccess && !publicRoute}
+          aria-hidden={checkingAccess && !publicRoute}
+        >
+          <Suspense fallback={<RoutePendingPage />}>
+            {!authReady && !publicRoute ? (
+              <RoutePendingPage />
+            ) : showStates ? (
+              <StateGallery />
+            ) : showExample ? (
+              <FormPreview />
+            ) : (
+              <Outlet />
+            )}
+          </Suspense>
+        </div>
+        {checkingAccess && !publicRoute && (
+          <div className="fixed inset-0 z-50 bg-background">
             <RoutePendingPage />
-          ) : showStates ? (
-            <StateGallery />
-          ) : showExample ? (
-            <FormPreview />
-          ) : (
-            <Outlet />
-          )}
-        </Suspense>
+          </div>
+        )}
         <Suspense fallback={null}>
           <Devtools />
         </Suspense>
