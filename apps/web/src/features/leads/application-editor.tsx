@@ -5,11 +5,12 @@ import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { PersonSummary } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
-import { readIntoCurrentQuery } from "../../lib/cache-invalidation";
+import { invalidateCachedFamilies, readIntoCurrentQuery } from "../../lib/cache-invalidation";
 import { readPerson } from "../people/people";
 import { invalidatePeoplePages } from "../people/people-query";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { readApplicationsPage } from "./leads-read";
+import { applicationDetailFamilies } from "./leads-query";
 import {
   applicationReviewIntent,
   writeLeadIntent,
@@ -62,7 +63,10 @@ export function ApplicationEditor({
     queryFn: (context) => readApplicationsPage(scope, undefined, id, undefined, context),
     retry: false,
   });
-  const before = !query.isError && query.data?.items.length === 1 ? query.data.items[0] : undefined;
+  const before =
+    !query.isError && !query.isFetching && query.data?.items.length === 1
+      ? query.data.items[0]
+      : undefined;
   const command = useMemberCommand({
     write: writeLeadIntent,
     readReceipt: readLeadReceipt,
@@ -78,6 +82,12 @@ export function ApplicationEditor({
         (result) => result.page,
       ),
     onRefresh: async (result, assertCurrent) => {
+      const business = ["business-applications", scope.accountId, scope.orgId];
+      await invalidateCachedFamilies(
+        queries,
+        [business, ...applicationDetailFamilies(queries, scope, id, scope.centerId)],
+        [business],
+      );
       if (result.kind === "application" && result.createdCandidate)
         await invalidatePeoplePages(queries, scope);
       assertCurrent();
@@ -158,8 +168,10 @@ export function ApplicationEditor({
       onSubmit={before && canReview && command.state === "ready" ? () => void submit() : undefined}
       content={
         <div className="flex flex-col gap-3">
-          {query.isPending && <p role="status">{t(($) => $.leads.loading)}</p>}
-          {(query.isError || (!query.isPending && !before)) && (
+          {(query.isPending || query.isFetching) && (
+            <p role="status">{t(($) => $.leads.loading)}</p>
+          )}
+          {(query.isError || (!query.isPending && !query.isFetching && !before)) && (
             <Alert variant="destructive">
               <AlertDescription>
                 {t(($) => $.leads.applicationReadFailed)}{" "}

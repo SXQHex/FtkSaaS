@@ -385,7 +385,10 @@ export function SaleLifecycleEditor({
                 onAccessLost={onAccessLost}
                 onRefresh={async (target, assertCurrent) => {
                   await Promise.all([
-                    invalidateEventViews(queries, target.scope, target.eventId, { finance: true }),
+                    invalidateEventViews(queries, target.scope, target.eventId, {
+                      finance: true,
+                      personId,
+                    }),
                     invalidateMemberReservationViews(queries, target.scope, personId),
                   ]);
                   assertCurrent();

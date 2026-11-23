@@ -26,6 +26,7 @@ import {
   type ReportFileRow,
 } from "./reports-view";
 import { reportInterval, readReport, readImportDirectory } from "./reports-read";
+import { reportKeys } from "./reports-query";
 import {
   reportMoney,
   reportCount,
@@ -122,8 +123,7 @@ export function ReportsContent({
   const reports = useQueries({
     queries: definitions.map((item) => ({
       queryKey: [
-        "report-view",
-        scope,
+        ...reportKeys.views(scope),
         item.name,
         item.kind,
         item.breakdown,
@@ -150,7 +150,7 @@ export function ReportsContent({
     ]),
   ) as Partial<Record<(typeof definitions)[number]["name"], ReportView>>;
   const finance = useQuery({
-    queryKey: ["report-finance-summary", scope, filters],
+    queryKey: [...reportKeys.financeSummary(scope), filters],
     queryFn: (context) =>
       readFinanceDirectory(
         scope,
@@ -337,7 +337,7 @@ export function ReportsContent({
       queries,
       kind
         ? [kind === "imports" ? importFamily : exportFamily]
-        : [["report-view", scope], ["report-finance-summary", scope], exportFamily, importFamily],
+        : [reportKeys.views(scope), reportKeys.financeSummary(scope), exportFamily, importFamily],
     );
     assertCurrent();
     const firstPages = kind ? [kind] : tab === "files" ? (["imports", "exports"] as const) : [];

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useBlocker } from "@tanstack/react-router";
-import { capturePrivateReadback, invalidateCachedFamilies } from "../../lib/cache-invalidation";
+import { capturePrivateReadback } from "../../lib/cache-invalidation";
 import { invalidateMemberReservationViews } from "../member-reservations/member-reservations-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -161,14 +161,7 @@ export function CancelReservation({
     const result = await readCancellationResult(intent.current, primary.current);
     assertCurrent();
     if (!mounted.current || terminal.current) return;
-    const subject = [accountId, orgId, centerId, personId] as const;
-    await Promise.all([
-      invalidateMemberReservationViews(queries, scope, personId),
-      invalidateCachedFamilies(queries, [
-        ["profile-ledger", ...subject],
-        ["profile-rights", ...subject],
-      ]),
-    ]);
+    await invalidateMemberReservationViews(queries, scope, personId);
     assertCurrent();
     await onRefresh(result, assertCurrent);
     assertCurrent();

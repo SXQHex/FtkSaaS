@@ -2,6 +2,55 @@ import { test, expect } from "./test.js";
 import { scanAccessibility } from "./accessibility.js";
 import { mockStudio, openStudio, studioIds as I } from "./studio-fixture.js";
 
+for (const code of ["FORBIDDEN", "NOT_FOUND"] as const) {
+  test(`Studio keeps an acknowledged retirement recoverable after ${code} and hides old rule details`, async ({
+    page,
+  }) => {
+    const state = await mockStudio(page);
+    let denyReadback = true;
+    await page.route("**/functions/v1/backend-v1/management_state_get_v1", async (route) => {
+      const input = route.request().postDataJSON() as { selector?: { key?: { rule_id?: string } } };
+      if (
+        denyReadback &&
+        input.selector?.key?.rule_id === state.rules[0]?.id &&
+        state.writes.some(({ payload }) => payload.action === "retire")
+      ) {
+        denyReadback = false;
+        await route.fulfill({
+          json: { ok: false, error: { code, retryable: false, trace_id: I.org } },
+        });
+      } else await route.fallback();
+    });
+    await openStudio(page);
+    await page.getByRole("tab", { name: "Uygunluk", exact: true }).click();
+    await page.getByLabel("Kaynak", { exact: true }).selectOption(I.instructor);
+    await page
+      .getByLabel("Geçerlilik dönemi", { exact: true })
+      .selectOption(JSON.stringify(["2026-11-01", null]));
+    await page.getByRole("button", { name: "Kalıcı kuralı kapat", exact: true }).click();
+    await page
+      .getByRole("menuitem")
+      .filter({ hasText: /18:00:00/ })
+      .click();
+    const dialog = page.getByRole("alertdialog");
+    await expect(dialog.getByText(/Pazartesi, Çarşamba/)).toBeVisible();
+    await dialog.getByLabel("İşlem gerekçesi", { exact: false }).fill("Kural artık kullanılmıyor");
+    await dialog.getByRole("button", { name: "Kalıcı kuralı kapat", exact: true }).click();
+    const retry = dialog.getByRole("button", { name: "Listeyi yeniden yükle", exact: true });
+    await expect(retry).toBeVisible();
+    await expect(dialog.getByText(/Pazartesi, Çarşamba/)).toHaveCount(0);
+    await expect(
+      dialog.getByRole("button", { name: "Kalıcı kuralı kapat", exact: true }),
+    ).toBeDisabled();
+    await retry.click();
+    await expect(
+      dialog.getByText("İşlem kaydedildi; güncel bilgiler yüklendi.", { exact: true }),
+    ).toBeVisible();
+    expect(state.writes.filter(({ payload }) => payload.action === "retire")).toHaveLength(1);
+    expect(state.rules[0]?.active).toBe(false);
+  });
+}
+
 test("Studio lifecycle: explicit last-rule retirement, same-key recovery, versioned closure cancellation and AA", async ({
   page,
 }) => {

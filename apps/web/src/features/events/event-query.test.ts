@@ -41,3 +41,28 @@ it("keeps the exact validated event readback and invalidates only the matching p
   await invalidateEventViews(queries, scope, "event");
   expect(queries.getQueryState(detail)?.isInvalidated).toBe(true);
 });
+
+it("invalidates collection reports and the affected person's warm debt projections", async () => {
+  const queries = new QueryClient();
+  const foreign = { ...scope, centerId: "different" };
+  const subject = [scope.accountId, scope.orgId, scope.centerId, "person"];
+  const affected = [
+    ["report-finance-summary", scope, { interval: "current" }],
+    ["report-view", scope, "collections", "collection_breakdown", "person", {}, "cursor-2"],
+    ["profile-person", ...subject],
+    ["people", ...subject.slice(0, 3), "search"],
+    ["member-entitlements", ...subject, "debt"],
+  ];
+  const untouched = [
+    ["report-finance-summary", foreign],
+    ["report-view", scope, "sessions", "session_metrics"],
+    ["report-view", scope, "weeks", "sales"],
+    ["profile-person", ...subject.slice(0, 3), "another-person"],
+  ];
+  for (const key of [...affected, ...untouched]) queries.setQueryData(key, { version: 1 });
+
+  await invalidateEventViews(queries, scope, "event", { finance: true, personId: "person" });
+
+  for (const key of affected) expect(queries.getQueryState(key)?.isInvalidated).toBe(true);
+  for (const key of untouched) expect(queries.getQueryState(key)?.isInvalidated).toBe(false);
+});

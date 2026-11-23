@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useBlocker } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   instructorEmailContact,
   instructorEmailPolicy,
@@ -9,6 +10,8 @@ import { useTranslation } from "react-i18next";
 import { revalidateLogic, useForm } from "@tanstack/react-form";
 import { XIcon } from "lucide-react";
 import { BackendError } from "../../lib/backend";
+import { capturePrivateReadback } from "../../lib/cache-invalidation";
+import { invalidatePersonIdentityViews } from "../people/people-query";
 import {
   instructorEditDraft,
   instructorClassesChanged,
@@ -168,6 +171,7 @@ function InstructorEditForm({
   onLockChange: (value: boolean) => void;
 }) {
   const { t } = useTranslation();
+  const queries = useQueryClient();
   const [base, setBase] = useState(initial);
   const [defaultValues, setDefaultValues] = useState(() => instructorEditDraft(initial));
   const [notice, setNotice] = useState<Notice>("ready");
@@ -319,10 +323,21 @@ function InstructorEditForm({
       document.activeElement instanceof HTMLElement ? document.activeElement : null;
     lock.current = true;
     setBusy(true);
+    const assertCurrent = capturePrivateReadback(queries);
     try {
       while (current.next < current.intent.steps.length) {
+        const step = current.intent.steps[current.next];
         await saveInstructorEditStep(current.intent, current.next);
         current.next++;
+        // A later role or class step can fail after the identity write commits.
+        assertCurrent();
+        if (step?.kind === "profile")
+          await invalidatePersonIdentityViews(
+            queries,
+            current.intent.scope,
+            current.intent.personId,
+          );
+        assertCurrent();
         if (!mounted.current) return;
         setCompleted(current.next);
       }

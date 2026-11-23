@@ -27,6 +27,8 @@ import {
   scheduleLocalDate,
 } from "./schedule-read";
 import { scheduleRangeQuery } from "./schedule-query";
+import { scheduleCacheKeys, sessionScheduleFamilies } from "./schedule-cache";
+import { sessionDetailKeys } from "../session-detail/session-detail-query";
 import {
   scheduleEvents,
   scheduleBackendError,
@@ -248,10 +250,9 @@ export function ScheduleContent({
     onAccessLost: accessLost,
     onRefresh: async (intent) => {
       await invalidateCachedFamilies(queries, [
-        ["schedule-range", scope.accountId, scope.orgId, scope.centerId],
-        ["session-detail", scope.accountId, scope.orgId, scope.centerId],
-        ["instructor-calendar", scope.accountId, scope.orgId, scope.centerId],
-        ["instructor-today-attendance", scope.accountId, scope.orgId, scope.centerId],
+        ...sessionScheduleFamilies(scope),
+        sessionDetailKeys.center(scope),
+        scheduleCacheKeys.instructorSession(scope),
         ...(intent.operation === "replacement_session_create_v1"
           ? [
               [
@@ -877,8 +878,9 @@ export function ScheduleContent({
                 onAccessLost={accessLost}
                 onRefresh={async () => {
                   await invalidateCachedFamilies(queries, [
-                    ["schedule-range", scope.accountId, scope.orgId, scope.centerId],
-                    ["session-detail", scope.accountId, scope.orgId, scope.centerId],
+                    ...sessionScheduleFamilies(scope),
+                    sessionDetailKeys.session(scope, selected.session.id),
+                    scheduleCacheKeys.instructorSession(scope),
                   ]);
                   await calendar.refetch({ throwOnError: true });
                   const fresh = await readScheduleEditor(scope, selected.session.id);

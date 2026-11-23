@@ -42,7 +42,7 @@ export function RegisteredEventPayment({
   before: EventView;
   registrationId: string;
   onClose: () => void;
-  onSaved: (detailVerified?: boolean) => Promise<void>;
+  onSaved: (detailVerified: boolean, personId?: string) => Promise<void>;
   recoveryOnly?: boolean;
   onLockChange: (value: boolean) => void;
   onAccessLost: (cause: unknown) => boolean;
@@ -79,7 +79,7 @@ export function RegisteredEventPayment({
         readRegisteredCollectionResult(intent, id, (event) => event),
       ),
     onAccessLost,
-    onRefresh: () => onSaved(true),
+    onRefresh: () => onSaved(true, expected?.person_id),
   });
   const locked = preparing || command.locked;
   const row =

@@ -99,17 +99,18 @@ async function findProduct(scope: ClientScope, leadId: string, id: string) {
   throw Error("TRIAL_SOURCE_UNAVAILABLE");
 }
 async function findOffer(scope: ClientScope, leadId: string, id: string) {
-  let cursor: string | undefined;
+  const firstPage = await readTrialHistory(scope, leadId);
+  let page = firstPage;
   const seen = new Set<string>();
-  do {
-    const page = await readTrialHistory(scope, leadId, cursor),
-      found = page.items.find((row) => row.offer_id === id);
-    if (found) return found;
-    cursor = page.next_cursor ?? undefined;
-    if (cursor && seen.has(cursor)) throw Error("TRIAL_CURSOR_REPEATED");
-    if (cursor) seen.add(cursor);
-  } while (cursor);
-  throw Error("TRIAL_SOURCE_UNAVAILABLE");
+  while (true) {
+    const offer = page.items.find((row) => row.offer_id === id);
+    if (offer) return { offer, firstPage };
+    const cursor = page.next_cursor;
+    if (!cursor) throw Error("TRIAL_SOURCE_UNAVAILABLE");
+    if (seen.has(cursor)) throw Error("TRIAL_CURSOR_REPEATED");
+    seen.add(cursor);
+    page = await readTrialHistory(scope, leadId, cursor);
+  }
 }
 async function freshLead(scope: ClientScope, lead: LeadDetail) {
   const current = await readLeadDetail(scope, lead.personId, lead.id);
@@ -234,7 +235,7 @@ export async function trialConfirmIntent(
 ): Promise<TrialIntent> {
   if (!reviewed) throw Error("LEAD_REVIEW_REQUIRED");
   await freshLead(scope, lead);
-  const current = await findOffer(scope, lead.id, offer.offer_id),
+  const { offer: current } = await findOffer(scope, lead.id, offer.offer_id),
     state = await readOfferState(scope, offer.offer_id);
   if (
     current.version !== offer.version ||
@@ -292,7 +293,7 @@ export async function readTrialResult(intent: TrialIntent, id?: string) {
   const primary = z.uuid().parse(id);
   if (intent.operation === "trial_registration_confirm_v1" && primary !== intent.offer.offer_id)
     throw Error("TRIAL_RESULT_UNAVAILABLE");
-  const offer = await findOffer(intent.scope, intent.lead.id, primary);
+  const { offer, firstPage } = await findOffer(intent.scope, intent.lead.id, primary);
   if (intent.operation === "trial_offer_create_v1") {
     if (
       offer.product_version_id !== intent.request.product_version_id ||
@@ -308,5 +309,5 @@ export async function readTrialResult(intent: TrialIntent, id?: string) {
     offer.session_id !== intent.offer.session_id
   )
     throw Error("TRIAL_RESULT_UNAVAILABLE");
-  return offer;
+  return { ...offer, firstPage };
 }

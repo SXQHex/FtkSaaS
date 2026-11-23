@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { v7 as uuidv7 } from "uuid";
 import { Button } from "@ftksaas/ui/components/button";
@@ -21,6 +21,7 @@ import {
   TableRow,
 } from "@ftksaas/ui/components/table";
 import type { PlatformInvoice } from "@ftksaas/api-contracts";
+import { invalidateCachedFamilies, readIntoCurrentQuery } from "../../lib/cache-invalidation";
 import { EventCommandNotice } from "../events/event-command-notice";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { SettingsReviewDialog } from "../settings/settings-review-dialog";
@@ -49,6 +50,7 @@ export function PlatformInvoices({
   onDenied: () => void;
 }) {
   const { t } = useTranslation();
+  const queries = useQueryClient();
   const copy = t(($) => $.platform.invoices, { returnObjects: true });
   const { record } = usePlatformActivity();
   const id = useId();
@@ -63,8 +65,9 @@ export function PlatformInvoices({
   const [published, setPublished] = useState<PlatformInvoice>();
   const [review, setReview] = useState<StagedInvoice>();
   const [accepted, setAccepted] = useState(false);
+  const historyKey = ["platform-invoices", accountId, orgId];
   const history = useInfiniteQuery({
-    queryKey: ["platform-invoices", accountId, orgId],
+    queryKey: historyKey,
     initialPageParam: undefined as string | undefined,
     queryFn: (context) => readPlatformInvoices(accountId, orgId, context.pageParam, context),
     getNextPageParam: (last) => last.next_cursor ?? undefined,
@@ -82,6 +85,20 @@ export function PlatformInvoices({
     onDenied();
     return true;
   };
+  async function refreshHistory(assertCurrent: () => void, published = false) {
+    const families = published
+      ? [historyKey, ["billing-invoices", accountId, orgId]]
+      : [historyKey];
+    await invalidateCachedFamilies(queries, families, families);
+    assertCurrent();
+    await readIntoCurrentQuery(
+      queries,
+      historyKey,
+      () => readPlatformInvoices(accountId, orgId),
+      (page) => ({ pages: [page], pageParams: [undefined] }),
+    );
+    assertCurrent();
+  }
   const upload = useMemberCommand({
     write: uploadPlatformInvoice,
     readResult: async (intent, invoiceId) => {
@@ -100,8 +117,8 @@ export function PlatformInvoices({
         },
       };
     },
-    onRefresh: async (result) => {
-      await history.refetch({ throwOnError: true });
+    onRefresh: async (result, assertCurrent) => {
+      await refreshHistory(assertCurrent);
       setStaged(result);
     },
     onAccessLost,
@@ -118,9 +135,9 @@ export function PlatformInvoices({
         throw Error("INVOICE_PUBLISH_RESULT_INVALID");
       return result;
     },
-    onRefresh: async (row) => {
+    onRefresh: async (row, assertCurrent) => {
       if (!review) throw Error("INVOICE_PUBLISH_RESULT_INVALID");
-      await history.refetch({ throwOnError: true });
+      await refreshHistory(assertCurrent, true);
       if (staged?.id === row.id) setPublished(row);
       record({ kind: "invoicePublished", key: review.intent.publishKey, subject: name });
     },
@@ -255,7 +272,7 @@ export function PlatformInvoices({
             {history.hasNextPage && (
               <Button
                 variant="outline"
-                isDisabled={history.isFetching}
+                isDisabled={locked || history.isFetching}
                 onPress={() => void history.fetchNextPage()}
               >
                 {copy.more}

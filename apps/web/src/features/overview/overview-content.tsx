@@ -7,6 +7,7 @@ import { BackendError } from "../../lib/backend";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { hasWorkspaceManagementScope } from "../workspace/workspace";
 import { readOverviewDay, readOverviewLabels, readOverviewParticipants } from "./overview-read";
+import { scheduleCacheKeys } from "../schedule/schedule-cache";
 import { useOverviewWork } from "./use-overview-work";
 import { OverviewView } from "./overview-view";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
@@ -30,7 +31,7 @@ export function OverviewContent({
       ? workspace.data.centers.find((c) => c.id === scope.centerId && c.accessible)
       : undefined;
   const program = useQuery({
-    queryKey: ["overview", scope.accountId, scope.orgId, scope.centerId, center?.timezone],
+    queryKey: [...scheduleCacheKeys.overview(scope), center?.timezone],
     queryFn: (context) => readOverviewDay(scope, center!.timezone, undefined, context),
     enabled: !!center,
     retry: false,
@@ -42,10 +43,7 @@ export function OverviewContent({
     entries?.find((row) => row.session.id === program.data?.nextId);
   const labels = useQuery({
     queryKey: [
-      "overview-labels",
-      scope.accountId,
-      scope.orgId,
-      scope.centerId,
+      ...scheduleCacheKeys.overviewLabels(scope),
       entries?.map((r) => [
         r.session.id,
         r.session.version,
@@ -58,10 +56,7 @@ export function OverviewContent({
   });
   const members = useQuery({
     queryKey: [
-      "overview-participants",
-      scope.accountId,
-      scope.orgId,
-      scope.centerId,
+      ...scheduleCacheKeys.overviewParticipants(scope),
       selected?.session.id,
       selected?.session.version,
       selected?.session.capacity,

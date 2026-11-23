@@ -28,8 +28,8 @@ import { readPerson } from "../people/people";
 
 import { readFinancePage } from "../finance/finance";
 import { invalidateFinanceViews } from "../finance/finance-query";
-import { invalidatePeoplePages } from "../people/people-query";
-import { invalidateProductSalesViews } from "../products/products-query";
+import { invalidatePeoplePages, invalidatePersonIdentityViews } from "../people/people-query";
+import { invalidateProductPages, invalidateProductSalesViews } from "../products/products-query";
 import { invalidateMemberReservationViews } from "../member-reservations/member-reservations-query";
 import { cacheVerifiedReadback } from "../../lib/cache-invalidation";
 import { CollectionEditor } from "../finance/finance-content";
@@ -234,8 +234,9 @@ export function MemberProfileContent({
       onAccessLost={accessLost}
       onRefresh={async (current, assertCurrent) => {
         assertCurrent();
+        await invalidatePersonIdentityViews(queries, scope, personId);
+        assertCurrent();
         await cacheVerifiedReadback(queries, personKey, current);
-        await invalidatePeoplePages(queries, scope);
       }}
     />
   );
@@ -896,7 +897,9 @@ export function MemberProfileContent({
           onRefresh={async (result, assertCurrent) => {
             assertCurrent();
             await cacheVerifiedReadback(queries, rightsKey, result.rights);
-            await invalidateMemberReservationViews(queries, scope, personId);
+            await invalidateMemberReservationViews(queries, scope, personId, {
+              verifiedProfileRights: true,
+            });
             assertCurrent();
             await person.refetch({ throwOnError: true });
           }}
@@ -920,7 +923,12 @@ export function MemberProfileContent({
           onRefresh={async (result, assertCurrent) => {
             assertCurrent();
             await cacheVerifiedReadback(queries, rightsKey, result.rights);
-            await invalidateMemberReservationViews(queries, scope, personId);
+            await Promise.all([
+              invalidateMemberReservationViews(queries, scope, personId, {
+                verifiedProfileRights: true,
+              }),
+              invalidateProductPages(queries, scope),
+            ]);
             assertCurrent();
             await person.refetch({ throwOnError: true });
           }}
@@ -948,7 +956,9 @@ export function MemberProfileContent({
                 cacheVerifiedReadback(queries, negativeKey, result.limit),
                 cacheVerifiedReadback(queries, rightsKey, result.rights),
               ]);
-              await invalidateMemberReservationViews(queries, scope, personId);
+              await invalidateMemberReservationViews(queries, scope, personId, {
+                verifiedProfileRights: true,
+              });
               assertCurrent();
               await person.refetch({ throwOnError: true });
             }}
@@ -1022,7 +1032,9 @@ export function MemberProfileContent({
               (product) => product.version_id === result.entitlement.product_version_id,
             )?.id;
             await Promise.all([
-              invalidateMemberReservationViews(queries, scope, personId),
+              invalidateMemberReservationViews(queries, scope, personId, {
+                verifiedProfileRights: true,
+              }),
               invalidateProductSalesViews(queries, scope, productId ? [productId] : undefined),
             ]);
             assertCurrent();
@@ -1121,7 +1133,9 @@ export function MemberProfileContent({
               setCursors([undefined]);
             }
             await Promise.all([
-              invalidateMemberReservationViews(queries, scope, personId),
+              invalidateMemberReservationViews(queries, scope, personId, {
+                verifiedProfileRights: true,
+              }),
               invalidateProductSalesViews(queries, scope),
             ]);
             assertCurrent();

@@ -2,6 +2,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
 import { overviewWorkKey } from "../overview/overview-work";
+import { reportKeys } from "../reports/reports-query";
 
 export const leadsKeys = {
   directory: (scope: ClientScope) =>
@@ -24,5 +25,21 @@ export function invalidateLeadPages(queries: QueryClient, scope: ClientScope) {
     leadsKeys.applications(scope),
     leadsKeys.summary(scope),
     overviewWorkKey(scope),
+    [...reportKeys.views(scope), "crm", "crm_conversion"],
   ]);
+}
+
+export function applicationDetailFamilies(
+  queries: QueryClient,
+  scope: Pick<ClientScope, "accountId" | "orgId">,
+  id: string,
+  verifiedCenterId?: string,
+) {
+  return queries
+    .getQueryCache()
+    .findAll({
+      queryKey: ["lead-application", scope.accountId, scope.orgId],
+      predicate: ({ queryKey }) => queryKey[4] === id && queryKey[3] !== verifiedCenterId,
+    })
+    .map(({ queryKey }) => queryKey);
 }

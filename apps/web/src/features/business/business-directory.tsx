@@ -1,6 +1,6 @@
 import { useEffect, useId, useState } from "react";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
-import { invalidateCachedFamilies, retainFirstInfinitePage } from "../../lib/cache-invalidation";
+import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
 import { useTranslation } from "react-i18next";
 import { v7 as uuidv7 } from "uuid";
 import { Button, LinkButton } from "@ftksaas/ui/components/button";
@@ -20,6 +20,7 @@ import type { CenterView } from "@ftksaas/api-contracts";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import { EventCommandNotice } from "../events/event-command-notice";
 import { readApplicationsPage } from "../leads/leads-read";
+import { applicationDetailFamilies } from "../leads/leads-query";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { readPeoplePage } from "../people/people";
 import { SettingsReviewDialog } from "../settings/settings-review-dialog";
@@ -202,15 +203,21 @@ export function BusinessApplications({
     write: routeApplication,
     readResult: readRoutedApplication,
     onAccessLost: () => false,
-    onRefresh: async (row) => {
-      setDestination((current) => ({ ...current, [row.id]: "" }));
-      await invalidateCachedFamilies(client, [
-        key,
-        ["lead-applications", scope.accountId, scope.orgId],
-      ]);
-      retainFirstInfinitePage(client, key);
+    onRefresh: async (row, assertCurrent) => {
+      await invalidateCachedFamilies(
+        client,
+        [
+          key,
+          ["lead-applications", scope.accountId, scope.orgId],
+          ...applicationDetailFamilies(client, scope, row.id),
+        ],
+        [key],
+      );
+      assertCurrent();
       const refreshed = await applications.refetch({ throwOnError: true });
+      assertCurrent();
       if (!refreshed.data) throw new Error("BUSINESS_APPLICATIONS_UNAVAILABLE");
+      setDestination((current) => ({ ...current, [row.id]: "" }));
     },
   });
   useEffect(() => {

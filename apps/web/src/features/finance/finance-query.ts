@@ -1,6 +1,7 @@
 import { capturePrivateReadback } from "../../lib/cache-invalidation";
 import type { QueryClient } from "@tanstack/react-query";
 import type { ClientScope } from "../../lib/scoped-backend";
+import { reportCollectionFamilies, reportSalesFamilies } from "../reports/reports-query";
 
 export const financeKeys = {
   person: (scope: ClientScope, personId: string, currency: string) =>
@@ -30,9 +31,11 @@ export async function invalidateFinanceViews(
     financeKeys.person(scope, personId, currency),
     ["profile-person", ...tenant, personId],
     ["people", ...tenant],
+    ["lesson-requests", ...tenant],
     financeKeys.directory(scope),
     ["member-entitlements", ...tenant, personId],
-    ["report-finance-summary", scope],
+    ...reportCollectionFamilies(scope),
+    ...reportSalesFamilies(scope),
   ];
 
   // Credit balance reads belong to a person and a currency, even when the
@@ -50,26 +53,16 @@ export async function invalidateFinanceViews(
     })
     .map(({ queryKey }) => queryKey);
 
-  // Only monetary reports change after a collection, correction or refund.
-  // Session metrics, instructor balances and CRM reports are independent.
-  const reportKeys = queries
-    .getQueryCache()
-    .findAll({ queryKey: ["report-view", scope] })
-    .filter(({ queryKey }) => ["sales", "collection_breakdown"].includes(String(queryKey[3])))
-    .map(({ queryKey }) => queryKey);
-
   // A read started before a confirmed native write must not replace its
   // readback. Never refetch every historical cursor or report in this step.
   await Promise.all([
     ...families.map((queryKey) => queries.cancelQueries({ queryKey })),
-    ...[...creditKeys, ...reportKeys].map((queryKey) =>
-      queries.cancelQueries({ queryKey, exact: true }),
-    ),
+    ...creditKeys.map((queryKey) => queries.cancelQueries({ queryKey, exact: true })),
   ]);
   assertCurrent();
   await Promise.all([
     ...families.map((queryKey) => queries.invalidateQueries({ queryKey, refetchType: "none" })),
-    ...[...creditKeys, ...reportKeys].map((queryKey) =>
+    ...creditKeys.map((queryKey) =>
       queries.invalidateQueries({ queryKey, exact: true, refetchType: "none" }),
     ),
   ]);

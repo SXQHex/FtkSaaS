@@ -11,6 +11,8 @@ import { readInstructorSession, instructorRoomLabel } from "./instructor-read";
 import { InstructorSessionView } from "./instructor-session-view";
 import { SessionAttendanceController } from "../session-detail/session-attendance-controller";
 import { scheduleInterval, ScheduleTimeError } from "../schedule/schedule-time";
+import { scheduleCacheKeys, sessionScheduleFamilies } from "../schedule/schedule-cache";
+import { sessionDetailKeys } from "../session-detail/session-detail-query";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { Button } from "@ftksaas/ui/components/button";
 import { Field, FieldLabel, FieldError } from "@ftksaas/ui/components/field";
@@ -37,15 +39,7 @@ export function InstructorSessionContent({
   if (self?.instructor) duties.push("instructor");
   if (self?.assistant) duties.push("assistant");
   const personId = duties.length ? identity?.person_id : undefined;
-  const prefix = [
-    "instructor-session",
-    scope.accountId,
-    scope.orgId,
-    scope.centerId,
-    personId,
-    sessionId,
-    duties,
-  ];
+  const prefix = [...scheduleCacheKeys.instructorSession(scope), personId, sessionId, duties];
   const query = useQuery({
     queryKey: prefix,
     queryFn: (readContext) =>
@@ -154,11 +148,11 @@ export function InstructorSessionContent({
     const result = await refetch({ throwOnError: true });
     if (!result.data) throw new Error("INSTRUCTOR_SESSION_UNAVAILABLE");
     await invalidateCachedFamilies(queries, [
-      ["instructor-calendar", scope.accountId, scope.orgId, scope.centerId],
-      ["instructor-today-attendance", scope.accountId, scope.orgId, scope.centerId],
+      ...sessionScheduleFamilies(scope),
+      sessionDetailKeys.session(scope, sessionId),
       ["instructor-month-earnings", scope.accountId, scope.orgId, scope.centerId],
     ]);
-  }, [refetch, queries, scope.accountId, scope.orgId, scope.centerId]);
+  }, [refetch, queries, scope, sessionId]);
   const error = !center || !personId || query.isError || workspace.isError;
   const retry = (
     <Button

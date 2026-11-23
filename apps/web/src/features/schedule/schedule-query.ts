@@ -2,6 +2,7 @@ import { queryOptions } from "@tanstack/react-query";
 import type { Interval } from "@ftksaas/api-contracts";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { readScheduleRange } from "./schedule-read";
+import { scheduleCacheKeys } from "./schedule-cache";
 
 export function scheduleRangeQuery(
   scope: ClientScope,
@@ -10,10 +11,7 @@ export function scheduleRangeQuery(
 ) {
   return queryOptions({
     queryKey: [
-      "schedule-range",
-      scope.accountId,
-      scope.orgId,
-      scope.centerId,
+      ...scheduleCacheKeys.range(scope),
       range?.starts_at,
       range?.ends_at,
       filters.roomId,
