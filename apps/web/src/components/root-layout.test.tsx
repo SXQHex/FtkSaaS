@@ -1,5 +1,7 @@
 import "../i18n";
 import { render, screen, waitFor } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { PropsWithChildren } from "react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, expect, it, vi } from "vitest";
 import { LoginForm } from "../features/auth/login-form";
@@ -21,6 +23,15 @@ vi.mock("@tanstack/react-router", () => ({
     ),
 }));
 import { RootLayout } from "./root-layout";
+function renderRoot() {
+  const queries = new QueryClient();
+  return render(<RootLayout />, {
+    wrapper: ({ children }: PropsWithChildren) => (
+      <QueryClientProvider client={queries}>{children}</QueryClientProvider>
+    ),
+  });
+}
+
 afterEach(() => {
   state.ready = true;
   state.pathname = "/login";
@@ -33,7 +44,7 @@ it("keeps the login form mounted while post-authentication account reading fails
       reject = rejectPromise;
     }),
   );
-  const { rerender } = render(<RootLayout />);
+  const { rerender } = renderRoot();
   await userEvent.type(screen.getByLabelText("E-posta"), "fixture@example.invalid");
   await userEvent.type(screen.getByLabelText("Parola", { exact: true }), "fixture-password");
   await userEvent.click(screen.getByRole("button", { name: "Giriş yap" }));
@@ -48,7 +59,7 @@ it("keeps the login form mounted while post-authentication account reading fails
 });
 it("immediately removes protected content during a session scope change", () => {
   state.pathname = "/account";
-  const { rerender } = render(<RootLayout />);
+  const { rerender } = renderRoot();
   expect(screen.getByText("private-account-fixture")).toBeVisible();
   state.ready = false;
   rerender(<RootLayout />);
