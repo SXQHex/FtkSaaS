@@ -1,5 +1,6 @@
 import type { QueryClient } from "@tanstack/react-query";
 import type { ClientScope } from "../../lib/scoped-backend";
+import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
 
 export const productsKeys = {
   management: (scope: ClientScope) =>
@@ -7,8 +8,5 @@ export const productsKeys = {
 };
 
 export function invalidateProductPages(queries: QueryClient, scope: ClientScope) {
-  return queries.invalidateQueries({
-    queryKey: productsKeys.management(scope),
-    refetchType: "none",
-  });
+  return invalidateCachedFamilies(queries, [productsKeys.management(scope)]);
 }

@@ -1,5 +1,6 @@
 import type { QueryClient } from "@tanstack/react-query";
 import type { ClientScope } from "../../lib/scoped-backend";
+import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
 
 export const leadsKeys = {
   directory: (scope: ClientScope) =>
@@ -14,14 +15,12 @@ export const leadsKeys = {
     ["lead-work-summary", scope.accountId, scope.orgId, scope.centerId] as const,
 };
 
-export async function invalidateLeadPages(queries: QueryClient, scope: ClientScope) {
-  await Promise.all(
-    [
-      leadsKeys.directory(scope),
-      leadsKeys.followups(scope),
-      leadsKeys.sourceFollowups(scope),
-      leadsKeys.applications(scope),
-      leadsKeys.summary(scope),
-    ].map((queryKey) => queries.invalidateQueries({ queryKey, refetchType: "none" })),
-  );
+export function invalidateLeadPages(queries: QueryClient, scope: ClientScope) {
+  return invalidateCachedFamilies(queries, [
+    leadsKeys.directory(scope),
+    leadsKeys.followups(scope),
+    leadsKeys.sourceFollowups(scope),
+    leadsKeys.applications(scope),
+    leadsKeys.summary(scope),
+  ]);
 }
