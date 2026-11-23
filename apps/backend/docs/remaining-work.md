@@ -2,6 +2,12 @@
 
 Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin tek sahibidir**. [Sıra ve kontrol noktaları](production-queue.md), [kaynak/test/hosted kabulü](00-FtkSaaS-yeni-sohbet-devir.md), [ürün kapsamı](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md), [domain davranışı](../../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md) ve [P08](../../../docs/decisions/P08-accepted-scope.md) kendi sahiplerinde tutulur. Buradaki ölçülebilir kabul senaryoları yeni ürün kuralı değildir. F01–F33/14 modül kapsamı korunur; mevcut sağlam kod yeniden yazılmaz.
 
+<a id="hosted-api-gecikmesi"></a>
+## Hosted API gecikmesi
+
+- [x] Canlı RPC gecikmesini ve kişi listesi organizasyon kilidi bekleyişini ölç. İncelenen okumalarda paylaşımlı satır kilidini ve yazma/okuma çakışmasını izole PostgreSQL'de doğrula. [Ölçüm ve kaynak kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#hosted-api-gecikmesi).
+- [ ] Aday native CI ve development teslimi sonrası aynı istemci akışlarının canlı gecikmesini yeniden ölç. Organizasyon kapsamı dışındaki `account_get_v1` gecikmesi için PostgREST bekleme süresi ile PostgreSQL çalışma süresini aynı isteklerle eşleştir.
+
 <a id="ci503-native-baslangic"></a>
 ## CI503 — Native worker başlangıcı ve ödeme yanıtı teşhisi
 

@@ -18,6 +18,41 @@ test('Student status filters selected-center current membership before paginatio
  await relation(people[4],other,'inactive');await relation(people[0],other,'active');
  const read=(b={},u=owner)=>api('people_list_v1',{query:'Synthetic status',page:{limit:1},...b},u);
  const all=async b=>{const ids=[];let cursor;do{const p=await read({...b,page:{limit:1,...(cursor?{cursor}:{})}});ids.push(...p.items.map(x=>x.id));cursor=p.next_cursor;}while(cursor);assert.equal(new Set(ids).size,ids.length);return ids.sort();};
+ await t.test('organization reads share the row lock and retain the write fence',async()=>{
+  const reader=await connect();
+  const reads=[
+   ['people_list_v1',{center_id:center,student_status:'active',page:{limit:1}}],
+   ['roles_list_v1',{center_id:center,page:{limit:1}}],
+   ['centers_list_v1',{}],
+   ['centers_list_v1',{center_id:center,include_setup_status:true}],
+   ['subscription_get_v1',{}],
+   ['settings_get_v1',{scope:'organization'}],
+   ['settings_catalog_get_v1',{scope:'organization'}],
+  ];
+  try{
+   await db.query('begin');
+   await db.query('select id from core.organizations where id=$1 for share',[org]);
+   await reader.query('begin');
+   await reader.query("set local lock_timeout='250ms'");
+   await reader.query("set local request.jwt.claim.role='service_role'");
+   for(const [operation,body] of reads){
+    const request={client_api_version:1,request_id:key(),org_id:org,...body};
+    const {rows:[{result}]}=await reader.query(
+     'select private.execute_operation($1,$2,$3,$4,$5,$6) as result',
+     [operation,request,owner.id,owner.session_id,Array.from({length:32},key),{verified_aal:'aal1'}],
+    );
+    assert.equal(result.ok,true,operation+' must finish with another read holding the organization lock');
+   }
+   await db.query('rollback');
+   await assert.rejects(
+    db.query('select id from core.organizations where id=$1 for update nowait',[org]),
+    {code:'55P03'},
+   );
+  }finally{
+   await db.query('rollback');
+   try{await reader.query('rollback');}finally{await reader.end();}
+  }
+ });
  await t.test('all matching pages are complete despite earlier opposite-state rows',async()=>{
   assert.deepEqual(await all({student_status:'active'}),[people[4],people[5]].sort());assert.deepEqual(await all({student_status:'inactive'}),people.slice(0,4).sort());
   assert.deepEqual(await all({relationship:'student',student_status:'active'}),[people[4],people[5]].sort());

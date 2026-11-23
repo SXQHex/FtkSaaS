@@ -314,8 +314,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "64046d7da5219ad6a03aac5ec54969c4a91ae00ff20be9cb18712658aa469d90",
-        "reason": "API11 fixture DB saatine bağlandı; yalnız suite kaynak SHA ve tam satır sahipliği yenilendi. Manifest, typed hata/kurtarma ve bütün kabul kapsamı incelendi; ortak istemci davranışı aynı."
+        "fingerprint": "bea340a50bc462c638c32c642a529819a484d49f7b6cb30bcc39946d42c71ea8",
+        "reason": "API shard kaynak bağı, kişi listesi kilit regresyonunun mevcut test grubunda yürütülmesini doğrular."
       }
     },
     {
@@ -513,7 +513,8 @@
         "apps/backend/supabase/migrations/20261119150000_centers_list_rls.sql",
         "packages/api-contracts/src/read-transport.ts",
         "apps/backend/supabase/migrations/20261119170000_shared_center_authorization.sql",
-        "apps/backend/supabase/migrations/20261119170002_sql_list_pagination.sql"
+        "apps/backend/supabase/migrations/20261119170002_sql_list_pagination.sql",
+        "apps/backend/supabase/migrations/20261124012000_share_organization_read_locks.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -541,8 +542,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "e056753343aa60c94b9c83d286a599178919a4be360c619f5aa070d62cee61e5",
-        "reason": "Organizasyonun başlangıç sıfır politikası ve effective_at seçimi SQL/test kaynaklarından incelendi. Test hazırlığı artık DB saatiyle başlangıçtan sonra; kurulum yetkileri, varsayılanlar ve rehber aynı."
+        "fingerprint": "adab1a9372fe50e4ed8ac7355ee5f36bc661b8093e5e37da824a6e25650a043a",
+        "reason": "Merkez ve rol listeleri aynı canlı yetki denetimiyle paylaşımlı organizasyon kilidi kullanır. Yazmalar özel kilit almaya devam eder."
       }
     },
     {
@@ -758,7 +759,8 @@
         "apps/backend/supabase/migrations/20261115035110_web1_review_lifecycle.sql",
         "apps/backend/database/person-detail-summary.sql",
         "apps/backend/database/account-person-directory-query.sql",
-        "apps/backend/database/person-membership-date.sql"
+        "apps/backend/database/person-membership-date.sql",
+        "apps/backend/supabase/migrations/20261124012000_share_organization_read_locks.sql"
       ],
       "operations": [
         "account_access_send_v1",
@@ -777,8 +779,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "5e5c5805938ae331a35419e06b267f2eefd2153b2970d68ac0792a390dc9a545",
-        "reason": "Paylaşılan kabul dosyasına eklenen rapor, stüdyo kuyruğu ve fatura sayfalama senaryoları incelendi."
+        "fingerprint": "84256c99626186d33a49b194c51e696a6c7df559361eca7a5d04b9410d375ba4",
+        "reason": "Kişi listesi ve sayfa filtreleri paylaşımlı organizasyon kilidiyle çalışır. Yazma sıralaması ve merkez kapsamı aynı geçit üzerinden doğrulanır."
       }
     },
     {
@@ -1573,7 +1575,8 @@
         "apps/backend/database/public-form-discovery.sql",
         "apps/backend/database/settings-catalog-v24.sql",
         "apps/backend/supabase/migrations/20261117014804_public_program_discovery.sql",
-        "apps/backend/supabase/migrations/20261119170001_lazy_settings_projection.sql"
+        "apps/backend/supabase/migrations/20261119170001_lazy_settings_projection.sql",
+        "apps/backend/supabase/migrations/20261124012000_share_organization_read_locks.sql"
       ],
       "operations": [
         "notification_preferences_set_v1",
@@ -1588,8 +1591,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "1656a52d1237d33ae3b4d8cc9d23225260e091fc0ba89fd27dc4c1774f825516",
-        "reason": "Ayar kataloğu, geçmiş, scope, cursor ve değer projeksiyonlarıyla MFA kapsamı incelendi."
+        "fingerprint": "e636748b46792c497ee95b0f7f162f7ea5b6e4cdfa7d25ef3fdd002087dddc6f",
+        "reason": "Etkili ayar ve katalog projeksiyonları paylaşımlı organizasyon kilidi alır. Ayar değişikliği ve güvenlik kontrollerinin sıra garantisi korunur."
       }
     },
     {
@@ -1655,7 +1658,8 @@
         "apps/backend/database/pro-upgrade-brand-discovery.sql",
         "apps/backend/supabase/migrations/20261108025013_pro_upgrade_brand_discovery.sql",
         "apps/backend/database/platform-console-completion.sql",
-        "apps/backend/supabase/migrations/20261119060000_platform_console_completion.sql"
+        "apps/backend/supabase/migrations/20261119060000_platform_console_completion.sql",
+        "apps/backend/supabase/migrations/20261124012000_share_organization_read_locks.sql"
       ],
       "operations": [
         "subscription_get_v1",
@@ -1667,8 +1671,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "e4cc97bf2d694c2ee099161221abf1be4b9a28fbf0ffcb10f5a9a4b4ea6f09ae",
-        "reason": "Paylaşılan kabul dosyasına eklenen rapor, stüdyo kuyruğu ve fatura sayfalama senaryoları incelendi."
+        "fingerprint": "c4a650f93c562bc9ea59145d1dc8073ff3541ee6e50492d56b02c2449f175723",
+        "reason": "Abonelik özeti paylaşımlı organizasyon kilidi ile okunur. Plan ve ödeme geçişleri özel organizasyon kilidi ile sıralanır."
       }
     },
     {
