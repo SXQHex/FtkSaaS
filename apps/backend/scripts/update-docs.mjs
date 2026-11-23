@@ -51,7 +51,7 @@ export function validateWorkflows(manifest,contract,root,{allowStale=false}={}){
 export function contextFiles(root){
  const files=execFileSync('git',['ls-files','-z','--cached','--others','--exclude-standard'],{cwd:root,encoding:'utf8'}).split('\0');
  return [...new Set(files)].filter(p=>p&&fs.existsSync(path.join(root,p))&&(
-  /^apps\/backend\/(database\/.*\.sql|supabase\/(migrations\/.*\.sql|functions\/.*\.(ts|json)|config\.toml)|tests\/.*\.(mjs|sql)|scripts\/.*\.(mjs|sql|py|json)|transports\/.*\.mjs|api\/.*\.js|config\/.*\.json)$/.test(p)||
+  /^apps\/backend\/(database\/.*\.sql|supabase\/(migrations\/.*\.sql|functions\/.*\.(ts|js|json)|config\.toml)|tests\/.*\.(mjs|sql)|scripts\/.*\.(mjs|sql|py|json)|transports\/.*\.mjs|api\/.*\.js|config\/.*\.json)$/.test(p)||
   /^packages\/api-contracts\/(schema\/.*\.json|src\/.*\.ts)$/.test(p)
  )).sort().map(p=>({path:p,sha256:sha(regular(root,p))}));
 }
@@ -76,7 +76,7 @@ export function renderReferences(root,manifest,contract){
  const owners=new Map(manifest.flows.flatMap(f=>f.operations.map(n=>[n,f])));
  const implemented=new Set(json(path.join(root,'apps/backend/supabase/functions/backend-v1/implemented.json')).operations);
  out[base+'functions.md']=intro('API ve iş akışı haritası')+
-  'DTO/izin/hata/yan etkiler [üretilmiş API kataloğu](contracts/05-FtkSaaS-O4-API-katalogu.md) ve [makine sözleşmesinden](../packages/api-contracts/schema/contract.json) gelir. Edge kodu [backend-v1](../apps/backend/supabase/functions/backend-v1/index.ts) altındadır; SQL domain davranışını Edge dosyasından tek başına çıkarma. `implemented.json` içindeki varlık tüm selector/provider/ürün kabulünün tamamlandığı anlamına gelmez. Backend-only satırları tarayıcı endpoint önerisi değildir.\n\n'+
+  'DTO/izin/hata/yan etkiler [üretilmiş API kataloğu](contracts/05-FtkSaaS-O4-API-katalogu.md) ve [makine sözleşmesinden](../packages/api-contracts/schema/contract.json) gelir. Edge kodu [backend-v1](../apps/backend/supabase/functions/backend-v1/index.js) altındadır; SQL domain davranışını Edge dosyasından tek başına çıkarma. `implemented.json` içindeki varlık tüm selector/provider/ürün kabulünün tamamlandığı anlamına gelmez. Backend-only satırları tarayıcı endpoint önerisi değildir.\n\n'+
   '| API | Çağrılabilir envanter | Faz | İzin | Akış / kapsam |\n|---|---|---|---|---|\n'+[...ops.values()].map(o=>{const f=owners.get(o.name);return `| \`${o.name}\` | ${implemented.has(o.name)?'runtime (sınırları oku)':'contract_only'} | ${cell(o.operation_contract.kind)} | ${cell(o.permission)} | [${f.id}](${link(base+'functions.md',f.guide)}) / ${f.audience} |`;}).join('\n')+
   '\n\n## Akış kanıt kaynakları\n\nTest dosyası bağlantısı çalıştırılmış test başarısı değildir. Kaynak bağlı CI/hosted sonuçları güncel kabul belgesinin sahibidir.\n\n'+manifest.flows.map(f=>`- [${f.id} — ${f.title}](${link(base+'functions.md',f.guide)}): [alan devri](${link(base+'functions.md',f.detail)}); ${f.tests.map(t=>`[${path.basename(t)}](${link(base+'functions.md',t)})`).join(', ')}`).join('\n')+'\n';
  return {outputs:out,context:{format:1,documents:registry.documents,excluded_documents:['docs/history/**'],source_files:files,source_sha256:digest,flows:manifest.flows.map(f=>({id:f.id,guide:f.guide,sources:f.sources,tests:f.tests,operations:f.operations}))}};

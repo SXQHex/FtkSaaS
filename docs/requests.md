@@ -69,6 +69,8 @@ Bu dosya alanlar arası talep ve teslim kabulünün tek kaydıdır. Sohbet devri
 
 | XREQ-070 | Backend değerlendirmesi; W1-BE-36 recovery kabul callback kaynağı | Backend; tüketici frontend | [WF01](workflows.md#wf01) | Zorunlu bağımsız callback pini ve mevcut development runner CLI girişi; gerçek sağlayıcı kanıtı ayrı. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-recovery-callback-acceptance) | Frontend veya hosted kabulü verilmedi. [Değerlendirme](#xreq-070). |
 
+| XREQ-071 | Backend; kullanıcının ödeme onayı gecikmesi itirazı | Frontend | [WF17](workflows.md#wf17), [WF13](workflows.md#wf13); [talep ve kabul](#xreq-071) | Son onay → komut ACK → doğrulanmış görünür sonuç ayrı ölçülür; gereksiz ağ beklemeleri azaltılırken hesap/oturum, güncel kaynak, aynı-key ve readback garantileri korunur. | Değerlendirmede | Backend kaynak incelemesi tamamlandı; frontend teknik değerlendirmesi ve gerçek ekran kabulü bekleniyor. |
+
 Alanların kendi planlarındaki bağımlılık gözlemleri otomatik olarak talep, onay veya işe başlama yetkisi sayılmaz; somut talep bu tabloya kaydedildiğinde `XREQ-001` biçiminde sabit bir kimlik alır.
 
 ## XREQ-001 kayıtta mevcut hesap bildirimi
@@ -955,3 +957,22 @@ Mevcut native çekirdek ve kaynak komutları korunur; eksik kapsam keşfi/filtre
 ## XREQ-070 Web1 native recovery kabul aracının callback kaynağı
 
 **Backend değerlendirmesi — 17 Kasım2026:** W1-BE-36 bulgusu mevcut recovery helper’ında doğrulandı. Eski hedef varsayımı kaldırılır; native/expired kabulü güvenilir private girdiden zorunlu origin/path/next pini alır, link/provider cevabından hedef türetmez. Mevcut development runner’ına native|expired stdin JSON CLI girişi eklenir; yeni Auth/RPC, proof üretimi, TTL/saat değişikliği veya hosted reset/seed yoktur. Yan callback reddi ve özgün parola/oturum temizliği korunur. Kesin native akış [WF01](workflows.md#wf01), operatör girişleri [backend çalışma rehberi](../apps/backend/docs/remote-backend-setup.md#pinlenmiş-callback-ile-native-recovery-kabulü), güncel kaynak/run/ortam ve eski kanıt ayrımı [backend devri](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-recovery-callback-acceptance) sahibindedir. Unit fixture yeni app/loopback gerçek sağlayıcı kabulü değildir; P01/G-PRO alt kontrolü yeni gerçek kanıt olmadan kapatılmaz. Frontend sayfa kabulü yeniden açılmadı ve karşı alan adına kabul verilmedi.
+
+<a id="xreq-071"></a>
+## XREQ-071 Platform ödeme onayının uçtan uca gecikmesi
+
+### Backend talebi — 23 Kasım 2026
+
+**İhtiyaç:** Kullanıcı, ödeme onayında 2–3 saniyelik rutin beklemeye itiraz etti. [Backend incelemesi](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#ci503-native-baslangic) yerel native başlangıç maliyeti ile hosted gecikmeyi ayırır; birinin düzelmesi diğerinin kabulü değildir. Bu talep frontend komut akışındaki seri beklemelerin ölçülmesini ve aynı güvenlik/doğruluk garantileriyle azaltılmasını ister. Yeni ürün/API kuralı veya onaylanmış sayısal SLA tanımlamaz.
+
+**Kaynak bulgusu:** İncelenen `main b79d25f129700d20b2eeb16676b72e344c1bd727` üzerinde `platform-payment.ts`, `scoped-backend.ts` ve komut yaşam döngüsü, son onaydan doğrulanmış sonuca kadar yedi Edge çağrısını altı seri aşamada çalıştırır: hesap → ödeme kaynağı → hesap → `saas_payment_verify_v1` → hesap → paralel ödeme/organizasyon okuması. Her `scopedBackend` mevcut native bearer'ı sabitleyip domain hesabını doğrular. Başlangıç detay yükleme, token yenileme, kurtarma ve aktif query invalidation beklemeleri bu sayıya dahil değildir. Bu statik çağrı sayısı ölçülmüş ekran süresi değildir; tek başına kontrollerin silinmesini haklı çıkarmaz. Mevcut M08 salt Query okuma iyileştirmesi, komut/receipt güvenliğini değiştirme kabulü sayılmaz.
+
+**Beklenen davranış ve kabul:**
+
+1. Aynı sentetik fixture, cihaz/ağ ve soğuk/ılık koşullarında önce/sonra örnek sayısı, medyan/p95, endpoint sayısı ve ağ zaman çizelgesi kaydedilir. Son onay → ACK ile son onay → typed readback/görünür başarı ayrı ölçülür; tek RPC veya önbellek başarısı bütün akışın süresi diye sunulmaz.
+2. Daha az seri ağ işi, mevcut hesabın domain kimliği ve sabitlenmiş native oturum/bearer bağıyla eşdeğer doğrulama sağlar. Farklı hesaba geçiş, aynı kullanıcıda yeni oturum, normal token yenileme, iptal edilmiş oturum, platform yetkisi kaybı ve geç dönen yanıt olumsuzları korunur.
+3. İlk yazıdan önce incelenen ödeme sürümü/pending durumu doğrulanır. Tek atomik backend komutu, dondurulmuş payload/operation key ve kayıp ACK sonrası aynı-key kurtarma korunur; ACK sonrasında ikinci yazı yapılmaz. Finans/abonelik yan etkileri istemcide ayrı adımlara bölünmez.
+4. Ödeme/organizasyon typed readback'i, tam ID/org eşleşmesi, ilerleyen sürüm ve seçilen kabul/ret durumu korunur. Okuma başarısızsa `saved-unread`, ACK bilinmiyorsa mevcut belirsiz sonuç/kurtarma durumu kalır; iyimser başarı veya otomatik yeni-key/503 retry eklenmez.
+5. Çift tıklama/yön değiştirme kilitleri, hesap/org kapsamlı invalidation ve geç yanıt kontrolü korunur. Var olan negatif assertion'lar ve frontend kontrolleri eksiksiz geçer. Backend sözleşmesi ihtiyacı ortaya çıkarsa bu kayıt üzerinden backend değerlendirmesine döner.
+
+Frontend uygulama, onay ve gerçek ekran kabulü bu backend talebiyle verilmiş değildir.

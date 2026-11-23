@@ -1,5 +1,34 @@
 # Güncel kaynak ve kabul
 
+<a id="ci503-native-baslangic"></a>
+## CI503 — Boş runtime yanıtı ve native başlangıç maliyeti
+
+**İncelenen kaynak:** `main b79d25f129700d20b2eeb16676b72e344c1bd727`; PR394 head `1adca1840d80058aaab0c988212ef50fff1695ef`; [CI45149046748](https://github.com/SXQHex/FtkSaaS/actions/runs/45149046748), attempt1, tested merge `0dc4f25c1724c06e8760a9005ff2ece98254e7b3`. Main ile PR head arasında backend/contracts farkı yok. Başarısız [api-10 işi](https://github.com/SXQHex/FtkSaaS/actions/runs/45149046748/job/137605660702) 48 testte 47 başarı/1 hata; core, quality ve diğer 11 API shard geçti.
+
+**Hata:** `Cross-center multi-line settlement and atomic ledger failures`, `settlementFixture` içindeki `saas_payment_verify_v1` çağrısında 2122,809 ms sonra `HTTP503 / content-type:null / 0 byte` aldı. Hata atomik settlement assertion'larından ve geç hata enjekte eden trigger'lardan önce oluştu. Testin JSON zarfını zorunlu tutması doğrudur. Uygulama hata yolları JSON üretir; bu boş gövde uygulamanın normal `TEMPORARY_FAILURE` yanıtı değildir. Edge parent PID değişmedi ve host bellek kapısı geçti; bunlar tek worker iptalini dışlamaz.
+
+CLI3.0.0'ın sabitlediği Edge Runtime1.77.9 dış sunucusu, iptal edilmiş bağlantı token'ında tam bu biçimde boş503 ve `x-served-by: base/server` üretir ([kaynak](https://github.com/supabase/edge-runtime/blob/0dd15ef2281b60ea03413ef5d2a60ebb25b0e21d/crates/base/src/server.rs#L238-L247), [upstream PR696](https://github.com/supabase/edge-runtime/pull/696)). Eski CI artifact'ı bu başlığı veya functions stderr/kapanma nedenini saklamadı. CPU/bellek sınırı ve worker yaşam döngüsü olasılıkları arasında kesin seçim yapılamadı. 2,12 saniyeyi doğrudan 2000 ms CPU sınırı diye yorumlamak yanlıştır; aşağıdaki deneyde 2 saniyeyi aşan doğru yanıtlar yalnız 27–33 ms metered CPU kullandı. Özgün503 tekrar üretilmedi ve çözülmüş sayılmıyor.
+
+**Ölçülmüş native başlangıç sorunu:** `build-edge.mjs`, esbuild'in saf JavaScript çıktısını `index.ts` olarak yazıyordu. Her yeni native worker, hazır ESZIP olmadığında bu `.ts` dosyasını yeniden parse/transpile edip source map üretir; aynı `.js` kaynak ESZIP'e doğrudan kopyalanır. Bu hazırlık user CPU supervisor'ından önce gerçekleşir. Hosted hazır ESZIP bu yolu atlar; yerel kazanım hosted kazanım diye sunulmaz.
+
+23 Kasım'da CLI pinleriyle SHA256 doğrulanmış `edge-runtime-v1.77.9-r0-linux-amd64`, aynı 3.286.430 bayt kaynak (`75f05b99d9cef6a022dba938c81e5f1f6373552daa37fef7c5b9789c749f4d5a`) ve eşleştirilmiş üç tur kullanıldı. Minimal teşhis main worker'ı `oneshot`, 256 MB, CPU soft1000/hard2000 ms, wall400000 ms ve `noModuleCache:false` ayarlarını korudu. GET isteği gerçek backend'in DB'ye gitmeyen metot doğrulamasında sona erdi; CLI'nin bütün gateway/Auth katmanını çalıştırdığı iddia edilmez.
+
+| Tur | `.ts` HTTP / boot / user CPU | Aynı baytlı `.js` HTTP / boot / user CPU |
+|---|---|---|
+| 1 | 2266 / 2233 / 33 ms | 158 / 123 / 27 ms |
+| 2 | 2035 / 2007 / 27 ms | 121 / 87 / 26 ms |
+| 3 | 1163 / 1129 / 27 ms | 120 / 92 / 27 ms |
+
+Altı yanıtın tamamı beklenen `400 / application/json / VALIDATION_FAILED`, altı kapanma `EarlyDrop`; boş503 yok. HTTP medyanı 2035 → 121 ms. Ayrı desteklenen `edge-runtime bundle` ölçümünde ESZIP 15.523.319 → 3.286.858 bayt; sıcak paketleme yaklaşık 1,3 saniye → 27 ms. Bu, yanlış uzantının başlangıç maliyetini doğrular; ödeme SQL'i, özgün503 veya canlı ekran kabulü değildir.
+
+**Hosted salt okunur gözlem:** Supabase `function_edge_logs`/`edge_logs`/`function_logs`, 22 Kasım10:42–23 Kasım10:42 UTC aralığında sorgulandı. Backend v108, Türkiye istemcisi ve `eu-central-1` bölgesinden 184 tarayıcı POST/HTTP200 için execution-time medyan691 ms, p952413 ms, maksimum10100 ms; `account_get_v1` alt grubunda 74 çağrı, medyan693/p952142 ms. Native Auth/RPC proxy süreleri de ayrı okundu: `account_get_v1` RPC tarafında 77 çağrı, upstream medyan518/p952029 ms; Auth user tarafında 193 çağrı, medyan13/p95297 ms. Bu farklı örneklemlerin percentile'ları toplanmaz ve aynı isteğin tam trace'i sayılmaz. v108 worker boot p5091/p95114 ms, user CPU p5030/p9535 ms; genel native2sn başlangıç maliyetini hosted gecikmeye taşımak doğru değildir. Yeni v109 için kullanıcı POST örneklemi yalnız6 ve tarayıcı dışıdır; regresyon karşılaştırması yapılamaz. Aynı24saatte ödeme verify çağrısı yoktur. PostgreSQL'in15 Ekim'den beri biriken5 verify RPC örneği de güncel ödeme dağılımı sayılamaz. Gerçek hosted ödeme/ACK/readback ölçümü açık; frontend kaynakta görülen seri çağrılar [XREQ-071](../../../docs/requests.md#xreq-071) sahibindedir.
+
+**Aday kaynak ve doğrulama:** `backend-v1/index.js` önceki bundle ile bayt ve SHA256 bakımından aynıdır. Generator/config, kaynak sınıflandırması, resmi WF00/WF01 review/provenance ve deploy yolu güncellendi. Deploy receipt'i artık entrypoint kimliği taşır; eski `.ts`/eksik kimlikte aynı kaynak SHA'sıyla deploy atlanmaz, canlı entrypoint/JWT/version ayrıca doğrulanır. Invalid JSON anında test helper'ı güvenli `x-served-by` sınıfını ve retained functions loglarından sabit kapanma/iptal olaylarını kaydeder. Tek çağrı5saniye/2MiB/2000satırla sınırlıdır; body/URI/secret/ham hata yazılmaz, tanı başarısızlığı özgün testi başarılı kılamaz. Mevcut artifact yolu kullanılır; workflow/observer değiştirilmedi.
+
+Node24.22.3 ile repo backend `verify` scripti (`npm run verify`) **467/467 + 150/150 + 10/10**, sıfır skip/hata ile geçti; eksik tarihsel Git fixture objeleri getirilerek kontroller gerçekten çalıştırıldı. `pnpm check:quality` **10/10, sıfır bulgu**, TypeScript7.0.2 ve üç bundle drift kontrolü geçti. Yerel pnpm11.25.0 mevcut bağımlılıklarla yalnız bu kalite komutunu yürüttü; CI'ın pinli Node/pnpm kabulü ayrıca beklenir. Bağımsız son kaynak incelemesi maddi bulgu vermedi. Request/success/failure validator'ları, Auth/SQL davranışı, worker CPU/bellek sınırları, concurrency ve test kapıları korunur; frontend kaynağı değiştirilmedi.
+
+**Ortam ve teslim sınırı:** Tam yerel native tekrar, PostgreSQL Unix socket bind `Operation not permitted` nedeniyle çalışmadı. Resmî indirmeler ve hash doğrulaması başarılı; bu ortam engeli backend veya test hatası değildir. Aday full clean, merge, development deploy ve gerçek hosted ödeme kabulü henüz doğrulanmadı. `scripts/ci/delta-analysis.mjs` ve `deploy-development.mjs` içindeki entrypoint değişiklikleri trusted yüzeydedir; [mevcut kaynak bağlı kurulum/merge yetkisi](../../../docs/ci-policy.md#güvenilir-politika-ve-dağıtım) atlanmaz. Kabul adımları [CI503 backlog](remaining-work.md#ci503-native-baslangic) sahibindedir; yeni run kanıtı yalnız ait olduğu kaynağa bağlanır.
+
 <a id="bt01-edge-tip-kabul-adayi"></a>
 ## BT01 — Edge TypeScript ve dış veri sınırı aday kabulü
 

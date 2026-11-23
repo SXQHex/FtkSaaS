@@ -145,6 +145,7 @@
         "apps/backend/scripts/generate.mjs",
         "apps/backend/scripts/governance.mjs",
         "apps/backend/scripts/health.mjs",
+        "apps/backend/scripts/native-runtime-diagnostics.mjs",
         "apps/backend/scripts/optimize-standalone-validators.mjs",
         "apps/backend/scripts/paths.mjs",
         "apps/backend/scripts/probe-db.mjs",
@@ -165,7 +166,7 @@
         "apps/backend/supabase/functions/backend-v1/handler.ts",
         "apps/backend/supabase/functions/backend-v1/implemented.json",
         "apps/backend/supabase/functions/backend-v1/import-file.ts",
-        "apps/backend/supabase/functions/backend-v1/index.ts",
+        "apps/backend/supabase/functions/backend-v1/index.js",
         "apps/backend/supabase/functions/backend-v1/lifecycle-auth.ts",
         "apps/backend/supabase/functions/backend-v1/public-ingress.ts",
         "apps/backend/supabase/functions/backend-v1/settings-image.ts",
@@ -313,8 +314,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "fc698860a169d623585327b927c8bf9b53e9dbc45fbbca51aa2e28060e86cbde",
-        "reason": "BT01 pending checksum context guard and native Edge test reviewed; API suite fingerprint and complete split line coverage independently verified"
+        "fingerprint": "c506f8550c93c2a698e52c4f5ebcd6b89db7d474d21bd67662c162ad1087fe3c",
+        "reason": "Ortak protokol ve değişen kaynaklar incelendi: aynı validator ve handler baytları JavaScript girişinden yüklenir; dağıtım entrypoint kimliği ve hata anı native tanısı kaynak bağına dahildir; API ve hata kabulü gevşetilmedi."
       }
     },
     {
@@ -407,8 +408,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "86abb2da63a70ab3b2649c31d6c0c8803c90c30f7008dd5c54f7838947bcbe08",
-        "reason": "BT01 Native Auth and signup response validation reviewed; consumer behavior maintained"
+        "fingerprint": "1372eaeb5b40134dc7c7f22b7170bee40cdc0027af3b4b719009be97320d90a1",
+        "reason": "WF01 ve Supabase config farkı incelendi: yalnız önceden derlenmiş backend girişinin uzantısı değişti; native Auth, JWT, MFA ve hesap davranışı aynı kaynak baytlarıyla korunuyor."
       }
     },
     {
