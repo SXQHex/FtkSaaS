@@ -8,6 +8,10 @@ export async function invalidateCachedFamilies(
 ) {
   if (!families.length || families.some((key) => key.length < 2))
     throw new Error("QUERY_INVALIDATION_SCOPE_REQUIRED");
+  // Read requests begun before a confirmed native write must not complete into
+  // a fresh cache after the mandatory first-page readback. Cancel only the
+  // affected Query readers; native writers, receipts and status are separate.
+  await Promise.all(families.map((queryKey) => queries.cancelQueries({ queryKey })));
   await Promise.all(
     families.map((queryKey) => queries.invalidateQueries({ queryKey, refetchType: "none" })),
   );

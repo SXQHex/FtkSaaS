@@ -4,6 +4,7 @@ import { invalidatePeoplePages, peopleKeys } from "../people/people-query";
 import { invalidateProductPages, productsKeys } from "../products/products-query";
 import { invalidateLeadPages, leadsKeys } from "../leads/leads-query";
 import { financeKeys, invalidateFinanceViews } from "../finance/finance-query";
+import { invalidateSessionDetailViews, sessionDetailKeys } from "../session-detail/session-detail-query";
 import {
   invalidateMemberPrivateLessonLists,
   memberPrivateLessonKeys,
@@ -190,4 +191,134 @@ it("M04 invalidates earnings periods, catalog and counts per center", async () =
   await invalidateEarningsViews(queries, scope);
   for (const key of keys) expect(queries.getQueryState(key)?.isInvalidated).toBe(true);
   expect(queries.getQueryState(otherKey)?.isInvalidated).toBe(false);
+});
+
+it("A-ortak M01–M05: one QueryClient keeps old cursors stale, reads page one and isolates tenants", async () => {
+  const queries = new QueryClient();
+  const otherOrg = { ...scope, orgId: "org-b" };
+  const otherActor = { ...scope, accountId: "actor-b" };
+  const tenant = [scope.accountId, scope.orgId, scope.centerId];
+  const documentPage = (source: typeof scope, cursor?: string) => [
+    "document-directory",
+    source,
+    "center",
+    "documents",
+    "",
+    "",
+    "all",
+    "",
+    cursor,
+  ];
+  const scenarios: {
+    name: string;
+    first: readonly unknown[];
+    old: readonly unknown[];
+    foreign: readonly (readonly unknown[])[];
+    invalidate: () => Promise<void>;
+  }[] = [
+    {
+      name: "M01 session",
+      first: sessionDetailKeys.participants(scope, "session-a"),
+      old: sessionDetailKeys.participants(scope, "session-a", undefined, "cursor-2"),
+      foreign: [
+        sessionDetailKeys.participants(other, "session-a", undefined, "cursor-2"),
+        sessionDetailKeys.participants(otherOrg, "session-a", undefined, "cursor-2"),
+      ],
+      invalidate: () => invalidateSessionDetailViews(queries, scope, "session-a"),
+    },
+    {
+      name: "M02 documents",
+      first: documentPage(scope),
+      old: documentPage(scope, "cursor-2"),
+      foreign: [documentPage(other, "cursor-2"), documentPage(otherActor, "cursor-2")],
+      invalidate: () => invalidateDocumentDirectoryViews(queries, scope),
+    },
+    {
+      name: "M03 accounts",
+      first: [...accessKeys.accounts(scope), "linked", "search", undefined],
+      old: [...accessKeys.accounts(scope), "linked", "search", "cursor-2"],
+      foreign: [
+        [...accessKeys.accounts(other), "linked", "search", "cursor-2"],
+        [...accessKeys.accounts(otherOrg), "linked", "search", "cursor-2"],
+      ],
+      invalidate: () => invalidateAccessDirectories(queries, scope),
+    },
+    {
+      name: "M04 earnings",
+      first: [...earningsKeys.directory(scope), "earnings", "person-a", "October", undefined],
+      old: [...earningsKeys.directory(scope), "earnings", "person-a", "September", "cursor-2"],
+      foreign: [
+        [...earningsKeys.directory(other), "earnings", "person-a", "September", "cursor-2"],
+        [...earningsKeys.directory(otherActor), "earnings", "person-a", "September", "cursor-2"],
+      ],
+      invalidate: () => invalidateEarningsViews(queries, scope),
+    },
+    {
+      name: "M05 finance",
+      first: [...financeKeys.directory(scope), "movements", "November", {}, undefined],
+      old: [...financeKeys.directory(scope), "debts", "October", {}, "cursor-2"],
+      foreign: [
+        [...financeKeys.directory(other), "movements", "November", {}, "cursor-2"],
+        [...financeKeys.directory(otherOrg), "movements", "November", {}, "cursor-2"],
+        [...financeKeys.directory(otherActor), "movements", "November", {}, "cursor-2"],
+        [...financeKeys.person(scope, "person-a", "EUR"), "cursor-2"],
+      ],
+      invalidate: () => invalidateFinanceViews(queries, scope, "person-a", "TRY"),
+    },
+  ];
+
+  // All five domains have cached page-two responses in the same live client.
+  // An unrelated center, organization, actor or currency must remain untouched.
+  for (const scenario of scenarios) {
+    cache(queries, scenario.first);
+    cache(queries, scenario.old);
+    for (const key of scenario.foreign) cache(queries, key);
+  }
+  const readCounts: number[] = [];
+  for (const scenario of scenarios) {
+    const oldReader = vi.fn(async () => ({ revision: "stale" }));
+    const unsubscribe = new QueryObserver(queries, {
+      queryKey: scenario.old,
+      queryFn: oldReader,
+      staleTime: Infinity,
+    }).subscribe(() => {});
+
+    // The command's confirmed native write/receipt/result triggers only the
+    // matching domain's invalidation. The E2E tests exercise that native chain.
+    await scenario.invalidate();
+    expect(queries.getQueryState(scenario.first)?.isInvalidated, scenario.name).toBe(true);
+    expect(queries.getQueryState(scenario.old)?.isInvalidated, scenario.name).toBe(true);
+    for (const key of scenario.foreign)
+      expect(queries.getQueryState(key)?.isInvalidated, scenario.name).toBe(false);
+    expect(oldReader, scenario.name).not.toHaveBeenCalled();
+
+    const firstReader = vi.fn(async () => ({ revision: "fresh-first" }));
+    await queries.fetchQuery({
+      queryKey: scenario.first,
+      queryFn: firstReader,
+      staleTime: 0,
+      retry: false,
+    });
+    expect(firstReader, scenario.name).toHaveBeenCalledTimes(1);
+    expect(oldReader, scenario.name).not.toHaveBeenCalled();
+
+    const freshOldReader = vi.fn(async () => ({ revision: "fresh-second" }));
+    await queries.fetchQuery({
+      queryKey: scenario.old,
+      queryFn: freshOldReader,
+      staleTime: Infinity,
+      retry: false,
+    });
+    expect(freshOldReader, scenario.name).toHaveBeenCalledTimes(1);
+    expect(queries.getQueryData(scenario.old), scenario.name).toEqual({
+      revision: "fresh-second",
+    });
+    readCounts.push(firstReader.mock.calls.length + freshOldReader.mock.calls.length);
+    unsubscribe();
+  }
+  expect(readCounts).toEqual([2, 2, 2, 2, 2]);
+  expect(queries.getQueryData(["people", ...tenant, "person-unrelated"])).toBeUndefined();
+  for (const scenario of scenarios)
+    for (const key of scenario.foreign)
+      expect(queries.getQueryData(key), scenario.name).toEqual({ fixture: true });
 });

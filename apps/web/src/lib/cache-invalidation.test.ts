@@ -79,3 +79,52 @@ it("retains only the first cached infinite page before native readback", async (
     pageParams: [undefined],
   });
 });
+
+it("cancels old in-flight page reads before native readback while preserving foreign requests", async () => {
+  const queries = new QueryClient();
+  const family = ["directory", "actor-a", "org-a", "center-a"];
+  const old = [...family, "cursor-2"];
+  const foreign = ["directory", "actor-a", "org-a", "center-b", "cursor-2"];
+  queries.setQueryData(old, { revision: "before" });
+
+  let finishOld!: (value: { revision: string }) => void;
+  const oldNetwork = new Promise<{ revision: string }>((resolve) => {
+    finishOld = resolve;
+  });
+  let finishForeign!: (value: { revision: string }) => void;
+  const foreignNetwork = new Promise<{ revision: string }>((resolve) => {
+    finishForeign = resolve;
+  });
+  const oldRequest = queries.fetchQuery({
+    queryKey: old,
+    queryFn: () => oldNetwork,
+    staleTime: 0,
+    retry: false,
+  });
+  const foreignRequest = queries.fetchQuery({
+    queryKey: foreign,
+    queryFn: () => foreignNetwork,
+    retry: false,
+  });
+
+  await invalidateCachedFamilies(queries, [family]);
+  await expect(oldRequest).resolves.toEqual({ revision: "before" });
+  expect(queries.getQueryState(old)?.isInvalidated).toBe(true);
+  expect(queries.getQueryState(foreign)?.fetchStatus).toBe("fetching");
+
+  const freshPage = { revision: "after" };
+  await expect(
+    queries.fetchQuery({
+      queryKey: old,
+      queryFn: async () => freshPage,
+      staleTime: 0,
+      retry: false,
+    }),
+  ).resolves.toEqual(freshPage);
+  finishOld({ revision: "late-before" });
+  finishForeign({ revision: "foreign-after" });
+  await expect(foreignRequest).resolves.toEqual({ revision: "foreign-after" });
+  expect(queries.getQueryData(old)).toEqual(freshPage);
+  expect(queries.getQueryData(foreign)).toEqual({ revision: "foreign-after" });
+  expect(queries.getQueryState(foreign)?.isInvalidated).toBe(false);
+});
