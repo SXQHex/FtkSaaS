@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { QueryClient } from "@tanstack/react-query";
 import { BackendError } from "../../lib/backend";
+import type { SafeError } from "@ftksaas/api-contracts";
 import { accountQueryKeys } from "./account-query";
 import { workspaceKeys, workspaceQuery } from "../workspace/workspace-query";
 import type { readWorkspace } from "../workspace/workspace";
@@ -65,9 +66,8 @@ function fixture() {
   };
   return { queries, actions };
 }
-const error = (code: ConstructorParameters<typeof BackendError>[0] extends infer E
-  ? NonNullable<E>["code"]
-  : never) => new BackendError({ code, retryable: false, trace_id: "test" });
+const error = (code: SafeError["code"]) =>
+  new BackendError({ code, retryable: false, trace_id: "test" });
 
 beforeEach(() => workspaceRead.mockReset());
 
