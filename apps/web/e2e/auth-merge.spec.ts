@@ -522,7 +522,16 @@ test("Merge: confirmed write resets page-two cursor and reads only fresh first p
   const state = await mockMerge(page, false, true);
   await openMerge(page);
   await expect(page.getByText("İlk sayfa üyesi · Diğer kaynak", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Sonraki", exact: true }).click();
+  const nextDirectory = page.getByRole("button", {
+    name: "Sonraki: Birleştirme istekleri",
+    exact: true,
+  });
+  await expect(page.getByRole("button", { name: "Sonraki: Kayıt 1", exact: true })).toHaveCount(1);
+  await expect(page.getByRole("button", { name: "Sonraki: Kayıt 2", exact: true })).toHaveCount(1);
+  await expect(page.getByRole("button", { name: "Önceki: Kayıt 1", exact: true })).toHaveCount(1);
+  await expect(page.getByRole("button", { name: "Önceki: Kayıt 2", exact: true })).toHaveCount(1);
+  await expect(nextDirectory).toHaveCount(1);
+  await nextDirectory.click();
   await expect(page.getByText("Örnek Eğitmen · Örnek Yönetici", { exact: true })).toBeVisible();
   await selectPair(page);
   await page.getByLabel("Gerekçe", { exact: false }).fill("Kontrollü birleştirme");
@@ -541,8 +550,10 @@ test("Merge: confirmed write resets page-two cursor and reads only fresh first p
   expect(afterWrite).toHaveLength(1);
   expect(state.writes).toHaveLength(1);
   await expect(page.getByText("İlk sayfa üyesi · Diğer kaynak", { exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Önceki", exact: true })).toBeDisabled();
-  await page.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Önceki: Birleştirme istekleri", exact: true }),
+  ).toBeDisabled();
+  await nextDirectory.click();
   await expect(page.getByText("Üçüncü sayfa üyesi · Diğer kaynak", { exact: true })).toBeVisible();
   expect(state.reads.filter((read) => read.cursor === "fresh-native-next")).toHaveLength(1);
   expect(

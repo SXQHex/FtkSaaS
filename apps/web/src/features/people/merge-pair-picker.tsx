@@ -226,6 +226,7 @@ function PersonPicker({
           type="button"
           variant="outline"
           size="sm"
+          aria-label={`${t(($) => $.people.previous)}: ${t(($) => $.peopleMerge.record, { number: index + 1 })}`}
           isDisabled={locked || page === 0 || people.isFetching}
           onPress={() => setPage((value) => value - 1)}
         >
@@ -235,6 +236,7 @@ function PersonPicker({
           type="button"
           variant="outline"
           size="sm"
+          aria-label={`${t(($) => $.people.next)}: ${t(($) => $.peopleMerge.record, { number: index + 1 })}`}
           isDisabled={locked || people.isFetching || people.isError || !people.data?.next_cursor}
           onPress={() => {
             const next = people.data?.next_cursor;

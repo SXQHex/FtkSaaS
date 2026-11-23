@@ -609,6 +609,7 @@ export function MergeContent({
             <Button
               variant="outline"
               size="sm"
+              aria-label={`${t(($) => $.people.previous)}: ${t(($) => $.peopleMerge.listLabel)}`}
               isDisabled={locked || page === 0 || directory.isFetching}
               onPress={() => {
                 clearSelection();
@@ -620,6 +621,7 @@ export function MergeContent({
             <Button
               variant="outline"
               size="sm"
+              aria-label={`${t(($) => $.people.next)}: ${t(($) => $.peopleMerge.listLabel)}`}
               isDisabled={
                 locked || directory.isFetching || directory.isError || !pageData?.next_cursor
               }
