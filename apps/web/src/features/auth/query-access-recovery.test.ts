@@ -313,6 +313,52 @@ describe("M06: cross-feature access reconciliation", () => {
     stop();
   });
 
+  it("cannot restore a queued old workspace after concurrent terminal session loss", async () => {
+    const { queries, actions } = fixture();
+    let release!: (view: Workspace) => void;
+    workspaceRead.mockImplementationOnce(
+      () =>
+        new Promise<Workspace>((resolve) => {
+          release = resolve;
+        }),
+    );
+    const stop = observeQueryAccessFailures(queries, actions);
+    const denied = queries
+      .fetchQuery({
+        queryKey: ["lead-applications", accountId, orgId, centerId],
+        queryFn: async () => {
+          throw error("FORBIDDEN");
+        },
+        retry: false,
+      })
+      .catch(() => undefined);
+    await vi.waitFor(() => expect(workspaceRead).toHaveBeenCalledOnce());
+
+    const expired = queries
+      .fetchQuery({
+        queryKey: ["people", accountId, orgId, centerId],
+        queryFn: async () => {
+          throw error("SESSION_REVOKED");
+        },
+        retry: false,
+      })
+      .catch(() => undefined);
+    await expired;
+
+    const revoked = view({ manager: false, accessible: false });
+    workspaceRead.mockResolvedValueOnce(revoked);
+    await queries.fetchQuery({ ...workspaceQuery(queries, accountId, orgId), staleTime: 0 });
+    release(view());
+    await denied;
+    await vi.waitFor(() => expect(actions.showLogin).toHaveBeenCalledOnce());
+    await vi.waitFor(() => expect(actions.onChecking).toHaveBeenLastCalledWith(false));
+
+    expect(queries.getQueryCache().getAll()).toHaveLength(0);
+    expect(actions.invalidateRoute).not.toHaveBeenCalled();
+    expect(actions.onChecking.mock.calls.map(([value]) => value)).toEqual([true, false]);
+    stop();
+  });
+
   it("observes an expired native session from any feature query and removes old private data", async () => {
     const { queries, actions } = fixture();
     const stop = observeQueryAccessFailures(queries, actions);
