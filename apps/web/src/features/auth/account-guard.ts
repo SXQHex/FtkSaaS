@@ -49,7 +49,9 @@ async function prepareAccountAndWorkspace(
     : undefined;
   if (
     organizationId &&
-    (selected?.isInvalidated || selected?.status === "error" || (!selected?.data && !query.initialData))
+    (selected?.isInvalidated ||
+      selected?.status === "error" ||
+      (!selected?.data && !query.initialData))
   ) {
     // A direct link or a browser history transition has no fresh authority
     // guarantee. Await the native scoped read before the route can render.
