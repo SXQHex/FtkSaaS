@@ -54,7 +54,8 @@ export function workspaceAccessLost(before: Workspace | undefined, after: Worksp
   if (!before?.selected) return false;
   const previous = before.selected;
   const current = after?.selected;
-  if (!current || current.id !== previous.id) return true;
+  if (!current || current.id !== previous.id)
+    return !after?.organizations.some((organization) => organization.id === previous.id);
   if (
     previous.self_context?.person_id &&
     previous.self_context.person_id !== current.self_context?.person_id
