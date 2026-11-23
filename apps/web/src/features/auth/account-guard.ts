@@ -3,7 +3,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import { getSupabaseClient } from "../../lib/supabase";
 import { BackendError } from "../../lib/backend";
 import { accountQuery } from "./account-query";
-import { workspaceQuery } from "../workspace/workspace-query";
+import { workspaceKeys, workspaceQuery } from "../workspace/workspace-query";
 import { hasDeletionReceipt } from "../account/deletion";
 import { takeInvitationReturn } from "../invitations/invitation";
 
@@ -43,11 +43,24 @@ async function prepareAccountAndWorkspace(
   organizationId?: string,
 ) {
   const account = await loadAccountProjection(context, includePlatformScope);
-  // Non-blocking: the workspace is the same Query consumed by both shells.
-  // Its failure remains visible in the shell, rather than failing the account route.
-  void context.queryClient
-    .query(workspaceQuery(context.queryClient, account.id, organizationId))
-    .catch(() => {});
+  const query = workspaceQuery(context.queryClient, account.id, organizationId);
+  const selected = organizationId
+    ? context.queryClient.getQueryState(workspaceKeys.projection(account.id, organizationId))
+    : undefined;
+  if (
+    organizationId &&
+    (selected?.isInvalidated ||
+      selected?.status === "error" ||
+      (!selected?.data && !query.initialData))
+  ) {
+    // A direct link or a browser history transition has no fresh authority
+    // guarantee. Await the native scoped read before the route can render.
+    await context.queryClient.query(query);
+  } else {
+    // A forward SPA navigation reuses this document's already verified
+    // workspace; extra forced reads would restart live command readbacks.
+    void context.queryClient.query(query).catch(() => {});
+  }
   // Return no account DTO: Router coordinates; Query is the sole account cache.
 }
 
