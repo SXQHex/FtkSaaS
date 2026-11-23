@@ -3,7 +3,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import { getSupabaseClient } from "../../lib/supabase";
 import { BackendError } from "../../lib/backend";
 import { verifiedAccountProjection } from "./account-query";
-import { workspaceKeys, workspaceQuery } from "../workspace/workspace-query";
+import { workspaceQuery } from "../workspace/workspace-query";
 import { hasDeletionReceipt } from "../account/deletion";
 import { takeInvitationReturn } from "../invitations/invitation";
 
@@ -44,14 +44,10 @@ async function prepareAccountAndWorkspace(
 ) {
   const account = await loadAccountProjection(context, includePlatformScope);
   const query = workspaceQuery(context.queryClient, account.id, organizationId);
-  const selected = organizationId
-    ? context.queryClient.getQueryState(workspaceKeys.projection(account.id, organizationId))
-    : undefined;
+  const selected = context.queryClient.getQueryState(query.queryKey);
   if (
-    organizationId &&
-    (selected?.isInvalidated ||
-      selected?.status === "error" ||
-      (!selected?.data && !query.initialData))
+    selected?.isInvalidated ||
+    (organizationId && (selected?.status === "error" || (!selected?.data && !query.initialData)))
   ) {
     // A direct link or a browser history transition has no fresh authority
     // guarantee. Await the native scoped read before the route can render.

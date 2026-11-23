@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createRouteMask, createRouter, RouterProvider } from "@tanstack/react-router";
 import { QueryClientProvider } from "@tanstack/react-query";
+import type { QueryFilters } from "@tanstack/react-query";
 import { I18nextProvider } from "react-i18next";
 import { I18nProvider } from "react-aria-components/I18nProvider";
 
@@ -35,12 +36,13 @@ window.addEventListener(
     } catch {
       // An unrecognized destination keeps the conservative history fallback.
     }
-    void queryClient.invalidateQueries({
+    const filters: QueryFilters = {
       queryKey: workspaceKeys.all(),
       predicate: ({ queryKey }) =>
         !organizationId || queryKey[2] === organizationId || queryKey[2] === null,
-      refetchType: "none",
-    });
+    };
+    void queryClient.cancelQueries(filters);
+    void queryClient.invalidateQueries({ ...filters, refetchType: "none" });
   },
   { capture: true },
 );
@@ -51,6 +53,7 @@ const router = createRouter({
   context: { queryClient },
   defaultPreload: "intent",
   defaultPreloadStaleTime: 0,
+  defaultStaleReloadMode: "blocking",
   routeMasks: [
     createRouteMask({
       routeTree,

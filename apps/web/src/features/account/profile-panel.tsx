@@ -13,6 +13,11 @@ import type { PhotoDraft } from "./profile-photo";
 import { BackendError } from "../../lib/backend";
 import { invalidateAccountProjections, verifiedAccountForId } from "../auth/account-query";
 import {
+  capturePrivateReadback,
+  invalidateCachedFamilies,
+  readIntoCurrentQuery,
+} from "../../lib/cache-invalidation";
+import {
   Card,
   CardHeader,
   CardTitle,
@@ -47,19 +52,27 @@ export function ProfilePanel({
   const { t } = useTranslation();
   const router = useRouter();
   const queries = useQueryClient();
+  const family = ["account-profile", accountId] as const;
+  const queryKey = [...family, variant] as const;
+  const includePlatformScope = variant === "account";
+  const verifiedAccount = () => verifiedAccountForId(queries, accountId, includePlatformScope);
   const profile = useQuery({
-    queryKey: ["account-profile", accountId, variant],
-    queryFn: () =>
-      readProfile(accountId, () => verifiedAccountForId(queries, accountId, variant === "account")),
+    queryKey,
+    queryFn: ({ signal }) => readProfile(accountId, verifiedAccount, signal),
   });
   async function refresh() {
-    // The profile reread must share the now-stale account projection. After a
-    // successful write, do not return yesterday's identity/display name.
+    const assertCurrent = capturePrivateReadback(queries);
+    await invalidateCachedFamilies(queries, [family]);
+    assertCurrent();
     await invalidateAccountProjections(queries);
-    const result = await profile.refetch({ throwOnError: true });
-    if (!result.data) throw new Error("PROFILE_UNAVAILABLE");
+    assertCurrent();
+    // The invalidated account is verified natively and shared with the router.
+    const result = await readIntoCurrentQuery(queries, queryKey, () =>
+      readProfile(accountId, verifiedAccount),
+    );
     await router.invalidate();
-    return result.data;
+    assertCurrent();
+    return result;
   }
   if (profile.isPending) return <Skeleton className="h-80 w-full" />;
   if (!profile.data)
@@ -125,7 +138,6 @@ export function ProfileForm({
       const next = await onRefresh();
       if (reset) {
         setBase(next);
-        form.reset(next.values);
         setPhotoDraft(undefined);
         intent.current = undefined;
         setWriteKnown(false);
@@ -167,6 +179,23 @@ export function ProfileForm({
     },
   });
   const submitting = useStore(form.store, (state) => state.isSubmitting);
+  const textDirty = useStore(form.store, (state) => state.isDirty);
+  if (
+    latest.version > base.version &&
+    !textDirty &&
+    photoDraft === undefined &&
+    !submitting &&
+    !reading &&
+    !preparingPhoto &&
+    !writeKnown &&
+    (notice === "clean" || notice === "saved")
+  ) {
+    setBase(latest);
+    setNotice("clean");
+  }
+  useEffect(() => {
+    form.reset(base.values);
+  }, [base.values, form]);
   const locked =
     submitting ||
     reading ||

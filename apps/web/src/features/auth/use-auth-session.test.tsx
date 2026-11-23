@@ -172,6 +172,7 @@ it("retains identity while the observer is disabled for a public page", async ()
   rerender({ enabled: false });
   expect(unsubscribe).toHaveBeenCalledOnce();
   rerender({ enabled: true });
+  expect(result.current).toBe(false);
   const resumed = changed.mock.calls[1][0];
   await act(() => resumed("INITIAL_SESSION", session(actor, secondSession)));
   expect(queryClear).toHaveBeenCalledOnce();

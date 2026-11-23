@@ -1,8 +1,10 @@
 import { v7 as uuidv7 } from "uuid";
-import { getBackend } from "../../lib/backend";
+import { getBackend, queryBackendRead } from "../../lib/backend";
 import type { RequestAccountProfileUpdate, SettingsImageUpload } from "@ftksaas/api-contracts";
 import { readAccount } from "../../lib/account";
 import { scopedBackend } from "../../lib/scoped-backend";
+import { getSupabaseClient } from "../../lib/supabase";
+import { sameNativeSession } from "../auth/native-session-id";
 
 export interface ProfileValues {
   displayName: string;
@@ -13,17 +15,42 @@ export interface ProfileValues {
 
 export async function readProfile(
   accountId: string,
-  readVerifiedAccount: () => ReturnType<typeof readAccount> = readAccount,
+  readVerifiedAccount: (bearer: string) => ReturnType<typeof readAccount> = (bearer) =>
+    readAccount(false, bearer),
+  signal?: AbortSignal,
 ) {
+  signal?.throwIfAborted();
+  const auth = getSupabaseClient().auth;
+  const { data, error } = await auth.getSession();
+  if (error) throw error;
+  if (!data.session) throw new Error("AUTH_REQUIRED");
+  const session = data.session;
+  async function confirmSession() {
+    signal?.throwIfAborted();
+    const latest = await auth.getSession();
+    if (latest.error) throw latest.error;
+    if (!latest.data.session || !sameNativeSession(session, latest.data.session))
+      throw new Error("ACCOUNT_CHANGED");
+    signal?.throwIfAborted();
+  }
   const [account, page] = await Promise.all([
-    readVerifiedAccount(),
-    getBackend().call("management_state_get_v1", {
-      client_api_version: 1,
-      request_id: uuidv7(),
-      operation: "account_profile_update_v1",
-      selector: { operation: "account_profile_update_v1", key: {} },
-    }),
-  ]);
+    readVerifiedAccount(session.access_token),
+    queryBackendRead(
+      getBackend(session.access_token),
+      "management_state_get_v1",
+      {
+        client_api_version: 1,
+        request_id: uuidv7(),
+        operation: "account_profile_update_v1",
+        selector: { operation: "account_profile_update_v1", key: {} },
+      },
+      signal,
+    ),
+  ]).catch(async (failure: unknown) => {
+    await confirmSession();
+    throw failure;
+  });
+  await confirmSession();
   const matches = page.items.filter(
     (item) => item.entity?.type === "accounts" && item.entity.id === accountId,
   );

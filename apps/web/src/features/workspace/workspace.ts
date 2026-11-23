@@ -42,6 +42,32 @@ export async function readWorkspace(
       );
   signal?.throwIfAborted();
   if (account.id !== accountId) throw new Error("ACCOUNT_CHANGED");
+  async function confirmSession() {
+    signal?.throwIfAborted();
+    if (readVerifiedAccount) {
+      const latest = await getSupabaseClient().auth.getSession();
+      if (latest.error) throw latest.error;
+      if (!latest.data.session || !sameNativeSession(session, latest.data.session))
+        throw new Error("ACCOUNT_CHANGED");
+    }
+    signal?.throwIfAborted();
+  }
+  const session = data.session;
+  const projection = await readWorkspaceProjection(backend, organizationId, signal).catch(
+    async (error: unknown) => {
+      await confirmSession();
+      throw error;
+    },
+  );
+  await confirmSession();
+  return projection;
+}
+
+async function readWorkspaceProjection(
+  backend: ReturnType<typeof createBackend>,
+  organizationId?: string,
+  signal?: AbortSignal,
+) {
   const organizations: OrganizationView[] = [];
   const cursors = new Set<string>();
   let cursor: string | undefined;
@@ -121,13 +147,6 @@ export async function readWorkspace(
       }
     }
   }
-  if (readVerifiedAccount) {
-    const latest = await getSupabaseClient().auth.getSession();
-    if (latest.error) throw latest.error;
-    if (!latest.data.session || !sameNativeSession(data.session, latest.data.session))
-      throw new Error("ACCOUNT_CHANGED");
-  }
-  signal?.throwIfAborted();
   return { organizations, selected, centers, roles };
 }
 
@@ -145,6 +164,7 @@ export function workspaceRoles(view: Workspace | undefined, centerId?: string) {
     return [];
   const roles = view.roles.flatMap((role) =>
     role.state === "active" &&
+    role.account_access_granted !== false &&
     role.person_id === view.selected?.self_context?.person_id &&
     (role.scope_center_id === null || role.scope_center_id === centerId)
       ? [role.role]

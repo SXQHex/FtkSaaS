@@ -155,3 +155,56 @@ it("keeps password success separate from session reread failure and retries only
   expect(account).toHaveBeenCalledTimes(2);
   client.clear();
 });
+
+it("starts a fresh security-history chain after an MFA change", async () => {
+  const factor = {
+    id: "selected",
+    status: "verified",
+    factor_type: "totp",
+    friendly_name: "Fixture app",
+  };
+  factors.mockResolvedValue({ all: [factor], totp: [factor] });
+  refreshNative.mockResolvedValue({ error: null });
+  let removed = false;
+  remove.mockImplementation(async () => {
+    removed = true;
+    factors.mockResolvedValue({ all: [], totp: [] });
+  });
+  history.mockImplementation(async (cursor?: string) => ({
+    items: [],
+    next_cursor: cursor ? null : removed ? "new-next" : "old-next",
+  }));
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const historyKey = ["account-security-history", "fixture"];
+  const view = render(
+    <QueryClientProvider client={client}>
+      <SecurityPanel accountId="fixture" />
+    </QueryClientProvider>,
+  );
+  await userEvent.click(await screen.findByRole("button", { name: "Daha fazla" }));
+  await waitFor(() =>
+    expect(client.getQueryData(historyKey)).toMatchObject({
+      pageParams: [undefined, "old-next"],
+    }),
+  );
+  await userEvent.click(await screen.findByRole("button", { name: "Kaldır" }));
+  await userEvent.click(screen.getByRole("button", { name: "Uygulamayı kaldır" }));
+  expect(await screen.findByText("Güvenlik bilgileri yenilendi.")).toBeVisible();
+  expect(history.mock.calls.map(([cursor]) => cursor)).toEqual([undefined, "old-next", undefined]);
+  expect(client.getQueryData(historyKey)).toMatchObject({ pageParams: [undefined] });
+  await userEvent.click(screen.getByRole("button", { name: "Daha fazla" }));
+  await waitFor(() =>
+    expect(client.getQueryData(historyKey)).toMatchObject({
+      pageParams: [undefined, "new-next"],
+    }),
+  );
+  expect(history.mock.calls.map(([cursor]) => cursor)).toEqual([
+    undefined,
+    "old-next",
+    undefined,
+    "new-next",
+  ]);
+  expect(remove).toHaveBeenCalledOnce();
+  view.unmount();
+  client.clear();
+});

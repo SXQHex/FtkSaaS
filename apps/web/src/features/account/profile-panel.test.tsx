@@ -1,24 +1,36 @@
 import "../../i18n";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, expect, it, vi } from "vitest";
 import type { ProfileSnapshot } from "./profile";
-const { save, prepare, emailRequest } = vi.hoisted(() => ({
+const { read, readAccount, verifiedAccount, save, prepare, emailRequest } = vi.hoisted(() => ({
+  read: vi.fn(),
+  readAccount: vi.fn(),
+  verifiedAccount: vi.fn(),
   save: vi.fn(),
   prepare: vi.fn(),
   emailRequest: vi.fn(),
 }));
 vi.mock("./profile", async (original) => ({
   ...(await original<typeof import("./profile")>()),
+  readProfile: read,
   saveProfile: save,
 }));
+vi.mock("../../lib/account", () => ({ readAccount }));
+vi.mock("../auth/account-query", async (original) => ({
+  ...(await original<typeof import("../auth/account-query")>()),
+  verifiedAccountForId: verifiedAccount,
+}));
+vi.mock("@tanstack/react-router", () => ({ useRouter: () => ({ invalidate: vi.fn() }) }));
 vi.mock("./profile-photo", async (original) => ({
   ...(await original<typeof import("./profile-photo")>()),
   preparePhoto: prepare,
 }));
 vi.mock("./email", () => ({ requestEmailChange: emailRequest, resendEmailChange: vi.fn() }));
 import { BackendError } from "../../lib/backend";
-import { ProfileForm } from "./profile-panel";
+import { ProfileForm, ProfilePanel } from "./profile-panel";
+import { accountQueryKeys } from "../auth/account-query";
 afterEach(() => {
   vi.resetAllMocks();
   vi.unstubAllGlobals();
@@ -119,6 +131,67 @@ it("does not replace an unsaved draft on a background version change", async () 
   await userEvent.click(screen.getByRole("button", { name: "Güncel verileri yükle" }));
   await waitFor(() => expect(name).toHaveValue("Changed"));
 });
+
+it("adopts a newer background profile when there is no draft", async () => {
+  const refresh = vi.fn();
+  const view = render(<ProfileForm latest={base} onRefresh={refresh} />);
+  view.rerender(<ProfileForm latest={next} onRefresh={refresh} />);
+  expect(screen.getByLabelText("Görünen ad")).toHaveValue("Changed");
+  expect(screen.queryByText("Profil başka bir yerde değişti.", { exact: false })).toBeNull();
+  expect(refresh).not.toHaveBeenCalled();
+});
+
+it.each([
+  ["account", "member"],
+  ["member", "account"],
+] as const)(
+  "a %s save refreshes the warm %s profile using the same actor",
+  async (active, sibling) => {
+    const queries = new QueryClient({ defaultOptions: { queries: { staleTime: 30_000 } } });
+    const activeKey = ["account-profile", id, active];
+    const siblingKey = ["account-profile", id, sibling];
+    const otherActorKey = ["account-profile", "other-actor", sibling];
+    const actorProjection = accountQueryKeys.projection("native-actor", active === "account");
+    queries.setQueryData(actorProjection, base.account);
+    for (const key of [activeKey, siblingKey, otherActorKey]) queries.setQueryData(key, base);
+    let remote = base;
+    read.mockImplementation(
+      async (_: string, account: () => Promise<ProfileSnapshot["account"]>) => ({
+        ...remote,
+        account: await account(),
+      }),
+    );
+    verifiedAccount.mockImplementation(async () => {
+      expect(queries.getQueryState(actorProjection)?.isInvalidated).toBe(true);
+      return remote.account;
+    });
+    save.mockImplementation(async () => {
+      remote = next;
+      return { version: next.version };
+    });
+    const panel = (variant: typeof active) => (
+      <QueryClientProvider client={queries}>
+        <ProfilePanel key={variant} accountId={id} variant={variant} />
+      </QueryClientProvider>
+    );
+    const view = render(panel(active));
+    const name = screen.getByLabelText("Görünen ad");
+    await userEvent.clear(name);
+    await userEvent.type(name, "Changed");
+    await userEvent.click(screen.getByRole("button", { name: "Değişiklikleri kaydet" }));
+    await waitFor(() => expect(queries.getQueryData(activeKey)).toEqual(next));
+    expect(queries.getQueryState(siblingKey)?.isInvalidated).toBe(true);
+    expect(queries.getQueryState(otherActorKey)?.isInvalidated).toBe(false);
+    expect(verifiedAccount).toHaveBeenCalledExactlyOnceWith(queries, id, active === "account");
+    expect(readAccount).not.toHaveBeenCalled();
+    view.rerender(panel(sibling));
+    await waitFor(() => expect(screen.getByLabelText("Görünen ad")).toHaveValue("Changed"));
+    expect(queries.getQueryData(siblingKey)).toEqual(next);
+    expect(save).toHaveBeenCalledOnce();
+    view.unmount();
+    queries.clear();
+  },
+);
 
 it("keeps a photo draft atomic with text and retries the exact intent until a confirmed read", async () => {
   const create = vi.fn(() => "blob:fixture"),

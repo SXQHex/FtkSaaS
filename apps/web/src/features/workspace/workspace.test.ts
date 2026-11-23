@@ -245,6 +245,13 @@ it("treats explicit null and center-specific scope as authoritative over old rol
   expect(workspaceRoles(scoped, centerId)).toEqual(["center_manager"]);
   expect(workspaceRoles(scoped)).toEqual([]);
 });
+
+it("does not grant legacy management access from a role without account access", async () => {
+  const view = await readWorkspace(accountId, orgId);
+  expect(workspaceRoles(view, centerId)).toEqual(["owner"]);
+  view.roles[0].account_access_granted = false;
+  expect(workspaceRoles(view, centerId)).toEqual([]);
+});
 it("surfaces a management plan denial when there is no verified personal scope", async () => {
   roleReadError = "PLAN_FEATURE_UNAVAILABLE";
   await expect(readWorkspace(accountId, orgId)).rejects.toMatchObject({ code: roleReadError });
