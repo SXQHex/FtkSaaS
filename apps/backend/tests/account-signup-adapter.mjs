@@ -27,3 +27,10 @@ test('signup check gateway excludes credentials, strips private response fields 
  const failed=await handleAccountSignupCheck(req(),env,async()=>{throw Error('outage');});assert.equal(failed.status,503);assert.equal((await failed.json()).error.code,'TEMPORARY_FAILURE');
  const available=await handleAccountSignupCheck(req(),env,async()=>Response.json({ok:true,data:{status:'available'},trace_id:id()}));assert.equal((await available.json()).data.status,'available');
 });
+
+test('signup advisory rejects malformed or invented RPC outcomes',async()=>{
+ const req=new Request('https://example.invalid'+signupPath,{method:'POST',body,headers:signPublicRequest(body,'192.0.2.81',cfg.FTK_PUBLIC_INGRESS_SECRET,signupPath)});
+ for(const payload of [null,[],{data:{status:'invented'}},{data:{status:2}},{error:{code:'RATE_LIMITED'}},{error:'INVENTED_CODE'}]){
+  await assert.rejects(accountSignupCheck(req,body,input,k=>cfg[k],async()=>payload),/INVALID_SIGNUP_RPC/);
+ }
+});

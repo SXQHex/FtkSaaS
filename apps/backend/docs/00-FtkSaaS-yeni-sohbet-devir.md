@@ -1,5 +1,17 @@
 # Güncel kaynak ve kabul
 
+<a id="bt01-edge-tip-kabul-adayi"></a>
+## BT01 — Edge TypeScript ve dış veri sınırı aday kabulü
+
+Kaynak tabanı: \`e23c9daa5002bfe5510a919d752c9033a6a1edf9\` (\`main\`, BT01/1 PR #390 sonrası). BT01/1'in [kaynak envanteri](#bt01-edge-kaynak-taramasi) korunur; aşağıdaki sonuçlar **bu adayın yerel kaynak/test aşamasıdır**, henüz PR CI/merge/development/hosted kabulü değildir.
+
+- Backend \`tsconfig.json\` statik denetimi: \`backend-v1\` (generated \`index.ts\` hariç), \`resend-webhook\`, \`personal-calendar\` girişleri, native Deno tipleri, \`.ts\` importları ve \`.mjs\` transport tip bildirimleri. \`tests/types.test.ts\` içindeki iki kasıtlı \`@ts-expect-error\` korunur. Kaynak tipleri tek backend \`pnpm typecheck\`/\`verify\` üzerinden denetlenir; tip kontrolünü aşan \`any\` veya yeni susturma yok.
+- \`generate-validators.mjs\` aynı \`contract.json\` operasyon envanterinden \`validators.d.ts\` üretir; \`--check\` kaynak eşitliğini doğrular. AJV \`validators.js\` ve üç Edge bundle için mevcut drift/boyut denetimi aynen yürür.
+- \`handler.ts\`, native Auth/MFA ve JWT claim, JSON, RPC iç zarfı, takvim feed, dosya/CSV/fatura ve public preflight; e-posta/tick/Resend/Turnstile/Storage dış veri sınırları \`unknown\`/runtime alan kontrolleriyle daraltıldı. Hatalı şema \`INTEGRITY_VIOLATION\` veya mevcut kapalı provider ret yolu üzerinden reddedilir; yetkili SQL, tenant sınırı, operasyon anahtarı, normal sözleşme yanıtı ve frontend kaynakları değiştirilmedi.
+- Node 24.22.1, pnpm 12.15.0: backend \`verify\` **144/144**, etkilenen \`node --test\` **44/44**, \`pnpm check:quality\` **10/10 ve sıfır bulgu**. Backend ve contracts statik tip kontrolleri, \`docs:check\`, validator/bundle \`--check\` geçerli. Bunlar izole DB full clean veya gerçek provider/development kabulünün yerine geçmez.
+
+Zorunlu aday full clean/core+API, policy kurulumu ve tam kaynak/merge/main/development doğrulaması **açık**. CI çalışmadan BT01 bütünsel olarak kapatılamaz.
+
 <a id="bt01-edge-kaynak-taramasi"></a>
 ## BT01/1 — Edge kaynak ve dış veri sınırı envanteri
 

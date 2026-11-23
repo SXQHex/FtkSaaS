@@ -1,4 +1,5 @@
 import {contentHash} from './document-storage.ts';
+import {isRecord,parseJson,requireRecord,responseJson} from './edge-json.ts';
 type Column={source_column:string;target:string};
 const targets=new Set(['display_name','email','phone','source_key','person_ref','opening_credits','opening_debt_minor','opening_credit_value_minor','currency','product_version_ref','start_date','end_date']);
 // Strict RFC4180, including escaped quotes and quoted line breaks. Headers are
@@ -45,9 +46,9 @@ export function parseImportCsv(text:string,mapping:{columns:Column[];delimiter?:
   if(crm){
    try{
     const phone=String(payload.phone??'').replace(/[\s().-]/g,'').replace(/^00/,'+');if(!/^\+[1-9][0-9]{6,14}$/.test(phone))throw Error('phone');payload.phone=phone;
-    const consents=payload.consents===undefined?[]:JSON.parse(String(payload.consents));if(!Array.isArray(consents)||consents.length>20)throw Error('consents');
+    const consents:unknown=payload.consents===undefined?[]:parseJson(String(payload.consents));if(!Array.isArray(consents)||consents.length>20)throw Error('consents');
     const purposes=new Set();for(const proof of consents){
-     if(!proof||typeof proof!=='object'||Array.isArray(proof)||Object.keys(proof).length!==4||Object.keys(proof).some(k=>!['purpose','version','accepted','occurred_at'].includes(k))||typeof proof.accepted!=='boolean'||typeof proof.purpose!=='string'||!proof.purpose.trim()||proof.purpose.length>100||typeof proof.version!=='string'||!proof.version.trim()||proof.version.length>200||typeof proof.occurred_at!=='string'||!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:[0-5]\d(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/i.test(proof.occurred_at)||!Number.isFinite(Date.parse(proof.occurred_at))||Date.parse(proof.occurred_at)>Date.now()||purposes.has(proof.purpose))throw Error('consents');purposes.add(proof.purpose);
+     if(!isRecord(proof)||Object.keys(proof).length!==4||Object.keys(proof).some(k=>!['purpose','version','accepted','occurred_at'].includes(k))||typeof proof.accepted!=='boolean'||typeof proof.purpose!=='string'||!proof.purpose.trim()||proof.purpose.length>100||typeof proof.version!=='string'||!proof.version.trim()||proof.version.length>200||typeof proof.occurred_at!=='string'||!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:[0-5]\d(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/i.test(proof.occurred_at)||!Number.isFinite(Date.parse(proof.occurred_at))||Date.parse(proof.occurred_at)>Date.now()||purposes.has(proof.purpose))throw Error('consents');purposes.add(proof.purpose);
     }payload.consents=consents;
     for(const [field,max] of [['display_name',200],['email',320],['interest',1000],['message',10000],['partner_name',200],['mode',200]] as const)if(payload[field]!==undefined&&(typeof payload[field]!=='string'||!String(payload[field]).trim()||String(payload[field]).length>max))throw Error(field);
     if(payload.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(payload.email)))throw Error('email');
@@ -71,9 +72,9 @@ export function importStorage(base:string,key:string,fetcher:typeof fetch=fetch)
  return {
   async upload(objectKey:string){
    const r=await fetcher(base+'/storage/v1/object/upload/sign/'+bucket+'/'+path(objectKey),{method:'POST',headers:{...headers,'content-type':'application/json','x-upsert':'false'},body:JSON.stringify({upsert:false}),signal:AbortSignal.timeout(15000)});
-   if(!r.ok)throw Error('STORAGE_UNAVAILABLE');const data=await r.json();if(typeof data.url!=='string'||!data.url.startsWith('/object/upload/sign/'+bucket+'/'))throw Error('INVALID_STORAGE_RESPONSE');return '/storage/v1'+data.url;
+   if(!r.ok)throw Error('STORAGE_UNAVAILABLE');const data=requireRecord(await responseJson(r));if(typeof data.url!=='string'||!data.url.startsWith('/object/upload/sign/'+bucket+'/'))throw Error('INVALID_STORAGE_RESPONSE');return '/storage/v1'+data.url;
   },
-  async read(meta:{object_key:string;bytes:number;checksum:string;max_rows:number}){
+  async read(meta:{object_key:string;bytes:number;checksum:string}){
    if(!Number.isSafeInteger(meta.bytes)||meta.bytes<1||meta.bytes>2097152)throw Error('VALIDATION_FAILED');
    const r=await fetcher(base+'/storage/v1/object/authenticated/'+bucket+'/'+path(meta.object_key),{headers,signal:AbortSignal.timeout(15000)});
    if(!r.ok||!r.body||r.headers.get('content-type')?.split(';')[0]!=='text/csv')throw Error('VALIDATION_FAILED');

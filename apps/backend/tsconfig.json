@@ -1,6 +1,16 @@
 {
   "extends": "@ftksaas/typescript-config/base.json",
   "include": [
-    "tests/types.test.ts"
+    "tests/types.test.ts",
+    "supabase/functions/backend-v1/*.ts",
+    "supabase/functions/resend-webhook/handler.ts",
+    "supabase/functions/personal-calendar/handler.ts",
+    "supabase/functions/deno-runtime.d.ts"
+  ],
+  "compilerOptions": {
+    "allowImportingTsExtensions": true
+  },
+  "exclude": [
+    "supabase/functions/**/index.ts"
   ]
 }

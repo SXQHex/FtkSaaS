@@ -1,5 +1,6 @@
 import {deliverTransactionalEmail} from './transactional-email.ts';
 import {sendEmail} from './email-provider.ts';
+import {isRecord,parseJson,requireRecord,responseJson} from './edge-json.ts';
 type Env=(name:string)=>string|undefined;
 type Fetch=typeof fetch;
 type Claim={job_id:string;org_id:string;invitation_id:string;lease_token:string;recipient:string;sealed_token:string;from_email:string;app_origin:string;api_key:string;catalog:{id:string;language:string;version:number;content:{title:string;text:string}}};
@@ -13,17 +14,23 @@ async function signature(key:string,value:string){
 }
 function equal(a:string,b:string){if(a.length!==b.length)return false;let difference=0;for(let i=0;i<a.length;i++)difference|=a.charCodeAt(i)^b.charCodeAt(i);return difference===0;}
 async function unseal(value:string,serviceKey:string){
- const sealed=JSON.parse(value),decode=(s:string)=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+ const sealed=requireRecord(parseJson(value));
+ if(typeof sealed.iv!=='string'||typeof sealed.cipher!=='string')throw Error('INVALID_SEALED_TOKEN');
+ const decode=(s:string)=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
  const key=await crypto.subtle.importKey('raw',await crypto.subtle.digest('SHA-256',enc.encode(serviceKey)),'AES-GCM',false,['decrypt']);
  const token=new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:decode(sealed.iv)},key,decode(sealed.cipher)));
  if(!/^[a-f0-9]{64}$/.test(token))throw Error('INVALID_SEALED_TOKEN');return token;
 }
-function validClaim(x:any):x is Claim{
- return x&&['job_id','org_id','invitation_id'].every(k=>typeof x[k]==='string'&&uuid.test(x[k]))
+function validClaim(x:unknown):x is Claim{
+ if(!isRecord(x))return false;
+ const catalog=isRecord(x.catalog)?x.catalog:null;
+ const content=catalog&&isRecord(catalog.content)?catalog.content:null;
+ return ['job_id','org_id','invitation_id'].every(k=>typeof x[k]==='string'&&uuid.test(x[k]))
   &&['lease_token','recipient','sealed_token','from_email','app_origin','api_key'].every(k=>typeof x[k]==='string'&&x[k].length>0)
-  &&x.catalog&&uuid.test(x.catalog.id)&&typeof x.catalog.language==='string'&&Number.isInteger(x.catalog.version)
-  &&typeof x.catalog.content?.title==='string'&&typeof x.catalog.content?.text==='string'&&!/[\r\n]/.test(x.catalog.content.title)
-  &&!/[\r\n]/.test(x.recipient+x.from_email)&&/^https:\/\/[a-zA-Z0-9.-]+(?::[0-9]+)?$/.test(x.app_origin);
+  &&catalog!==null&&typeof catalog.id==='string'&&uuid.test(catalog.id)&&typeof catalog.language==='string'&&Number.isInteger(catalog.version)
+  &&content!==null&&typeof content.title==='string'&&typeof content.text==='string'&&!/[\r\n]/.test(content.title)
+  &&typeof x.recipient==='string'&&typeof x.from_email==='string'&&!/[\r\n]/.test(x.recipient+x.from_email)
+  &&typeof x.app_origin==='string'&&/^https:\/\/[a-zA-Z0-9.-]+(?::[0-9]+)?$/.test(x.app_origin);
 }
 // Native Cron's private operational transport. This does not establish a human
 // Auth session or expose a new frontend operation. Request contains no job/PII.
@@ -32,17 +39,17 @@ export async function invitationTick(req:Request,env:Env,send:Fetch=fetch,now=Da
   const serviceKey=env('SUPABASE_SERVICE_ROLE_KEY'),base=env('SUPABASE_URL'),signingKey=env('FTK_INVITATION_TICK_SECRET');
   if(!serviceKey||!base||!signingKey||!/^[a-f0-9]{64}$/.test(signingKey))return reply(503,{error:'SERVICE_UNAVAILABLE'});
   const raw=await req.text();if(raw.length>256)return reply(400,{error:'VALIDATION_FAILED'});
-  const request=JSON.parse(raw);
-  if(Object.keys(request).length!==1||typeof request.request_id!=='string'||!uuid.test(request.request_id))return reply(400,{error:'VALIDATION_FAILED'});
+  const request=parseJson(raw);
+  if(!isRecord(request)||Object.keys(request).length!==1||typeof request.request_id!=='string'||!uuid.test(request.request_id))return reply(400,{error:'VALIDATION_FAILED'});
   const at=req.headers.get('x-ftk-worker-time')??'',provided=req.headers.get('x-ftk-worker-signature')??'';
   if(!/^\d{10}$/.test(at)||Math.abs(now/1000-Number(at))>30||!/^[a-f0-9]{64}$/.test(provided))return reply(403,{error:'FORBIDDEN'});
   if(!equal(provided,await signature(signingKey,at+'.'+request.request_id)))return reply(403,{error:'FORBIDDEN'});
   const rpc=async(body:unknown,aux:unknown)=>{
    const res=await send(base+'/rest/v1/rpc/outbox_deliver_v1',{method:'POST',headers:{authorization:'Bearer '+serviceKey,apikey:serviceKey,'content-type':'application/json','Content-Profile':'api_v1'},
     body:JSON.stringify({p_request:body,p_actor_auth_id:null,p_session_id:null,p_ids:[],p_aux:aux}),signal:AbortSignal.timeout(10000)});
-   if(!res.ok){await res.arrayBuffer();throw Error('DELIVERY_RPC_UNAVAILABLE');}return res.json();
+   if(!res.ok){await res.arrayBuffer();throw Error('DELIVERY_RPC_UNAVAILABLE');}return responseJson(res);
   };
-  const claimed=await rpc(request,{invitation_phase:'claim'}),item=claimed._internal_invitation;
+  const claimed=requireRecord(await rpc(request,{invitation_phase:'claim'})),item=claimed._internal_invitation;
   if(claimed._internal_email)return reply(200,await deliverTransactionalEmail(claimed._internal_email,request.request_id,rpc,send));
   if(item===null)return reply(200,{claimed:0});
   if(!validClaim(item))return reply(503,{error:'TEMPORARY_FAILURE'});
@@ -54,7 +61,8 @@ export async function invitationTick(req:Request,env:Env,send:Fetch=fetch,now=Da
    // Immutable invitation + frozen sender/origin give byte-identical retry bodies.
    const payload={from:item.from_email,to:[item.recipient],subject:item.catalog.content.title,
     text:item.catalog.content.text.split('{{link}}').join(link.href)};
-   const authorized=await rpc(command,{invitation_phase:'authorize'});
+   const authorized=requireRecord(await rpc(command,{invitation_phase:'authorize'}));
+   if(typeof authorized.authorized!=='boolean')throw Error('INVALID_INVITATION_AUTHORIZATION');
    if(authorized.authorized!==true){await rpc(command,{invitation_phase:'finish',retryable:false});return reply(200,{claimed:1});}
    const outcome=await sendEmail({apiKey:item.api_key,idempotencyKey:'ftksaas-invitation/'+item.job_id,payload},send);
    if(outcome.state==='accepted')provider_reference=outcome.provider_reference;

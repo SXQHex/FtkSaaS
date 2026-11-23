@@ -1,6 +1,6 @@
 # Güvenlik kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `4a551ad8233b8d59ae987a45aa46a507e224cfb09ebec31686c806e45fac17fd`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `ac25c55550825c5976923d5f069cd239a55edbbbc2f3d44eb4f469d96c3283e7`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 İnsan istemci native Auth ile JWT doğrulanan Edge yolunu, düz merkez listesi ise [istemci protokolündeki](client-integration.md) Data API yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan denetlenir. İstemci erişimi core/private ve service-only RPC dışında kalır. Worker ve public credential transport ayrı yetki yollarıdır. [Teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
 

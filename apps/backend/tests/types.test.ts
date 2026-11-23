@@ -40,3 +40,22 @@ export type LegacyCatalogResponse = Assert<Same<Operations['products_list_v1']['
 export type PublicationStillRequiresTerms = Assert<Same<Operations['product_publish_v1']['request']['terms'],ProductTerms>>;
 export type CenterFinanceResponse = Assert<Same<Operations['finance_directory_get_v1']['response']['data'],FinanceDirectoryView>>;
 export type ManagedCatalogResponse = Assert<Same<Operations['products_management_list_v1']['response']['data'],ProductManagementView>>;
+
+
+// Untrusted network/JSON data must not be assignable to authenticated claims,
+// verified factors or RPC response envelopes before a runtime guard succeeds.
+import type {SessionClaims,NativeUser} from '../supabase/functions/backend-v1/auth-payload.js';
+import {request_account_get_v1,success_account_get_v1} from '../supabase/functions/backend-v1/validators.js';
+type InvalidSessionRejected = Assert<{sub:string;session_id:number;aal:'aal2'} extends SessionClaims ? false : true>;
+type InvalidFactorRejected = Assert<{id:string;hasVerifiedFactor:string} extends NativeUser ? false : true>;
+type UnknownSessionRejected = Assert<unknown extends SessionClaims ? false : true>;
+export type ExternalClaimSafety = [InvalidSessionRejected,InvalidFactorRejected,UnknownSessionRejected];
+declare const untrustedInput: unknown;
+if(request_account_get_v1(untrustedInput)){
+ const typedRequest:Operations['account_get_v1']['request']=untrustedInput;
+ void typedRequest;
+}
+if(success_account_get_v1(untrustedInput)){
+ const typedResponse:Operations['account_get_v1']['response']=untrustedInput;
+ void typedResponse;
+}
