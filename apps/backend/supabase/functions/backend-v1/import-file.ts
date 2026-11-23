@@ -1,5 +1,5 @@
 import {contentHash} from './document-storage.ts';
-import {isRecord,parseJson,requireRecord,responseJson} from './edge-json.ts';
+import {isRecord,isUnknownArray,parseJson,requireRecord,responseJson} from './edge-json.ts';
 type Column={source_column:string;target:string};
 const targets=new Set(['display_name','email','phone','source_key','person_ref','opening_credits','opening_debt_minor','opening_credit_value_minor','currency','product_version_ref','start_date','end_date']);
 // Strict RFC4180, including escaped quotes and quoted line breaks. Headers are
@@ -22,7 +22,9 @@ export function parseImportCsv(text:string,mapping:{columns:Column[];delimiter?:
   if(ch==='"'||closed)throw Error('VALIDATION_FAILED');cell+=ch;
  }
  if(quoted)throw Error('VALIDATION_FAILED');if(cell||line.length||closed)row();
- if(lines.length<2)throw Error('VALIDATION_FAILED');const headers=lines.shift()!;
+ if(lines.length<2)throw Error('VALIDATION_FAILED');
+ const headers=lines.shift();
+ if(!headers)throw Error('VALIDATION_FAILED');
  if(headers.some(x=>!x.trim())||new Set(headers).size!==headers.length)throw Error('VALIDATION_FAILED');
  if(!mapping.columns.length||mapping.columns.length>100)throw Error('VALIDATION_FAILED');
  const source=new Set<string>(),seen=new Set<string>();
@@ -46,7 +48,7 @@ export function parseImportCsv(text:string,mapping:{columns:Column[];delimiter?:
   if(crm){
    try{
     const phone=String(payload.phone??'').replace(/[\s().-]/g,'').replace(/^00/,'+');if(!/^\+[1-9][0-9]{6,14}$/.test(phone))throw Error('phone');payload.phone=phone;
-    const consents:unknown=payload.consents===undefined?[]:parseJson(String(payload.consents));if(!Array.isArray(consents)||consents.length>20)throw Error('consents');
+    const consents:unknown=payload.consents===undefined?[]:parseJson(String(payload.consents));if(!isUnknownArray(consents)||consents.length>20)throw Error('consents');
     const purposes=new Set();for(const proof of consents){
      if(!isRecord(proof)||Object.keys(proof).length!==4||Object.keys(proof).some(k=>!['purpose','version','accepted','occurred_at'].includes(k))||typeof proof.accepted!=='boolean'||typeof proof.purpose!=='string'||!proof.purpose.trim()||proof.purpose.length>100||typeof proof.version!=='string'||!proof.version.trim()||proof.version.length>200||typeof proof.occurred_at!=='string'||!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:[0-5]\d(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/i.test(proof.occurred_at)||!Number.isFinite(Date.parse(proof.occurred_at))||Date.parse(proof.occurred_at)>Date.now()||purposes.has(proof.purpose))throw Error('consents');purposes.add(proof.purpose);
     }payload.consents=consents;

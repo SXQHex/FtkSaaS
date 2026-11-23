@@ -1,4 +1,4 @@
-import {isRecord} from './edge-json.ts';
+import {isRecord,isUnknownArray} from './edge-json.ts';
 // Authentication comes from native Auth, not from decoded JWT attributes.
 // These guards only select the validated fields the gateway actually consumes.
 export interface NativeUser {
@@ -14,8 +14,8 @@ export function nativeUser(value: unknown): NativeUser | null {
   if (!isRecord(value) || typeof value.id !== 'string' || !value.id) return null;
   const factors = value.factors;
   if (factors !== undefined && factors !== null &&
-      (!Array.isArray(factors) || !factors.every(factor => isRecord(factor) && typeof factor.status === 'string'))) return null;
-  return {id: value.id, hasVerifiedFactor: Array.isArray(factors) && factors.some(factor => isRecord(factor) && factor.status === 'verified')};
+      (!isUnknownArray(factors) || !factors.every(factor => isRecord(factor) && typeof factor.status === 'string'))) return null;
+  return {id: value.id, hasVerifiedFactor: isUnknownArray(factors) && factors.some(factor => isRecord(factor) && factor.status === 'verified')};
 }
 export function sessionClaims(value: unknown): SessionClaims | null {
   if (!isRecord(value) || typeof value.sub !== 'string' || typeof value.session_id !== 'string' ||

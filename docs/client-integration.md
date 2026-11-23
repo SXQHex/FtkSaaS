@@ -10,6 +10,8 @@ Güncel kaynak/hosted kabulü [00 devirde](../apps/backend/docs/00-FtkSaaS-yeni-
 
 `centers_list_v1` düz liste okuması için typed istemci aynı Supabase origin'inde `POST /rest/v1/rpc/centers_list_v1`, `Content-Profile: api_read` ve `{p_request: request}` kullanır. Native JWT ve başarı/hata zarfı aynıdır. `include_setup_status:true` Edge üzerinden çalışır. Data API ulaşılabilir değilse, native taşıma hatası dönerse veya HTTP 401/403 kapısında kalırsa taşıma aynı isteği Edge'e iletir. HTTP 200 içindeki iş hatası doğrudan tüketiciye döner. Ekran/iş akışı mevcut operasyonu çağırmaya devam eder. Tarayıcı Data API açılımı [backend ortam rehberinde](../apps/backend/docs/remote-backend-setup.md#merkez-listesi-data-api).
 
+`@ftksaas/api-contracts/client` yanıtı ilgili operasyonun başarı şeması veya ortak hata şemasıyla doğrular. Şemaya uymayan gövde HTTP durumunu taşıyan `BackendTransportError` üretir. Edge ve ortak istemci aynı makine sözleşmesinden üretilen doğrulayıcıları kullanır.
+
 Anonim kayıt ön kontrolü `account_signup_check_v1` için [kayıt transport sözleşmesini](settings.md#e-posta-parola-kayıt-tüketicisi) kullanır. Yalnız `account_exists / available` döner; ardından gerekiyorsa native SDK signup çağırır. Gateway public/anon anahtar taşır; Edge→RPC service anahtarı istemciye verilmez. Kontrol parola almaz, hesap oluşturmaz veya posta göndermez.
 
 ## İşlem bütünlüğü

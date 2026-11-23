@@ -75,6 +75,14 @@ Güncel main ve DB saatli fixture ile birleşik adayda Node24.22.3 repo backend 
 - **Development.** [Development delivery #45135050103](https://github.com/SXQHex/FtkSaaS/actions/runs/45135050103) aynı main SHA’sında `deploy`, hosted backend ve deployed documentation adımlarını tamamladı. Çalışan doğrulamalar `backend-v1` JWT sınırını, imzasız webhook reddini, takvim gateway kontrollerini ve hosted backend smoke testini kapsadı.
 - **Kaynak kontrolü.** Main `d646cf52968996bb68efd3d0cbd6b826fcdbd259` üzerinde 18 el yazımı Edge TypeScript modülünde açık `any` ve tip susturma bulunmadı. `JSON.parse()` ve `Response.json()` değerleri `unknown` olarak alınıyor. `.mjs` çağrıları tip bildirimi üzerinden denetleniyor. İki negatif sözleşme tipi testi korunuyor. Backend bundle daha sonra aynı baytlarla `index.js` yoluna taşındı.
 
+### BT01 sonrası tip denetimi
+
+Taban `471685a674c09b704768e8be40d83e3d1a784959`. [Main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/45285021817) başarılı. Ek kaynak taraması ortak istemcide doğrulanmamış yanıt cast’i, JSON ve dizi daraltmasında örtük `any` ve üç non-null assertion buldu.
+
+Ortak istemci ve Edge aynı üretilmiş AJV doğrulayıcılarını kullanıyor. Ortak istemci yalnız sözleşmeye uyan başarı ya da hata gövdesini döndürüyor. Bozuk gövde `BackendTransportError` üretiyor. Edge modülleri JSON ve dizi elemanlarını doğrulanana kadar `unknown` olarak taşıyor. Takvim ve CORS transport gövdeleri backend tip denetimine dahil. TypeScript 7.0.2 ile 27 modülde yapılan denetimde dört standart JSON çağrısı dışında `any` akışı veya non-null assertion görülmedi. Dört dönüş değeri doğrudan `unknown` değişkenlere atanıyor.
+
+Yerel backend `verify` 628/628, kalite 10/10 ve sıfır floor bulgusu verdi. Frontend uyumluluk tip denetimi ve izolasyon geçti. Aday native CI, merge ve development kabulü bekliyor.
+
 <a id="bt01-edge-kaynak-taramasi"></a>
 ## BT01/1 — Edge kaynak ve dış veri sınırı envanteri
 

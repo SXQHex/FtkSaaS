@@ -8,7 +8,8 @@
     "supabase/functions/deno-runtime.d.ts"
   ],
   "compilerOptions": {
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "allowJs": true
   },
   "exclude": [
     "supabase/functions/**/index.ts"

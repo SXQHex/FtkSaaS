@@ -16,7 +16,9 @@ export function calendarOrigin(value:string|undefined):string {
 export async function calendarToken(secret:string|undefined,authId:string,orgId:string,operation:string,operationKey:string):Promise<{token:string;hash:string}> {
  if(!secret||!hex.test(secret))throw Error('CALENDAR_NOT_CONFIGURED');
  if(!uuid.test(authId)||!uuid.test(orgId)||!uuid.test(operationKey)||!['calendar_link_create_v1','calendar_link_rotate_v1'].includes(operation))throw Error('INVALID_CALENDAR_TOKEN_CONTEXT');
- const key=await crypto.subtle.importKey('raw',Uint8Array.from(secret.match(/../g)!,x=>parseInt(x,16)),{name:'HMAC',hash:'SHA-256'},false,['sign']);
+ const octets=secret.match(/../g);
+ if(!octets)throw Error('CALENDAR_NOT_CONFIGURED');
+ const key=await crypto.subtle.importKey('raw',Uint8Array.from(octets,x=>parseInt(x,16)),{name:'HMAC',hash:'SHA-256'},false,['sign']);
  const token=toHex(await crypto.subtle.sign('HMAC',key,encoder.encode(JSON.stringify(['FtkSaaS personal calendar v1',authId.toLowerCase(),orgId.toLowerCase(),operation,operationKey.toLowerCase()]))));
  return {token,hash:await calendarTokenHash(token)};
 }

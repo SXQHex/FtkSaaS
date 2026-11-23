@@ -1,6 +1,12 @@
+// @ts-check
 import {newUuidV7} from '../scripts/uuid.mjs';
 // Exact origins only. No cookies: callers use native Auth bearer tokens.
 const allowedHeaders='authorization,apikey,content-type,x-client-info,x-retry-count,traceparent,tracestate,baggage,x-ftk-bot-proof';
+/**
+ * @param {Request} request
+ * @param {{FTK_BROWSER_ORIGINS?: string}} env
+ * @returns {{headers?: Readonly<Record<string, string>>, response?: Response}}
+ */
 export function browserCors(request,env){
  const origin=request.headers.get('origin');
  const denied=()=>({response:Response.json({ok:false,error:{code:'FORBIDDEN',retryable:false,trace_id:newUuidV7()}},{status:403,headers:{'cache-control':'no-store',vary:'Origin'}})});
@@ -15,6 +21,10 @@ export function browserCors(request,env){
  if(request.headers.get('access-control-request-method')!=='POST'||requested.some(x=>!allowedHeaders.split(',').includes(x)))return denied();
  return {headers,response:new Response(null,{status:204,headers:{...headers,'access-control-allow-methods':'POST,OPTIONS','access-control-allow-headers':allowedHeaders,'cache-control':'no-store'}})};
 }
+/**
+ * @param {Response} response
+ * @param {Readonly<Record<string, string>>} [headers]
+ */
 export function applyBrowserCors(response,headers){
  const result=new Response(response.body,response);result.headers.delete('access-control-allow-origin');
  for(const [key,value] of Object.entries(headers??{}))result.headers.set(key,value);

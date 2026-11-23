@@ -300,9 +300,10 @@
         "apps/backend/supabase/migrations/20261118214900_tracking_media_redaction.sql",
         "apps/backend/supabase/migrations/20261119170000_shared_center_authorization.sql",
         "apps/backend/supabase/functions/backend-v1/edge-json.ts",
-        "apps/backend/supabase/functions/backend-v1/validators.d.ts",
+        "packages/api-contracts/src/validators.d.ts",
         "apps/backend/supabase/functions/deno-runtime.d.ts",
-        "apps/backend/transports/browser-cors.d.mts"
+        "packages/api-contracts/src/validators.js",
+        "packages/api-contracts/package.json"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -314,8 +315,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "bea340a50bc462c638c32c642a529819a484d49f7b6cb30bcc39946d42c71ea8",
-        "reason": "API shard kaynak bağı, kişi listesi kilit regresyonunun mevcut test grubunda yürütülmesini doğrular."
+        "fingerprint": "39601b56bca314f4f30ee74f09ece2b46393860f89be23cd4bbc173eb2000da7",
+        "reason": "Ortak istemci ve Edge aynı sözleşme doğrulayıcılarını kullanır. İstek ve geçerli yanıt biçimleri aynı kaldı."
       }
     },
     {
@@ -408,8 +409,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "1372eaeb5b40134dc7c7f22b7170bee40cdc0027af3b4b719009be97320d90a1",
-        "reason": "WF01 ve Supabase config farkı incelendi: yalnız önceden derlenmiş backend girişinin uzantısı değişti; native Auth, JWT, MFA ve hesap davranışı aynı kaynak baytlarıyla korunuyor."
+        "fingerprint": "d28df6cb0d17b1627b03c99d46432bb4b3dd3654ee028549ea9c885fb57c2f8f",
+        "reason": "Native Auth faktörleri bilinmeyen dizi elemanları olarak alan kontrolünden geçer. AAL ve oturum bağlama kuralları korunur."
       }
     },
     {
@@ -542,8 +543,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "adab1a9372fe50e4ed8ac7355ee5f36bc661b8093e5e37da824a6e25650a043a",
-        "reason": "Merkez ve rol listeleri aynı canlı yetki denetimiyle paylaşımlı organizasyon kilidi kullanır. Yazmalar özel kilit almaya devam eder."
+        "fingerprint": "8e4879184b0f6dffe234580db69f839c4b6273ceb8001620a8c25531a426706b",
+        "reason": "Düz merkez listesi Data API yönlendirmesi, kurulum özeti ve Edge fallback koşulları aynı. Yanıt ortak istemcide operasyon şemasına göre doğrulanır."
       }
     },
     {
@@ -1270,8 +1271,7 @@
         "apps/backend/database/public-page-event-applications.sql",
         "apps/backend/database/settings-catalog-v25.sql",
         "apps/backend/supabase/migrations/20261118214100_public_page_event_applications.sql",
-        "apps/backend/supabase/migrations/20261118214000_settings_catalog_v25.sql",
-        "apps/backend/transports/calendar-gateway.d.mts"
+        "apps/backend/supabase/migrations/20261118214000_settings_catalog_v25.sql"
       ],
       "operations": [
         "publication_set_v1",
@@ -1285,8 +1285,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "f5123676449d1c6b7b2f79885916501ee085f57fb675419abf1052d8e319569e",
-        "reason": "BT01 S14 signed public ingress regression: preserved original HMAC assertion, verified captured timestamp with 60s window and negative forged payload, signature and IP controls."
+        "fingerprint": "0d8e04c99705c84ba96a6512521ceafd17f67ac5e32cae0b9625da1756709f98",
+        "reason": "Takvim upstream JSON alanları okumadan önce doğrulanır. GET/HEAD, geçerli hata eşlemesi, MIME ve bayt sınırları korunur."
       }
     },
     {
@@ -2012,8 +2012,8 @@
         "platform_operator_access_set_v1"
       ],
       "review": {
-        "fingerprint": "04713f488f5d7d4b3a4335e72f7c9b651d611a1a88b478e685237e65550e3465",
-        "reason": "Pending document checksum null allowed only before Storage proof; ready and invoice require verified SHA checksum"
+        "fingerprint": "8c38e3b4caed92b0141c5bda9eac2d6f8388760797332ce59aa9871792b75982",
+        "reason": "Ortak handler operasyon ve RPC sonucunu alan kontrolleriyle daraltır. Platform işlem sözleşmesi ve yetki sırası aynı kaldı."
       }
     },
     {
@@ -2212,8 +2212,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "2cedc1c1d1c221f9bbff99ca9ea75ce4b1c83c9356e7ef30961f7d3f3262352c",
-        "reason": "BT01 kaynak incelemesi: Edge TypeScript, onayli JSON/RPC/Auth/providercode reddi ve mevcut WF sozlesmesi korunuyor."
+        "fingerprint": "3c737bc41d71e03c7ede55bd16b747157d292437287b2650ba5b1b80f0a61ad8",
+        "reason": "İşlemsel e-posta alıcı dizisi bilinmeyen öğe olarak kontrol edilir. Claim, yetki ve teslimat sırası korunur."
       }
     }
   ]
