@@ -536,9 +536,7 @@ test("Merge: confirmed write resets page-two cursor and reads only fresh first p
     page.getByText("İşlem kaydedildi ve güncel sonuç okundu.", { exact: true }).first(),
   ).toBeVisible();
 
-  const afterWrite = state.reads.filter(
-    (read) => read.afterWrite && read.status === "suggested",
-  );
+  const afterWrite = state.reads.filter((read) => read.afterWrite && read.status === "suggested");
   expect(afterWrite.filter((read) => read.cursor)).toHaveLength(0);
   expect(afterWrite).toHaveLength(1);
   expect(state.writes).toHaveLength(1);
@@ -547,7 +545,8 @@ test("Merge: confirmed write resets page-two cursor and reads only fresh first p
   await page.getByRole("button", { name: "Sonraki", exact: true }).click();
   await expect(page.getByText("Üçüncü sayfa üyesi", { exact: true })).toBeVisible();
   expect(state.reads.filter((read) => read.cursor === "fresh-native-next")).toHaveLength(1);
-  expect(state.reads.filter((read) => read.afterWrite && read.cursor === "stale-native-next"))
-    .toHaveLength(0);
+  expect(
+    state.reads.filter((read) => read.afterWrite && read.cursor === "stale-native-next"),
+  ).toHaveLength(0);
   expect(state.writes).toHaveLength(1);
 });
