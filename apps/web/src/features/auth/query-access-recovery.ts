@@ -165,6 +165,15 @@ export function observeQueryAccessFailures(queries: QueryClient, actions: Access
   }
 
   let checking = false;
+  let terminated = false;
+  // Once native identity is rejected, no queued workspace read may restore it.
+  const safeActions: AccessRecoveryActions = {
+    ...actions,
+    showLogin: async () => {
+      terminated = true;
+      await actions.showLogin();
+    },
+  };
   // Concurrent feature failures must not disappear behind the first
   // permission recheck: a later SESSION_REVOKED outranks a benign FORBIDDEN.
   const pending = new Map<string, () => Promise<unknown>>();
@@ -195,7 +204,7 @@ export function observeQueryAccessFailures(queries: QueryClient, actions: Access
     })()
       .catch(() => {
         queries.clear();
-        return actions.showLogin();
+        return safeActions.showLogin();
       })
       .finally(() => {
         checking = false;
@@ -228,12 +237,15 @@ export function observeQueryAccessFailures(queries: QueryClient, actions: Access
       // React Query's manual cache projections are not proof of a new remote
       // authority decision. Only a native workspace read can revoke access.
       if (
+        !terminated &&
         !event.action.manual &&
         previous?.selectedId &&
         previous.fingerprint !== workspaceAuthority(current) &&
         current
       ) {
         run(`workspace:${query.queryHash}`, async () => {
+          // A queued role refresh must never rehydrate an actor after logout.
+          if (terminated || !knownAccountId(queries)) return;
           // An externally revoked role must invalidate every scoped feature,
           // including cached history pages and still pending responses.
           queries.clear();
@@ -244,7 +256,10 @@ export function observeQueryAccessFailures(queries: QueryClient, actions: Access
       return;
     }
     if (event.action.type !== "error") return;
-    if (!classifyAccessFailure(query.state.error)) return;
+    const kind = classifyAccessFailure(query.state.error);
+    if (!kind) return;
+    if (kind !== "permission") terminated = true;
+    else if (terminated) return;
     if (handled.has(query.queryHash)) return;
     handled.add(query.queryHash);
     const key = query.queryKey;
@@ -253,11 +268,11 @@ export function observeQueryAccessFailures(queries: QueryClient, actions: Access
       // Another concurrent revocation may already have purged this feature.
       // Still process terminal session/actor errors after their Query vanishes.
       if (
-        classifyAccessFailure(error) === "permission" &&
-        !cache.find({ queryKey: key, exact: true })
+        kind === "permission" &&
+        (terminated || !cache.find({ queryKey: key, exact: true }))
       )
         return Promise.resolve();
-      return reconcileQueryAccessFailure(queries, key, error, actions);
+      return reconcileQueryAccessFailure(queries, key, error, safeActions);
     });
   });
 }
