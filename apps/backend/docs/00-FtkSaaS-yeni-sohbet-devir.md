@@ -18,6 +18,19 @@ Backend `verify` 467 + 150 + 10 testte sıfır hata ve atlama ile geçti. Yerel 
 <a id="ci503-native-baslangic"></a>
 ## CI503 — Boş runtime yanıtı ve native başlangıç maliyeti
 
+<a id="xreq-072-runtime-adayi"></a>
+### XREQ-072 native Edge Runtime adayı — 24 Kasım 2026
+
+[Kaynak yaması](../scripts/acceptance/xreq-072-edge-runtime.patch), Supabase Edge Runtime [v1.77.9 kaynağına](https://github.com/supabase/edge-runtime/tree/0dd15ef2281b60ea03413ef5d2a60ebb25b0e21d) uygulanır (MIT). `oneshot` ve dış bağlantı token'ı bulunan yol, normal request-end sinyalini dış HTTP yanıtının tamamlanmasına veya istemci iptaline bağlar. Yanıt başlıklarından önce iptal edilen sunucu future'ı aynı bağlantı token'ını kapatır. Token'sız ve diğer supervisor yolları mevcut request-end sinyalini kullanır. Sınırların durdurma yolları kendi supervisor kararlarıyla işler. İncelenen güncel [v1.79.4](https://github.com/supabase/edge-runtime/compare/v1.79.3...v1.79.4) farkı bu yaşam döngüsünü değiştirmiyor.
+
+Kaynak yaması SHA-256 `f9eaafb77992facc4be62af4b265c38bd5564b45fdf6e42539e67975afe5c92c`. İzole Linux amd64 derlemesinde Rust 1.98.0, upstream `Cargo.lock`, CMake 3.31.6 ve Debian OpenBLAS 0.3.29+ds-3 kullanıldı. Komut `CARGO_PROFILE_DEV_DEBUG=0 CARGO_PROFILE_DEV_INCREMENTAL=false cargo +1.98.0 build --locked --bin edge-runtime`. Yerel debug ELF SHA-256 `50716951d5f52e6a9c7c525d6047d1ce03486548f84d1b202d56cc047b16b538`. [Kabul aracı](../scripts/acceptance/edge-response-lifecycle.mjs) için `node apps/backend/scripts/acceptance/edge-response-lifecycle.mjs <ELF> <SHA-256> [kütüphane-dizini]` kullanılır.
+
+Resmi Linux amd64 paketi, CLI arşiv özeti doğrulanarak açıldı. İçindeki ELF `76954e8efdda8262238f75fe91d9436c9f2df4905f0105669d8bb1175050dbf7` ile tamponlanan JSON, boş 204 ve akış gövdeleri boş 503 verdi. Aynı fixture'da aday JSON, 204, tamponlanan akış ve doğrudan akışı doğru dış statü ve gövdeyle tamamladı. Başlık öncesi ve akış başladıktan sonraki gerçek istemci iptallerinde worker kapandı. CPU, bellek ve testte kısa wall-clock ihlalleri gerçek supervisor kapanışıyla başarısız kaldı. 50 istek, eşzamanlılık 2, 50 normal worker kapanışı ve 422080 KiB Edge tepe RSS ölçüldü. Toplam 11/11 native kontrol geçti.
+
+Güncel backend-v1 bundle özeti `76bcf6b6565f162b93e5891ff6890585dcbe6bdb0763b2c351745b9b0fb4caec` ile ayrı metot doğrulama deneyi, eşzamanlılık 2 altında 200/200 beklenen `400 / VALIDATION_FAILED` ve 267516 KiB tepe RSS verdi. Optimize edilmemiş derleyicide büyük bundle varsayılan Rust iş parçacığı yığınını aştı. Bu deneyde yalnız debug süreç yığını `RUST_MIN_STACK=33554432` ile ayarlandı. HTTP yanıtı veritabanına erişmeyen doğrulama yolundan geldi.
+
+Bu kanıt izole Edge ikilisini kapsar. Yerel ortamda Unix soketi açma `Operation not permitted` ile reddedildiği için tam Supabase/DB kabulü bu adayla yerelde çalıştırılamadı. Ortak kurulumda onaylı ve sabitlenmiş paket kullanılmalı, gerçek core/API/quality koşusu aynı binary ile bağlanmalı. Özgün CI çağrısının kesin kapanma nedeni ve hosted ödeme ölçümü kendi kabul kayıtlarında açık kalır.
+
 ### PR395 başarısız aday ve güncel main — 23 Kasım
 
 Main, PR394 birleşmesiyle `585675ce43bfde64624aa493619808f60dd174a3` oldu. Önceki `b79d25f129700d20b2eeb16676b72e344c1bd727` tabanına göre yalnız frontend ve lockfile değişti; kök/backend AGENTS ve backend/contracts kaynakları aynı. Bu main, PR395 dalına çakışmasız alındı; frontend dosyalarında backend düzeltmesi yapılmadı.
