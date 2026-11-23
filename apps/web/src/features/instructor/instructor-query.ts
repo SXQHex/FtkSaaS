@@ -2,6 +2,7 @@ import { queryOptions } from "@tanstack/react-query";
 import type { Interval } from "@ftksaas/api-contracts";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { readInstructorCalendar } from "./instructor-read";
+import { scheduleCacheKeys } from "../schedule/schedule-cache";
 
 export function instructorCalendarQuery(
   scope: ClientScope,
@@ -14,10 +15,7 @@ export function instructorCalendarQuery(
   };
   return queryOptions({
     queryKey: [
-      "instructor-calendar",
-      scope.accountId,
-      scope.orgId,
-      scope.centerId,
+      ...scheduleCacheKeys.instructorCalendar(scope),
       personId,
       normalized?.starts_at,
       normalized?.ends_at,

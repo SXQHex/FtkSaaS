@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
 import { instructorCalendarQuery } from "./instructor-query";
+import { scheduleCacheKeys } from "../schedule/schedule-cache";
 import { formatMinorAmount } from "../../lib/money";
 import {
   instructorPeriod,
@@ -95,10 +96,7 @@ export function InstructorTodayContent({
   const todayItems = items?.filter((row) => row.day === localToday);
   const attendanceQuery = useQuery({
     queryKey: [
-      "instructor-today-attendance",
-      scope.accountId,
-      scope.orgId,
-      scope.centerId,
+      ...scheduleCacheKeys.instructorAttendance(scope),
       personId,
       todayItems?.map(({ session }) => [session.id, session.version, session.attendance_state]),
     ],

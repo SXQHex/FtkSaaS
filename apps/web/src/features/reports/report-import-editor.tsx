@@ -12,14 +12,10 @@ import type {
   ImportRowState,
 } from "@ftksaas/api-contracts";
 import { formatMinorAmount } from "../../lib/money";
-import {
-  cacheVerifiedReadback,
-  capturePrivateReadback,
-  invalidateCachedFamilies,
-} from "../../lib/cache-invalidation";
+import { cacheVerifiedReadback, capturePrivateReadback } from "../../lib/cache-invalidation";
 import { useMemberCommand } from "../member-profile/use-member-command";
-import { invalidatePeoplePages } from "../people/people-query";
 import { invalidateLeadPages } from "../leads/leads-query";
+import { invalidateStudentImportViews } from "./report-import-effects";
 import { EventCommandNotice } from "../events/event-command-notice";
 import {
   writeComplete,
@@ -240,14 +236,7 @@ export function ReportImportEditor({
       return;
     refreshedImport.current = jobId;
     void (kind === "students"
-      ? Promise.all([
-          invalidatePeoplePages(queries, scope),
-          invalidateCachedFamilies(queries, [
-            ["report-view", scope, "weeks", "sales"],
-            ["report-view", scope, "products", "sales"],
-            ["report-finance-summary", scope],
-          ]),
-        ])
+      ? invalidateStudentImportViews(queries, scope)
       : invalidateLeadPages(queries, scope));
   }, [applySummary, job.fetchStatus, jobId, kind, queries, rows.fetchStatus, scope]);
   useEffect(() => {

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { BackendError } from "../../lib/backend";
@@ -31,7 +31,8 @@ export function MemberDocumentContextsPanel({
   onLockChange: (locked: boolean) => void;
 }) {
   const { t } = useTranslation(),
-    router = useRouter();
+    router = useRouter(),
+    queries = useQueryClient();
   const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]),
     [locked, setLocked] = useState(false),
     [selected, setSelected] = useState<{
@@ -39,14 +40,9 @@ export function MemberDocumentContextsPanel({
       binding: DocumentContext;
       before: DocumentView;
     }>();
+  const prefix = ["member-document-contexts", scope.accountId, scope.orgId, scope.centerId];
   const query = useQuery({
-    queryKey: [
-      "member-document-contexts",
-      scope.accountId,
-      scope.orgId,
-      scope.centerId,
-      cursors.at(-1),
-    ],
+    queryKey: [...prefix, cursors.at(-1)],
     queryFn: (readContext) => readMemberDocumentContexts(scope, cursors.at(-1), readContext),
     retry: false,
     refetchOnWindowFocus: false,
@@ -75,24 +71,38 @@ export function MemberDocumentContextsPanel({
     if (query.error) accessLost(query.error);
   }, [query.error, accessLost]);
   const next = query.data?.next_cursor;
-  if (selected)
+  if (selected) {
+    const currentDocument = query.data?.items
+      .find(
+        (row) => documentContextKey(row.context) === documentContextKey(selected.binding.context),
+      )
+      ?.requirements.find((document) => document.id === selected.before.id);
     return (
       <MemberDocumentEditor
         key={selected.key}
         binding={selected.binding}
-        before={selected.before}
+        before={currentDocument ?? selected.before}
+        sourceAvailable={!!currentDocument && !query.isError && !query.isFetching}
         disabled={disabled}
         onLockChange={lock}
         onAccessLost={accessLost}
         onAccepted={async () => {
-          const result = await query.refetch();
-          if (result.isError) throw result.error;
+          const read = queries.fetchQuery({
+            queryKey: [...prefix, undefined],
+            queryFn: ({ client, signal }) =>
+              readMemberDocumentContexts(scope, undefined, { client, signal }),
+            staleTime: 0,
+            retry: false,
+          });
+          setCursors([undefined]);
+          await read;
         }}
         onClose={() => {
           if (!locked) setSelected(undefined);
         }}
       />
     );
+  }
   return (
     <div className="space-y-3">
       <p className="text-xs text-muted-foreground">

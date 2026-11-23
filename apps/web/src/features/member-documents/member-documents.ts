@@ -1,6 +1,8 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { BackendError } from "../../lib/backend";
+import type { QueryClient } from "@tanstack/react-query";
+import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
 import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type {
   AcceptanceContext,
@@ -12,6 +14,21 @@ export interface DocumentContext {
   scope: ClientScope;
   personId: string;
   context: AcceptanceContext;
+}
+export function invalidateDocumentAcceptanceViews(queries: QueryClient, binding: DocumentContext) {
+  const { scope, personId } = binding;
+  const tenant = [scope.accountId, scope.orgId, scope.centerId] as const;
+  const catalog = ["document-catalog", scope];
+  return invalidateCachedFamilies(
+    queries,
+    [
+      ["member-documents", ...tenant, personId],
+      ["member-document-contexts", ...tenant],
+      ["document-directory", scope],
+      catalog,
+    ],
+    [catalog],
+  );
 }
 export async function readRequiredDocuments(
   binding: DocumentContext,

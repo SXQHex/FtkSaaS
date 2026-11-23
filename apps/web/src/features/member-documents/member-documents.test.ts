@@ -1,6 +1,8 @@
 import { beforeEach, expect, it, vi } from "vitest";
 import type { DocumentView } from "@ftksaas/api-contracts";
+import { QueryClient } from "@tanstack/react-query";
 import {
+  invalidateDocumentAcceptanceViews,
   documentBody,
   readRequiredDocuments,
   documentAcceptanceIntent,
@@ -20,6 +22,28 @@ const binding = {
     product_version_id: id(6),
   },
 };
+it("marks affected acceptance projections and their continuation pages stale", async () => {
+  const queries = new QueryClient();
+  const { scope, personId, context } = binding;
+  const affected = [
+    ["member-documents", scope.accountId, scope.orgId, scope.centerId, personId, context],
+    ["member-document-contexts", scope.accountId, scope.orgId, scope.centerId, "next"],
+    ["document-directory", scope, "center", "acceptance", doc.id],
+  ];
+  const unaffected = [
+    ["member-documents", scope.accountId, scope.orgId, scope.centerId, id(98), context],
+    ["document-directory", { ...scope, centerId: id(99) }, "center", "acceptance", doc.id],
+  ];
+  const catalog = ["document-catalog", scope, "center"];
+  for (const key of [...affected, ...unaffected]) queries.setQueryData(key, []);
+  queries.setQueryData(catalog, { pages: ["first", "second"], pageParams: [undefined, "next"] });
+  await invalidateDocumentAcceptanceViews(queries, binding);
+  for (const key of affected) expect(queries.getQueryState(key)?.isInvalidated).toBe(true);
+  for (const key of unaffected) expect(queries.getQueryState(key)?.isInvalidated).toBe(false);
+  expect(queries.getQueryState(catalog)?.isInvalidated).toBe(true);
+  expect(queries.getQueryData(catalog)).toEqual({ pages: ["first"], pageParams: [undefined] });
+  queries.clear();
+});
 const doc: DocumentView = {
   id: id(7),
   version_id: id(8),

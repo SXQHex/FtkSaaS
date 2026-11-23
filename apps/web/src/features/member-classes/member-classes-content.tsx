@@ -219,9 +219,12 @@ export function MemberClassesContent({
           timezone={timezone}
           onSaved={refresh}
           onClose={() => {
+            if (!locked) setTarget(undefined);
+          }}
+          onReload={() => {
             if (!locked) {
               setTarget(undefined);
-              void refresh();
+              void refresh().catch(accessLost);
             }
           }}
           onLockChange={lock}

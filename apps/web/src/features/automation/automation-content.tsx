@@ -24,7 +24,7 @@ import {
   readAutomationResult,
   type AutomationRecord,
 } from "./automation";
-import { readAutomationQueue } from "./automation-discovery";
+import { automationDiscoveryKey, readAutomationQueue } from "./automation-discovery";
 import { SegmentDiscovery } from "./segment-discovery";
 import { segmentDraft } from "./automation-form";
 import { Button } from "@ftksaas/ui/components/button";
@@ -156,7 +156,7 @@ export function AutomationContent({
     const choicesKey = ["automation-segment-choices", scope.accountId, scope.orgId, scope.centerId];
     await invalidateCachedFamilies(
       queries,
-      [prefix, choicesKey],
+      [prefix, choicesKey, automationDiscoveryKey(scope)],
       segmentWritten ? [choicesKey] : [],
     );
     assertCurrent();

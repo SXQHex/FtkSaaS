@@ -3,6 +3,7 @@ import { useBlocker, useRouter } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { BackendError } from "../../lib/backend";
+import { capturePrivateReadback, clearPrivateQueries } from "../../lib/cache-invalidation";
 import { Button } from "@ftksaas/ui/components/button";
 import type { StudioScope } from "./studio";
 import { ResourceLifecycleDialog } from "./resource-lifecycle-dialog";
@@ -81,15 +82,9 @@ export function ResourceLifecycleController({
         : failure instanceof Error
           ? failure.message
           : undefined;
-    if (
-      !code ||
-      !(
-        ["AUTH_REQUIRED", "ACCOUNT_CHANGED", "SESSION_REVOKED"].includes(code) ||
-        (acknowledged.current && ["FORBIDDEN", "NOT_FOUND"].includes(code))
-      )
-    )
+    if (!code || !["AUTH_REQUIRED", "ACCOUNT_CHANGED", "SESSION_REVOKED"].includes(code))
       return false;
-    queries.clear();
+    clearPrivateQueries(queries);
     onClose();
     void router.invalidate();
     return true;
@@ -98,9 +93,13 @@ export function ResourceLifecycleController({
   useEffect(() => {
     let active = true;
     mounted.current = true;
+    const assertCurrent = capturePrivateReadback(queries);
     async function load() {
       try {
-        const next = await readResourceLifecycle(initial.current.scope, initial.current.selection);
+        const next = await readResourceLifecycle(
+          initial.current.scope,
+          initial.current.selection,
+        ).finally(assertCurrent);
         if (active) {
           setBase(next);
           setNotice(next.active ? "ready" : "closed");
@@ -114,7 +113,7 @@ export function ResourceLifecycleController({
       active = false;
       mounted.current = false;
     };
-  }, []);
+  }, [queries]);
   useEffect(() => {
     if (busy || notice === "reading") return;
     if (error) document.getElementById("resource-lifecycle-reason")?.focus();
@@ -125,7 +124,9 @@ export function ResourceLifecycleController({
     lock.current = true;
     setBusy(true);
     try {
-      const next = await readResourceLifecycle(scope, selection);
+      const next = await readResourceLifecycle(scope, selection).finally(
+        capturePrivateReadback(queries),
+      );
       if (mounted.current) {
         setBase(next);
         setReason("");
@@ -133,7 +134,10 @@ export function ResourceLifecycleController({
         setNotice(next.active ? "ready" : "closed");
       }
     } catch (failure) {
-      if (mounted.current && !accessLost(failure)) setNotice("read-error");
+      if (mounted.current && !accessLost(failure)) {
+        setBase(undefined);
+        setNotice("read-error");
+      }
     } finally {
       lock.current = false;
       if (mounted.current) setBusy(false);
@@ -145,22 +149,29 @@ export function ResourceLifecycleController({
     setBusy(true);
     try {
       if (!acknowledged.current) {
-        await writeResourceLifecycle(intent.current);
+        const assertCurrent = capturePrivateReadback(queries);
+        await writeResourceLifecycle(intent.current).catch((error: unknown) => {
+          assertCurrent();
+          throw error;
+        });
         acknowledged.current = true;
         setHasAcknowledgement(true);
       }
       if (!mounted.current) return;
       setNotice("saved-unread");
-      const next = await rereadResourceLifecycle(intent.current);
-      await onRefresh();
+      const assertCurrent = capturePrivateReadback(queries);
+      const next = await rereadResourceLifecycle(intent.current).finally(assertCurrent);
+      await onRefresh().finally(assertCurrent);
       if (mounted.current) {
         setBase(next);
         setNotice("saved");
       }
     } catch (failure) {
       if (!mounted.current || accessLost(failure)) return;
-      if (acknowledged.current) setNotice("saved-unread");
-      else if (
+      if (acknowledged.current) {
+        setBase(undefined);
+        setNotice("saved-unread");
+      } else if (
         failure instanceof BackendError &&
         failure.code !== "TRANSPORT_ERROR" &&
         !failure.retryable
@@ -182,9 +193,9 @@ export function ResourceLifecycleController({
     intent.current = resourceLifecycleIntent(base, reason);
     void execute();
   }
-  const facts: { label: string; value: string }[] = [
-    { label: t(($) => $.studio.scope), value: selection.label },
-  ];
+  const facts: { label: string; value: string }[] = base
+    ? [{ label: t(($) => $.studio.scope), value: selection.label }]
+    : [];
   const current = base?.current.current;
   if (current?.operation === "availability_save_v1" && current.values.rule) {
     const rule = current.values.rule;

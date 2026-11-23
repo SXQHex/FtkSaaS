@@ -169,13 +169,16 @@ for (const operational of [false, true])
     await expect(
       state.card.getByRole("button", { name: "İşleme özel koşullar belgesini oku", exact: true }),
     ).toBeVisible();
+    expect(state.reads.at(-1)).toMatchObject({ page: { cursor: "second-context" } });
+    const readsBeforeAcceptance = state.reads.length;
     await accept(page);
     await expect(
       page.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),
     ).toBeVisible();
     expect(state.writes).toHaveLength(2);
     expect(state.writes[1]!.context).toEqual(state.second);
-    expect(state.reads.at(-1)).toMatchObject({ page: { cursor: "second-context" } });
+    expect(state.reads.slice(readsBeforeAcceptance)).toHaveLength(1);
+    expect(state.reads.at(-1)?.page).not.toHaveProperty("cursor");
   });
 for (const mode of ["unknown", "context-unread"] as const)
   test(`account document ${mode} keeps the editor and shared fields locked until exact result reread`, async ({

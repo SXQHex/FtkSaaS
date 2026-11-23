@@ -34,6 +34,7 @@ export function MemberClassEditor({
   timezone,
   onSaved,
   onClose,
+  onReload,
   onLockChange,
   onAccessLost,
 }: {
@@ -44,6 +45,7 @@ export function MemberClassEditor({
   timezone: string;
   onSaved: () => Promise<void>;
   onClose: () => void;
+  onReload: () => void;
   onLockChange: (locked: boolean) => void;
   onAccessLost: (cause: unknown) => boolean;
 }) {
@@ -196,7 +198,7 @@ export function MemberClassEditor({
         },
       }}
     >
-      <EventCommandNotice command={command} onReload={onClose} />
+      <EventCommandNotice command={command} onReload={onReload} />
       <FieldGroup>
         {(action === "book" || action === "accept") && (
           <>

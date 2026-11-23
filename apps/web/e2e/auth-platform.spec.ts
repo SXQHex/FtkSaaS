@@ -1072,6 +1072,7 @@ test("platform invoices paginate and publish a pending invoice discovered after 
   await platformFixture(page, "platform");
   const invoice = text.invoices;
   let denied = false;
+  const postPublishHistory: (string | undefined)[] = [];
   const pending = {
     kind: "invoice",
     id: uid(281),
@@ -1097,6 +1098,7 @@ test("platform invoices paginate and publish a pending invoice discovered after 
         status: 403,
         json: { ok: false, error: { code: "FORBIDDEN", retryable: false, trace_id: target } },
       });
+    if (pending.published_at) postPublishHistory.push(request.page.cursor);
     const data =
       request.page.cursor === "next-invoice" ? list([historical]) : list([pending], "next-invoice");
     return route.fulfill({ json: { ok: true, trace_id: target, data } });
@@ -1123,6 +1125,11 @@ test("platform invoices paginate and publish a pending invoice discovered after 
   await expect(grid.getByRole("row").filter({ hasText: pending.invoice_number })).toContainText(
     invoice.publishedStatus,
   );
+  expect(postPublishHistory).toEqual([undefined]);
+  await expect(grid.getByRole("rowheader", { name: historical.invoice_number })).toHaveCount(0);
+  await page.getByRole("button", { name: invoice.more }).click();
+  await expect(grid.getByRole("rowheader", { name: historical.invoice_number })).toBeVisible();
+  expect(postPublishHistory).toEqual([undefined, "next-invoice"]);
   denied = true;
   await page.reload();
   await expect(page.getByText(text.denied, { exact: true })).toBeVisible();

@@ -130,16 +130,12 @@ function keyHasOrganization(key: QueryKey, orgId: string): boolean {
   );
 }
 
-function activeWorkspace(queries: QueryClient, accountId: string, failedKey: QueryKey) {
-  const candidates = queries
+function workspaceOrganization(queries: QueryClient, accountId: string, failedKey: QueryKey) {
+  // Actor-only and platform queries have no organization to recheck.
+  return queries
     .getQueriesData<Workspace>({ queryKey: workspaceKeys.account(accountId) })
-    .filter(([, view]) => Boolean(view?.selected?.id));
-  // A platform/actor-only denial has no organization scope. Never guess one
-  // from an unrelated workspace projection or interpret it as a global logout.
-  const matched = candidates.find(([, view]) =>
-    view?.selected?.id ? keyHasOrganization(failedKey, view.selected.id) : false,
-  );
-  return matched;
+    .map(([, view]) => view?.selected?.id)
+    .find((id) => id && keyHasOrganization(failedKey, id));
 }
 
 export interface AccessRecoveryActions {
@@ -167,24 +163,27 @@ export async function reconcileQueryAccessFailure(
   }
 
   const accountId = knownAccountId(queries);
-  const match = accountId ? activeWorkspace(queries, accountId, failedKey) : undefined;
-  const previous = match?.[1];
-  if (!accountId || !match || !previous?.selected?.id) {
+  const orgId = accountId ? workspaceOrganization(queries, accountId, failedKey) : undefined;
+  if (!accountId || !orgId) {
     // FORBIDDEN is an operation-specific denial unless an organization
     // authority actually changed. Preserve platform/user error screens.
     return;
   }
 
-  const orgId = previous.selected.id;
   const cache = queries.getQueryCache();
-  const filter = { queryKey: match[0], exact: true };
-  const projection = cache.find(filter);
+  const projections = cache
+    .findAll({ queryKey: workspaceKeys.account(accountId) })
+    .flatMap((query) => {
+      const view = query.state.data as Workspace | undefined;
+      return view?.selected?.id === orgId ? [{ query, view }] : [];
+    });
   const revision = privateQueryRevision(queries);
-  const currentProjection = () =>
+  const currentProjections = () =>
     active() &&
     privateQueryRevision(queries) === revision &&
-    cache.find(filter) === projection &&
-    projection?.state.data === previous;
+    projections.every(
+      ({ query, view }) => cache.get(query.queryHash) === query && query.state.data === view,
+    );
   let current: Workspace;
   try {
     // An independent native recheck cannot reuse a cached Query success or
@@ -193,13 +192,16 @@ export async function reconcileQueryAccessFailure(
       verifiedWorkspaceAccount(queries, session.user.id),
     );
   } catch (error) {
-    if (!currentProjection()) return;
+    if (!currentProjections()) return;
     clearPrivateQueries(queries);
     if (classifyAccessFailure(error) === "session") await actions.showLogin();
     else await actions.invalidateRoute();
     return;
   }
-  if (!currentProjection() || !workspaceAccessLost(previous, current)) {
+  if (
+    !currentProjections() ||
+    !projections.some(({ view }) => workspaceAccessLost(view, current))
+  ) {
     // A feature-specific FORBIDDEN (or newly granted capabilities) must not
     // evict unrelated authorized data or a pending native command.
     return;
@@ -351,14 +353,14 @@ export function observeQueryAccessFailures(queries: QueryClient, actions: Access
     if (!kind) return;
     if (kind === "session") terminated = true;
     else if (terminated) return;
-    if (handled.has(query.queryHash)) return;
-    handled.add(query.queryHash);
+    if (kind !== "permission") {
+      if (handled.has(query.queryHash)) return;
+      handled.add(query.queryHash);
+    }
     const key = query.queryKey;
     const error = query.state.error;
     const accountId = kind === "permission" ? knownAccountId(queries) : undefined;
-    const organizationId = accountId
-      ? activeWorkspace(queries, accountId, key)?.[1]?.selected?.id
-      : undefined;
+    const organizationId = accountId ? workspaceOrganization(queries, accountId, key) : undefined;
     if (kind === "permission" && !organizationId) return;
     if (organizationId && checkingOrganizations.has(organizationId)) return;
     if (organizationId) checkingOrganizations.add(organizationId);

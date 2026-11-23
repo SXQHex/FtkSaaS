@@ -1,4 +1,4 @@
-import { cacheVerifiedReadback } from "../../lib/cache-invalidation";
+import { cacheVerifiedReadback, invalidateCachedFamilies } from "../../lib/cache-invalidation";
 import { invalidateWorkspace } from "../workspace/workspace-query";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -13,6 +13,7 @@ import { scheduleBackendError } from "../schedule/schedule-presentation";
 import { SettingsReviewDialog } from "./settings-review-dialog";
 import {
   readSettingsDocument,
+  settingsDocumentKey,
   parseSettingsDocumentPatch,
   settingsDocumentIntent,
   settingsResetIntent,
@@ -125,7 +126,7 @@ export function useSettingsDocument({
     },
     [onAccessLost],
   );
-  const key = ["settings-document", scope.accountId, scope.orgId, scope.centerId, level];
+  const key = settingsDocumentKey(scope, level);
   const query = useQuery({
     queryKey: key,
     queryFn: async (context) => {
@@ -156,11 +157,15 @@ export function useSettingsDocument({
         ),
       );
       if (review?.logo !== undefined) setLogoDraft(undefined);
-      if (review?.rows)
-        await queries.invalidateQueries({
-          queryKey: ["preparation-catalog", scope.accountId, scope.orgId],
-          refetchType: "none",
-        });
+      if (review?.rows) {
+        const preparationCatalog = ["preparation-catalog", scope.accountId, scope.orgId];
+        await invalidateCachedFamilies(
+          queries,
+          level === "organization"
+            ? [preparationCatalog, ["settings-document", scope.accountId, scope.orgId, "center"]]
+            : [[...preparationCatalog, scope.centerId]],
+        );
+      }
       await queries.invalidateQueries(
         { queryKey: ["settings-history", scope.accountId, scope.orgId] },
         { throwOnError: true },
@@ -174,8 +179,13 @@ export function useSettingsDocument({
     return () => onLockChange(false);
   }, [locked, onLockChange]);
   const source =
-    !accessDenied && !command.unavailable && !query.isError && !query.isFetching
-      ? query.data
+    enabled &&
+    !accessDenied &&
+    !command.unavailable &&
+    !query.isError &&
+    !query.isFetching &&
+    query.data
+      ? { ...query.data, scope }
       : undefined;
   const writable = (field: string) =>
     !readOnly &&

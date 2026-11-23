@@ -3,6 +3,7 @@ import { useQuery, useInfiniteQuery, useQueryClient } from "@tanstack/react-quer
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { invalidateAccountProjections, verifiedAccountForId } from "../auth/account-query";
+import { capturePrivateReadback, invalidateCachedFamilies } from "../../lib/cache-invalidation";
 import { readFactors, readSecurityHistory } from "./security";
 import { getSupabaseClient } from "../../lib/supabase";
 import { GoogleIdentities } from "./google-identities";
@@ -41,9 +42,11 @@ export function SecurityPanel({ accountId }: { accountId: string }) {
   const [changed, setChanged] = useState(false);
   const [refreshError, setRefreshError] = useState(false);
   const [pending, setPending] = useState(false);
-  const factors = useQuery({ queryKey: ["account-factors", accountId], queryFn: readFactors });
+  const factorsKey = ["account-factors", accountId] as const;
+  const historyKey = ["account-security-history", accountId] as const;
+  const factors = useQuery({ queryKey: factorsKey, queryFn: readFactors });
   const history = useInfiniteQuery({
-    queryKey: ["account-security-history", accountId],
+    queryKey: historyKey,
     initialPageParam: undefined as string | undefined,
     queryFn: ({ pageParam }) => readSecurityHistory(pageParam),
     getNextPageParam: (last) => last.next_cursor ?? undefined,
@@ -51,19 +54,25 @@ export function SecurityPanel({ accountId }: { accountId: string }) {
   async function refresh() {
     setPending(true);
     setRefreshError(false);
+    const assertCurrent = capturePrivateReadback(queries);
     try {
       if (needsNativeRefresh.current) {
         const { error } = await getSupabaseClient().auth.refreshSession();
         if (error) throw error;
         needsNativeRefresh.current = false;
       }
+      assertCurrent();
+      await invalidateCachedFamilies(queries, [factorsKey, historyKey], [historyKey]);
+      assertCurrent();
       await invalidateAccountProjections(queries);
+      assertCurrent();
       await Promise.all([
         verifiedAccountForId(queries, accountId, true),
         ...(needsSessionsRead.current ? [readSessions()] : []),
         factors.refetch({ throwOnError: true }),
         history.refetch({ throwOnError: true }),
       ]);
+      assertCurrent();
       await router.invalidate();
       needsSessionsRead.current = false;
     } catch {
@@ -274,7 +283,7 @@ export function SecurityPanel({ accountId }: { accountId: string }) {
           <CardFooter>
             <Button
               variant="outline"
-              isDisabled={history.isFetchingNextPage}
+              isDisabled={pending || history.isFetching}
               onPress={() => {
                 void history.fetchNextPage();
               }}

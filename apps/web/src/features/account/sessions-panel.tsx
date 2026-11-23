@@ -7,6 +7,7 @@ import { PencilIcon } from "lucide-react";
 import type { AccountSessionView } from "@ftksaas/api-contracts";
 import { getSupabaseClient } from "../../lib/supabase";
 import { invalidateAccountProjections, verifiedAccountForId } from "../auth/account-query";
+import { capturePrivateReadback, invalidateCachedFamilies } from "../../lib/cache-invalidation";
 import { readSessions, revokeSession } from "./sessions";
 import { RevokeOthers } from "./revoke-others";
 import { SessionLabel } from "./session-label";
@@ -32,6 +33,8 @@ import { Button } from "@ftksaas/ui/components/button";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { Skeleton } from "@ftksaas/ui/components/skeleton";
 
+type SessionRefresh = "first-page" | "visible-pages";
+
 export function SessionsPanel({ accountId }: { accountId: string }) {
   const { t } = useTranslation();
   const router = useRouter();
@@ -39,29 +42,46 @@ export function SessionsPanel({ accountId }: { accountId: string }) {
   const [labelConflict, setLabelConflict] = useState(false);
   const [editing, setEditing] = useState<AccountSessionView>();
   const [pending, setPending] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [failed, setFailed] = useState(false);
-  const [refreshError, setRefreshError] = useState(false);
+  const [refreshError, setRefreshError] = useState<SessionRefresh>();
   const [changed, setChanged] = useState(false);
   const intents = useRef(new Map<string, string>());
+  const sessionKey = ["account-sessions", accountId] as const;
+  const historyKey = ["account-security-history", accountId] as const;
   const sessions = useInfiniteQuery({
-    queryKey: ["account-sessions", accountId],
+    queryKey: sessionKey,
     initialPageParam: undefined as string | undefined,
     queryFn: ({ pageParam }) => readSessions(pageParam),
     getNextPageParam: (last) => last.next_cursor ?? undefined,
   });
-  async function refresh() {
-    setRefreshError(false);
+  async function refresh(mode: SessionRefresh = "first-page") {
+    setRefreshing(true);
+    setRefreshError(undefined);
+    const assertCurrent = capturePrivateReadback(queries);
     try {
+      const affected = [sessionKey, historyKey];
+      // Revalidate loaded rows from the start for label edits and uncertain
+      // revocations. A confirmed revocation changes the list's membership.
+      await invalidateCachedFamilies(
+        queries,
+        affected,
+        mode === "visible-pages" ? [historyKey] : affected,
+      );
+      assertCurrent();
       await invalidateAccountProjections(queries);
+      assertCurrent();
       await Promise.all([
         verifiedAccountForId(queries, accountId, true),
         sessions.refetch({ throwOnError: true }),
-        queries.invalidateQueries({ queryKey: ["account-security-history", accountId] }),
       ]);
+      assertCurrent();
       await router.invalidate();
       setChanged(true);
     } catch {
-      setRefreshError(true);
+      setRefreshError(mode);
+    } finally {
+      setRefreshing(false);
     }
   }
   async function revoke(sessionId: string) {
@@ -74,8 +94,10 @@ export function SessionsPanel({ accountId }: { accountId: string }) {
       intents.current.set(sessionId, key);
     }
     let currentRevoked = false;
+    let confirmed = false;
     try {
       const result = await revokeSession(sessionId, key);
+      confirmed = true;
       currentRevoked = result.current_revoked;
       if (currentRevoked) {
         try {
@@ -91,7 +113,7 @@ export function SessionsPanel({ accountId }: { accountId: string }) {
     } catch {
       setFailed(true);
     } finally {
-      if (!currentRevoked) await refresh();
+      if (!currentRevoked) await refresh(confirmed ? "first-page" : "visible-pages");
       setPending(false);
     }
   }
@@ -107,7 +129,7 @@ export function SessionsPanel({ accountId }: { accountId: string }) {
         </CardAction>
       </CardHeader>
       <CardContent className="min-w-0">
-        {changed && !pending && !failed && !refreshError && !labelConflict && (
+        {changed && !pending && !refreshing && !failed && !refreshError && !labelConflict && (
           <p role="status">{t(($) => $.sessions.updated)}</p>
         )}
         {labelConflict && (
@@ -127,8 +149,9 @@ export function SessionsPanel({ accountId }: { accountId: string }) {
               <Button
                 variant="outline"
                 size="sm"
+                isDisabled={refreshing}
                 onPress={() => {
-                  void refresh();
+                  void refresh(refreshError);
                 }}
               >
                 {t(($) => $.auth.retry)}
@@ -180,7 +203,7 @@ export function SessionsPanel({ accountId }: { accountId: string }) {
                         <Button
                           variant="ghost"
                           size="icon-sm"
-                          isDisabled={pending}
+                          isDisabled={pending || refreshing}
                           aria-label={t(($) => $.sessions.editLabel, {
                             name:
                               session.label ||
@@ -214,7 +237,7 @@ export function SessionsPanel({ accountId }: { accountId: string }) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          isDisabled={pending}
+                          isDisabled={pending || refreshing}
                           onPress={() => {
                             void revoke(session.session_id);
                           }}
@@ -235,7 +258,7 @@ export function SessionsPanel({ accountId }: { accountId: string }) {
               setEditing(undefined);
               setLabelConflict(conflict);
             }}
-            onRefresh={refresh}
+            onRefresh={() => refresh("visible-pages")}
           />
         )}
       </CardContent>
@@ -243,7 +266,7 @@ export function SessionsPanel({ accountId }: { accountId: string }) {
         <CardFooter>
           <Button
             variant="outline"
-            isDisabled={sessions.isFetchingNextPage}
+            isDisabled={pending || refreshing || sessions.isFetching}
             onPress={() => {
               void sessions.fetchNextPage();
             }}

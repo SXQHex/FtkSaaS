@@ -3,6 +3,9 @@ import { v7 as uuidv7 } from "uuid";
 import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { AutomationJobView, JobState, Interval } from "@ftksaas/api-contracts";
 import { getTemporal } from "../../lib/temporal";
+export const automationDiscoveryKey = (scope: ClientScope) =>
+  ["automation-discovery", scope.accountId, scope.orgId, scope.centerId] as const;
+
 const count = z.number().int().nonnegative().safe(),
   version = z.number().int().positive().safe(),
   instant = z.iso.datetime({ offset: true });

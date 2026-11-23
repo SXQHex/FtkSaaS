@@ -1,8 +1,25 @@
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
 import type { PolicyKey } from "@ftksaas/api-contracts";
+import type { QueryClient } from "@tanstack/react-query";
+import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
 import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { SettingsLevel } from "./settings-document";
+
+const settingsPoliciesFamily = (scope: ClientScope) =>
+  ["settings-policies", scope.accountId, scope.orgId] as const;
+export const settingsPoliciesKey = (scope: ClientScope, level: SettingsLevel) =>
+  [...settingsPoliciesFamily(scope), scope.centerId, level] as const;
+
+export function invalidateSettingsPolicyViews(
+  queries: QueryClient,
+  scope: ClientScope,
+  level: SettingsLevel,
+) {
+  return invalidateCachedFamilies(queries, [
+    level === "organization" ? settingsPoliciesFamily(scope) : settingsPoliciesKey(scope, level),
+  ]);
+}
 
 export const settingsPolicyKeys = [
   "student_cancel_private",

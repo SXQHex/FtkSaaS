@@ -19,7 +19,7 @@ import { EventActionController, type EventActionSelection } from "./event-action
 import { EventEditor } from "./event-editor";
 import { studioRoomsQuery } from "../studio/studio-rooms-query";
 import { EventRegistrationController } from "./event-registration-controller";
-import { eventDetailQuery, invalidateEventViews } from "./event-query";
+import { eventDetailQuery, invalidateEventViews, type EventWriteEffects } from "./event-query";
 
 export function EventDetailContent({
   scope,
@@ -162,11 +162,7 @@ export function EventDetailContent({
     },
     [onLockChange],
   );
-  async function refresh(afterWrite: {
-    finance?: boolean;
-    earnings?: boolean;
-    detailVerified?: boolean;
-  }) {
+  async function refresh(afterWrite: EventWriteEffects) {
     const assertCurrent = capturePrivateReadback(queries);
     await invalidateEventViews(queries, scope, eventId, afterWrite);
     assertCurrent();
@@ -458,15 +454,22 @@ export function EventDetailContent({
             setAction(undefined);
             void source.refetch();
           }}
-          onSaved={() =>
-            refresh({
-              finance: [
-                "cancel",
-                "cancel_registration",
-                "complete",
-                "close_attendance",
-                "correct_attendance",
-              ].includes(action.selection.action),
+          onSaved={() => {
+            const selection = action.selection;
+            const finance = [
+              "cancel",
+              "cancel_registration",
+              "complete",
+              "close_attendance",
+              "correct_attendance",
+            ].includes(selection.action);
+            return refresh({
+              finance,
+              productRights: finance,
+              personId:
+                selection.action === "cancel_registration"
+                  ? action.before.registrations?.find((row) => row.id === selection.id)?.person_id
+                  : undefined,
               earnings: [
                 "verify_duty",
                 "cancel",
@@ -474,8 +477,8 @@ export function EventDetailContent({
                 "close_attendance",
                 "correct_attendance",
               ].includes(action.selection.action),
-            })
-          }
+            });
+          }}
           onLockChange={setPending}
           onAccessLost={accessLost}
         />
@@ -490,7 +493,9 @@ export function EventDetailContent({
           onClose={() => {
             if (!locked) setRegistration(undefined);
           }}
-          onSaved={(detailVerified) => refresh({ finance: true, detailVerified })}
+          onSaved={(detailVerified, personId) =>
+            refresh({ finance: true, detailVerified, personId })
+          }
           onLockChange={setPending}
           onAccessLost={accessLost}
         />

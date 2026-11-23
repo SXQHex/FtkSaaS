@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useBlocker } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { BackendError } from "../../lib/backend";
+import { capturePrivateReadback } from "../../lib/cache-invalidation";
 import { readMergeOperation, readMergeResult, writeMerge, type MergeIntent } from "./merge";
 
 export type MergeCommandState =
@@ -17,8 +19,9 @@ export function useMergeCommand({
   onRefresh,
 }: {
   onAccessLost: (error: unknown) => boolean;
-  onRefresh: () => Promise<void>;
+  onRefresh: (intent: MergeIntent, assertCurrent: () => void) => Promise<void>;
 }) {
+  const queries = useQueryClient();
   const [state, setState] = useState<MergeCommandState>("ready");
   const [busy, setBusy] = useState(false);
   const [unavailable, setUnavailable] = useState(false);
@@ -49,9 +52,14 @@ export function useMergeCommand({
     setState("rejected");
   }
   async function reread() {
-    if (!intent.current || !acknowledged.current) return;
-    await readMergeResult(intent.current);
-    await onRefresh();
+    const activeIntent = intent.current;
+    if (!activeIntent || !acknowledged.current) return;
+    const assertCurrent = capturePrivateReadback(queries);
+    await readMergeResult(activeIntent);
+    assertCurrent();
+    if (!mounted.current || terminal.current) return;
+    await onRefresh(activeIntent, assertCurrent);
+    assertCurrent();
     if (mounted.current && !terminal.current) setState("saved");
   }
   async function execute() {

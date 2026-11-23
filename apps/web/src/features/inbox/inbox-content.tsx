@@ -134,7 +134,7 @@ export function InboxContent({
       if (cause) accessLost(cause);
   }, [list.error, source.error, nativeSource.error, accessLost]);
   async function refreshFirstPage(assertCurrent: () => void, allUnread = false) {
-    const families = allUnread ? organizationInboxReadKeys(queries, scope) : [[...prefix, "list"]];
+    const families = organizationInboxReadKeys(queries, scope, allUnread ? undefined : []);
     await invalidateAndReadFirstPage({
       queries,
       families,
@@ -189,7 +189,12 @@ export function InboxContent({
         return;
       }
       const stateKeys = rows.map((row) => [...prefix, "state", row.id]);
-      await invalidateCachedFamilies(queries, stateKeys);
+      const affectedStates = organizationInboxReadKeys(
+        queries,
+        scope,
+        rows.map((row) => row.id),
+      ).filter((key) => key[4] === "state");
+      if (affectedStates.length) await invalidateCachedFamilies(queries, affectedStates);
       assertCurrent();
       await Promise.all(
         rows.map(async (row, index) => {

@@ -442,8 +442,16 @@ test("automation segment chooser reads a valid continuation again after a segmen
 test("automation reviewed disable preserves definition and uses the actual version", async ({
   page,
 }) => {
-  const state = await fixture(page);
+  const state = await fixture(page, "segment");
   const original = structuredClone(state.definition);
+  await page.getByRole("tab", { name: "Segmentler", exact: true }).click();
+  const openUsage = page.getByRole("button", { name: "Kullanan otomasyonlar", exact: true });
+  const usage = page.getByRole("dialog");
+  await openUsage.click();
+  await expect(usage.getByText("Açık", { exact: true })).toBeVisible();
+  await usage.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  expect(state.discoveries).toHaveLength(1);
+  await page.getByRole("tab", { name: "Otomasyonlar", exact: true }).click();
   await page
     .getByRole("switch", { name: "Örnek takip otomasyonunu aç veya kapat", exact: true })
     .press("Space");
@@ -456,14 +464,26 @@ test("automation reviewed disable preserves definition and uses the actual versi
     expected_version: 7,
     definition: { ...original, enabled: false },
   });
+  expect(state.discoveries).toHaveLength(1);
+  await d.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await page.getByRole("tab", { name: "Segmentler", exact: true }).click();
+  await openUsage.click();
+  await expect(usage.getByText("Kapalı", { exact: true })).toBeVisible();
+  expect(state.discoveries).toHaveLength(2);
 });
 test("automation unknown write recovers via the exact receipt without another effect", async ({
   page,
 }) => {
   const state = await fixture(page, "unknown");
-  await page
-    .getByRole("switch", { name: "Örnek takip otomasyonunu aç veya kapat", exact: true })
-    .press("Space");
+  await page.getByRole("tab", { name: "Otomasyonlar", exact: true }).click();
+  const toggle = page.getByRole("switch", {
+    name: "Örnek takip otomasyonunu aç veya kapat",
+    exact: true,
+  });
+  await expect(toggle).toBeEnabled();
+  await toggle.focus();
+  await expect(toggle).toBeFocused();
+  await page.keyboard.press("Space");
   const d = page.getByRole("alertdialog");
   await d.getByRole("checkbox").press("Space");
   await d.getByRole("button", { name: "Otomasyonu kapat", exact: true }).click();
@@ -473,9 +493,15 @@ test("automation unknown write recovers via the exact receipt without another ef
 });
 test("automation stale preflight rejects the reviewed toggle without writing", async ({ page }) => {
   const state = await fixture(page, "stale");
-  await page
-    .getByRole("switch", { name: "Örnek takip otomasyonunu aç veya kapat", exact: true })
-    .press("Space");
+  await page.getByRole("tab", { name: "Otomasyonlar", exact: true }).click();
+  const toggle = page.getByRole("switch", {
+    name: "Örnek takip otomasyonunu aç veya kapat",
+    exact: true,
+  });
+  await expect(toggle).toBeEnabled();
+  await toggle.focus();
+  await expect(toggle).toBeFocused();
+  await page.keyboard.press("Space");
   const d = page.getByRole("alertdialog");
   await d.getByRole("checkbox").press("Space");
   await d.getByRole("button", { name: "Otomasyonu kapat", exact: true }).click();

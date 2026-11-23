@@ -116,6 +116,7 @@ async function fixture(
     unread: false,
     documentAccepted: false,
     documentUnread: false,
+    documentSummaryDenied: false,
     documentContentFailed: false,
     documentContentGate: undefined as Promise<void> | undefined,
     documentText: initialDocumentText,
@@ -194,6 +195,7 @@ async function fixture(
       if (!options.documents) return send([]);
       if (!r.context.product_version_id) return send([]);
       expect(r.context.product_version_id).toBe(right.product_version_id);
+      if (!r.content_file_id && state.documentSummaryDenied) return reject();
       if (r.content_file_id && options.documentContentFailure && !state.documentContentFailed) {
         state.documentContentFailed = true;
         return reject("SERVICE_UNAVAILABLE", true);
@@ -560,6 +562,19 @@ test("member booking requires an explicit right and review, then rereads native 
     page.getByText("Kayıtlısın", { exact: true }).filter({ visible: true }),
   ).toBeVisible();
 });
+test("closing an unsubmitted booking leaves the warm weekly class list alone", async ({ page }) => {
+  const state = await fixture(page);
+  await page.getByRole("button", { name: "Kayıt ol", exact: true }).click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog.getByRole("radio").first()).toBeVisible();
+  const calendarReads = () => state.reads.filter(({ op }) => op === "calendar_get_v1").length;
+  const readsBeforeClose = calendarReads();
+  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Kayıt ol", exact: true })).toBeVisible();
+  expect(calendarReads()).toBe(readsBeforeClose);
+  expect(state.writes).toHaveLength(0);
+});
 test("member unknown booking recovers from the same receipt and never repeats the write", async ({
   page,
 }) => {
@@ -751,6 +766,24 @@ test("member acknowledged document acceptance rereads only its result", async ({
   await expect(d.getByText("Kabul edildi", { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(1);
   expect(state.reads.filter((r) => r.op === "operation_status_get_v1")).toHaveLength(0);
+});
+test("a denied requirements refresh hides the document but preserves acceptance recovery", async ({
+  page,
+}) => {
+  const { state, d } = await openDocument(page);
+  const body = d.getByText(initialDocumentText, { exact: true });
+  await expect(body).toBeVisible();
+  state.documentSummaryDenied = true;
+  await d.getByRole("checkbox", { name: documentReview, exact: true }).press("Space");
+  await d.getByRole("button", { name: "Belgeyi kabul et", exact: true }).click();
+  const retry = d.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true });
+  await expect(retry).toBeVisible();
+  await expect(body).toHaveCount(0);
+  await expect(d.getByRole("button", { name: "Belgeyi kabul et", exact: true })).toHaveCount(0);
+  state.documentSummaryDenied = false;
+  await retry.click();
+  await expect(d.getByText("Kabul edildi", { exact: true })).toBeVisible();
+  expect(state.writes.map(({ op }) => op)).toEqual(["document_accept_v1"]);
 });
 test("member document content failure exposes explicit retry and never offers acceptance of stale content", async ({
   page,

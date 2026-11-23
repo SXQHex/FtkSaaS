@@ -62,7 +62,8 @@ async function trials(page: Page, mode: "ackUnread" | "confirm" | "denied" = "ac
           },
         ]
       : [];
-  const writes: Record<string, unknown>[] = [],
+  const historyReads: Record<string, unknown>[] = [],
+    writes: Record<string, unknown>[] = [],
     receipts = new Map<string, { operation: string; id: string }>();
   let failRead = false,
     deny = mode === "denied";
@@ -136,6 +137,7 @@ async function trials(page: Page, mode: "ackUnread" | "confirm" | "denied" = "ac
           ]),
         );
       if (key.directory === "history") {
+        historyReads.push(r.page);
         if (failRead) {
           failRead = false;
           return route.abort("failed");
@@ -217,6 +219,7 @@ async function trials(page: Page, mode: "ackUnread" | "confirm" | "denied" = "ac
     session,
     product,
     offers,
+    historyReads,
     writes,
     setAllowed: () => {
       deny = false;
@@ -321,9 +324,12 @@ test("paid trial confirmation uses immutable offer terms and a real registration
   await dialog.getByRole("checkbox").press("Space");
   await dialog.getByRole("button", { name: "Kaydet", exact: true }).click();
   await expect(dialog.getByText(/Sonuç bilinmiyor/)).toBeVisible();
+  const historyReadsBeforeRecovery = state.historyReads.length;
   await dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   await expect(dialog.getByText("Gerçek ders kaydı oluşturuldu.", { exact: true })).toBeVisible();
+  expect(state.historyReads.slice(historyReadsBeforeRecovery)).toHaveLength(1);
+  expect(state.historyReads.at(-1)).not.toHaveProperty("cursor");
   expect(state.writes).toHaveLength(1);
   expect(state.native.writes).toHaveLength(0);
   await closeLead(page);

@@ -51,7 +51,7 @@ type RegistrationControllerProps = {
   registrationId?: string;
   selfPersonId?: string;
   onClose: () => void;
-  onSaved: (detailVerified?: boolean) => Promise<void>;
+  onSaved: (detailVerified: boolean, personId?: string) => Promise<void>;
   recoveryOnly?: boolean;
   onLockChange: (value: boolean) => void;
   onAccessLost: (cause: unknown) => boolean;
@@ -78,7 +78,7 @@ function NewEventRegistrationController({
   before: EventView;
   selfPersonId?: string;
   onClose: () => void;
-  onSaved: (detailVerified?: boolean) => Promise<void>;
+  onSaved: (detailVerified: boolean, personId?: string) => Promise<void>;
   recoveryOnly?: boolean;
   onLockChange: (value: boolean) => void;
   onAccessLost: (error: unknown) => boolean;
@@ -171,7 +171,7 @@ function NewEventRegistrationController({
     onAccessLost,
     onRefresh: async (result) => {
       if (result.outcome === "capacity_closed") setCapacityClosed(true);
-      await onSaved(true);
+      await onSaved(true, personId);
     },
   });
   const prepareCommand = useMemberCommand({
@@ -187,7 +187,7 @@ function NewEventRegistrationController({
     onAccessLost,
     onRefresh: async () => {
       setPreview(undefined);
-      await onSaved();
+      await onSaved(false, personId);
     },
   });
   const collectionCommand = useMemberCommand({
@@ -203,7 +203,7 @@ function NewEventRegistrationController({
     onAccessLost,
     onRefresh: async () => {
       setPreview(undefined);
-      await onSaved();
+      await onSaved(false, personId);
     },
   });
   const actionLocked =

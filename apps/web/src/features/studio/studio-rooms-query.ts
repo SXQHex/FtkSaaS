@@ -1,5 +1,7 @@
 import { queryOptions, type QueryClient } from "@tanstack/react-query";
 import { invalidateAndReadFirstPage } from "../../lib/cache-invalidation";
+import { scheduleCacheKeys } from "../schedule/schedule-cache";
+import { sessionDetailKeys } from "../session-detail/session-detail-query";
 import { readStudioRooms, type StudioScope } from "./studio";
 
 export function studioRoomsQuery(scope: StudioScope) {
@@ -13,6 +15,13 @@ export function studioRoomsQuery(scope: StudioScope) {
 export async function refreshStudioRooms(queries: QueryClient, scope: StudioScope) {
   const key = studioRoomsQuery(scope).queryKey;
   const tenant = [scope.accountId, scope.orgId, scope.centerId] as const;
+  const sessionRooms = queries
+    .getQueryCache()
+    .findAll({
+      queryKey: sessionDetailKeys.center(scope),
+      predicate: ({ queryKey }) => queryKey[5] === "rooms",
+    })
+    .map(({ queryKey }) => queryKey);
   return invalidateAndReadFirstPage({
     queries,
     families: [
@@ -20,6 +29,12 @@ export async function refreshStudioRooms(queries: QueryClient, scope: StudioScop
       ["studio", ...tenant],
       ["schedule-sources", ...tenant],
       ["settings-subscription", scope.accountId, scope.orgId],
+      scheduleCacheKeys.instructorCalendar(scope),
+      scheduleCacheKeys.instructorSession(scope),
+      scheduleCacheKeys.overviewLabels(scope),
+      ["member-classes", ...tenant],
+      ["member-reservations", ...tenant],
+      ...sessionRooms,
     ],
     firstPageKey: key,
     readFirstPage: ({ signal }) => readStudioRooms(scope, undefined, signal),

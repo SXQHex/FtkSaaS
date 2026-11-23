@@ -25,15 +25,21 @@ function sameSession(previous: NativeIdentity | null | undefined, current: Nativ
 }
 
 export function useAuthSession(enabled = true, onSessionHandoff?: (pending: boolean) => void) {
-  const [ready, setReady] = useState(true);
+  const configured = Boolean(
+    import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+  );
+  const [ready, setReady] = useState(!configured);
+  const [observing, setObserving] = useState(enabled);
+  if (observing !== enabled) {
+    setObserving(enabled);
+    setReady(!configured);
+  }
   const queries = useQueryClient();
   const router = useRouter();
   // Keep the last native identity when the observer pauses for public routes.
   const previous = useRef<NativeIdentity | null | undefined>(undefined);
   useEffect(() => {
-    if (!enabled) return;
-    if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY)
-      return;
+    if (!configured || !enabled) return;
     let revision = 0;
     let mounted = true;
     const { data } = getSupabaseClient().auth.onAuthStateChange((event, session) => {
@@ -41,6 +47,7 @@ export function useAuthSession(enabled = true, onSessionHandoff?: (pending: bool
       const changed = !sameSession(previous.current, current);
       if (event === "INITIAL_SESSION" && previous.current === undefined) {
         previous.current = current;
+        setReady(true);
         return;
       }
       const sameActorHandoff =
@@ -52,8 +59,10 @@ export function useAuthSession(enabled = true, onSessionHandoff?: (pending: bool
       previous.current = current;
       if (event === "INITIAL_SESSION" && !changed) {
         // Resubscribing after a public route keeps the proven same session.
-        setReady(true);
-        onSessionHandoff?.(false);
+        if (revision === 0) {
+          setReady(true);
+          onSessionHandoff?.(false);
+        }
         return;
       }
       // SIGNED_IN is re-emitted on focus; TOKEN_REFRESHED and MFA keep the
@@ -92,6 +101,6 @@ export function useAuthSession(enabled = true, onSessionHandoff?: (pending: bool
       mounted = false;
       data.subscription.unsubscribe();
     };
-  }, [enabled, queries, router, onSessionHandoff]);
-  return ready;
+  }, [configured, enabled, queries, router, onSessionHandoff]);
+  return configured ? enabled && ready : true;
 }

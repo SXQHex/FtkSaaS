@@ -1,5 +1,6 @@
 import { invalidateLeadPages } from "./leads-query";
 import { useWorkspaceQuery } from "../workspace/workspace-query";
+import { hasWorkspaceManagementScope } from "../workspace/workspace";
 import { useCallback, useEffect, useState } from "react";
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouter } from "@tanstack/react-router";
@@ -81,19 +82,7 @@ export function LeadsContent({
       ? workspace.data
       : undefined;
   const timezone = current?.centers.find((row) => row.id === scope.centerId)?.timezone;
-  const canReview =
-    !workspace.isError &&
-    Boolean(
-      current?.roles.some(
-        (role) =>
-          role.state === "active" &&
-          role.account_access_granted !== false &&
-          role.person_id === current.selected?.self_context?.person_id &&
-          (role.role === "owner" ||
-            role.role === "org_manager" ||
-            (role.role === "center_manager" && role.scope_center_id === scope.centerId)),
-      ),
-    );
+  const canReview = !workspace.isError && hasWorkspaceManagementScope(current, scope.centerId);
   const onLocked = useCallback((value: boolean) => setLocked(value), []);
   useEffect(() => {
     onLockChange(locked);

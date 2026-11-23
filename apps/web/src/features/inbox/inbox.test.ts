@@ -27,6 +27,22 @@ it("marks cached inbox state and lists across the member's organization only", (
   expect(organizationInboxReadKeys(queries, scope)).toEqual([ownList, otherCenterState]);
   queries.clear();
 });
+it("marks every organization list and only the selected notification states", () => {
+  const queries = new QueryClient();
+  const otherCenter = inboxKey({ ...scope, centerId: id(5) });
+  const first = [...inboxKey(scope), "list", "", "all", undefined];
+  const continuation = [...otherCenter, "list", "", "unread", "next"];
+  const selected = [...otherCenter, "state", id(7)];
+  const unrelated = [...otherCenter, "state", id(8)];
+  for (const key of [first, continuation, selected, unrelated]) queries.setQueryData(key, true);
+
+  expect(organizationInboxReadKeys(queries, scope, [id(7)])).toEqual([
+    first,
+    continuation,
+    selected,
+  ]);
+  queries.clear();
+});
 const notification = {
   id: id(4),
   kind: "synthetic",

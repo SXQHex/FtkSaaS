@@ -136,8 +136,13 @@ export function MergeContent({
   );
   const command = useMergeCommand({
     onAccessLost: accessLost,
-    onRefresh: async () => {
-      await invalidateMergeViews(queries, scope);
+    onRefresh: async (intent, assertCurrent) => {
+      await invalidateMergeViews(
+        queries,
+        intent.scope,
+        intent.kind === "apply" && intent.decision === "merge",
+      );
+      assertCurrent();
       // A merge can remove or reorder the old server cursor. Read the visible
       // filter's first page, not the previously selected continuation page.
       await queries.fetchQuery({
@@ -160,6 +165,7 @@ export function MergeContent({
         staleTime: 0,
         retry: false,
       });
+      assertCurrent();
       setCursors([undefined]);
       setPage(0);
     },

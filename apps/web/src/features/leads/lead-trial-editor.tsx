@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useBlocker, useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
+import { cacheVerifiedReadback, invalidateCachedFamilies } from "../../lib/cache-invalidation";
 import { formatMinorAmount } from "../../lib/money";
 import type { LeadDetail } from "./leads-read";
 import { leadDraft } from "./leads-command";
@@ -21,6 +22,7 @@ import {
   readTrialResult,
 } from "./lead-trial";
 import { useMemberCommand } from "../member-profile/use-member-command";
+import { invalidateMemberReservationViews } from "../member-reservations/member-reservations-query";
 import { LeadCommandNotice } from "./lead-command-notice";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { Button } from "@ftksaas/ui/components/button";
@@ -45,7 +47,8 @@ export function LeadTrialEditor({
   onLockChange: (locked: boolean) => void;
 }) {
   const { t } = useTranslation(),
-    router = useRouter();
+    router = useRouter(),
+    queries = useQueryClient();
   const [draft, setDraft] = useState<LeadDraft>(() => leadDraft(lead)),
     [day, setDay] = useState(""),
     [category, setCategory] = useState(""),
@@ -61,8 +64,11 @@ export function LeadTrialEditor({
       active.current = false;
     };
   }, []);
+  const tenant = [scope.accountId, scope.orgId, scope.centerId] as const;
+  const productsKey = ["lead-trial-products", ...tenant, lead.id] as const;
+  const historyKey = ["lead-trial-history", ...tenant, lead.id] as const;
   const products = useInfiniteQuery({
-    queryKey: ["lead-trial-products", scope.accountId, scope.orgId, scope.centerId, lead.id],
+    queryKey: productsKey,
     queryFn: (context) => readTrialProducts(scope, lead.id, context.pageParam, context),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (page) => page.next_cursor ?? undefined,
@@ -73,7 +79,7 @@ export function LeadTrialEditor({
     refetchOnReconnect: false,
   });
   const history = useInfiniteQuery({
-    queryKey: ["lead-trial-history", scope.accountId, scope.orgId, scope.centerId, lead.id],
+    queryKey: historyKey,
     queryFn: (context) => readTrialHistory(scope, lead.id, context.pageParam, context),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (page) => page.next_cursor ?? undefined,
@@ -106,9 +112,19 @@ export function LeadTrialEditor({
     readReceipt: readTrialReceipt,
     readResult: readTrialResult,
     onAccessLost: accessLost,
-    onRefresh: async () => {
-      await history.refetch({ throwOnError: true });
-      if (mode === "offer") await products.refetch({ throwOnError: true });
+    onRefresh: async ({ firstPage }, assertCurrent) => {
+      if (mode === "confirm") await invalidateMemberReservationViews(queries, scope, lead.personId);
+      assertCurrent();
+      await cacheVerifiedReadback(queries, historyKey, {
+        pages: [firstPage],
+        pageParams: [undefined],
+      });
+      if (mode === "offer") {
+        await invalidateCachedFamilies(queries, [productsKey], [productsKey]);
+        assertCurrent();
+        await products.refetch({ throwOnError: true });
+      }
+      assertCurrent();
       await onSaved();
     },
   });

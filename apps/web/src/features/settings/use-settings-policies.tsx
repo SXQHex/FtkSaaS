@@ -6,7 +6,7 @@ import type { ClientScope } from "../../lib/scoped-backend";
 import { formatMinorAmount } from "../../lib/money";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { Button } from "@ftksaas/ui/components/button";
-import { readSettingsPolicies } from "./settings-policies";
+import { readSettingsPolicies, settingsPoliciesKey } from "./settings-policies";
 import type { SettingsLevel } from "./settings-document";
 import type { SettingsViewData } from "./settings-view";
 
@@ -31,7 +31,7 @@ export function useSettingsPolicies({
 }) {
   const { t } = useTranslation();
   const query = useQuery({
-    queryKey: ["settings-policies", scope.accountId, scope.orgId, scope.centerId, level],
+    queryKey: settingsPoliciesKey(scope, level),
     queryFn: (context) => readSettingsPolicies(scope, level, context),
     enabled,
     retry: false,

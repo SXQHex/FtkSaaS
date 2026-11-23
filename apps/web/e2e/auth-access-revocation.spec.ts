@@ -3,6 +3,51 @@ import { origin } from "./auth-fixture.js";
 import { mockLeads } from "./leads-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 
+test("M06: warm Back keeps the CRM hidden until the native center read settles", async ({
+  page,
+}) => {
+  const state = await mockLeads(page);
+  await page.getByRole("tab", { name: "Liste", exact: true }).click();
+  const privateRow = page.getByRole("button", { name: "Aday A", exact: true });
+  await expect(privateRow).toBeVisible();
+  const privateScreen = page.getByRole("tab", { name: "Liste", exact: true });
+
+  await page.locator('[data-slot="sidebar-footer"]').getByRole("button").click();
+  await page.getByRole("menuitem", { name: "Hesabım", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
+
+  let release!: () => void;
+  const held = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  let verificationReads = 0;
+  await page.route("**/functions/v1/backend-v1/centers_list_v1", async (route) => {
+    verificationReads++;
+    await held;
+    return route.fulfill({
+      json: {
+        ok: true,
+        data: { items: [], next_cursor: null, as_of: "2026-11-23T00:00:00Z" },
+        trace_id: I.role,
+      },
+    });
+  });
+  await page.goBack();
+  try {
+    await expect.poll(() => verificationReads).toBeGreaterThan(0);
+    await page.evaluate(
+      "new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))",
+    );
+    await expect(privateScreen).toBeHidden();
+  } finally {
+    release();
+  }
+  await expect(page).toHaveURL(/\/leads$/);
+  await expect(privateRow).toBeHidden();
+  await expect(page).not.toHaveURL(/\/login$/);
+  expect(state.writes).toHaveLength(0);
+});
+
 test("M06: revoked center access clears live CRM, history and deep-link permissions", async ({
   page,
 }) => {

@@ -1,15 +1,25 @@
-import { afterEach, expect, it, vi } from "vitest";
-const { call, account, scope } = vi.hoisted(() => ({
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+const { call, account, scope, getSession } = vi.hoisted(() => ({
   call: vi.fn(),
   account: vi.fn(),
   scope: vi.fn(),
+  getSession: vi.fn(),
 }));
-vi.mock("../../lib/backend", () => ({ getBackend: () => ({ call }) }));
+vi.mock("../../lib/backend", () => ({
+  getBackend: () => ({ call }),
+  queryBackendRead: (_: unknown, operation: string, request: unknown) => call(operation, request),
+}));
+vi.mock("../../lib/supabase", () => ({ getSupabaseClient: () => ({ auth: { getSession } }) }));
 vi.mock("../../lib/account", () => ({ readAccount: account }));
 vi.mock("../../lib/scoped-backend", () => ({ scopedBackend: scope }));
 import { profileChange, readProfile, saveProfile } from "./profile";
 afterEach(() => vi.resetAllMocks());
 const entity = { type: "accounts", id: "fixture-account" };
+const session = (access_token = "native-a") => ({
+  data: { session: { access_token, user: { id: "native-user" } } },
+  error: null,
+});
+beforeEach(() => getSession.mockResolvedValue(session()));
 function page(version = 7) {
   return {
     items: [
@@ -70,6 +80,14 @@ it("rejects absent/mismatched management versions instead of fabricating an init
   await expect(readProfile(entity.id)).rejects.toThrow("PROFILE_UNAVAILABLE");
   call.mockResolvedValue(page());
   await expect(readProfile("different-account")).rejects.toThrow("PROFILE_UNAVAILABLE");
+});
+
+it.each(["data", "denial"])("discards a previous native session's profile %s", async (outcome) => {
+  account.mockResolvedValue({ id: entity.id });
+  getSession.mockResolvedValueOnce(session()).mockResolvedValueOnce(session("native-b"));
+  if (outcome === "data") call.mockResolvedValueOnce(page());
+  else call.mockRejectedValueOnce(new Error("SESSION_REVOKED"));
+  await expect(readProfile(entity.id)).rejects.toThrow("ACCOUNT_CHANGED");
 });
 it("writes only the explicit profile fields and clears optional names/phone with null", async () => {
   scope.mockResolvedValue({ call });

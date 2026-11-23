@@ -75,6 +75,54 @@ const error = (code: SafeError["code"]) =>
 beforeEach(() => workspaceRead.mockReset());
 
 describe("M06: cross-feature access reconciliation", () => {
+  it("checks the scoped authority even when an earlier automatic projection had fewer privileges", async () => {
+    const { queries, actions } = fixture();
+    const scoped = workspaceKeys.projection(accountId, orgId);
+    queries.removeQueries({ queryKey: scoped, exact: true });
+    const reduced = view({ manager: false });
+    queries.setQueryData(workspaceKeys.projection(accountId), reduced);
+    queries.setQueryData(scoped, view());
+    workspaceRead.mockResolvedValueOnce(reduced);
+    const feature = ["leads", accountId, orgId, centerId, "first-page"];
+
+    await reconcileQueryAccessFailure(queries, feature, error("FORBIDDEN"), actions);
+
+    expect(workspaceRead).toHaveBeenCalledOnce();
+    expect(queries.getQueryData(feature)).toBeUndefined();
+    expect(queries.getQueryData(scoped)).toEqual(reduced);
+    expect(actions.invalidateRoute).toHaveBeenCalledOnce();
+  });
+
+  it("rechecks a new permission denial after a previous operation-specific denial", async () => {
+    const { queries, actions } = fixture();
+    const feature = ["leads", accountId, orgId, centerId, "first-page"];
+    workspaceRead.mockResolvedValueOnce(view()).mockResolvedValueOnce(view({ manager: false }));
+    const stop = observeQueryAccessFailures(queries, actions);
+    const deny = () =>
+      queries.fetchQuery({
+        queryKey: feature,
+        staleTime: 0,
+        queryFn: async () => {
+          throw error("FORBIDDEN");
+        },
+      });
+    try {
+      await expect(deny()).rejects.toThrow("FORBIDDEN");
+      await vi.waitFor(() => expect(actions.onChecking).toHaveBeenLastCalledWith(false));
+      expect(queries.getQueryData(feature)).toBeDefined();
+      expect(actions.invalidateRoute).not.toHaveBeenCalled();
+
+      await expect(deny()).rejects.toThrow("FORBIDDEN");
+
+      await vi.waitFor(() => expect(actions.invalidateRoute).toHaveBeenCalledOnce());
+      expect(workspaceRead).toHaveBeenCalledTimes(2);
+      expect(queries.getQueryData(feature)).toBeUndefined();
+      expect(actions.showLogin).not.toHaveBeenCalled();
+    } finally {
+      stop();
+    }
+  });
+
   it("separates invalid sessions, switched actors, permission and plan denials", () => {
     expect(classifyAccessFailure(error("AUTH_REQUIRED"))).toBe("session");
     expect(classifyAccessFailure(error("SESSION_REVOKED"))).toBe("session");
