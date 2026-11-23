@@ -6,6 +6,7 @@ import { Outlet, useRouter, useRouterState } from "@tanstack/react-router";
 import { useAuthSession } from "../features/auth/use-auth-session";
 import { observeQueryAccessFailures } from "../features/auth/query-access-recovery";
 import { RoutePendingPage } from "../features/states/route-state-pages";
+import { StateView } from "../features/states/state-view";
 import { NetworkNotice } from "../features/states/network-notice";
 
 const isDevelopment = import.meta.env.DEV && import.meta.env.MODE === "development";
@@ -49,9 +50,7 @@ export function RootLayout() {
       >
         <NetworkNotice />
         <div
-          className={
-            checkingAccess && !publicRoute ? "invisible pointer-events-none contents" : "contents"
-          }
+          className="contents"
           inert={checkingAccess && !publicRoute}
           aria-hidden={checkingAccess && !publicRoute}
         >
@@ -69,7 +68,7 @@ export function RootLayout() {
         </div>
         {checkingAccess && !publicRoute && (
           <div className="fixed inset-0 z-50 bg-background">
-            <RoutePendingPage />
+            <StateView kind="loading" />
           </div>
         )}
         <Suspense fallback={null}>
