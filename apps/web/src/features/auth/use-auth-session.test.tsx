@@ -142,6 +142,13 @@ it("purges old actor and unknown-session markers rather than trusting the same u
 });
 
 it("retains identity while the observer is disabled for a public page", async () => {
+  let finish!: () => void;
+  invalidate.mockImplementation(
+    () =>
+      new Promise<void>((resolve) => {
+        finish = resolve;
+      }),
+  );
   const { rerender, result } = renderHook(
     ({ enabled }: { enabled: boolean }) => useAuthSession(enabled),
     { initialProps: { enabled: true } },
@@ -155,7 +162,11 @@ it("retains identity while the observer is disabled for a public page", async ()
   await act(() => resumed("INITIAL_SESSION", session(actor, secondSession)));
   expect(clear).toHaveBeenCalledOnce();
   expect(result.current).toBe(false);
-  await waitFor(() => expect(result.current).toBe(true));
+  await waitFor(() => expect(invalidate).toHaveBeenCalledExactlyOnceWith({ sync: true }));
+  await act(async () => {
+    finish();
+  });
+  expect(result.current).toBe(true);
 });
 
 it("does not allow an older route response to reopen a newer session's private screen", async () => {
