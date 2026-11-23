@@ -385,12 +385,12 @@
         {
           "line": 420,
           "path": "apps/backend/tests/public-program-discovery-acceptance.mjs",
-          "sha256": "5be408ac803de78a934c9aee8ab8b588596a553b4ad4eb8ace698e0ed987a106"
+          "sha256": "ffdee037635954efccd897647b9b8da8bad4c09ea493f603d5719603f237b443"
         },
         {
           "line": 421,
           "path": "apps/backend/tests/report-finance-tracking-acceptance.mjs",
-          "sha256": "9f83c37de1653f7b08734d9b56515a45fd4ecc38d5c080a13db3bb7a70d4e365"
+          "sha256": "acd2407cbb35b90114b73af29a7794f8af4dfd289a4190ff9c248a1e47ec9702"
         },
         {
           "line": 422,
@@ -402,15 +402,15 @@
     },
     {
       "path": "apps/backend/tests/instructor-earnings.test.mjs",
-      "sha256": "8032e778937a4734d93cd2c2c0952d62ddca6e6ab729c53f9fa23dfa9a7c3bae",
+      "sha256": "8838a2055147c4633ef530539ca76cb88ebfdbdf760e45ce0e23a212445bf13a",
       "shared": [
         [
           2,
           71
         ],
         [
-          378,
-          379
+          398,
+          399
         ]
       ],
       "parts": [
@@ -422,8 +422,8 @@
               105
             ],
             [
-              380,
-              380
+              400,
+              400
             ]
           ]
         },
@@ -435,8 +435,8 @@
               190
             ],
             [
-              381,
-              381
+              401,
+              401
             ]
           ]
         },
@@ -448,8 +448,8 @@
               245
             ],
             [
-              382,
-              382
+              402,
+              402
             ]
           ]
         },
@@ -458,11 +458,11 @@
           "ranges": [
             [
               246,
-              345
+              365
             ],
             [
-              383,
-              383
+              403,
+              403
             ]
           ]
         },
@@ -470,12 +470,12 @@
           "id": "earnings-pilot",
           "ranges": [
             [
-              346,
-              377
+              366,
+              397
             ],
             [
-              384,
-              384
+              404,
+              404
             ]
           ]
         }
@@ -738,7 +738,7 @@
         {
           "line": 1,
           "path": "apps/backend/tests/class-duty-management-acceptance.mjs",
-          "sha256": "dce0bdf16509acd8bdda9877a23e44308dce39844eb090689c8335211498e007"
+          "sha256": "dd6d2c024bc7c269af05e9835e9112d4dbdc6819d761c09d1579885ce5b01786"
         },
         {
           "line": 2,
@@ -1062,7 +1062,7 @@
         {
           "line": 145,
           "path": "apps/backend/tests/starter-studio-acceptance.mjs",
-          "sha256": "0765a38b8a18f27a8bf3b9e3a7359fecd4dcccaa63df60156bf4a6bc7050ea80"
+          "sha256": "7f012973b49b58118841a6664443748e24549f0e40670c235d08a31667247ab7"
         },
         {
           "line": 147,
@@ -1262,7 +1262,7 @@
         {
           "line": 311,
           "path": "apps/backend/tests/studio-setup-status-acceptance.mjs",
-          "sha256": "b46feeb5bca4a343255841e9a914ff9a94307832d5c78d3894ff43bb66b58d08"
+          "sha256": "9280c933246931344bbd3ed47d23c8cf0290774a9fc5abb2cfb579006efe24a4"
         },
         {
           "line": 312,
@@ -1274,7 +1274,7 @@
     },
     {
       "path": "apps/backend/tests/schedule-reads.test.mjs",
-      "sha256": "b1d01a4294b68b863475c71508e0c2147fc9f54edacfa882f51634ec14de7bca",
+      "sha256": "543bc77155bd3466c6a479d2999c381a8d9a8ffaf7cce9a55b7358e68c39c46d",
       "shared": [
         [
           6,
@@ -1287,7 +1287,7 @@
           "ranges": [
             [
               12,
-              288
+              328
             ]
           ]
         }
@@ -1319,7 +1319,7 @@
           "sha256": "711436cf2c71cef5abef536f5537b157cacc3f5b2e527cce0f542f4eaef3ec0f"
         },
         {
-          "line": 289,
+          "line": 329,
           "path": "apps/backend/tests/member-lesson-discovery-acceptance.mjs",
           "sha256": "2696ee36b0cdbfd66bf6ae363bd3638a4cbba2d7a7adff9d6a5ffc1e180817d0"
         }

@@ -33,15 +33,21 @@ for(const planName of ['starter','pro','business'])test('Class duty management '
   const snapshot=await before(),empty=await read();assert.equal(empty.next_cursor,null);assert.equal(empty.items.length,1);
   const absent=empty.items[0];assert.equal(absent.exists,false);assert.equal(absent.entity,null);assert.equal(absent.state,null);assert.deepEqual(absent.versions,[]);
   assert.deepEqual(absent.current,{operation:'class_assignment_set_v1',values:selector.key});assert.deepEqual(await before(),snapshot);
+  const classPage={operation:'class_save_v1',selector:{operation:'class_save_v1',
+   key:{class_id:classId,class_assignment_instructor_id:person}},page:{limit:1}};
+  const assignedClass=async()=>(await api('management_state_get_v1',classPage)).items[0].current.values.instructor_assignment;
+  assert.deepEqual(await assignedClass(),{person_id:person,id:null,state:null,version:null});
   const uppercase=(await read({selector:{...selector,key:{...selector.key,class_id:classId.toUpperCase(),person_id:person.toUpperCase()}}})).items[0];
   assert.deepEqual(uppercase.current.values,selector.key);
   const created=await api('class_assignment_set_v1',{...selector.key}),active=(await read()).items[0];
   assert.equal(active.entity.type,'class_assignments');assert.equal(active.entity.id,created.primary_id);assert.equal(active.state,'active');assert.equal(active.exists,true);
   assert.deepEqual(active.versions,[{entity:{type:'class_assignments',id:created.primary_id},version:created.version}]);
   assert.deepEqual(active.current.values,{...selector.key,state:'active'});
+  assert.deepEqual(await assignedClass(),{person_id:person,id:created.primary_id,state:'active',version:created.version});
   assert.deepEqual((await read({entity:{...active.entity,id:active.entity.id.toUpperCase()}})).items[0].entity,active.entity);
   const removed=await api('class_assignment_set_v1',{...selector.key,expected_version:active.versions[0].version,state:'inactive'});
   const inactive=(await read({entity:active.entity})).items[0];assert.equal(inactive.state,'inactive');assert.equal(inactive.versions[0].version,removed.version);
+  assert.deepEqual(await assignedClass(),{person_id:person,id:active.entity.id,state:'inactive',version:removed.version});
   const stale=await call(owner,'class_assignment_set_v1',{org_id:org,center_id:center,...selector.key,expected_version:created.version,state:'active'},key());
   assert.equal(stale.result.ok,false);assert.equal(stale.result.error.code,'VERSION_CONFLICT');
   const restored=await api('class_assignment_set_v1',{...selector.key,expected_version:removed.version,state:'active'});

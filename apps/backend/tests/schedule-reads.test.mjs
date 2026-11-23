@@ -122,6 +122,28 @@ test('Schedule reads through real Auth -> Edge -> RPC',async t=>{
   await fail(student.u,'reservation_list_v1',{session_id:s3,page:{}},'FORBIDDEN');
   assert((await get(student.u,s1)).assignments.every(a=>!('agreement_id' in a)));
  });
+ await t.test('opt-in calendar and self reservation projections preserve native visibility and originating cursors',async()=>{
+  const options={center_id:c1,page:{limit:1},include_session_summary:true};
+  const first=await cal(owner,options),detail=await get(owner,s1,{center_id:c1});
+  assert(first.next_cursor);
+  assert.equal(first.items[0].id,s1);
+  const {state,attendance_state,version,format,class_id}=detail;
+  assert.deepEqual(first.items[0].session_summary,{state,attendance_state,version,format,class_id,
+   assignments:detail.assignments.map(({person_id,duty})=>({person_id,duty}))});
+  assert.equal((await cal(owner,{...options,include_session_summary:false})).items[0].session_summary,undefined);
+  const page={limit:1,cursor:first.next_cursor};
+  assert.deepEqual(ids(await cal(owner,{...options,page})),[s2]);
+  await fail(owner,'calendar_get_v1',{interval,...options,include_session_summary:false,page},'VALIDATION_FAILED');
+  await fail(cm.u,'calendar_get_v1',{interval,...options,center_id:c2},'FORBIDDEN');
+  assert.deepEqual(ids(await cal(instructor.u,{...options,resource:{kind:'person',id:instructor.p}})),[s1]);
+  const r=await list(student.u,{center_id:c1,include_self_summary:true});
+  const mine=r.items.find(x=>x.id===r1);
+  assert.equal(mine.self_summary.title,first.items[0].title);
+  assert.equal(mine.self_summary.attendance_result,null);
+  assert.equal(mine.self_summary.cancellation.source,'reservation_policy');
+  assert.equal(mine.self_summary.cancellation.policy_version_id,policy);
+  assert((await list(cm.u,{center_id:c1,include_self_summary:true})).items.every(x=>x.self_summary===undefined));
+ });
  await t.test('assigned instructor and assistant see only authorized program and required roster',async()=>{
   for(const a of [instructor,assistant]){
    assert.deepEqual(ids(await cal(a.u)),[s1]);
@@ -146,6 +168,24 @@ test('Schedule reads through real Auth -> Edge -> RPC',async t=>{
   for(const op of ['calendar_get_v1','reservation_list_v1'])await fail(staff.u,op,{interval,page:{}},'FORBIDDEN');
   await mut('permission_set_v1',{center_id:c1,person_id:staff.p,expected_version:1,permission:'reservation.write',enabled:true});
   assert.deepEqual(ids(await list(staff.u)).sort(),[r1,r2,r3,cancelled].sort());
+  const permissionRequest={center_id:c1,operation:'permission_set_v1',selector:{
+   operation:'permission_set_v1',key:{person_id:staff.p,permission_summary:true}},page:{}};
+  const readPermissions=async request=>(await must(owner,'management_state_get_v1',scope(request))).items[0];
+  const summary=await readPermissions(permissionRequest);
+  assert.deepEqual(summary.entity,{type:'people',id:staff.p});
+  assert.equal(summary.versions[0].version,2);
+  const overrides=summary.current.values.permission_overrides;
+  assert.deepEqual(overrides.find(row=>row.permission==='reservation.write'),{
+   permission:'reservation.write',override_exists:true,enabled:true,override_version:1,effective_staff_grant:true,
+  });
+  assert.deepEqual(overrides.find(row=>row.permission==='attendance.draft'),{
+   permission:'attendance.draft',override_exists:false,enabled:null,override_version:null,effective_staff_grant:false,
+  });
+  const exact=await readPermissions({...permissionRequest,selector:{...permissionRequest.selector,key:{person_id:staff.p,permission:'reservation.write'}}});
+  assert.equal(exact.current.values.enabled,true);
+  assert.deepEqual(exact.versions,summary.versions);
+  await fail(staff.u,'management_state_get_v1',permissionRequest,'FORBIDDEN');
+  await fail(cm.u,'management_state_get_v1',{...permissionRequest,center_id:c2},'FORBIDDEN');
   await fail(staff.u,'session_get_v1',{session_id:s3},'FORBIDDEN');
   await fail(staff.u,'calendar_get_v1',{center_id:c2,interval,page:{}},'FORBIDDEN');
  });

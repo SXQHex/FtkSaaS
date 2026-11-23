@@ -71,7 +71,7 @@ Bu dosya alanlar arası talep ve teslim kabulünün tek kaydıdır. Sohbet devri
 
 | XREQ-071 | Backend; kullanıcının ödeme onayı gecikmesi itirazı | Frontend | [WF17](workflows.md#wf17), [WF13](workflows.md#wf13); [talep ve kabul](#xreq-071) | Son onay → komut ACK → doğrulanmış görünür sonuç ayrı ölçülür; gereksiz ağ beklemeleri azaltılırken hesap/oturum, güncel kaynak, aynı-key ve readback garantileri korunur. | Değerlendirmede | Backend kaynak incelemesi tamamlandı; frontend teknik değerlendirmesi ve gerçek ekran kabulü bekleniyor. |
 | XREQ-072 | Backend; native CI boş 503 kanıtı | Yönetim | [WF00](workflows.md#wf00); [runtime kusuru ve kabul](#xreq-072) | Normal worker tamamlanması geçerli dış yanıtı iptal etmez; oneshot, kaynak/bellek sınırları ve eksiksiz native kabul korunarak kaynak bağlı runtime düzeltmesi kurulur. | Native aday doğrulandı. Kurulum ve tam CI kabulü açık. | PR395 API8 base/server iptali kaydedildi. [Backend adayının kaynağı, binary hash'i ve yerel doğrulaması](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#xreq-072-runtime-adayi). |
-| XREQ-073 | Frontend · M09 okuma maliyeti | Backend değerlendirmesi | [Frontend M09](../apps/web/docs/remaining-work.md#router-query-birlesik) · [İstek ve kabul](#xreq-073) | Mevcut kaynak ve alan yetkileriyle sınırlı typed sayfa projeksiyonları, toplamlar ve kesin seçiciler. | Backend teknik değerlendirmesi hazır | [Kaynak bulguları ve önerilen kapsam](#xreq-073-backend-degerlendirmesi). Uygulama ve kabul açık. |
+| XREQ-073 | Frontend · M09 okuma maliyeti | Backend değerlendirmesi | [Frontend M09](../apps/web/docs/remaining-work.md#router-query-birlesik) · [İstek ve kabul](#xreq-073) | Mevcut kaynak ve alan yetkileriyle sınırlı typed sayfa projeksiyonları, toplamlar ve kesin seçiciler. | Backend uygulaması kısmi | [Uygulanan okumalar ve açık kabuller](#xreq-073-backend-uygulamasi). Kaynak bağlı clean ve hosted ölçüm açık. |
 
 Alanların kendi planlarındaki bağımlılık gözlemleri otomatik olarak talep, onay veya işe başlama yetkisi sayılmaz; somut talep bu tabloya kaydedildiğinde `XREQ-001` biçiminde sabit bir kimlik alır.
 
@@ -1047,3 +1047,18 @@ Frontend [M09 taraması](../apps/web/docs/remaining-work.md#router-query-birlesi
 | Etkinlik ve Platform | Etkinlikte venue ve görev kimliği var. Görünür oda ve görevli adı ancak ilgili okuma yetkisiyle projekte edilmeli. Etkinlik detayındaki ödeme özeti, görünür kayıttan mevcut borç ve hazırlık kimliğini gösterebiliyor. Kimlik varsa `event_payment_get_v1` kullanılabilir. Kayıt oluşmadan kesin hazırlık keşfi gerekiyorsa etkinlik + canonical kişi, kayıt varsa buna ek olarak kayıt kimliğiyle salt okunur seçici gerekir. Hazırlık oluşturma ayrı komut olarak kalır. [Etkinlik finansı](../apps/backend/database/event-directory-finance.sql) · [Kurulum kuyruğu](../apps/backend/database/studio-setup-requests.sql) başvuru kimliğiyle daralmıyor ve sürüm taşımıyor. Önce mevcut platform kuyruğuna kimlik seçicisi eklenmeli. Sürüm ancak hangi komutun hangi değişikliği algılaması gerektiği belirlenirse sözleşmeye alınmalı. |
 
 **Önerilen sıra.** İlk dilim tek merkez, seçili Ekip üyesi ve takvim sayfası. Sonraki dilim rezervasyon/kişi ve seçili eğitmen okumaları. Finans, public, etkinlik ve Platform projeksiyonları kendi eşdeğerlik kanıtlarıyla ilerler. Sayfa zenginleştirmelerinde önce yetkili sayfa seçilir, ardından yalnız o satırlar zenginleştirilir. Aynı sonucu üreten eski/yeni çağrılar aynı sentetik fixture'da karşılaştırılır. Karşılaştırma istek ve sonuç satırı sayısı, süre, farklı tenant/rol/plan retleri, sürüm ve cursor değişimini kapsar. İstek sayısından gecikme kazanımı çıkarılmaz. Hosted ölçüm ve frontend kabulü açık.
+
+
+<a id="xreq-073-backend-uygulamasi"></a>
+### Backend uygulaması
+
+| Alan | Native sözleşme |
+|---|---|
+| Merkez ve Ekip | Kesin `centers_list_v1.center_id` ve seçili canonical kişi için `permission_summary:true`. Kişi yazma sürümü, override sürümü ve canlı personel grant sonucu ayrı. |
+| Takvim, rezervasyon ve Stüdyo | Sayfa kapsamlı `include_session_summary`, rezervasyon sahibine `include_self_summary`, aktif sınıf sayfasında seçili eğitmen için `class_assignment_instructor_id`. |
+| Finans | Öznenin sınırlı döneminde işaretli net toplam `summary_only:true`, eğitmen dizini satırında `include_closed_session_count:true`. Tahsilat/borç ve yoklama Business raporlarında mevcut `group_by:center` ile birleşik `totals` birlikte kullanılabilir. |
+| Public ve Platform | `public_calendar_get_v1` için bağımsız `context` ve kesin `event` modu. `studio_setup_list_v1.setup_request_id` ile mevcut yetki içinde tam kimlik seçimi. |
+
+Orijinal yazma, tekrar oynatma ve taze sonuç okuması korunur. Ders talebinde normal işlem sonucu zaten kesin seans ve rezervasyon kimliğini taşır. Kayıp ACK için ayrı native kanıt gereklidir. Yönetim satırları için ortak canonical ad alanı, görünür kaynak ve anlaşma özetleri, etkinliğin yönetim etiketleri ve kayıt öncesi ödeme hazırlığı keşfi açık. Platform sıra durumunun sürümü için yazıcının hangi önkoşulu denetleyeceği açık. Public etkinlik modu mevcut slug/merkez form bağını döndürür. Yayına özel yeni bir form veya belge eşlemesi tanımlanmadı. Hosted uçtan uca eşdeğerlik, gecikme ve istemci kabulü açık.
+
+Yerel PostgreSQL 17 üzerinde aynı sentetik sayfada üç seans ve bir etkinlikle 30 karşılaştırma yapıldı. Takvim + seans ayrıntıları 4 RPC ve 7 satırdan 1 RPC ve 4 satıra indi. p50 36,95 ms → 15,42 ms, p95 43,63 ms → 22,50 ms. Ölçüm native RPC ve SQL süresini kapsar. Edge ve ağ bu ölçüme dahil değildir.

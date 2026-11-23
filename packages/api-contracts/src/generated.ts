@@ -722,6 +722,7 @@ discipline_ids?: EventDisciplineIds
 management_attention?: "instructor_required"
 room_labels?: SessionRoomLabel[]
 member_lesson?: MemberLessonDiscovery
+session_summary?: CalendarSessionSummary
 }
 /**
  * Zero/one/many org-owned labels. No entitlement or role grant.
@@ -1017,6 +1018,10 @@ include_room_labels?: boolean
  * Explicit native-self student discovery of accessible upcoming group and private lessons. Does not grant management or roster access.
  */
 member_discovery?: boolean
+/**
+ * Include lifecycle, attendance, current version and visible session duties on the returned page. Cannot be combined with member_discovery.
+ */
+include_session_summary?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -1585,6 +1590,35 @@ context: AcceptanceContext
  */
 rendered_document_id: string
 })
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_public_calendar_get".
+ */
+export type RequestPublicCalendarGet = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+center_id?: (string | null)
+slug: Text
+interval?: Interval
+page: Page
+include_disciplines?: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id?: string
+include_details?: boolean
+/**
+ * Context resolves publication and form status without listing rows. Event resolves one visitor-visible upcoming event using slug, center and publication identity.
+ */
+mode?: ("calendar" | "context" | "event")
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+publication_id?: string
+}
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Request_public_application_submit".
@@ -3990,6 +4024,7 @@ PolicyView?: PolicyView
 RelationshipView?: RelationshipView
 PersonSummary?: PersonSummary
 PersonView?: PersonView
+CalendarSessionSummary?: CalendarSessionSummary
 CalendarItem?: CalendarItem
 SessionView?: SessionView
 ReservationView?: ReservationView
@@ -4602,6 +4637,7 @@ ManagementProjection_availability_exception_save_v1?: ManagementProjectionAvaila
 ManagementProjection_policy_publish_v1?: ManagementProjectionPolicyPublishV1
 ManagementProjection_role_assign_v1?: ManagementProjectionRoleAssignV1
 ManagementProjection_role_revoke_v1?: ManagementProjectionRoleRevokeV1
+TeamPermissionOverrideSummary?: TeamPermissionOverrideSummary
 ManagementProjection_permission_set_v1?: ManagementProjectionPermissionSetV1
 ManagementProjection_org_manager_assign_v1?: ManagementProjectionOrgManagerAssignV1
 ManagementProjection_org_manager_revoke_v1?: ManagementProjectionOrgManagerRevokeV1
@@ -5380,6 +5416,9 @@ Success_platform_operator_access_set?: SuccessPlatformOperatorAccessSet
 ManagementSelector_platform_operator_access_set_v1?: ManagementSelectorPlatformOperatorAccessSetV1
 ManagementProjection_platform_operator_access_set_v1?: ManagementProjectionPlatformOperatorAccessSetV1
 PlatformDirectoryInvoice?: PlatformDirectoryInvoice
+ReservationSelfSummary?: ReservationSelfSummary
+EarningPeriodTotal?: EarningPeriodTotal
+ClassPageInstructorAssignment?: ClassPageInstructorAssignment
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8128,6 +8167,24 @@ version: PositiveInt
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CalendarSessionSummary".
+ */
+export interface CalendarSessionSummary {
+state: SessionState
+attendance_state: AttendanceClosure
+version: PositiveInt
+format: SessionFormat
+class_id: (string | null)
+assignments: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+duty: Duty
+}[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SessionCapacityView".
  */
 export interface SessionCapacityView {
@@ -8308,6 +8365,19 @@ version: PositiveInt
 booking_category?: (BookingCategory | null)
 subscriber_number?: (SubscriberNumber | null)
 source_summary?: ReservationSourceSummary
+self_summary?: ReservationSelfSummary
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ReservationSelfSummary".
+ */
+export interface ReservationSelfSummary {
+title: Text
+starts_at: Instant
+ends_at: Instant
+attendance_state: AttendanceClosure
+attendance_result: (AttendanceResult | null)
+cancellation: MemberLessonCancellation
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9753,6 +9823,15 @@ export interface Page_EarningView {
 items: EarningView[]
 next_cursor?: (OpaqueToken | null)
 as_of: Instant
+period_totals?: EarningPeriodTotal[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "EarningPeriodTotal".
+ */
+export interface EarningPeriodTotal {
+currency: Currency
+net_minor: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -10497,10 +10576,13 @@ request_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 org_id: string
+/**
+ * When supplied, returns only that center if visible under the existing reader scope.
+ */
 center_id?: (string | null)
 page: Page
 /**
- * Opt-in manager-only setup summary. Requires center_id; returns only that center. Omitted/false preserves the original list.
+ * Opt-in manager-only setup summary. Requires center_id. Omitted or false uses the normal center reader.
  */
 include_setup_status?: boolean
 }
@@ -12085,6 +12167,10 @@ time_filter?: ("all" | "upcoming" | "past")
  * Only the authorized page receives the actual assigned sale and permitted current rights; no automatic package selection.
  */
 include_source_summary?: boolean
+/**
+ * For the caller’s own reservations in the returned page, include session title and interval, final attendance and the reservation cancellation policy.
+ */
+include_self_summary?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -13490,6 +13576,10 @@ center_id?: (string | null)
 person_id: string
 interval: Interval
 page: Page
+/**
+ * Return calendar-period net movements by currency for the current instructor and center. Requires interval and no cursor.
+ */
+summary_only?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -14998,27 +15088,6 @@ data: Mutation
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 trace_id: string
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_public_calendar_get".
- */
-export interface RequestPublicCalendarGet {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-center_id?: (string | null)
-slug: Text
-interval: Interval
-page: Page
-include_disciplines?: boolean
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-discipline_id?: string
-include_details?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -19524,7 +19593,22 @@ person_id?: string
 permission?: Permission
 enabled?: Bool
 override_exists?: boolean
+permission_overrides?: TeamPermissionOverrideSummary[]
 }
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "TeamPermissionOverrideSummary".
+ */
+export interface TeamPermissionOverrideSummary {
+permission: Permission
+override_exists: boolean
+enabled: (boolean | null)
+override_version: (PositiveInt | null)
+/**
+ * Result of the native staff grant check for this person, center and permission. Command-specific authorization still applies.
+ */
+effective_staff_grant: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -19736,6 +19820,7 @@ external_open?: Bool
 discipline_id?: string
 waitlist_enabled?: boolean
 waitlist_impact?: ClassWaitlistImpact
+instructor_assignment?: ClassPageInstructorAssignment
 }
 }
 /**
@@ -19760,6 +19845,19 @@ session_id: string
 version: PositiveInt
 state: ("waiting" | "offered")
 }[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ClassPageInstructorAssignment".
+ */
+export interface ClassPageInstructorAssignment {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+id: (string | null)
+state: (("active" | "inactive") | null)
+version: (PositiveInt | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -22678,13 +22776,19 @@ assignment_id: string
  */
 export interface ManagementSelectorPermissionSetV1 {
 operation: "permission_set_v1"
-key: {
+key: ({
+[k: string]: unknown
+} & {
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 person_id: string
-permission: Permission
-}
+permission?: Permission
+/**
+ * Read all settable overrides for the canonical person in the selected center.
+ */
+permission_summary?: true
+})
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -22910,6 +23014,10 @@ class_id?: (string | null)
  */
 discipline_id?: string
 include_waitlist?: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+class_assignment_instructor_id?: string
 }
 }
 /**
@@ -31746,6 +31854,7 @@ agreement_ids: string[]
  * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 current_agreement_ids: string[]
+closed_session_count?: Count
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -31784,6 +31893,10 @@ view: ("instructors" | "earnings" | "payments")
 person_id?: string
 interval?: Interval
 page: Page
+/**
+ * Include an exact closed session count for each returned instructors row in the selected period.
+ */
+include_closed_session_count?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -32115,6 +32228,10 @@ client_api_version: 1
 request_id: string
 platform_queue?: boolean
 page: Page
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+setup_request_id?: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

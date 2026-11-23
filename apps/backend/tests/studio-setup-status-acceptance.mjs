@@ -57,6 +57,7 @@ test('Centers Data API preserves the plain list contract and live authorization'
  try{await compare(owner,{},[center,other],browserOrigin);}
  finally{await db.query('delete from private.centers_read_browser_origins where origin=$1',[browserOrigin]);}
  await compare(owner,{include_setup_status:false,page:{limit:1,cursor:null}},[center,other]);
+ await compare(owner,{center_id:center,page:{limit:1}},[center]);
  await compare(stranger,{},'NOT_FOUND');
  await compare(owner,{center_id:key()},'NOT_FOUND');
  await compare(owner,{org_id:key()},'NOT_FOUND');
@@ -78,6 +79,8 @@ test('Centers Data API preserves the plain list contract and live authorization'
  await db.query("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[link,org,account.id,person]);
  await db.query("insert into core.center_relationships(id,org_id,center_id,person_id,kind,state,started_at) values($1,$2,$3,$4,'student','active',now())",[key(),org,center,person]);
  await compare(member,{},[center]);
+ await compare(member,{center_id:center},[center]);
+ await compare(member,{center_id:other},[]);
  const strong=await nativeTotp(t,member);
  await compare(member,{},'AUTH_REQUIRED');
  await compare(strong,{},[center]);

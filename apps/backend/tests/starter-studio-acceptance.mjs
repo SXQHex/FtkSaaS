@@ -382,6 +382,12 @@ test('W1-BE-43 verified account requests first setup and only the platform fulfi
  assert.deepEqual([...first.items,...second.items],(await list(platform,true)).items.slice(0,2));
  assert.equal((await call(applicant,'studio_setup_list_v1',{page:continuation.page})).result.error.code,'VALIDATION_FAILED');
  assert.equal((await list(platform,true)).items.find(row=>row.id===requested.primary_id).account_id,account.id);
+ const exact={platform_queue:true,setup_request_id:requested.primary_id,page:{}};
+ assert.deepEqual((await must(platform,'studio_setup_list_v1',exact)).items,
+  (await list(platform,true)).items.filter(row=>row.id===requested.primary_id));
+ assert.deepEqual((await must(other,'studio_setup_list_v1',{...exact,platform_queue:false})).items,[]);
+ assert.equal((await call(applicant,'studio_setup_list_v1',exact)).result.error.code,'FORBIDDEN');
+ assert.equal((await call(platform,'studio_setup_list_v1',{...exact,page:continuation.page})).result.error.code,'VALIDATION_FAILED');
  const create={verified_account_id:account.id,name:open.name,initial_plan_id:plan,studio_setup_id:requested.primary_id};
  assert.equal((await call(applicant,'organization_create_v1',create,key())).result.error.code,'FORBIDDEN');
  const createKey=key(),organization=await must(platform,'organization_create_v1',create,createKey);
@@ -390,6 +396,8 @@ test('W1-BE-43 verified account requests first setup and only the platform fulfi
  assert.equal(linked.state,'fulfilled');
  assert.equal(linked.organization_id,organization.primary_id);
  assert(!(await list(platform,true)).items.some(row=>row.id===requested.primary_id));
+ assert.deepEqual((await must(platform,'studio_setup_list_v1',exact)).items,[]);
+ assert.deepEqual((await must(applicant,'studio_setup_list_v1',{...exact,platform_queue:false})).items,[linked]);
  assert.equal((await call(platform,'studio_setup_list_v1',continuation)).result.error.code,'VERSION_CONFLICT');
  assert((await must(applicant,'organizations_list_v1',{page:{}})).items.some(row=>row.id===organization.primary_id));
  assert.equal((await call(applicant,'studio_setup_open_v1',open,key())).result.error.code,'INVALID_STATE_TRANSITION');

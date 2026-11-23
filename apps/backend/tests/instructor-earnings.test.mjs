@@ -334,6 +334,26 @@ async function earningsFixture(t){
   await fail('earnings_list_v1',{center_id:c2,person_id:instructor.p,interval:{starts_at:'2020-01-01T00:00:00Z',ends_at:'2030-01-01T00:00:00Z'},page:{}},'FORBIDDEN',manager.u);
   await fail('instructor_agreement_publish_v1',{center_id:c2,...agreementRequest(terms([fixed(1)]))},'FORBIDDEN',manager.u);
  });
+ await t.test('self period totals equal the complete signed ledger with no detail rows',async()=>{
+  const interval={starts_at:'2020-01-01T00:00:00Z',ends_at:'2030-01-01T00:00:00Z'};
+  const request={person_id:instructor.p,interval,page:{limit:1},summary_only:true};
+  const result=await must(instructor.u,'earnings_list_v1',scope(request));
+  assert.deepEqual(result.items,[]);
+  assert.equal(result.next_cursor,null);
+  const movements=(await earningRead(instructor.u)).items,totals=new Map();
+  for(const row of movements){
+   const amount=BigInt(row.amount_minor)*(row.direction==='add'?1n:-1n);
+   totals.set(row.currency,(totals.get(row.currency)??0n)+amount);
+  }
+  assert(movements.length>1);
+  assert.deepEqual(result.period_totals,[...totals].sort(([a],[b])=>a.localeCompare(b))
+   .map(([currency,amount])=>({currency,net_minor:amount.toString()})));
+  const empty=await must(instructor.u,'earnings_list_v1',scope({...request,interval:{
+   starts_at:'2000-01-01T00:00:00Z',ends_at:'2001-01-01T00:00:00Z'}}));
+  assert.deepEqual(empty.period_totals,[]);
+  await fail('earnings_list_v1',request,'FORBIDDEN',student.u);
+  await fail('earnings_list_v1',{...request,page:{cursor:'invalid'}},'VALIDATION_FAILED',instructor.u);
+ });
  await t.test('live role revocation blocks instructor read and manager receipt replay',async()=>{
   const revokeImpact=await mut('role_revoke_preview_v1',{assignment_id:instructor.grant.primary_id,expected_version:instructor.grant.version});
   await mut('role_revoke_v1',{impact_approval:{id:revokeImpact.id,token:revokeImpact.token},assignment_id:instructor.grant.primary_id,expected_version:instructor.grant.version,reason:'Revoke instructor access'});

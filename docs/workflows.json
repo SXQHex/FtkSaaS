@@ -317,8 +317,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "6b28a5c7683fb702526a7d2aebf4b11134fb0f18ae0ad587261b62a63d2d2a44",
-        "reason": "Ortak istemci ve Edge sözleşme doğrulayıcıları ile native Edge yanıt ömrü yaması ve binary kabulü incelendi. İstek ve geçerli yanıt biçimleri aynı."
+        "fingerprint": "0b8cfb750a2cd2f8aa4f3345103aa6db2a8dfdc5480f0093ac1a2a1c2f01feeb",
+        "reason": "XREQ-073 eşleşen istek ve yanıt doğrulayıcıları, ortak UUID referansları ve dar native okumaların test envanteri incelendi."
       }
     },
     {
@@ -517,7 +517,8 @@
         "packages/api-contracts/src/read-transport.ts",
         "apps/backend/supabase/migrations/20261119170000_shared_center_authorization.sql",
         "apps/backend/supabase/migrations/20261119170002_sql_list_pagination.sql",
-        "apps/backend/supabase/migrations/20261124012000_share_organization_read_locks.sql"
+        "apps/backend/supabase/migrations/20261124012000_share_organization_read_locks.sql",
+        "apps/backend/supabase/migrations/20261124013000_scoped_read_projections.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -545,8 +546,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "8e4879184b0f6dffe234580db69f839c4b6273ceb8001620a8c25531a426706b",
-        "reason": "Düz merkez listesi Data API yönlendirmesi, kurulum özeti ve Edge fallback koşulları aynı. Yanıt ortak istemcide operasyon şemasına göre doğrulanır."
+        "fingerprint": "1de5904cae3b326868f9e583cf60062e5aa18d1f4be966ee03ebe7be8e04a471",
+        "reason": "XREQ-073 kesin merkez seçicisi, personel override özeti ve sınıf atama testleri mevcut role ve yazma sürümüne göre incelendi."
       }
     },
     {
@@ -641,7 +642,8 @@
         "apps/backend/supabase/migrations/20261116201341_member_lesson_discovery.sql",
         "apps/backend/database/reservation-debt-and-session-change-notice.sql",
         "apps/backend/supabase/migrations/20261118010101_reservation_debt_and_session_change_notice.sql",
-        "apps/backend/supabase/migrations/20261119170000_shared_center_authorization.sql"
+        "apps/backend/supabase/migrations/20261119170000_shared_center_authorization.sql",
+        "apps/backend/supabase/migrations/20261124013000_scoped_read_projections.sql"
       ],
       "operations": [
         "availability_save_v1",
@@ -664,8 +666,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "7fd61e4aafb707cd53c643964bcf52d79b7528784468e7129859fd22b09b0f9c",
-        "reason": "Politika effective_at/sürüm seçimi, rezervasyon kredi kapısı ve snapshot testleri incelendi. DB saatli fixture ve etkin limit assertionları eklendi; program/seans/rezervasyon iş kuralları ve rehber değişmedi."
+        "fingerprint": "ffe4bccbe5279fe8d1521acdd7d0cb1fd3e1ce7d4ad8d3d2853983d20f7080ce",
+        "reason": "XREQ-073 takvim ve aktif sınıf sayfası projeksiyonları mevcut kaynak filtresi, görev kapsamı ve sayfa fingerprintiyle incelendi."
       }
     },
     {
@@ -763,7 +765,8 @@
         "apps/backend/database/person-detail-summary.sql",
         "apps/backend/database/account-person-directory-query.sql",
         "apps/backend/database/person-membership-date.sql",
-        "apps/backend/supabase/migrations/20261124012000_share_organization_read_locks.sql"
+        "apps/backend/supabase/migrations/20261124012000_share_organization_read_locks.sql",
+        "apps/backend/supabase/migrations/20261124013000_scoped_read_projections.sql"
       ],
       "operations": [
         "account_access_send_v1",
@@ -782,8 +785,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "84256c99626186d33a49b194c51e696a6c7df559361eca7a5d04b9410d375ba4",
-        "reason": "Kişi listesi ve sayfa filtreleri paylaşımlı organizasyon kilidiyle çalışır. Yazma sıralaması ve merkez kapsamı aynı geçit üzerinden doğrulanır."
+        "fingerprint": "836c89a955c7d96a9ce13ec352d5cb6c13d306f37950c10ff9f531060b57d96b",
+        "reason": "XREQ-073 canonical rezervasyon sahibine bağlı kesinleşen yoklama ve iptal kaynağı incelendi."
       }
     },
     {
@@ -910,8 +913,8 @@
         "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "13c64e4a7ee008ef2dbf315826cf2d226a7c3bdc8885529ec6b4a650f4709f9d",
-        "reason": "Paylaşılan kabul dosyasına eklenen rapor, stüdyo kuyruğu ve fatura sayfalama senaryoları incelendi."
+        "fingerprint": "e5160a212b03db1354ad43ff554b495171949596253d6ac0d5d42235feda78b8",
+        "reason": "XREQ-073 paylaşılan sözleşme ve test kaynağı incelendi. Bu akışın komutları, mevcut alanları ve yetki koşulları aynı."
       }
     },
     {
@@ -1023,8 +1026,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "b7614321f5c1877c49a63b6f6d6ac07e9414e446cd1fb353d591fb0df0dc7c30",
-        "reason": "Cross-center settlement fixture deterministic source and lesson slots reviewed; no booking conflict permission or assertion relaxation"
+        "fingerprint": "793389ca361ba85e15742982645edfc4d7bef011b56c2d31fbfd1d6f56610c4e",
+        "reason": "XREQ-073 paylaşılan sözleşme ve test kaynağı incelendi. Bu akışın komutları, mevcut alanları ve yetki koşulları aynı."
       }
     },
     {
@@ -1095,8 +1098,8 @@
         "attendance_correction_request_v1"
       ],
       "review": {
-        "fingerprint": "870a24550ca20452bb2757b87e9f0c4ae94406d9d6c104d34ff440ef499fae2f",
-        "reason": "Paylaşılan kabul dosyasına eklenen rapor, stüdyo kuyruğu ve fatura sayfalama senaryoları incelendi."
+        "fingerprint": "0b7ec9d7140b10f6a041cdf040c8a7081723417dbe0e6cd8f1df6fa32c0dc5de",
+        "reason": "XREQ-073 paylaşılan sözleşme ve test kaynağı incelendi. Bu akışın komutları, mevcut alanları ve yetki koşulları aynı."
       }
     },
     {
@@ -1170,8 +1173,8 @@
         "member_finance_currencies_get_v1"
       ],
       "review": {
-        "fingerprint": "7069035f18bd6f1c8378897e36db4052df9963eef298fa0121762a3966c0eb0c",
-        "reason": "Paylaşılan kabul dosyasına eklenen rapor, stüdyo kuyruğu ve fatura sayfalama senaryoları incelendi."
+        "fingerprint": "76fbbdc82ab09c953ff3b9ca72263141bbdd0b79260c80a477459dd4c48ae5d0",
+        "reason": "XREQ-073 paylaşılan sözleşme ve test kaynağı incelendi. Bu akışın komutları, mevcut alanları ve yetki koşulları aynı."
       }
     },
     {
@@ -1273,7 +1276,8 @@
         "apps/backend/database/public-page-event-applications.sql",
         "apps/backend/database/settings-catalog-v25.sql",
         "apps/backend/supabase/migrations/20261118214100_public_page_event_applications.sql",
-        "apps/backend/supabase/migrations/20261118214000_settings_catalog_v25.sql"
+        "apps/backend/supabase/migrations/20261118214000_settings_catalog_v25.sql",
+        "apps/backend/supabase/migrations/20261124013100_exact_public_finance_and_setup_reads.sql"
       ],
       "operations": [
         "publication_set_v1",
@@ -1287,8 +1291,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "0d8e04c99705c84ba96a6512521ceafd17f67ac5e32cae0b9625da1756709f98",
-        "reason": "Takvim upstream JSON alanları okumadan önce doğrulanır. GET/HEAD, geçerli hata eşlemesi, MIME ve bayt sınırları korunur."
+        "fingerprint": "9f256456c9ccfd708ffdb038357cee31723c93ee1649ae851b16ec4f5ef6ed68",
+        "reason": "XREQ-073 public bağlam ve tek etkinlik seçicileri mevcut açılış, takma ad, merkez ve form bağlama kontrolleriyle incelendi."
       }
     },
     {
@@ -1362,8 +1366,8 @@
         "import_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "df71242511a57c8a37590c91eb8be6a78fddc9dd3837e7410b69851759080c67",
-        "reason": "Raporun tipli SQL sayfası, tam kapsam toplamı, eski cursor devamı ve CSV satır kaynağı incelendi."
+        "fingerprint": "f799a5c54a40014648bfca2398fd34167fd6551dd5019c0e324c0dad3e01a8bd",
+        "reason": "XREQ-073 paylaşılan sözleşme ve test kaynağı incelendi. Bu akışın komutları, mevcut alanları ve yetki koşulları aynı."
       }
     },
     {
@@ -1453,8 +1457,8 @@
         "document_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "72640aa14485d2b22dfedbfb2d798d703bdb4db4789b8e954c3ee40bf0b61ad1",
-        "reason": "Paylaşılan kabul dosyasına eklenen rapor, stüdyo kuyruğu ve fatura sayfalama senaryoları incelendi."
+        "fingerprint": "c4e54e47324d54fa80e6bedc1e253ce1514fc63140feff87ac3482b2292789c4",
+        "reason": "XREQ-073 paylaşılan sözleşme ve test kaynağı incelendi. Bu akışın komutları, mevcut alanları ve yetki koşulları aynı."
       }
     },
     {
@@ -1593,8 +1597,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "e636748b46792c497ee95b0f7f162f7ea5b6e4cdfa7d25ef3fdd002087dddc6f",
-        "reason": "Etkili ayar ve katalog projeksiyonları paylaşımlı organizasyon kilidi alır. Ayar değişikliği ve güvenlik kontrollerinin sıra garantisi korunur."
+        "fingerprint": "3b9f2b9ecd1e2fa20948205afc60b60fd26530c7624ad1969cd738a781ec2dc5",
+        "reason": "XREQ-073 paylaşılan sözleşme ve test kaynağı incelendi. Bu akışın komutları, mevcut alanları ve yetki koşulları aynı."
       }
     },
     {
@@ -1673,8 +1677,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "c4a650f93c562bc9ea59145d1dc8073ff3541ee6e50492d56b02c2449f175723",
-        "reason": "Abonelik özeti paylaşımlı organizasyon kilidi ile okunur. Plan ve ödeme geçişleri özel organizasyon kilidi ile sıralanır."
+        "fingerprint": "585628e47bead0edcf9585e2e96a6657a184c293016f8d60f65974db429b1d74",
+        "reason": "XREQ-073 paylaşılan sözleşme ve test kaynağı incelendi. Bu akışın komutları, mevcut alanları ve yetki koşulları aynı."
       }
     },
     {
@@ -1726,7 +1730,8 @@
         "apps/backend/database/instructor-finance-directory.sql",
         "apps/backend/supabase/migrations/20261117034013_instructor_finance_directory.sql",
         "apps/backend/database/instructor-earning-session-context.sql",
-        "apps/backend/supabase/migrations/20261118211600_instructor_earning_session_context.sql"
+        "apps/backend/supabase/migrations/20261118211600_instructor_earning_session_context.sql",
+        "apps/backend/supabase/migrations/20261124013100_exact_public_finance_and_setup_reads.sql"
       ],
       "operations": [
         "instructor_agreement_publish_v1",
@@ -1741,8 +1746,8 @@
         "instructor_finance_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "6664d2a56002d1d0e4a95b375989aadf88a10d434e3c31e6e11a8cdfa305930d",
-        "reason": "Paylaşılan kabul dosyasına eklenen rapor, stüdyo kuyruğu ve fatura sayfalama senaryoları incelendi."
+        "fingerprint": "a1c3f6dd2972568c927a9dd9db226991c797e7ec466855a28d8e2999ae512260",
+        "reason": "XREQ-073 işaretli para birimi toplamları ve kapalı seans sayacı mevcut yetki, düzeltme ve dönem kesitiyle incelendi."
       }
     },
     {
@@ -1896,8 +1901,8 @@
         "management_work_list_v1"
       ],
       "review": {
-        "fingerprint": "9a874ff5a54d183b81349d0e72cc4aeafc5903f593057a1abb1eb1081b70859b",
-        "reason": "Paylaşılan kabul dosyasına eklenen rapor, stüdyo kuyruğu ve fatura sayfalama senaryoları incelendi."
+        "fingerprint": "94c30a06fd9fa62397635a5ee27f7b78711d316097abae03f5caa0891548dc51",
+        "reason": "XREQ-073 paylaşılan sözleşme ve test kaynağı incelendi. Bu akışın komutları, mevcut alanları ve yetki koşulları aynı."
       }
     },
     {
@@ -1989,7 +1994,8 @@
         "apps/backend/supabase/migrations/20261119060000_platform_console_completion.sql",
         "apps/backend/database/platform-invoice-directory.sql",
         "apps/backend/supabase/migrations/20261119161030_platform_invoice_directory.sql",
-        "apps/backend/supabase/migrations/20261119170002_sql_list_pagination.sql"
+        "apps/backend/supabase/migrations/20261119170002_sql_list_pagination.sql",
+        "apps/backend/supabase/migrations/20261124013100_exact_public_finance_and_setup_reads.sql"
       ],
       "operations": [
         "account_delete_preview_v1",
@@ -2014,8 +2020,8 @@
         "platform_operator_access_set_v1"
       ],
       "review": {
-        "fingerprint": "8c38e3b4caed92b0141c5bda9eac2d6f8388760797332ce59aa9871792b75982",
-        "reason": "Ortak handler operasyon ve RPC sonucunu alan kontrolleriyle daraltır. Platform işlem sözleşmesi ve yetki sırası aynı kaldı."
+        "fingerprint": "fb212985ebf2bae20571bcdd7131994ad3a3f6d94edf3b96338ac15b1d1b423a",
+        "reason": "XREQ-073 Platform kesin başvuru seçicisi kendi kayıt ve canlı kuyruk görünürlüğü, cursor ayrımı ve kabul testiyle incelendi."
       }
     },
     {
@@ -2088,8 +2094,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "831871a5fd8461cceffb6289c026c7ed6df516b5f90c82dbd196b2cda4f4ebdc",
-        "reason": "Reviewed platform console code and the updated runtime and serial acceptance evidence for existing authority."
+        "fingerprint": "e91c14aa744f6e7bf1add5663419f9fa2fa4f9d2a58fba676bd7c88d0df6dea1",
+        "reason": "XREQ-073 paylaşılan sözleşme ve test kaynağı incelendi. Bu akışın komutları, mevcut alanları ve yetki koşulları aynı."
       }
     },
     {
