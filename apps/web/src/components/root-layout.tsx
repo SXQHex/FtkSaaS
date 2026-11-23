@@ -20,9 +20,10 @@ export function RootLayout() {
   const router = useRouter();
   const queries = useQueryClient();
   const [checkingAccess, setCheckingAccess] = useState(false);
+  const [sameActorHandoff, setSameActorHandoff] = useState(false);
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const anonymousProgram = pathname.startsWith("/public/");
-  const authReady = useAuthSession(!anonymousProgram);
+  const authReady = useAuthSession(!anonymousProgram, setSameActorHandoff);
   const publicRoute =
     anonymousProgram ||
     ["/", "/login", "/signup", "/verify-email", "/forgot-password", "/auth/callback"].includes(
@@ -36,6 +37,10 @@ export function RootLayout() {
       showLogin: () => router.navigate({ to: "/login", replace: true }),
     });
   }, [publicRoute, queries, router]);
+  const privateAuthPending = !authReady && !publicRoute;
+  // Preserve in-flight native commands without exposing any old private UI.
+  // Queries were already evicted and Router guards must finish before reveal.
+  const preserveCommandTree = privateAuthPending && sameActorHandoff;
   const showExample =
     isDevelopment && new URLSearchParams(window.location.search).has("__form_example");
   const showStates =
@@ -50,12 +55,12 @@ export function RootLayout() {
       >
         <NetworkNotice />
         <div
-          className="contents"
-          inert={checkingAccess && !publicRoute}
-          aria-hidden={checkingAccess && !publicRoute}
+          className={preserveCommandTree ? "invisible" : "contents"}
+          inert={(checkingAccess || privateAuthPending) && !publicRoute}
+          aria-hidden={(checkingAccess || privateAuthPending) && !publicRoute}
         >
           <Suspense fallback={<RoutePendingPage />}>
-            {!authReady && !publicRoute ? (
+            {privateAuthPending && !preserveCommandTree ? (
               <RoutePendingPage />
             ) : showStates ? (
               <StateGallery />
@@ -66,7 +71,7 @@ export function RootLayout() {
             )}
           </Suspense>
         </div>
-        {checkingAccess && !publicRoute && (
+        {(checkingAccess || preserveCommandTree) && !publicRoute && (
           <div className="fixed inset-0 z-50 bg-background">
             <StateView kind="loading" />
           </div>

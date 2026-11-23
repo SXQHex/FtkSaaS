@@ -1,14 +1,16 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-const { changed, clear, invalidate, unsubscribe, queries, router } = vi.hoisted(() => {
+const { changed, clear, queryClear, invalidate, unsubscribe, queries, router } = vi.hoisted(() => {
   const clear = vi.fn();
+  const queryClear = vi.fn();
   const invalidate = vi.fn();
   return {
     changed: vi.fn(),
     clear,
+    queryClear,
     invalidate,
     unsubscribe: vi.fn(),
-    queries: { clear },
+    queries: { clear, getQueryCache: () => ({ clear: queryClear }) },
     router: { invalidate },
   };
 });
@@ -97,6 +99,7 @@ it("does not purge private Query or the recovery marker for focus, token rotatio
   await act(() => callback("MFA_CHALLENGE_VERIFIED", session(actor, firstSession, "aal2")));
   await act(() => callback("USER_UPDATED", session(actor, firstSession, "updated")));
   expect(clear).not.toHaveBeenCalled();
+  expect(queryClear).not.toHaveBeenCalled();
   expect(invalidate).not.toHaveBeenCalled();
   expect(result.current).toBe(true);
   expect(sessionStorage.getItem("ftk-recovery-account")).toBe(`${actor}:${firstSession}`);
@@ -109,12 +112,12 @@ it("evicts all private cache on a same-user new native session and revalidates r
   sessionStorage.setItem("ftk-recovery-account", `${actor}:${firstSession}`);
   await act(() => callback("SIGNED_IN", session(actor, secondSession)));
   expect(result.current).toBe(false);
-  expect(clear).toHaveBeenCalledOnce();
+  expect(queryClear).toHaveBeenCalledOnce();
   expect(sessionStorage.getItem("ftk-recovery-account")).toBeNull();
   await waitFor(() => expect(invalidate).toHaveBeenCalledExactlyOnceWith({ sync: true }));
   await waitFor(() => expect(result.current).toBe(true));
   await act(() => callback("TOKEN_REFRESHED", session(actor, secondSession, "new-token")));
-  expect(clear).toHaveBeenCalledTimes(1);
+  expect(queryClear).toHaveBeenCalledTimes(1);
 });
 
 it("keeps a verified recovery marker for PASSWORD_RECOVERY in the same native session", async () => {
@@ -134,11 +137,12 @@ it("purges old actor and unknown-session markers rather than trusting the same u
   await act(() => callback("INITIAL_SESSION", session()));
   sessionStorage.setItem("ftk-recovery-account", `${actor}:${firstSession}`);
   await act(() => callback("SIGNED_IN", { user: { id: actor }, access_token: "opaque" }));
-  expect(clear).toHaveBeenCalledTimes(1);
+  expect(queryClear).toHaveBeenCalledTimes(1);
   expect(sessionStorage.getItem("ftk-recovery-account")).toBeNull();
   await waitFor(() => expect(result.current).toBe(true));
   await act(() => callback("SIGNED_IN", session(otherActor, secondSession)));
-  expect(clear).toHaveBeenCalledTimes(2);
+  expect(clear).toHaveBeenCalledOnce();
+  expect(queryClear).toHaveBeenCalledTimes(1);
 });
 
 it("retains identity while the observer is disabled for a public page", async () => {
@@ -160,7 +164,7 @@ it("retains identity while the observer is disabled for a public page", async ()
   rerender({ enabled: true });
   const resumed = changed.mock.calls[1][0];
   await act(() => resumed("INITIAL_SESSION", session(actor, secondSession)));
-  expect(clear).toHaveBeenCalledOnce();
+  expect(queryClear).toHaveBeenCalledOnce();
   expect(result.current).toBe(false);
   await waitFor(() => expect(invalidate).toHaveBeenCalledExactlyOnceWith({ sync: true }));
   await act(async () => {
@@ -201,5 +205,18 @@ it("does not allow an older route response to reopen a newer session's private s
     finishCurrent();
   });
   expect(result.current).toBe(true);
-  expect(clear).toHaveBeenCalledTimes(2);
+  expect(queryClear).toHaveBeenCalledTimes(2);
+});
+
+it("does not reset the MutationCache during same-user reauthentication", async () => {
+  const onHandoff = vi.fn();
+  const { result } = renderHook(() => useAuthSession(true, onHandoff));
+  const callback = changed.mock.calls[0][0];
+  await act(() => callback("INITIAL_SESSION", session()));
+  await act(() => callback("SIGNED_IN", session(actor, secondSession)));
+  expect(queryClear).toHaveBeenCalledOnce();
+  expect(clear).not.toHaveBeenCalled();
+  expect(onHandoff).toHaveBeenCalledWith(true);
+  await waitFor(() => expect(result.current).toBe(true));
+  expect(onHandoff).toHaveBeenLastCalledWith(false);
 });

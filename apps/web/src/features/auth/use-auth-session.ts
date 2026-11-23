@@ -23,14 +23,22 @@ function sameSession(previous: NativeIdentity | null | undefined, current: Nativ
   );
 }
 
-export function useAuthSession(enabled = true) {
+export function useAuthSession(
+  enabled = true,
+  onSessionHandoff?: (pending: boolean) => void,
+) {
   const [ready, setReady] = useState(true);
   const queries = useQueryClient();
   const router = useRouter();
   // Keep the last native identity when the observer pauses for public routes.
   const previous = useRef<NativeIdentity | null | undefined>(undefined);
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled) {
+      // A private reconciliation cannot leave the next route permanently pending.
+      setReady(true);
+      onSessionHandoff?.(false);
+      return;
+    }
     if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY)
       return;
     let revision = 0;
@@ -42,20 +50,37 @@ export function useAuthSession(enabled = true) {
         previous.current = current;
         return;
       }
+      const sameActorHandoff =
+        changed &&
+        previous.current !== null &&
+        previous.current !== undefined &&
+        current !== null &&
+        previous.current.userId === current.userId;
       previous.current = current;
       // SIGNED_IN is re-emitted on focus; TOKEN_REFRESHED and MFA keep the
       // original session_id. An actual same-user reauthentication does not.
       if (event === "SIGNED_OUT" || changed) sessionStorage.removeItem("ftk-recovery-account");
       if (!changed && event !== "SIGNED_OUT" && event !== "PASSWORD_RECOVERY") return;
       const next = ++revision;
+      onSessionHandoff?.(sameActorHandoff);
       setReady(false);
-      queries.clear();
+      if (sameActorHandoff) {
+        // Evict prior-session Query data without destroying a running
+        // native command's TanStack MutationCache/receipt lifetime.
+        queries.getQueryCache().clear();
+      } else {
+        // Sign-out and actor replacement discard both Queries and mutations.
+        queries.clear();
+      }
       // Defer SDK-dependent route reads until the native callback has returned.
       setTimeout(() => {
         if (!mounted || next !== revision) return;
         void router.invalidate({ sync: true }).then(
           () => {
-            if (mounted && next === revision) setReady(true);
+            if (mounted && next === revision) {
+              setReady(true);
+              onSessionHandoff?.(false);
+            }
           },
           () => {
             if (mounted && next === revision) window.location.replace("/login");
@@ -67,6 +92,6 @@ export function useAuthSession(enabled = true) {
       mounted = false;
       data.subscription.unsubscribe();
     };
-  }, [enabled, queries, router]);
+  }, [enabled, queries, router, onSessionHandoff]);
   return ready;
 }
