@@ -186,6 +186,13 @@ describe("M06: cross-feature access reconciliation", () => {
     const closed = structuredClone(original);
     closed.selected!.access_mode = "closed";
     expect(workspaceAccessLost(original, closed)).toBe(false);
+    const newOrganization = structuredClone(original);
+    newOrganization.organizations.push(newOrganization.selected!);
+    newOrganization.organizations.push({ ...newOrganization.selected!, id: "org-b" });
+    newOrganization.selected = undefined;
+    const previousAutomatic = structuredClone(original);
+    previousAutomatic.organizations.push(previousAutomatic.selected!);
+    expect(workspaceAccessLost(previousAutomatic, newOrganization)).toBe(false);
 
     const { queries, actions } = fixture();
     workspaceRead.mockResolvedValue(added);
