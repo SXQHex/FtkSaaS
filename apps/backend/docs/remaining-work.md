@@ -23,19 +23,13 @@ Bu dar hata/gecikme incelemesi, ertelenmiş O10 yük/kapasite projesini veya tic
 <a id="bt01"></a>
 ## BT01 — Backend TypeScript ve Edge tip güvenliği
 
-**Durum:** Aday kaynak ve yerel doğrulama hazır; zorunlu aday CI, merge ve development kabulü açık. **Tür:** Ortak backend kalite borcu · **Öncelik:** İlk iş; yeni ürün kuralı veya API davranışı kararı değildir.
+**Kapalı.** [Kaynak, zorunlu CI, main ve development kabulü](00-FtkSaaS-yeni-sohbet-devir.md#bt01-edge-tip-kabul-adayi) doğrulandı.
 
-**Kaynak bulgusu ve aday çözümü:** Başlangıç `main` sürümünde `apps/backend/tsconfig.json` yalnız `tests/types.test.ts` dosyasını denetliyordu. Bu adayda backend `typecheck`/`verify` grafiği el yazımı Edge modüllerini, Deno ortamını ve `.mjs` tip bildirimlerini de kapsar. `esbuild` bundle ve runtime AJV doğrulaması ayrıca korunur; ikisi statik tip denetiminin yerine geçmez. [Aday kaynak ve test kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#bt01-edge-tip-kabul-adayi).
-
-**Yapılacaklar:**
-
-- [x] `backend-v1`, `resend-webhook` ve `personal-calendar` el yazımı Edge TypeScript modüllerini, içe aktarılan `.mjs` transport sınırlarını, ilgili `packages/api-contracts` tiplerini ve açık/örtük `any` akışlarını tara. `JSON.parse()`, `Response.json()`, RPC, Auth ve sağlayıcı yanıtı sınırlarını çıkar; üretilmiş `index.ts`/`validators.js` ile kasıtlı negatif tip testlerini ayrı değerlendir. [Kaynak envanteri ve doğrulama](00-FtkSaaS-yeni-sohbet-devir.md#bt01-edge-kaynak-taramasi).
-- [ ] Edge modül grafiğini, Deno ortam türleri, `.ts` importları ve `.mjs` tip sınırları dahil, backend `typecheck`/`verify` ve zorunlu CI içinde sıfır hata ile kontrol et. Mevcut sözleşme tip testleri korunur; yalnız bundle üretmek veya `tests/types.test.ts` dosyasını kontrol etmek yeterli değildir.
-- [x] `backend-v1/handler.ts` içindeki dinamik validator erişimlerini ve `account-signup.ts`, `transactional-email.ts`, `invitation-delivery.ts`, `lifecycle-auth.ts` dahil tüm Edge dış veri sınırlarını gerçek tip/şema doğrulamasıyla güvenli hale getir. Doğrulanmamış veriyi `unknown` tut; el yazımı kaynakta `any`, `as any`, yeni `@ts-ignore`/`@ts-nocheck` veya kontrolü atlayan cast kullanma.
-- [x] `tests/types.test.ts` içindeki iki `@ts-expect-error` negatif tip testini koru; geçersiz sözleşme/JSON, eksik veya yanlış RPC claim, Auth/MFA ve sağlayıcı yanıtlarını reddeden regresyonları ekle veya mevcut testlerle doğrula. Yetki/tenant sınırı, hata kodları, idempotency ve istemci uyumluluğu değişmez.
-- [ ] Etkilenen testleri, üretilmiş validator/Edge bundle eşitliğini, backend tip/verify/kalite kontrollerini ve gerçek kaynak bağlı aday CI kabulünü geçir. TypeScript/CI konfigürasyonu trusted politika yüzeyidir; onay veya kalite kapısı gevşetmesi atlanmaz. İstemciye sunulan davranış değişirse `packages/api-contracts` aynı teslimde güncellenir.
-
-**Kabul:** El yazımı Edge kaynaklarının tamamı CI'da statik tip denetiminden geçer; denetimi aşan `any`/susturma yoktur; dış verinin şekli kullanımdan önce doğrulanır; mevcut runtime güvenlik ve sözleşme regresyonları başarılıdır. Kaynak, CI, merge ve ortam kanıtı ayrı ayrı [backend devrinde](00-FtkSaaS-yeni-sohbet-devir.md) tutulur.
+- [x] `backend-v1`, `resend-webhook`, `personal-calendar`, `.mjs` çağrı sınırları ve `packages/api-contracts` tipleri [kaynak taramasında](00-FtkSaaS-yeni-sohbet-devir.md#bt01-edge-kaynak-taramasi) incelendi.
+- [x] Backend `typecheck` ve zorunlu CI `verify` komutu el yazımı Edge TypeScript kaynaklarını, Deno türlerini ve `.mjs` tip bildirimlerini sıfır tip hatasıyla denetledi.
+- [x] İstek JSON’u, RPC, Auth ve sağlayıcı yanıtları tüketilmeden önce alan veya şema doğrulamasından geçiyor. Doğrulanmamış TypeScript değerleri `unknown` olarak taşınıyor.
+- [x] İki negatif sözleşme tipi testi ile bozuk JSON, RPC claim, Auth/MFA ve sağlayıcı yanıtı regresyonları doğrulandı.
+- [x] Üretilmiş AJV doğrulayıcıları ve Edge bundle eşitliği, kalite kontrolleri, kaynak bağlı full clean ve development doğrulamaları geçti.
 
 <a id="web1-v67-backend"></a>
 ## Web1 v67 backend talepleri
