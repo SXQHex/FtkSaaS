@@ -49,7 +49,9 @@ export function RootLayout() {
       >
         <NetworkNotice />
         <div
-          className={checkingAccess && !publicRoute ? "invisible pointer-events-none contents" : "contents"}
+          className={
+            checkingAccess && !publicRoute ? "invisible pointer-events-none contents" : "contents"
+          }
           inert={checkingAccess && !publicRoute}
           aria-hidden={checkingAccess && !publicRoute}
         >
