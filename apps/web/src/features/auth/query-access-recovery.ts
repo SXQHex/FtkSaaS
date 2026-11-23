@@ -48,6 +48,68 @@ export function workspaceAuthority(view: Workspace | undefined): string | undefi
   });
 }
 
+// Detect *lost* native capabilities, not any workspace revision. Adding a
+// center or gaining a role must never discard a pending command's receipt.
+export function workspaceAccessLost(before: Workspace | undefined, after: Workspace | undefined) {
+  if (!before?.selected) return false;
+  const previous = before.selected;
+  const current = after?.selected;
+  if (!current || current.id !== previous.id) return true;
+  if (
+    previous.self_context?.person_id &&
+    previous.self_context.person_id !== current.self_context?.person_id
+  )
+    return true;
+
+  const oldManagement = previous.self_management_scope;
+  const newManagement = current.self_management_scope;
+  if (oldManagement?.owner && !newManagement?.owner) return true;
+  if (oldManagement?.org_manager && !newManagement?.org_manager) return true;
+  if (
+    oldManagement?.managed_center_ids?.some(
+      (id) => !newManagement?.managed_center_ids?.includes(id),
+    )
+  )
+    return true;
+
+  if (
+    previous.self_context?.centers.some((center) => {
+      const fresh = current.self_context?.centers.find(
+        (row) => row.center_id === center.center_id,
+      );
+      return (
+        (center.student && !fresh?.student) ||
+        (center.instructor && !fresh?.instructor) ||
+        (center.assistant && !fresh?.assistant)
+      );
+    })
+  )
+    return true;
+
+  if (
+    before.centers.some(
+      (center) =>
+        center.accessible &&
+        !after?.centers.some((fresh) => fresh.id === center.id && fresh.accessible),
+    )
+  )
+    return true;
+
+  return before.roles.some(
+    (role) =>
+      role.state === "active" &&
+      role.account_access_granted !== false &&
+      !after?.roles.some(
+        (fresh) =>
+          fresh.person_id === role.person_id &&
+          fresh.role === role.role &&
+          fresh.scope_center_id === role.scope_center_id &&
+          fresh.state === "active" &&
+          fresh.account_access_granted !== false,
+      ),
+  );
+}
+
 function knownAccountId(queries: QueryClient): string | undefined {
   const ids = new Set(
     queries
@@ -72,10 +134,11 @@ function activeWorkspace(queries: QueryClient, accountId: string, failedKey: Que
   const candidates = queries
     .getQueriesData<Workspace>({ queryKey: workspaceKeys.account(accountId) })
     .filter(([, view]) => Boolean(view?.selected?.id));
-  const matched =
-    candidates.find(([, view]) =>
-      view?.selected?.id ? keyHasOrganization(failedKey, view.selected.id) : false,
-    ) ?? candidates[0];
+  // A platform/actor-only denial has no organization scope. Never guess one
+  // from an unrelated workspace projection or interpret it as a global logout.
+  const matched = candidates.find(([, view]) =>
+    view?.selected?.id ? keyHasOrganization(failedKey, view.selected.id) : false,
+  );
   return matched?.[1];
 }
 
@@ -104,18 +167,14 @@ export async function reconcileQueryAccessFailure(
   const accountId = knownAccountId(queries);
   const previous = accountId ? activeWorkspace(queries, accountId, failedKey) : undefined;
   if (!accountId || !previous?.selected?.id) {
-    // No verified authority to compare against: fail closed rather than retain
-    // an arbitrary older actor's private Query data.
-    queries.clear();
-    await actions.invalidateRoute();
+    // FORBIDDEN is an operation-specific denial unless an organization
+    // authority actually changed. Preserve platform/user error screens.
     return;
   }
 
   const orgId = previous.selected.id;
   let current: Workspace;
   try {
-    // An older in-flight workspace response must not defeat this permission check.
-    await queries.cancelQueries({ queryKey: workspaceKeys.account(accountId) });
     // An independent native recheck cannot reuse a cached Query success or
     // turn a denied feature query into another privileged cache read.
     current = await readWorkspace(accountId, orgId, (session) =>
@@ -127,9 +186,9 @@ export async function reconcileQueryAccessFailure(
     else await actions.invalidateRoute();
     return;
   }
-  if (workspaceAuthority(previous) === workspaceAuthority(current)) {
-    // A feature-specific FORBIDDEN must not evict unrelated authorized data.
-    queries.setQueryData(workspaceKeys.projection(accountId, orgId), current);
+  if (!workspaceAccessLost(previous, current)) {
+    // A feature-specific FORBIDDEN (or newly granted capabilities) must not
+    // evict unrelated authorized data or a pending native command.
     return;
   }
 
@@ -151,12 +210,12 @@ function isWorkspaceProjection(key: QueryKey) {
 
 export function observeQueryAccessFailures(queries: QueryClient, actions: AccessRecoveryActions) {
   const handled = new Set<string>();
-  const authorities = new Map<string, { fingerprint: string; selectedId?: string }>();
+  const authorities = new Map<string, { fingerprint: string; view: Workspace }>();
   const cache = queries.getQueryCache();
   const remember = (hash: string, view: Workspace | undefined) => {
     const fingerprint = workspaceAuthority(view);
     if (!fingerprint) return;
-    authorities.set(hash, { fingerprint, selectedId: view?.selected?.id });
+    if (view) authorities.set(hash, { fingerprint, view });
   };
   for (const query of cache.getAll()) {
     if (isWorkspaceProjection(query.queryKey)) {
@@ -239,8 +298,9 @@ export function observeQueryAccessFailures(queries: QueryClient, actions: Access
       if (
         !terminated &&
         !event.action.manual &&
-        previous?.selectedId &&
+        previous?.view.selected?.id &&
         previous.fingerprint !== workspaceAuthority(current) &&
+        workspaceAccessLost(previous.view, current) &&
         current
       ) {
         run(`workspace:${query.queryHash}`, async () => {
