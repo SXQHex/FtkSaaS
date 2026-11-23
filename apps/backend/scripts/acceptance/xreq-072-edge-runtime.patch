@@ -1,0 +1,131 @@
+diff --git a/crates/base/src/server.rs b/crates/base/src/server.rs
+index 0b33426d7e5b34cce7828e6fa7426d634961005f..eecc2c49ba1253fed7e6a97f393391f5d4e841cc 100644
+--- a/crates/base/src/server.rs
++++ b/crates/base/src/server.rs
+@@ -57,6 +57,7 @@ use tokio_rustls::rustls::pki_types::PrivateKeyDer;
+ use tokio_rustls::rustls::ServerConfig;
+ use tokio_rustls::TlsAcceptor;
+ use tokio_util::sync::CancellationToken;
++use tokio_util::sync::DropGuard;
+
+ use crate::inspector_server::Inspector;
+ use crate::worker;
+@@ -86,16 +87,8 @@ pub enum ServerHealth {
+ }
+
+ struct CancelOnDrop<S> {
++  _completion: DropGuard,
+   inner: S,
+-  cancel: Option<CancellationToken>,
+-}
+-
+-impl<S> Drop for CancelOnDrop<S> {
+-  fn drop(&mut self) {
+-    if let Some(cancel) = self.cancel.take() {
+-      cancel.cancel();
+-    }
+-  }
+ }
+
+ impl<S: Stream + Unpin> Stream for CancelOnDrop<S> {
+@@ -204,6 +197,9 @@ impl Service<Request<Body>> for WorkerService {
+
+       worker_req_tx.send(msg)?;
+       metric_src.incl_received_requests();
++      // Cancel if the client disconnects while the response is still pending.
++      // On success the response body owns completion until it is dropped.
++      let completion = cancel.clone().drop_guard();
+
+       tokio::spawn({
+         let metric_src_inner = metric_src.clone();
+@@ -224,7 +220,6 @@ impl Service<Request<Body>> for WorkerService {
+       let res = match res_rx.await {
+         Ok(res) => res,
+         Err(_) => {
+-          metric_src.incl_handled_requests();
+           return Ok(
+             Response::builder()
+               .status(http_v02::StatusCode::INTERNAL_SERVER_ERROR)
+@@ -254,8 +249,8 @@ impl Service<Request<Body>> for WorkerService {
+           Response::from_parts(
+             parts,
+             Body::wrap_stream(CancelOnDrop {
++              _completion: completion,
+               inner: body,
+-              cancel: Some(cancel),
+             }),
+           )
+         }
+diff --git a/crates/base/src/worker/pool.rs b/crates/base/src/worker/pool.rs
+index 01ba8dd8d3565ed958d9e4de07108a33a4da4d78..34c68f8ad547cf0168898959d7e11e1a536378aa 100644
+--- a/crates/base/src/worker/pool.rs
++++ b/crates/base/src/worker/pool.rs
+@@ -659,6 +659,20 @@ impl WorkerPool {
+               }
+             }
+
++            let req_end_tx = match (policy.is_oneshot(), conn_token.as_ref()) {
++              (true, Some(token)) => {
++                // Closing the inner body can precede the outer HTTP response.
++                // Retiring this isolate also cancels the shared connection.
++                let token = token.clone();
++                tokio::spawn(async move {
++                  token.cancelled_owned().await;
++                  let _ = req_end_tx.send(());
++                });
++                None
++              }
++              _ => Some(req_end_tx),
++            };
++
+             let result = send_user_worker_request(
+               profile.worker_request_msg_tx,
+               req,
+@@ -671,7 +685,9 @@ impl WorkerPool {
+             match result {
+               Ok(req) => Ok((req, req_end_tx)),
+               Err(err) => {
+-                let _ = req_end_tx.send(());
++                if let Some(req_end_tx) = req_end_tx {
++                  let _ = req_end_tx.send(());
++                }
+                 error!(
+                   "failed to send request to user worker: {}",
+                   err.to_string()
+diff --git a/ext/workers/context.rs b/ext/workers/context.rs
+index b19e479a2b34dae49b5551940db5ecfa6ea7b082..cf51edb46b5708e59e5f1c9991c7981640edceb1 100644
+--- a/ext/workers/context.rs
++++ b/ext/workers/context.rs
+@@ -297,7 +297,7 @@ pub enum UserWorkerMsgs {
+   ),
+ }
+
+-pub type SendRequestResult = (Response<Body>, mpsc::UnboundedSender<()>);
++pub type SendRequestResult = (Response<Body>, Option<mpsc::UnboundedSender<()>>);
+
+ #[derive(Debug)]
+ pub struct CreateUserWorkerResult {
+diff --git a/ext/workers/lib.rs b/ext/workers/lib.rs
+index 71e16b5e7aa8361652c9e11066f9cb4ff8cc15a6..b1d314b5c0228001ce60d1b37ae84b303c15db00 100644
+--- a/ext/workers/lib.rs
++++ b/ext/workers/lib.rs
+@@ -417,7 +417,7 @@ type BytesStream =
+ struct UserWorkerResponseBodyResource {
+   reader: AsyncRefCell<Peekable<BytesStream>>,
+   size: Option<u64>,
+-  req_end_tx: mpsc::UnboundedSender<()>,
++  req_end_tx: Option<mpsc::UnboundedSender<()>>,
+   cancel: CancelHandle,
+   conn_token: Option<CancellationToken>,
+ }
+@@ -463,7 +463,9 @@ impl Resource for UserWorkerResponseBodyResource {
+   fn close(self: Rc<Self>) {
+     self.cancel.cancel();
+
+-    let _ = self.req_end_tx.send(());
++    if let Some(req_end_tx) = self.req_end_tx.as_ref() {
++      let _ = req_end_tx.send(());
++    }
+     let Ok(this) = Rc::try_unwrap(self) else {
+       return;
+     };
