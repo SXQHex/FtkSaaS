@@ -42,7 +42,7 @@ export function SettingsPublicEditor({
 }: {
   before: SettingsDocumentSource;
   onClose: () => void;
-  onSaved: () => Promise<void>;
+  onSaved: (source: SettingsDocumentSource) => Promise<void>;
   onLockChange: (value: boolean) => void;
   onAccessLost: (error: unknown) => boolean;
 }) {
@@ -123,7 +123,7 @@ export function SettingsPublicEditor({
       return result;
     },
     onAccessLost,
-    onRefresh: async () => onSaved(),
+    onRefresh: onSaved,
   });
   const locked = preparing || command.locked;
   useEffect(() => {

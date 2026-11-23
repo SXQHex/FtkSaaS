@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { SegmentDiscoveryView } from "./segment-discovery-view";
-import { readSegmentDiscovery } from "./automation-discovery";
+import { automationDiscoveryKey, readSegmentDiscovery } from "./automation-discovery";
 import { Button } from "@ftksaas/ui/components/button";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 export function SegmentDiscovery({
@@ -21,15 +21,7 @@ export function SegmentDiscovery({
   const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]),
     [index, setIndex] = useState(0);
   const query = useQuery({
-    queryKey: [
-      "automation-discovery",
-      scope.accountId,
-      scope.orgId,
-      scope.centerId,
-      target.id,
-      target.mode,
-      cursors[index],
-    ],
+    queryKey: [...automationDiscoveryKey(scope), target.id, target.mode, cursors[index]],
     queryFn: async (context) => {
       const page = await readSegmentDiscovery(
         scope,

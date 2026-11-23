@@ -9,12 +9,20 @@ export type InboxFilter = "all" | "unread" | "todo" | "archived" | "deleted";
 export const inboxKey = (scope: ClientScope) =>
   ["inbox", scope.accountId, scope.orgId, scope.centerId] as const;
 
-export function organizationInboxReadKeys(queries: QueryClient, scope: ClientScope) {
+export function organizationInboxReadKeys(
+  queries: QueryClient,
+  scope: ClientScope,
+  notificationIds?: readonly string[],
+) {
   return queries
     .getQueryCache()
     .findAll({
       queryKey: ["inbox", scope.accountId, scope.orgId],
-      predicate: ({ queryKey }) => queryKey[4] === "list" || queryKey[4] === "state",
+      predicate: ({ queryKey }) =>
+        queryKey[4] === "list" ||
+        (queryKey[4] === "state" &&
+          (!notificationIds ||
+            (typeof queryKey[5] === "string" && notificationIds.includes(queryKey[5])))),
     })
     .map(({ queryKey }) => queryKey);
 }

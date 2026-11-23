@@ -21,8 +21,10 @@ import { SettingsPublicEditor } from "./settings-public-editor";
 import {
   publicSettingsKeys,
   readSettingsDocument,
+  settingsDocumentKey,
   type SettingsDocumentSource,
 } from "./settings-document";
+import { invalidateSettingsPolicyViews, settingsPoliciesKey } from "./settings-policies";
 import { publicCalendarInterval, readPublicCalendar } from "../public-program/public-calendar-read";
 import { SettingsPolicyEditor } from "./settings-policy-editor";
 import type { PolicyView } from "@ftksaas/api-contracts";
@@ -67,10 +69,20 @@ export function SettingsContent({
   const organization = current?.selected,
     center = current?.centers.find((item) => item.id === scope.centerId && item.accessible);
   const subscriptionSetup = organization?.access_mode === "bootstrap";
+  const roles = workspaceRoles(current, scope.centerId);
+  const canReadOrganizationCatalog = Boolean(
+    organization &&
+    center &&
+    !subscriptionSetup &&
+    !workspace.isError &&
+    (organization.self_management_scope === undefined ||
+      roles.includes("owner") ||
+      roles.includes("org_manager")),
+  );
   const catalog = useQuery({
     queryKey: ["settings-organization-catalog", scope.accountId, scope.orgId],
     queryFn: (context) => readOrganizationSettingsCatalog(scope, context),
-    enabled: Boolean(organization && center && !subscriptionSetup && !workspace.isError),
+    enabled: canReadOrganizationCatalog,
     retry: false,
   });
   useEffect(() => {
@@ -88,21 +100,14 @@ export function SettingsContent({
         <SettingsView data={{}} />
       </div>
     );
-  const roles = current.roles.filter(
-    (role) => role.state === "active" && role.person_id === organization.self_context?.person_id,
-  );
-  // Owner is stored on the organization, not necessarily as a role-assignment row.
-  // Native organization field access represents Owner/OM settings scope; each domain writer still rechecks its own gates.
   const organizationCatalog =
-    !subscriptionSetup && !catalog.isError && catalog.data?.state === "known"
+    canReadOrganizationCatalog && !catalog.isError && catalog.data?.state === "known"
       ? catalog.data.catalog
       : undefined;
   const canOrganization = Boolean(organizationCatalog);
   const canWriteOrganization =
     organizationCatalog?.fields.some((field) => field.key === "address" && field.writable) === true;
-  const canCenter = roles.some(
-    (role) => role.role === "center_manager" && role.scope_center_id === scope.centerId,
-  );
+  const canCenter = roles.includes("center_manager");
   return (
     <SettingsManagement
       key={`${scope.accountId}:${scope.orgId}:${scope.centerId}`}
@@ -117,10 +122,10 @@ export function SettingsContent({
         ) === true
       }
       canOrganization={canOrganization}
-      owner={workspaceRoles(current, scope.centerId).includes("owner")}
+      owner={roles.includes("owner")}
       canWriteOrganization={canWriteOrganization}
       readOnly={workspace.isError}
-      organizationLoading={catalog.isPending || catalog.isFetching}
+      organizationLoading={canReadOrganizationCatalog && (catalog.isPending || catalog.isFetching)}
       canCenter={canCenter}
       onLockChange={onLockChange}
     />
@@ -318,7 +323,7 @@ function SettingsManagement({
   const source = query.isError || query.isFetching ? undefined : query.data;
   const publicValues = document.source?.document.values;
   const organizationSource = useQuery({
-    queryKey: ["settings-document", scope.accountId, scope.orgId, scope.centerId, "organization"],
+    queryKey: settingsDocumentKey(scope, "organization"),
     queryFn: (context) => readSettingsDocument(scope, "organization", context),
     enabled: section === "yayin" && level === "center" && canOrganization && !readOnly,
     retry: false,
@@ -707,19 +712,8 @@ function SettingsManagement({
       {publicSettings && (
         <SettingsPublicEditor
           before={publicSettings}
-          onSaved={async () => {
-            await queries.invalidateQueries(
-              {
-                queryKey: [
-                  "settings-document",
-                  scope.accountId,
-                  scope.orgId,
-                  scope.centerId,
-                  level,
-                ],
-              },
-              { throwOnError: true },
-            );
+          onSaved={async (result) => {
+            await cacheVerifiedReadback(queries, settingsDocumentKey(scope, result.level), result);
             await queries.invalidateQueries({
               queryKey: ["settings-history", scope.accountId, scope.orgId],
             });
@@ -750,18 +744,13 @@ function SettingsManagement({
               .filter((row) => row.state === "active")
               .map((row) => ({ id: row.id, name: row.name })) ?? []
           }
-          onSaved={async () => {
-            await queries.invalidateQueries(
-              {
-                queryKey: [
-                  "settings-policies",
-                  scope.accountId,
-                  scope.orgId,
-                  scope.centerId,
-                  level,
-                ],
-              },
-              { throwOnError: true },
+          onSaved={async (result, assertCurrent) => {
+            await invalidateSettingsPolicyViews(queries, result.scope, result.level);
+            assertCurrent();
+            await cacheVerifiedReadback(
+              queries,
+              settingsPoliciesKey(result.scope, result.level),
+              result,
             );
             await queries.invalidateQueries({
               queryKey: ["settings-history", scope.accountId, scope.orgId],

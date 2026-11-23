@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useId, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { hashKey, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { DocumentView } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
@@ -23,6 +23,7 @@ import {
   writeDocumentAcceptance,
   readDocumentReceipt,
   readDocumentResult,
+  invalidateDocumentAcceptanceViews,
   type DocumentContext,
 } from "./member-documents";
 
@@ -40,7 +41,7 @@ export function MemberDocumentsPanel({
   onAccessLost: (cause: unknown) => boolean;
 }) {
   const { t } = useTranslation();
-  const [selected, setSelected] = useState<string>();
+  const [selected, setSelected] = useState<DocumentView>();
   const [childLocked, setChildLocked] = useState(false);
   const childLock = useCallback((value: boolean) => setChildLocked(value), []);
   const query = useQuery({
@@ -65,6 +66,7 @@ export function MemberDocumentsPanel({
     onLockChange(childLocked);
     return () => onLockChange(false);
   }, [childLocked, onLockChange]);
+  const currentDocument = query.data?.find((row) => row.id === selected?.id);
   return (
     <Card>
       <CardHeader>
@@ -94,7 +96,7 @@ export function MemberDocumentsPanel({
                       variant="outline"
                       size="sm"
                       isDisabled={disabled || childLocked}
-                      onPress={() => setSelected(row.id)}
+                      onPress={() => setSelected(row)}
                     >
                       {t(($) => $.memberDocuments.read, { name: row.name })}
                     </Button>
@@ -113,11 +115,12 @@ export function MemberDocumentsPanel({
               {t(($) => $.memberDocuments.retry)}
             </Button>
           )}
-          {selected && query.data?.find((row) => row.id === selected) && (
+          {selected && (
             <MemberDocumentEditor
-              key={selected}
+              key={selected.id}
               binding={binding}
-              before={query.data.find((row) => row.id === selected)!}
+              before={currentDocument ?? selected}
+              sourceAvailable={!!currentDocument && !query.isError && !query.isFetching}
               disabled={disabled}
               onLockChange={childLock}
               onAccessLost={onAccessLost}
@@ -137,6 +140,7 @@ export function MemberDocumentsPanel({
 export function MemberDocumentEditor({
   binding,
   before,
+  sourceAvailable,
   disabled,
   onLockChange,
   onAccessLost,
@@ -145,6 +149,7 @@ export function MemberDocumentEditor({
 }: {
   binding: DocumentContext;
   before: DocumentView;
+  sourceAvailable: boolean;
   disabled: boolean;
   onLockChange: (value: boolean) => void;
   onAccessLost: (cause: unknown) => boolean;
@@ -152,26 +157,26 @@ export function MemberDocumentEditor({
   onClose: () => void;
 }) {
   const { t } = useTranslation();
+  const queries = useQueryClient();
   const reviewId = useId();
   const sessionRevision = useContext(PrivateSessionRevision);
-  const documentKey = `${sessionRevision}:${before.id}:${before.version_id}:${before.file.id}`;
   const [reviewedDocument, setReviewedDocument] = useState<string>(),
     [preparing, setPreparing] = useState(false),
     [error, setError] = useState(false);
-  const reviewed = reviewedDocument === documentKey;
+  const contentKey = [
+    "member-document-content",
+    binding.scope.accountId,
+    binding.scope.orgId,
+    binding.scope.centerId,
+    binding.personId,
+    binding.context,
+    before.id,
+    before.version_id,
+    before.file.id,
+    sessionRevision,
+  ];
   const query = useQuery({
-    queryKey: [
-      "member-document-content",
-      binding.scope.accountId,
-      binding.scope.orgId,
-      binding.scope.centerId,
-      binding.personId,
-      binding.context,
-      before.id,
-      before.version_id,
-      before.file.id,
-      sessionRevision,
-    ],
+    queryKey: contentKey,
     queryFn: async (readContext) => {
       const row = (await readRequiredDocuments(binding, before.file.id, readContext)).find(
         (r) =>
@@ -180,22 +185,34 @@ export function MemberDocumentEditor({
       if (!row) throw Error("DOCUMENT_CONTENT_UNAVAILABLE");
       return { row, body: documentBody(row) };
     },
+    enabled: sourceAvailable && !before.accepted,
+    staleTime: 0,
     retry: false,
     refetchOnMount: "always",
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
+  const documentKey = hashKey([
+    ...contentKey,
+    query.data?.row.content_hash,
+    query.data?.row.rendered_document?.id,
+  ]);
+  const reviewed = reviewedDocument === documentKey;
   const command = useMemberCommand({
     write: writeDocumentAcceptance,
     readReceipt: readDocumentReceipt,
     readResult: readDocumentResult,
-    onRefresh: onAccepted,
+    onRefresh: async (_, assertCurrent) => {
+      await invalidateDocumentAcceptanceViews(queries, binding);
+      assertCurrent();
+      await onAccepted();
+    },
     onAccessLost,
   });
   const locked = preparing || command.locked;
-  const readOnly = disabled || locked || command.state !== "ready";
+  const readOnly = disabled || locked || command.state !== "ready" || !sourceAvailable;
   const content =
-    query.isSuccess && query.fetchStatus === "idle" && query.isFetchedAfterMount
+    sourceAvailable && query.isSuccess && query.fetchStatus === "idle" && query.isFetchedAfterMount
       ? query.data
       : undefined;
   useEffect(() => {
@@ -206,7 +223,7 @@ export function MemberDocumentEditor({
     if (query.error) onAccessLost(query.error);
   }, [query.error, onAccessLost]);
   async function accept() {
-    if (readOnly || !content) return;
+    if (readOnly || before.accepted || !content || content.row.accepted) return;
     if (!reviewed) {
       setError(true);
       return;
@@ -223,9 +240,16 @@ export function MemberDocumentEditor({
   }
   return (
     <FieldGroup>
-      <h3 className="font-semibold">{before.name}</h3>
-      {!content && !query.isError && <p role="status">{t(($) => $.memberDocuments.loading)}</p>}
-      {query.isError && (
+      {sourceAvailable && <h3 className="font-semibold">{before.name}</h3>}
+      {!sourceAvailable && command.state === "ready" && (
+        <Alert variant="destructive">
+          <AlertDescription>{t(($) => $.memberDocuments.unavailable)}</AlertDescription>
+        </Alert>
+      )}
+      {sourceAvailable && !before.accepted && !content && !query.isError && (
+        <p role="status">{t(($) => $.memberDocuments.loading)}</p>
+      )}
+      {sourceAvailable && query.isError && (
         <Alert variant="destructive">
           <AlertDescription>
             <p>{t(($) => $.memberDocuments.unavailable)}</p>
@@ -248,7 +272,7 @@ export function MemberDocumentEditor({
             <Checkbox
               id={reviewId}
               isSelected={reviewed}
-              isDisabled={readOnly || content.row.accepted}
+              isDisabled={readOnly || before.accepted || content.row.accepted}
               isInvalid={error}
               validationBehavior="aria"
               onChange={(value) => {
@@ -259,7 +283,7 @@ export function MemberDocumentEditor({
             <FieldLabel htmlFor={reviewId}>{t(($) => $.memberDocuments.review)}</FieldLabel>
           </Field>
           <Button
-            isDisabled={readOnly || content.row.accepted}
+            isDisabled={readOnly || before.accepted || content.row.accepted}
             onPress={() => {
               void accept();
             }}

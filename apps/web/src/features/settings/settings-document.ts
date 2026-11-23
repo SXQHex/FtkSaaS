@@ -4,6 +4,15 @@ import type { SettingsImageUpload, OrganizationSettingsValues } from "@ftksaas/a
 import { BackendError } from "../../lib/backend";
 import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 export type SettingsLevel = "organization" | "center";
+export const settingsDocumentKey = (scope: ClientScope, level: SettingsLevel) =>
+  [
+    "settings-document",
+    scope.accountId,
+    scope.orgId,
+    level,
+    ...(level === "center" ? [scope.centerId] : []),
+  ] as const;
+
 export const publicPageSlug = z
   .string()
   .min(3)

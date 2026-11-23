@@ -32,7 +32,10 @@ export function SettingsPolicyEditor({
   before: PolicyView;
   timezone: string;
   disciplines: { id: string; name: string }[];
-  onSaved: () => Promise<void>;
+  onSaved: (
+    source: Awaited<ReturnType<typeof readSettingsPolicyResult>>,
+    assertCurrent: () => void,
+  ) => Promise<void>;
   onClose: () => void;
   onLockChange: (value: boolean) => void;
   onAccessLost: (error: unknown) => boolean;
@@ -82,7 +85,7 @@ export function SettingsPolicyEditor({
     readReceipt: readSettingsPolicyReceipt,
     readResult: readSettingsPolicyResult,
     onAccessLost,
-    onRefresh: async () => onSaved(),
+    onRefresh: onSaved,
   });
   const locked = preparing || command.locked;
   useEffect(() => {

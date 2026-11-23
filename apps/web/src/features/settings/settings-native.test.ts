@@ -5,8 +5,10 @@ import {
   parseSettingsDocumentPatch,
   settingsDocumentIntent,
   readSettingsDocumentResult,
+  settingsDocumentKey,
   writeSettingsDocument,
 } from "./settings-document";
+import { invalidateSettingsPolicyViews, settingsPoliciesKey } from "./settings-policies";
 import { readPublicForms, readPublicConsentSources } from "./settings-public-reader";
 import {
   parseEditablePolicy,
@@ -32,6 +34,34 @@ const call = vi.hoisted(() => vi.fn());
 vi.mock("../../lib/scoped-backend", () => ({ scopedBackend: async () => ({ call }) }));
 const id = (n: number) => `019ab7b0-0000-7000-8000-${String(n).padStart(12, "0")}`;
 const scope = { accountId: id(1), orgId: id(2), centerId: id(3) };
+it("shares native organization settings across centers and separates local settings", () => {
+  const otherCenter = { ...scope, centerId: id(4) };
+  expect(settingsDocumentKey(scope, "organization")).toEqual(
+    settingsDocumentKey(otherCenter, "organization"),
+  );
+  expect(settingsDocumentKey(scope, "center")).not.toEqual(
+    settingsDocumentKey(otherCenter, "center"),
+  );
+  expect(settingsDocumentKey(scope, "organization")).not.toEqual(
+    settingsDocumentKey(scope, "center"),
+  );
+});
+it("marks effective center policy variants stale for an organization policy write", async () => {
+  const queries = new QueryClient();
+  const affected = [
+    settingsPoliciesKey(scope, "organization"),
+    settingsPoliciesKey(scope, "center"),
+    settingsPoliciesKey({ ...scope, centerId: id(4) }, "center"),
+  ];
+  const otherOrganization = settingsPoliciesKey({ ...scope, orgId: id(5) }, "center");
+  const otherAccount = settingsPoliciesKey({ ...scope, accountId: id(6) }, "center");
+  for (const key of [...affected, otherOrganization, otherAccount]) queries.setQueryData(key, []);
+  await invalidateSettingsPolicyViews(queries, scope, "organization");
+  for (const key of affected) expect(queries.getQueryState(key)?.isInvalidated).toBe(true);
+  for (const key of [otherOrganization, otherAccount])
+    expect(queries.getQueryState(key)?.isInvalidated).toBe(false);
+  queries.clear();
+});
 const at = "2026-11-17T12:00:00Z";
 const publicFields = ["name", "contact"];
 const proof = {
