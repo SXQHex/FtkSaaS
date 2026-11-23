@@ -9,7 +9,16 @@ const { check, signup, account, assurance, session } = vi.hoisted(() => ({
   session: vi.fn(),
 }));
 vi.mock("../../lib/public-gateway", () => ({ checkSignup: check }));
-vi.mock("../../lib/account", () => ({ readAccount: account }));
+vi.mock("../../lib/account", () => ({
+  readAccount: (
+    ...[includePlatformScope, bearer, signal]: Parameters<
+      typeof import("../../lib/account").readAccount
+    >
+  ) => {
+    signal?.throwIfAborted();
+    return account(includePlatformScope, bearer);
+  },
+}));
 vi.mock("../../lib/supabase", () => ({
   getSupabaseClient: () => ({
     auth: {
@@ -121,11 +130,7 @@ it("shares the verified immediate-signup account with its route and drops prior 
   queries.setQueryData(["workspace", "prior-account", null], { private: true });
   expect(await registerAccount(values, queries)).toBe("/account");
   await loadPlatformAccount({ context: { queryClient: queries, authUserId: "signup-user" } });
-  expect(account).toHaveBeenCalledExactlyOnceWith(
-    true,
-    "signup-native-token",
-    expect.any(AbortSignal),
-  );
+  expect(account).toHaveBeenCalledExactlyOnceWith(true, "signup-native-token");
   expect(queries.getQueryData(accountQueryKeys.projection("signup-user", true))).toEqual({
     id: "signup-account",
   });
@@ -195,11 +200,7 @@ it("rejects a same-user session change while the signup account response is pend
   });
   const queries = new QueryClient();
   await expect(registerAccount(values, queries)).rejects.toThrow("ACCOUNT_CHANGED");
-  expect(account).toHaveBeenCalledExactlyOnceWith(
-    true,
-    original.access_token,
-    expect.any(AbortSignal),
-  );
+  expect(account).toHaveBeenCalledExactlyOnceWith(true, original.access_token);
   expect(queries.getQueryData(accountQueryKeys.projection("signup-user", true))).toBeUndefined();
 });
 
@@ -219,9 +220,5 @@ it("accepts a normal token refresh in the originating signup session and shares 
   expect(await registerAccount(values, queries)).toBe("/account");
   await loadPlatformAccount({ context: { queryClient: queries, authUserId: "signup-user" } });
   expect(assurance).toHaveBeenCalledExactlyOnceWith(original.access_token);
-  expect(account).toHaveBeenCalledExactlyOnceWith(
-    true,
-    refreshed.access_token,
-    expect.any(AbortSignal),
-  );
+  expect(account).toHaveBeenCalledExactlyOnceWith(true, refreshed.access_token);
 });

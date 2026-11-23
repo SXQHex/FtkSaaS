@@ -17,8 +17,24 @@ const { range, instructors, participants, room } = vi.hoisted(() => ({
 }));
 vi.mock("../schedule/schedule-read", () => ({ readScheduleRange: range }));
 vi.mock("../session-detail/session-detail-read", () => ({
-  readAssignedSessionInstructors: instructors,
-  readSessionParticipants: participants,
+  readSessionInstructors: instructors,
+  readSessionParticipants: async (
+    ...[scope, sessionId, personId, cursor, context, select]: Parameters<
+      typeof import("../session-detail/session-detail-read").readSessionParticipants
+    >
+  ) => {
+    const page = (await participants(
+      scope,
+      sessionId,
+      personId,
+      cursor,
+      ...(context ? [context] : []),
+    )) as { items: ReturnType<typeof row>[]; next_cursor: string | null };
+    if (!select) return page;
+    const selected = select(page.items.map(({ reservation }) => reservation));
+    const ids = new Set(selected.map(({ id }) => id));
+    return { ...page, items: page.items.filter(({ reservation }) => ids.has(reservation.id)) };
+  },
 }));
 vi.mock("../studio/studio", () => ({ readStudioResource: room }));
 const id = (n: number) => `019ab7b0-0000-7000-8000-${String(n).padStart(12, "0")}`,
@@ -67,26 +83,6 @@ const row = (n: number, state: ReservationView["state"] = "active") => ({
   },
   person: undefined,
 });
-function previewPage(items: ReturnType<typeof row>[], next_cursor: string | null) {
-  participants.mockImplementationOnce(
-    (
-      _scope,
-      _sessionId,
-      _personId,
-      _cursor,
-      _context,
-      select: (items: ReservationView[]) => ReservationView[],
-    ) => {
-      const selected = new Set(
-        select(items.map(({ reservation }) => reservation)).map(({ id }) => id),
-      );
-      return Promise.resolve({
-        items: items.filter(({ reservation }) => selected.has(reservation.id)),
-        next_cursor,
-      });
-    },
-  );
-}
 beforeEach(() => {
   range.mockReset();
   instructors.mockReset();
@@ -124,47 +120,26 @@ it("reads one local day and preserves native lifecycle instead of completing pas
   expect(result.sessions.map((r) => r.session.id)).toEqual([id(8), session.id]);
   expect(result.sessions[0]?.session.state).toBe("planned");
   expect(result.nextId).toBe(session.id);
-  expect(range).toHaveBeenCalledWith(
-    scope,
-    {
-      starts_at: "2026-11-15T21:00:00Z",
-      ends_at: "2026-11-16T21:00:00Z",
-    },
-    undefined,
-    undefined,
-    undefined,
-    { includeRoomLabels: true },
-  );
+  expect(range).toHaveBeenCalledWith(scope, {
+    starts_at: "2026-11-15T21:00:00Z",
+    ends_at: "2026-11-16T21:00:00Z",
+  });
 });
-it("uses safe assigned room labels and deduplicates person reads across the native session projections", async () => {
-  const instructor = { person_id: id(7), duty: "instructor" as const };
-  const native = {
-    ...entry,
-    session: {
-      ...session,
-      assignments: [instructor],
-      room_labels: [{ room_id: id(6), name: "Atanmış salon" }],
-    },
-  };
-  instructors.mockResolvedValue([{ id: id(7), person: { display_name: "Eğitmen" } }]);
-  const labels = await readOverviewLabels(scope, [
-    native,
-    {
-      ...native,
-      session: { ...native.session, id: id(8) },
-    },
+it("uses safe assigned room labels and refuses a different session version", async () => {
+  instructors.mockResolvedValue({
+    session: { ...session, room_labels: [{ room_id: id(6), name: "Atanmış salon" }] },
+    instructors: [],
+  });
+  expect((await readOverviewLabels(scope, [entry])).get(session.id)?.rooms).toEqual([
+    "Atanmış salon",
   ]);
-  expect(labels.get(session.id)).toEqual({ rooms: ["Atanmış salon"], instructors: ["Eğitmen"] });
-  expect(labels.get(id(8))).toEqual(labels.get(session.id));
   expect(room).not.toHaveBeenCalled();
-  expect(instructors).toHaveBeenCalledExactlyOnceWith(
-    scope,
-    { assignments: [instructor, instructor] },
-    undefined,
-  );
+  expect(instructors).toHaveBeenCalledWith(scope, session.id, true);
+  instructors.mockResolvedValue({ session: { ...session, version: 3 }, instructors: [] });
+  await expect(readOverviewLabels(scope, [entry])).rejects.toThrow("OVERVIEW_SESSION_CHANGED");
 });
 it("restricted room labels stay unknown while transport failure remains an error", async () => {
-  instructors.mockResolvedValue([]);
+  instructors.mockResolvedValue({ session, instructors: [] });
   room.mockRejectedValue(
     new BackendError({ code: "FORBIDDEN", retryable: false, trace_id: id(10) }),
   );
@@ -176,27 +151,25 @@ it("restricted room labels stay unknown while transport failure remains an error
   await expect(readOverviewLabels(scope, [entry])).rejects.toThrow();
 });
 it("previews at most three native registered members, following only the selected session cursor", async () => {
-  previewPage([row(20, "cancelled")], "next");
-  previewPage([row(21), row(22, "completed"), row(23), row(24)], "unneeded");
+  participants
+    .mockResolvedValueOnce({ items: [row(20, "cancelled")], next_cursor: "next" })
+    .mockResolvedValueOnce({
+      items: [row(21), row(22), row(23), row(24)],
+      next_cursor: "unneeded",
+    });
   const result = await readOverviewParticipants(scope, session.id);
   expect(result.map((r) => r.reservation.id)).toEqual([id(21), id(22), id(23)]);
   expect(participants).toHaveBeenCalledTimes(2);
-  expect(participants).toHaveBeenLastCalledWith(
-    scope,
-    session.id,
-    undefined,
-    "next",
-    undefined,
-    expect.any(Function),
-  );
+  expect(participants).toHaveBeenLastCalledWith(scope, session.id, undefined, "next");
 });
 it("shares the owning Query context through overview sources and subsequent cursor reads", async () => {
   const context = { client: new QueryClient(), signal: new AbortController().signal };
   range.mockResolvedValue({ entries: [entry], reads: [] });
-  instructors.mockResolvedValue([]);
+  instructors.mockResolvedValue({ session, instructors: [] });
   room.mockResolvedValue({ name: "Atanmış salon" });
-  previewPage([row(21)], "next");
-  previewPage([row(22)], null);
+  participants
+    .mockResolvedValueOnce({ items: [row(21)], next_cursor: "next" })
+    .mockResolvedValueOnce({ items: [row(22)], next_cursor: null });
 
   await readOverviewDay(scope, "Europe/Istanbul", "2026-11-16T12:00:00Z", context);
   await readOverviewLabels(scope, [entry], context);
@@ -209,34 +182,18 @@ it("shares the owning Query context through overview sources and subsequent curs
       ends_at: "2026-11-16T21:00:00Z",
     },
     undefined,
-    context.signal,
+    undefined,
     context,
-    { includeRoomLabels: true },
   );
-  expect(instructors).toHaveBeenCalledExactlyOnceWith(scope, { assignments: [] }, context);
+  expect(instructors).toHaveBeenCalledExactlyOnceWith(scope, session.id, true, context);
   expect(room).toHaveBeenCalledExactlyOnceWith(scope, "room", id(6), context);
-  expect(participants).toHaveBeenNthCalledWith(
-    1,
-    scope,
-    session.id,
-    undefined,
-    undefined,
-    context,
-    expect.any(Function),
-  );
-  expect(participants).toHaveBeenNthCalledWith(
-    2,
-    scope,
-    session.id,
-    undefined,
-    "next",
-    context,
-    expect.any(Function),
-  );
+  expect(participants).toHaveBeenNthCalledWith(1, scope, session.id, undefined, undefined, context);
+  expect(participants).toHaveBeenNthCalledWith(2, scope, session.id, undefined, "next", context);
 });
 it("rejects repeated native reservation evidence across preview pages", async () => {
-  previewPage([row(21)], "next");
-  previewPage([row(21)], null);
+  participants
+    .mockResolvedValueOnce({ items: [row(21)], next_cursor: "next" })
+    .mockResolvedValueOnce({ items: [row(21)], next_cursor: null });
   await expect(readOverviewParticipants(scope, session.id)).rejects.toThrow(
     "OVERVIEW_PARTICIPANTS_UNAVAILABLE",
   );

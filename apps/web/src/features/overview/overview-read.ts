@@ -4,7 +4,7 @@ import { getTemporal } from "../../lib/temporal";
 import type { ClientScope, AccountReadContext } from "../../lib/scoped-backend";
 import { readScheduleRange, type ScheduleReadItem } from "../schedule/schedule-read";
 import {
-  readAssignedSessionInstructors,
+  readSessionInstructors,
   readSessionParticipants,
 } from "../session-detail/session-detail-read";
 import { readStudioResource } from "../studio/studio";
@@ -36,9 +36,9 @@ export async function readOverviewDay(
   context?: AccountReadContext,
 ) {
   const period = await overviewDay(timezone, now),
-    result = await readScheduleRange(scope, period.interval, undefined, context?.signal, context, {
-      includeRoomLabels: true,
-    });
+    result = context
+      ? await readScheduleRange(scope, period.interval, undefined, undefined, context)
+      : await readScheduleRange(scope, period.interval);
   const sessions = result.entries
     .filter((r): r is OverviewSession => r.type === "session")
     .sort(
@@ -74,30 +74,27 @@ export async function readOverviewLabels(
     }
     return value;
   }
-  if (!sessions.length) return result;
-  const assigned = await readAssignedSessionInstructors(
-    scope,
-    { assignments: sessions.flatMap(({ session }) => session.assignments) },
-    context,
-  );
-  const instructors = new Map(assigned.map((row) => [row.id, row.person?.display_name]));
   for (let index = 0; index < sessions.length; index += 4)
     await Promise.all(
-      sessions.slice(index, index + 4).map(async ({ session, item }) => {
-        const nativeRooms = session.room_labels?.map((r) => r.name) ?? [];
+      sessions.slice(index, index + 4).map(async (before) => {
+        const fresh = await readSessionInstructors(
+          scope,
+          before.session.id,
+          true,
+          ...(context ? ([context] as const) : []),
+        );
+        if (fresh.session.version !== before.session.version)
+          throw Error("OVERVIEW_SESSION_CHANGED");
+        const nativeRooms = fresh.session.room_labels?.map((r) => r.name) ?? [];
         const names = nativeRooms.length
           ? nativeRooms
           : await Promise.all(
-              (item.resources?.filter((r) => r.kind === "room") ?? []).map((r) => roomName(r.id)),
+              (before.item.resources?.filter((r) => r.kind === "room") ?? []).map((r) =>
+                roomName(r.id),
+              ),
             );
-        const ids = new Set(
-          session.assignments.filter((r) => r.duty === "instructor").map((r) => r.person_id),
-        );
-        result.set(session.id, {
-          instructors: [...ids].flatMap((id) => {
-            const name = instructors.get(id);
-            return name === undefined ? [] : [name];
-          }),
+        result.set(before.session.id, {
+          instructors: fresh.instructors.flatMap((r) => (r.person ? [r.person.display_name] : [])),
           rooms: names.filter((name): name is string => name !== null),
         });
       }),

@@ -128,6 +128,7 @@ test("reports bind all real sections, immutable product names, exact currencies 
       .filter((row) => row.op === "report_get_v1")
       .every((row) => row.r.center_id === I.center && row.r.filters.center_ids.length === 1),
   ).toBe(true);
+  expect(f.requests.some((row) => row.op === "finance_directory_get_v1")).toBe(true);
   expect(requestsFor(f.requests, "finance_directory_get_v1")).toEqual([
     expect.objectContaining({
       r: expect.objectContaining({ page: { limit: 1, sort: "created_at_asc" } }),

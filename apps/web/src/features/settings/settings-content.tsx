@@ -100,9 +100,7 @@ export function SettingsContent({
       </div>
     );
   const organizationCatalog =
-    canReadOrganizationCatalog && !catalog.isError && catalog.data?.state === "known"
-      ? catalog.data.catalog
-      : undefined;
+    canReadOrganizationCatalog && !catalog.isError ? catalog.data : undefined;
   const canOrganization = Boolean(organizationCatalog);
   const canWriteOrganization =
     organizationCatalog?.fields.some((field) => field.key === "address" && field.writable) === true;

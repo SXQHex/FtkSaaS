@@ -244,10 +244,9 @@ export async function readSettingsDocument(
     level === "organization" && readContext
       ? readContext.client
           .fetchQuery(readOrganizationSettingsCatalogQuery(scope))
-          .then((source) => {
+          .then((catalog) => {
             readContext.signal.throwIfAborted();
-            if (source.state === "forbidden") throw source.error;
-            return source.catalog;
+            return catalog;
           })
       : backend.call("settings_catalog_get_v1", { ...common(scope, level), request_id: uuidv7() }),
     backend.call("settings_get_v1", { ...common(scope, level), request_id: uuidv7() }),

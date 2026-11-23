@@ -1,4 +1,5 @@
 import { v7 as uuidv7 } from "uuid";
+import { readScheduleSession } from "../schedule/schedule-read";
 import { z } from "zod";
 import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
@@ -202,6 +203,19 @@ export async function readAssignedSessionInstructors(
         .map(async (id) => people.set(id, await visiblePerson(backend, scope, id))),
     );
   return ids.map((id) => ({ id, person: people.get(id) }));
+}
+
+export async function readSessionInstructors(
+  scope: ClientScope,
+  sessionId: string,
+  includeRoomLabels = false,
+  readContext?: AccountReadContext,
+) {
+  const session = await readScheduleSession(scope, sessionId, includeRoomLabels, readContext);
+  return {
+    session,
+    instructors: await readAssignedSessionInstructors(scope, session, readContext),
+  };
 }
 
 export async function readPersonSessionWaitlist(

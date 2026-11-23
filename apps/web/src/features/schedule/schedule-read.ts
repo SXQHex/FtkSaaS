@@ -79,7 +79,7 @@ export async function readScheduleRange(
   filters: { roomId?: string; instructorId?: string } = {},
   signal?: AbortSignal,
   readContext?: AccountReadContext,
-  projection: { includeRoomLabels?: boolean; sessionsStartingAfter?: number } = {},
+  projection: { sessionsStartingAfter?: number } = {},
 ): Promise<{
   entries: ScheduleReadItem[];
   reads: { resource: ResourceRef | null; asOf: string[] }[];
@@ -169,7 +169,6 @@ export async function readScheduleRange(
                 org_id: scope.orgId,
                 center_id: scope.centerId,
                 session_id: item.id,
-                ...(projection.includeRoomLabels ? { include_room_labels: true } : {}),
               },
               signal,
             ),

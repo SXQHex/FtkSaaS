@@ -44,7 +44,6 @@ export async function refreshStudioRooms(queries: QueryClient, scope: StudioScop
       ["settings-subscription", scope.accountId, scope.orgId],
       scheduleCacheKeys.instructorCalendar(scope),
       scheduleCacheKeys.instructorSession(scope),
-      scheduleCacheKeys.overview(scope),
       scheduleCacheKeys.overviewLabels(scope),
       ["member-classes", ...tenant],
       ["member-reservations", ...tenant],

@@ -1,7 +1,6 @@
 import { QueryClient, QueryObserver } from "@tanstack/react-query";
 import { expect, it, vi } from "vitest";
 import { refreshStudioRooms, studioRoomQuery, studioRoomsQuery } from "./studio-rooms-query";
-import { scheduleCacheKeys } from "../schedule/schedule-cache";
 import { readStudioResource, readStudioRooms, type RoomRecord } from "./studio";
 
 vi.mock("./studio", () => ({ readStudioRooms: vi.fn(), readStudioResource: vi.fn() }));
@@ -13,7 +12,6 @@ it("refreshes the room catalogue once and marks each scoped room label consumer 
   const catalogue = studioRoomsQuery(scope).queryKey;
   const affected = [
     studioRoomQuery(queries, scope, "room-a").queryKey,
-    [...scheduleCacheKeys.overview(scope), "timezone"],
     ["instructor-calendar", ...tenant, "teacher", "week"],
     ["instructor-session", ...tenant, "teacher", "session"],
     ["overview-labels", ...tenant, [["session", 1]]],
