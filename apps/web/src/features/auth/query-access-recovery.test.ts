@@ -169,7 +169,9 @@ describe("M06: cross-feature access reconciliation", () => {
 
   it("fails closed if native workspace cannot be revalidated", async () => {
     const { queries, actions } = fixture();
-    workspaceRead.mockRejectedValue(error("SESSION_REVOKED"));
+    workspaceRead.mockImplementationOnce(() => {
+      throw error("SESSION_REVOKED");
+    });
     await reconcileQueryAccessFailure(
       queries,
       ["leads", accountId, orgId],
@@ -208,6 +210,22 @@ describe("M06: cross-feature access reconciliation", () => {
     expect(actions.showLogin).not.toHaveBeenCalled();
     expect(actions.onChecking).toHaveBeenNthCalledWith(1, true);
     expect(actions.onChecking).toHaveBeenLastCalledWith(false);
+    stop();
+  });
+
+  it("detects revocation when a selected Query was first seeded from automatic workspace data", async () => {
+    const { queries, actions } = fixture();
+    queries.removeQueries({ queryKey: workspaceKeys.projection(accountId, orgId), exact: true });
+    queries.setQueryData(workspaceKeys.projection(accountId), view());
+    const stop = observeQueryAccessFailures(queries, actions);
+    workspaceRead.mockResolvedValue(view({ manager: false, accessible: false }));
+    await queries.fetchQuery({
+      ...workspaceQuery(queries, accountId, orgId),
+      staleTime: 0,
+    });
+    await vi.waitFor(() => expect(actions.invalidateRoute).toHaveBeenCalledOnce());
+    expect(queries.getQueryData(["leads", accountId, orgId, centerId, "first-page"])).toBeUndefined();
+    expect(actions.showLogin).not.toHaveBeenCalled();
     stop();
   });
 
