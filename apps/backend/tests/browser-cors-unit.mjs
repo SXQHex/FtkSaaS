@@ -77,3 +77,58 @@ test('Edge rejects malformed Auth users, JWT claims and RPC output without expos
   assert(!JSON.stringify(invalid.body).includes('private_marker'));
  }finally{globalThis.fetch=originalFetch;globalThis.Deno=originalDeno;}
 });
+
+test('Edge file completion validates pending Storage context with no persisted checksum and forwards observed byte hash',async()=>{
+ const {build}=await import('esbuild');
+ const {createHash}=await import('node:crypto');
+ const compiled=await build({entryPoints:['supabase/functions/backend-v1/handler.ts'],bundle:true,platform:'browser',format:'esm',write:false});
+ const originalDeno=globalThis.Deno,originalFetch=globalThis.fetch;
+ const id='019b0010-1111-7000-8000-000000000001',person='019b0010-1111-7000-8000-000000000002',file='019b0010-1111-7000-8000-000000000003';
+ const bytes=new TextEncoder().encode('synthetic private document bytes');
+ const sha=createHash('sha256').update(bytes).digest('hex');
+ const token='header.'+Buffer.from(JSON.stringify({sub:person,session_id:id,aal:'aal1'})).toString('base64url')+'.signature';
+ const env={FTK_BROWSER_ORIGINS:'https://spa.ftksaas.invalid',SUPABASE_URL:'https://example.supabase.invalid',SUPABASE_SERVICE_ROLE_KEY:'synthetic-only'};
+ let handler;
+ const phases=[],storage=[];
+ let state='pending_upload';
+ try{
+  globalThis.Deno={serve:callback=>{handler=callback;},env:{get:name=>env[name]}};
+  globalThis.fetch=async(url,options)=>{
+   if(url.endsWith('/auth/v1/user'))return Response.json({id:person});
+   if(url.endsWith('/rest/v1/rpc/file_upload_complete_v1')){
+    const {p_aux}=JSON.parse(options.body);phases.push(p_aux);
+    if(p_aux.phase==='storage_context')return Response.json({_internal_storage:{
+     object_key:id+'/'+file,bytes:bytes.length,mime:'text/plain',checksum:null,state
+    }});
+    return Response.json({ok:false,error:{code:'VALIDATION_FAILED',retryable:false,trace_id:id}});
+   }
+   if(url.endsWith('/storage/v1/object/authenticated/ftksaas-documents/'+id+'/'+file)){
+    storage.push(url);return new Response(bytes,{headers:{'content-type':'text/plain'}});
+   }
+   throw Error('UNEXPECTED_UPSTREAM');
+  };
+  await import('data:text/javascript;base64,'+Buffer.from(compiled.outputFiles[0].text).toString('base64')+'#pending-storage-context');
+  const request=new Request('https://edge.invalid/functions/v1/backend-v1/file_upload_complete_v1',{
+   method:'POST',headers:{origin:'https://spa.ftksaas.invalid',authorization:'Bearer '+token},
+   body:JSON.stringify({client_api_version:1,request_id:id,operation_key:id,org_id:id,file_id:file,checksum:sha})
+  });
+  const response=await handler(request);
+  const body=await response.json();
+  assert.equal(response.status,200,JSON.stringify(body));
+  assert.equal(body.error.code,'VALIDATION_FAILED');
+  assert.equal(storage.length,1);
+  assert.equal(phases.length,2);
+  assert.equal(phases[1].storage_verified,true);
+  assert.equal(phases[1].checksum,sha);
+  assert.equal(phases[1].object_key,id+'/'+file);
+  // A ready row without a persisted checksum must never bypass byte verification.
+  state='ready';
+  const invalid=await handler(new Request(request.url,{method:'POST',headers:request.headers,
+   body:JSON.stringify({client_api_version:1,request_id:id,operation_key:id,org_id:id,file_id:file,checksum:sha})}));
+  const rejected=await invalid.json();
+  assert.equal(invalid.status,500,JSON.stringify(rejected));
+  assert.equal(rejected.error.code,'INTEGRITY_VIOLATION');
+  assert.equal(phases.length,3,'invalid ready state must not reach the mutation RPC');
+  assert.equal(storage.length,1);
+ }finally{globalThis.Deno=originalDeno;globalThis.fetch=originalFetch;}
+});

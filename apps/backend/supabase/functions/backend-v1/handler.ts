@@ -28,10 +28,11 @@ function isImage(value:unknown):value is Parameters<typeof verifySettingsImage>[
  return isRecord(value)&&typeof value.mime==='string'&&['image/png','image/jpeg','image/webp'].includes(value.mime)&&
   typeof value.data_base64==='string'&&typeof value.checksum==='string';
 }
-type FileMeta={object_key:string;bytes:number;mime:string;checksum:string;state?:string;purpose?:string;published?:boolean;max_rows?:number};
+// The native file row has no checksum until successful Storage verification.
+type FileMeta={object_key:string;bytes:number;mime:string;checksum:string|null;state?:string;purpose?:string;published?:boolean;max_rows?:number};
 function isFileMeta(value:unknown):value is FileMeta{
  return isRecord(value)&&typeof value.object_key==='string'&&typeof value.bytes==='number'&&Number.isSafeInteger(value.bytes)&&
-  value.bytes>0&&value.bytes<=2097152&&typeof value.mime==='string'&&typeof value.checksum==='string'&&/^[a-f0-9]{64}$/.test(value.checksum)&&
+  value.bytes>0&&value.bytes<=2097152&&typeof value.mime==='string'&&(value.checksum===null||typeof value.checksum==='string'&&/^[a-f0-9]{64}$/.test(value.checksum))&&
   (value.state===undefined||typeof value.state==='string')&&
   (value.purpose===undefined||typeof value.purpose==='string')&&
   (value.published===undefined||typeof value.published==='boolean')&&
@@ -193,14 +194,21 @@ const handleRequest=async(req:Request):Promise<Response>=>{
    }
    const meta=context._internal_storage;
    if(!isFileMeta(meta))return failure('INTEGRITY_VIOLATION',500);
-   if(meta.state==='ready')invite={storage_verified:true,object_key:meta.object_key,bytes:meta.bytes,mime:meta.mime,checksum:meta.checksum};
-   else{
+   if(meta.state==='ready'){
+    if(meta.checksum===null)return failure('INTEGRITY_VIOLATION',500);
+    invite={storage_verified:true,object_key:meta.object_key,bytes:meta.bytes,mime:meta.mime,checksum:meta.checksum};
+   }else if(meta.state==='pending_upload'){
     try{
-     if(meta.purpose==='import'){await imports.read(meta);invite={storage_verified:true,object_key:meta.object_key,bytes:meta.bytes,mime:meta.mime,checksum:meta.checksum};}
-     else{const file=await storage.download(meta.object_key,{bytes:meta.bytes,mime:meta.mime});invite={storage_verified:true,object_key:meta.object_key,bytes:file.size,mime:file.mime,checksum:file.checksum};}
-    }
-    catch{return failure('VALIDATION_FAILED');}
-   }
+     if(meta.purpose==='import'){
+      if(meta.checksum===null)return failure('INTEGRITY_VIOLATION',500);
+      await imports.read({...meta,checksum:meta.checksum});
+      invite={storage_verified:true,object_key:meta.object_key,bytes:meta.bytes,mime:meta.mime,checksum:meta.checksum};
+     }else{
+      const file=await storage.download(meta.object_key,{bytes:meta.bytes,mime:meta.mime});
+      invite={storage_verified:true,object_key:meta.object_key,bytes:file.size,mime:file.mime,checksum:file.checksum};
+     }
+    }catch{return failure('VALIDATION_FAILED');}
+   }else return failure('INTEGRITY_VIOLATION',500);
   }
   const rpcContext=async(aux:unknown)=>{
    const r=await fetch(base+'/rest/v1/rpc/'+operation,{method:'POST',headers:{authorization:'Bearer '+key,apikey:key,'content-type':'application/json','Content-Profile':'api_v1'},body:JSON.stringify({p_request:request,p_actor_auth_id:user.id,p_session_id:claims.session_id,p_ids:Array.from({length:count},()=>v7()),p_aux:{...(isRecord(aux)?aux:{}),...authAux}})});
@@ -226,8 +234,9 @@ const handleRequest=async(req:Request):Promise<Response>=>{
     const code=isRecord(context.error)?context.error.code:undefined;
     return json(context,publishing?200:code==='NOT_FOUND'?404:code==='AUTH_REQUIRED'||code==='SESSION_REVOKED'?401:403,true);
    }
-   if(!isFileMeta(context._internal_invoice))return failure('INTEGRITY_VIOLATION',500);
-   const {object_key,...meta}=context._internal_invoice;
+   const invoiceMeta=context._internal_invoice;
+   if(!isFileMeta(invoiceMeta)||invoiceMeta.checksum===null||typeof invoiceMeta.published!=='boolean')return failure('INTEGRITY_VIOLATION',500);
+   const object_key=invoiceMeta.object_key,meta={bytes:invoiceMeta.bytes,mime:invoiceMeta.mime,checksum:invoiceMeta.checksum,published:invoiceMeta.published};
    const invoices=documentStorage(base,key,fetch,'ftksaas-invoices');
    if(publishing){
     if(!meta.published){

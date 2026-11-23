@@ -313,8 +313,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "8d29ef60ccd728d9c2a61002ca7c3ac366023c21ad00563ff75b43e76283d302",
-        "reason": "BT01 Edge request response validation and private RPC safeguards reviewed without contract change"
+        "fingerprint": "fc698860a169d623585327b927c8bf9b53e9dbc45fbbca51aa2e28060e86cbde",
+        "reason": "BT01 pending checksum context guard and native Edge test reviewed; API suite fingerprint and complete split line coverage independently verified"
       }
     },
     {
@@ -1017,8 +1017,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "50db31bc17cf6e7978f53f36d8e8df6a3798511839f805a65ce673dc67d8c9c3",
-        "reason": "Rezervasyon ve kapasite istisnası açık satışın gerçek seans kapsamını borçlanma öncesi doğrular. Yerel hak ve borçlanma senaryoları eklendi."
+        "fingerprint": "b7614321f5c1877c49a63b6f6d6ac07e9414e446cd1fb353d591fb0df0dc7c30",
+        "reason": "Cross-center settlement fixture deterministic source and lesson slots reviewed; no booking conflict permission or assertion relaxation"
       }
     },
     {
@@ -2007,8 +2007,8 @@
         "platform_operator_access_set_v1"
       ],
       "review": {
-        "fingerprint": "9678c888d599a2f50bc02445d99d1c9065ebbb06f8a1d7b6c907addb5f680c00",
-        "reason": "BT01 kaynak incelemesi: Edge TypeScript, onayli JSON/RPC/Auth/providercode reddi ve mevcut WF sozlesmesi korunuyor."
+        "fingerprint": "04713f488f5d7d4b3a4335e72f7c9b651d611a1a88b478e685237e65550e3465",
+        "reason": "Pending document checksum null allowed only before Storage proof; ready and invoice require verified SHA checksum"
       }
     },
     {
@@ -2040,8 +2040,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "41b1c9cf20533037fb8814529cff155a4933b99cd8463dd159f072a1b54f55b0",
-        "reason": "Ortak merkezler arası kabul kaynağı B kapsamındaki A satışının hak ayırmasını ve kaynak seçilmeden borçlanmayı doğrular."
+        "fingerprint": "8c6a2766af3b4d94ecb7713c80c6aacc7faaba49bca1cb4662a92edc891dbbcf",
+        "reason": "Cross-center source scope fixture previously overlapped on UTC minute 41-59; common hour slot and negative test now prevent this"
       }
     },
     {

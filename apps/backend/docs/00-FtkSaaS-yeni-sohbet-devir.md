@@ -3,6 +3,11 @@
 <a id="bt01-edge-tip-kabul-adayi"></a>
 ## BT01 — Edge TypeScript ve dış veri sınırı aday kabulü
 
+
+**PR #391 ilk aday sonucu:** [45095988123](https://github.com/SXQHex/FtkSaaS/actions/runs/45095988123) koşusunda quality, clean/core ve sekiz API shard geçti; api-1/api-7/api-10 belge yükleme (pending dosyada `checksum:null` iken erken bütünlük reddi), api-6 ise sentetik seans saatleri (aynı eğitmen üzerinde çakışan zamanlar) nedeniyle başarısız oldu. Ortak `file_upload_complete_v1` sınırında gerçek Storage dosyası doğrulanmadan kalıcı checksum beklenmesi yanlıştı. Düzeltme pending durumda özel Storage'dan bayt/gerçek SHA-256 okuyarak doğrulamayı sürdürür; ready dosya ve fatura checksum kontrolünü korur. Negatif test önce hatayı yeniden üretti; ardından pending başarı yolu ve eksik ready checksum reddi geçti. Api-6 fixture aynı UTC saat slotu üzerinden bağlandı; çakışma regresyonu önce başarısız, sonra başarılı oldu, native kaynak çatışması kuralı değişmedi. Değişen bölünmüş test dosyası için `api-suites.json` kaynak SHA ve yedi parçanın tam satır kapsamı yeniden denetlendi; assertion/test kapısı daraltılmadı.
+
+**Düzeltme yerel kontrolü:** Node 24.22.1 / pnpm 12.15.0 ile backend `verify` 144/144, etkilenen Edge unit 45/45, `check:quality` 10/10 (0 bulgu), `typecheck`, Edge bundle/validator `--check` ve workflow `docs:check` başarılı. Bunlar **yeni aday CI sonucu değildir**; ikinci PR aday full clean, merge ve development kaynağa bağlı kabulü açık kalır.
+
 Kaynak tabanı: \`e23c9daa5002bfe5510a919d752c9033a6a1edf9\` (\`main\`, BT01/1 PR #390 sonrası). BT01/1'in [kaynak envanteri](#bt01-edge-kaynak-taramasi) korunur; aşağıdaki sonuçlar **bu adayın yerel kaynak/test aşamasıdır**, henüz PR CI/merge/development/hosted kabulü değildir.
 
 - Backend \`tsconfig.json\` statik denetimi: \`backend-v1\` (generated \`index.ts\` hariç), \`resend-webhook\`, \`personal-calendar\` girişleri, native Deno tipleri, \`.ts\` importları ve \`.mjs\` transport tip bildirimleri. \`tests/types.test.ts\` içindeki iki kasıtlı \`@ts-expect-error\` korunur. Kaynak tipleri tek backend \`pnpm typecheck\`/\`verify\` üzerinden denetlenir; tip kontrolünü aşan \`any\` veya yeni susturma yok.
