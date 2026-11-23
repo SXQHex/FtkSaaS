@@ -56,7 +56,7 @@ describe("shared account projections", () => {
     expect(a).toBe(b);
     expect(a.id).toBe("account-a");
     expect(reader).toHaveBeenCalledTimes(1);
-    expect(reader).toHaveBeenCalledWith(false, "native-fixture");
+    expect(reader).toHaveBeenCalledWith(false, "native-fixture", expect.any(AbortSignal));
     expect(queries.getQueryData(accountQueryKeys.projection("native-a"))).toBe(a);
   });
 
@@ -96,7 +96,7 @@ describe("shared account projections", () => {
     await invalidateAccountProjections(queries);
     expect(await verifiedAccountForId(queries, "account-a")).toMatchObject({ id: "account-a" });
     expect(reader).toHaveBeenCalledTimes(2);
-    expect(reader).toHaveBeenNthCalledWith(2, true, "native-fixture");
+    expect(reader).toHaveBeenNthCalledWith(2, true, "native-fixture", expect.any(AbortSignal));
     expect(queries.getQueryData(accountQueryKeys.projection("native-a"))).toBeUndefined();
   });
 
@@ -107,7 +107,7 @@ describe("shared account projections", () => {
     await invalidateAccountProjections(queries);
     await verifiedAccountForId(queries, "account-a", true);
     expect(reader).toHaveBeenCalledTimes(3);
-    expect(reader).toHaveBeenNthCalledWith(3, true, "native-fixture");
+    expect(reader).toHaveBeenNthCalledWith(3, true, "native-fixture", expect.any(AbortSignal));
   });
 
   it("keeps a cold route waiting for the replacement account read when command refresh invalidates it", async () => {
@@ -333,7 +333,11 @@ describe("shared account projections", () => {
     const queries = new QueryClient();
     native.getSession.mockResolvedValueOnce(oldSession).mockResolvedValue(newSession);
     await expect(queries.query(accountQuery("native-a"))).rejects.toThrow("ACCOUNT_CHANGED");
-    expect(reader).toHaveBeenCalledWith(false, oldSession.data.session.access_token);
+    expect(reader).toHaveBeenCalledWith(
+      false,
+      oldSession.data.session.access_token,
+      expect.any(AbortSignal),
+    );
     expect(queries.getQueryData(accountQueryKeys.projection("native-a"))).toBeUndefined();
   });
 
@@ -362,7 +366,11 @@ describe("shared account projections", () => {
     native.getSession.mockResolvedValueOnce(original).mockResolvedValue(refreshed);
     const queries = new QueryClient();
     expect(await queries.query(accountQuery("native-a"))).toMatchObject({ id: "account-a" });
-    expect(reader).toHaveBeenCalledExactlyOnceWith(false, original.data.session.access_token);
+    expect(reader).toHaveBeenCalledExactlyOnceWith(
+      false,
+      original.data.session.access_token,
+      expect.any(AbortSignal),
+    );
   });
 
   it("rejects a late same-actor read when an opaque bearer rotates", async () => {

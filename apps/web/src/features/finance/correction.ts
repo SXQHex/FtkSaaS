@@ -36,11 +36,13 @@ async function movement(
   id: string,
   onFirstPage?: (view: Awaited<ReturnType<typeof readFinancePage>>) => void,
   firstPage?: Awaited<ReturnType<typeof readFinancePage>>,
+  signal?: AbortSignal,
 ) {
   const seen = new Set<string>();
   let cursor: string | undefined;
   do {
-    const data = (!cursor && firstPage) || (await readFinancePage(scope, selection, cursor));
+    const data =
+      (!cursor && firstPage) || (await readFinancePage(scope, selection, cursor, signal));
     if (!cursor) onFirstPage?.(data);
     const row = data.movements.items.find((x) => x.id === id);
     if (row) return { data, row };
@@ -54,9 +56,10 @@ export async function readCorrectionBase(
   scope: ClientScope,
   selection: FinanceSelection,
   id: string,
+  signal?: AbortSignal,
 ): Promise<CorrectionBase> {
   z.uuid().parse(id);
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, signal);
   const page = await backend.call("management_state_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
@@ -82,7 +85,7 @@ export async function readCorrectionBase(
     versions[0]!.version < 1
   )
     throw new Error("FINANCE_AUTHORITY_UNAVAILABLE");
-  const { row } = await movement(scope, selection, id);
+  const { row } = await movement(scope, selection, id, undefined, undefined, signal);
   if (row.kind !== "collection" || row.previous_id || row.currency !== selection.currency)
     throw new Error("FINANCE_SOURCE_UNAVAILABLE");
   return {

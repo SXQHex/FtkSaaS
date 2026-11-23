@@ -121,7 +121,11 @@ it("shares the verified immediate-signup account with its route and drops prior 
   queries.setQueryData(["workspace", "prior-account", null], { private: true });
   expect(await registerAccount(values, queries)).toBe("/account");
   await loadPlatformAccount({ context: { queryClient: queries, authUserId: "signup-user" } });
-  expect(account).toHaveBeenCalledExactlyOnceWith(true, "signup-native-token");
+  expect(account).toHaveBeenCalledExactlyOnceWith(
+    true,
+    "signup-native-token",
+    expect.any(AbortSignal),
+  );
   expect(queries.getQueryData(accountQueryKeys.projection("signup-user", true))).toEqual({
     id: "signup-account",
   });
@@ -191,7 +195,11 @@ it("rejects a same-user session change while the signup account response is pend
   });
   const queries = new QueryClient();
   await expect(registerAccount(values, queries)).rejects.toThrow("ACCOUNT_CHANGED");
-  expect(account).toHaveBeenCalledExactlyOnceWith(true, original.access_token);
+  expect(account).toHaveBeenCalledExactlyOnceWith(
+    true,
+    original.access_token,
+    expect.any(AbortSignal),
+  );
   expect(queries.getQueryData(accountQueryKeys.projection("signup-user", true))).toBeUndefined();
 });
 
@@ -211,5 +219,9 @@ it("accepts a normal token refresh in the originating signup session and shares 
   expect(await registerAccount(values, queries)).toBe("/account");
   await loadPlatformAccount({ context: { queryClient: queries, authUserId: "signup-user" } });
   expect(assurance).toHaveBeenCalledExactlyOnceWith(original.access_token);
-  expect(account).toHaveBeenCalledExactlyOnceWith(true, refreshed.access_token);
+  expect(account).toHaveBeenCalledExactlyOnceWith(
+    true,
+    refreshed.access_token,
+    expect.any(AbortSignal),
+  );
 });

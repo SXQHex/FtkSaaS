@@ -52,10 +52,15 @@ export const workCalendarSchema = z
 export type WorkCalendarValue = CenterWorkCalendar | null;
 const same = (a: WorkCalendarValue, b: WorkCalendarValue) =>
   JSON.stringify(workCalendarSchema.parse(a)) === JSON.stringify(workCalendarSchema.parse(b));
-export async function readWorkCalendar(scope: ClientScope, readContext?: AccountReadContext) {
-  const [source, context] = await Promise.all([
+export async function readWorkCalendar(
+  scope: ClientScope,
+  readContext?: AccountReadContext,
+  verifiedTimezone?: string,
+) {
+  const [source, timezone] = await Promise.all([
     readSettingsDocument(scope, "center", readContext),
-    readClosureContext(scope, readContext),
+    verifiedTimezone ??
+      readClosureContext(scope, readContext).then(({ center }) => center.timezone),
   ]);
   if (
     !Object.hasOwn(source.document.values, "work_calendar") ||
@@ -69,7 +74,7 @@ export async function readWorkCalendar(scope: ClientScope, readContext?: Account
     scope: { ...scope },
     calendar,
     version: source.document.version,
-    timezone: context.center.timezone,
+    timezone,
     writable: source.catalog.fields.some(
       (field) => field.key === "work_calendar" && field.writable,
     ),

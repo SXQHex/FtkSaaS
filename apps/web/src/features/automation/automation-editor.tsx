@@ -25,6 +25,7 @@ import {
   readAutomationReceipt,
   readAutomationResult,
   readSegments,
+  segmentPageQuery,
   readAutomationPreparations,
   resolveAutomationPreparation,
   type AutomationRecord,
@@ -85,13 +86,26 @@ export function AutomationEditor(props: AutomationEditorProps) {
     onLockChange(locked);
     return () => onLockChange(false);
   }, [locked, onLockChange]);
+  const firstChoice = useQuery({
+    ...segmentPageQuery(scope),
+    enabled: selection.kind === "automation",
+  });
+  const firstCursor = !firstChoice.isError
+    ? (firstChoice.data?.next_cursor ?? undefined)
+    : undefined;
   const choices = useInfiniteQuery({
-    queryKey: ["automation-segment-choices", scope.accountId, scope.orgId, scope.centerId],
+    queryKey: [
+      "automation-segment-choices",
+      scope.accountId,
+      scope.orgId,
+      scope.centerId,
+      firstCursor,
+    ],
     queryFn: (context) => readSegments(scope, undefined, context.pageParam, context),
-    initialPageParam: undefined as string | undefined,
+    initialPageParam: firstCursor,
     getNextPageParam: (page, _pages, _last, pageParams) =>
       page.next_cursor && !pageParams.includes(page.next_cursor) ? page.next_cursor : undefined,
-    enabled: selection.kind === "automation",
+    enabled: false,
     retry: false,
   });
   const templates = useQuery({
@@ -101,8 +115,9 @@ export function AutomationEditor(props: AutomationEditorProps) {
     retry: false,
   });
   useEffect(() => {
-    for (const cause of [choices.error, templates.error]) if (cause) onAccessLost(cause);
-  }, [choices.error, templates.error, onAccessLost]);
+    for (const cause of [firstChoice.error, choices.error, templates.error])
+      if (cause) onAccessLost(cause);
+  }, [firstChoice.error, choices.error, templates.error, onAccessLost]);
   function failure(cause: unknown) {
     if (!mounted.current || onAccessLost(cause)) return;
     setError(
@@ -231,7 +246,13 @@ export function AutomationEditor(props: AutomationEditorProps) {
       />
     );
   const workAlert = ["pending_request", "unclosed_attendance"].includes(auto.trigger);
-  const segments = choices.data?.pages.flatMap((page) => page.items) ?? [];
+  const segments =
+    firstChoice.isError || choices.isError
+      ? []
+      : [
+          ...(firstChoice.data?.items ?? []),
+          ...(choices.data?.pages.flatMap((page) => page.items) ?? []),
+        ];
   const nextSegmentCursor = choices.data?.pages.at(-1)?.next_cursor;
   const segmentCursorLoop =
     nextSegmentCursor && choices.data?.pageParams.includes(nextSegmentCursor);
@@ -334,7 +355,7 @@ export function AutomationEditor(props: AutomationEditorProps) {
               {t(($) => $.auth.retry)}
             </Button>
           )}
-          {choices.hasNextPage && (
+          {firstCursor && (!choices.data || choices.hasNextPage) && !choices.isError && (
             <Button
               variant="outline"
               isDisabled={locked || choices.isFetching}
@@ -345,12 +366,13 @@ export function AutomationEditor(props: AutomationEditorProps) {
               {t(($) => $.automation.moreSegments)}
             </Button>
           )}
-          {(choices.isError || segmentCursorLoop) && (
+          {(firstChoice.isError || choices.isError || segmentCursorLoop) && (
             <Button
               variant="outline"
               isDisabled={locked}
               onPress={() => {
-                void choices.refetch();
+                if (firstChoice.isError) void firstChoice.refetch();
+                else void choices.refetch();
               }}
             >
               {t(($) => $.auth.retry)}

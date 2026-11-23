@@ -21,7 +21,10 @@ it("distinguishes a denied organization scope from lost authentication and malfo
   call.mockRejectedValueOnce(
     new BackendError({ code: "FORBIDDEN", retryable: false, trace_id: "synthetic-trace" }),
   );
-  await expect(readOrganizationSettingsCatalog(scope)).resolves.toEqual({ state: "forbidden" });
+  await expect(readOrganizationSettingsCatalog(scope)).resolves.toMatchObject({
+    state: "forbidden",
+    error: { code: "FORBIDDEN" },
+  });
   call.mockRejectedValueOnce(
     new BackendError({ code: "SESSION_REVOKED", retryable: false, trace_id: "synthetic-trace" }),
   );

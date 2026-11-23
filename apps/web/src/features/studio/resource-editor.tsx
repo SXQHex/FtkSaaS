@@ -74,12 +74,18 @@ export function StudioResourceEditor({
   const { kind, id } = selection;
   useEffect(() => {
     mounted.current = true;
-    let active = true;
+    const controller = new AbortController();
     if (id) {
       const assertCurrent = capturePrivateReadback(queries);
-      void readStudioResource({ accountId, orgId, centerId }, kind, id)
+      void readStudioResource(
+        { accountId, orgId, centerId },
+        kind,
+        id,
+        undefined,
+        controller.signal,
+      )
         .then((value) => {
-          if (!active) return;
+          if (controller.signal.aborted) return;
           assertCurrent();
           setBase(value);
           setInitial(resourceDraft(value));
@@ -87,11 +93,11 @@ export function StudioResourceEditor({
           setNotice("ready");
         })
         .catch(() => {
-          if (active) setNotice("read-error");
+          if (!controller.signal.aborted) setNotice("read-error");
         });
     }
     return () => {
-      active = false;
+      controller.abort();
       mounted.current = false;
     };
   }, [accountId, orgId, centerId, kind, id, queries]);

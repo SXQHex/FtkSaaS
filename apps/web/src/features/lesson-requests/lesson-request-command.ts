@@ -155,7 +155,11 @@ function visibility(error: unknown) {
   throw error;
 }
 async function approvedReservation(intent: RequestIntent, request: LessonRequestView) {
-  const sessions = await readRequestSessions(intent.scope, intent.before),
+  const sessionId =
+    intent.operation === "lesson_request_approve_v1"
+      ? (intent.request.session_id ?? undefined)
+      : undefined;
+  const sessions = await readRequestSessions(intent.scope, intent.before, undefined, sessionId),
     backend = await scopedBackend(intent.scope);
   for (const session of sessions) {
     const seen = new Set<string>();

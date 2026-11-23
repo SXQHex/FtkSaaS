@@ -93,7 +93,10 @@ export function InstructorTodayContent({
     [calendar, localDate],
   );
   const localToday = period.data?.today;
-  const todayItems = items?.filter((row) => row.day === localToday);
+  const todayItems = items?.filter(
+    ({ day, session }) =>
+      day === localToday && session.state !== "cancelled" && session.attendance_state === "open",
+  );
   const attendanceQuery = useQuery({
     queryKey: [
       ...scheduleCacheKeys.instructorAttendance(scope),

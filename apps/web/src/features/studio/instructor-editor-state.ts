@@ -14,8 +14,9 @@ export async function readInstructorEditor(
   scope: StudioScope,
   personId: string,
   classes: ClassRecord[],
+  signal?: AbortSignal,
 ) {
-  const roles = await readStudioInstructors(scope, personId);
+  const roles = await readStudioInstructors(scope, personId, undefined, signal);
   const person = roles[0]?.person;
   if (!person) throw new Error("STUDIO_UNAVAILABLE");
   const accessible = person.relationships.some(
@@ -33,7 +34,7 @@ export async function readInstructorEditor(
     )
   )
     throw new Error("STUDIO_UNAVAILABLE");
-  const backend = await studioBackend(scope);
+  const backend = await studioBackend(scope, signal);
   const activeClasses = classes.filter((item) => item.active);
   const assignments: InstructorClassAssignment[] = new Array(activeClasses.length);
   let next = 0;

@@ -141,6 +141,7 @@ it("recognizes native recovery even before the root session observer mounts", as
   expect(account).toHaveBeenCalledExactlyOnceWith(
     false,
     nativeSession("native-recovery-user").access_token,
+    expect.any(AbortSignal),
   );
 });
 it("does not turn a normal OAuth session into a recovery session by changing next", async () => {
@@ -194,7 +195,11 @@ it("shares one pinned platform account read across the callback and protected ac
   ).toBe("/account");
   await loadPlatformAccount({ context: { queryClient: queries, authUserId: nativeUserId } });
   expect(auth.exchangeCodeForSession).toHaveBeenCalledOnce();
-  expect(account).toHaveBeenCalledExactlyOnceWith(true, nativeSession().access_token);
+  expect(account).toHaveBeenCalledExactlyOnceWith(
+    true,
+    nativeSession().access_token,
+    expect.any(AbortSignal),
+  );
   expect(queries.getQueryData(accountQueryKeys.projection(nativeUserId, true))).toMatchObject({
     id: "domain-account",
   });
@@ -207,7 +212,11 @@ it("drops private data from the prior session before publishing the callback pro
   queries.setQueryData(accountQueryKeys.projection(nativeUserId, true), { id: "old-account" });
   queries.setQueryData(["workspace", "old-account", null], { private: true });
   await completeCallback({ code: "callback-new-private-lifetime", next: "/account" }, queries);
-  expect(account).toHaveBeenCalledExactlyOnceWith(true, nativeSession().access_token);
+  expect(account).toHaveBeenCalledExactlyOnceWith(
+    true,
+    nativeSession().access_token,
+    expect.any(AbortSignal),
+  );
   expect(queries.getQueryData(accountQueryKeys.projection(nativeUserId, true))).toMatchObject({
     id: "domain-account",
   });
@@ -266,7 +275,11 @@ it("rejects a late account response from the exchanged session after same-user r
   await expect(
     completeCallback({ code: "callback-late-session-result", next: "/account" }, queries),
   ).rejects.toThrow("ACCOUNT_CHANGED");
-  expect(account).toHaveBeenCalledExactlyOnceWith(true, nativeSession().access_token);
+  expect(account).toHaveBeenCalledExactlyOnceWith(
+    true,
+    nativeSession().access_token,
+    expect.any(AbortSignal),
+  );
   expect(queries.getQueryData(accountQueryKeys.projection(nativeUserId, true))).toBeUndefined();
 });
 
@@ -282,7 +295,11 @@ it("accepts a refreshed bearer for the same exchanged native session", async () 
   expect(
     await completeCallback({ code: "callback-token-refresh", next: "/account" }, new QueryClient()),
   ).toBe("/account");
-  expect(account).toHaveBeenCalledExactlyOnceWith(true, nativeSession().access_token);
+  expect(account).toHaveBeenCalledExactlyOnceWith(
+    true,
+    nativeSession().access_token,
+    expect.any(AbortSignal),
+  );
 });
 
 it.each(["FORBIDDEN", "AUTH_REQUIRED", "SESSION_REVOKED"] as const)(

@@ -46,7 +46,7 @@ it("shares the verified post-login account read with the protected route", async
   expect(destination).toBe("/account");
   const projection = await queries.query(accountQuery(userId, true));
   expect(projection.id).toBe("account-a");
-  expect(account).toHaveBeenCalledExactlyOnceWith(true, "native-token");
+  expect(account).toHaveBeenCalledExactlyOnceWith(true, "native-token", expect.any(AbortSignal));
   expect(queries.getQueryData(accountQueryKeys.projection(userId, true))).toBe(projection);
 });
 
@@ -57,7 +57,11 @@ it("discards all prior private data when the same native user signs in again", a
   queries.setQueryData(["workspace", "stale-account", null], { private: true });
   account.mockResolvedValue({ id: "current-account" });
   await loginWithPassword({ email: "test@example.invalid", password: "fixture" }, queries);
-  expect(account).toHaveBeenCalledExactlyOnceWith(true, "new-session-token");
+  expect(account).toHaveBeenCalledExactlyOnceWith(
+    true,
+    "new-session-token",
+    expect.any(AbortSignal),
+  );
   expect(queries.getQueryData(accountQueryKeys.projection(userId, true))).toMatchObject({
     id: "current-account",
   });

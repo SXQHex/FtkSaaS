@@ -160,6 +160,7 @@ export function ReportsContent({
         undefined,
         context.signal,
         context,
+        1,
       ),
     enabled: active && !!filters && tab === "collections",
     retry: false,

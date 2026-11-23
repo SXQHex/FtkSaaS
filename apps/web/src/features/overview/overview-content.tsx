@@ -47,6 +47,7 @@ export function OverviewContent({
       entries?.map((r) => [
         r.session.id,
         r.session.version,
+        r.item.resources?.filter(({ kind }) => kind === "room").map(({ id }) => id),
         r.session.room_labels?.map(({ room_id, name }) => [room_id, name]),
       ]),
     ],

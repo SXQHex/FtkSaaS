@@ -193,31 +193,35 @@ export async function readRequestSessions(
   scope: ClientScope,
   request: LessonRequestView,
   readContext?: AccountReadContext,
+  exactSessionId?: string,
 ) {
-  const backend = await scopedBackend(scope, undefined, readContext),
-    { interval, instructorId } = await requestInterval(request),
+  const { interval, instructorId } = await requestInterval(request),
     seen = new Set<string>(),
     ids = new Set<string>();
-  let cursor: string | undefined;
-  do {
-    const page = await backend.call("calendar_get_v1", {
-      ...common(scope),
-      request_id: uuidv7(),
-      interval,
-      page: { limit: 50, sort: "starts_at_asc", ...(cursor ? { cursor } : {}) },
-    });
-    for (const row of page.items)
-      if (
-        row.type === "session" &&
-        row.center_id === scope.centerId &&
-        Date.parse(row.starts_at) === Date.parse(interval.starts_at) &&
-        Date.parse(row.ends_at) === Date.parse(interval.ends_at)
-      )
-        ids.add(row.id);
-    cursor = page.next_cursor ?? undefined;
-    if (cursor && seen.has(cursor)) throw new Error("LESSON_REQUEST_SESSIONS_UNAVAILABLE");
-    if (cursor) seen.add(cursor);
-  } while (cursor);
+  if (exactSessionId) ids.add(exactSessionId);
+  else {
+    const backend = await scopedBackend(scope, undefined, readContext);
+    let cursor: string | undefined;
+    do {
+      const page = await backend.call("calendar_get_v1", {
+        ...common(scope),
+        request_id: uuidv7(),
+        interval,
+        page: { limit: 50, sort: "starts_at_asc", ...(cursor ? { cursor } : {}) },
+      });
+      for (const row of page.items)
+        if (
+          row.type === "session" &&
+          row.center_id === scope.centerId &&
+          Date.parse(row.starts_at) === Date.parse(interval.starts_at) &&
+          Date.parse(row.ends_at) === Date.parse(interval.ends_at)
+        )
+          ids.add(row.id);
+      cursor = page.next_cursor ?? undefined;
+      if (cursor && seen.has(cursor)) throw new Error("LESSON_REQUEST_SESSIONS_UNAVAILABLE");
+      if (cursor) seen.add(cursor);
+    } while (cursor);
+  }
   const sessions = [];
   for (const id of ids) {
     const session = await readScheduleSession(scope, id, undefined, readContext);

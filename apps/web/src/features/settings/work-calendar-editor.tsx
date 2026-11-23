@@ -22,11 +22,13 @@ import {
 } from "./work-calendar";
 export function WorkCalendarEditor({
   scope,
+  timezone,
   onClose,
   onLockChange,
   onAccessLost,
 }: {
   scope: ClientScope;
+  timezone: string;
   onClose: () => void;
   onLockChange: (locked: boolean) => void;
   onAccessLost: (cause: unknown) => boolean;
@@ -48,10 +50,10 @@ export function WorkCalendarEditor({
       active.current = false;
     };
   }, []);
-  const key = ["work-calendar", scope.accountId, scope.orgId, scope.centerId];
+  const key = ["work-calendar", scope.accountId, scope.orgId, scope.centerId, timezone];
   const query = useQuery({
     queryKey: key,
-    queryFn: (context) => readWorkCalendar(scope, context),
+    queryFn: (context) => readWorkCalendar(scope, context, timezone),
     retry: false,
     refetchOnMount: "always",
     refetchOnWindowFocus: false,

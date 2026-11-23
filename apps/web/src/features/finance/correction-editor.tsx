@@ -67,10 +67,15 @@ export function CorrectionEditor({
     { personId, currency } = selection;
   useEffect(() => {
     mounted.current = true;
-    let active = true;
-    void readCorrectionBase({ accountId, orgId, centerId }, { personId, currency }, id)
+    const controller = new AbortController();
+    void readCorrectionBase(
+      { accountId, orgId, centerId },
+      { personId, currency },
+      id,
+      controller.signal,
+    )
       .then((value) => {
-        if (!active) return;
+        if (controller.signal.aborted) return;
         setBase(value);
         setDraft({
           ...financeDraft(value.selection),
@@ -78,14 +83,14 @@ export function CorrectionEditor({
         });
       })
       .catch((failure) => {
-        if (!active) return;
+        if (controller.signal.aborted) return;
         sourceFailure(failure);
       })
       .finally(() => {
-        if (active) setReading(false);
+        if (!controller.signal.aborted) setReading(false);
       });
     return () => {
-      active = false;
+      controller.abort();
       mounted.current = false;
     };
   }, [accountId, orgId, centerId, personId, currency, id]);

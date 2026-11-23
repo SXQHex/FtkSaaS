@@ -51,7 +51,10 @@ export function createBackend(config: {
       request: Operations[K]["request"],
       signal?: AbortSignal,
     ): Promise<Operations[K]["response"]["data"]> {
-      return readEnvelope<Operations[K]["response"]>(await post(operation, request, { signal }));
+      return readEnvelope<Operations[K]["response"]>(
+        await post(operation, request, { signal }),
+        signal,
+      );
     },
     async call<K extends keyof Operations & RuntimeOperationName>(
       operation: K,
@@ -96,13 +99,17 @@ export function getBackend(accessToken?: string) {
 
 export async function readEnvelope<T extends { data: unknown }>(
   response: Response,
+  signal?: AbortSignal,
 ): Promise<T["data"]> {
+  signal?.throwIfAborted();
   let result: unknown;
   try {
     result = await response.json();
   } catch {
+    signal?.throwIfAborted();
     throw new BackendError();
   }
+  signal?.throwIfAborted();
   if (!result || typeof result !== "object" || !("ok" in result)) throw new BackendError();
   if (
     result.ok === false &&

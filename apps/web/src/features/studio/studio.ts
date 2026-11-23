@@ -184,6 +184,25 @@ export async function readStudioRooms(
   );
   return items.map((item) => roomRecord(scope, item));
 }
+function readClassRecords(scope: StudioScope, backend: Awaited<ReturnType<typeof studioBackend>>) {
+  const operation = "class_save_v1" as const;
+  return studioPages((cursor) =>
+    backend.call("management_state_get_v1", {
+      client_api_version: 1,
+      request_id: uuidv7(),
+      org_id: scope.orgId,
+      center_id: scope.centerId,
+      operation,
+      selector: { operation, key: { include_waitlist: true } },
+      page: { limit: 50, ...(cursor ? { cursor } : {}) },
+    }),
+  ).then((items) => items.map((item) => classRecord(scope, item)));
+}
+
+export async function readStudioClasses(scope: StudioScope, signal?: AbortSignal) {
+  return readClassRecords(scope, await studioBackend(scope, signal));
+}
+
 export async function readStudioResources(
   scope: StudioScope,
   readContext?: AccountReadContext,
@@ -200,15 +219,13 @@ export async function readStudioResources(
       selector,
       page: { limit: 50, ...(cursor ? { cursor } : {}) },
     });
-  const [rooms, classItems, disciplines] = await Promise.all([
+  const [rooms, classes, disciplines] = await Promise.all([
     readRooms
       ? readRooms()
       : studioPages((cursor) =>
           management({ operation: "room_save_v1", key: { include_details: true } }, cursor),
         ).then((items) => items.map((item) => roomRecord(scope, item))),
-    studioPages((cursor) =>
-      management({ operation: "class_save_v1", key: { include_waitlist: true } }, cursor),
-    ),
+    readClassRecords(scope, backend),
     studioPages((cursor) =>
       backend.call("disciplines_list_v1", {
         client_api_version: 1,
@@ -226,7 +243,7 @@ export async function readStudioResources(
     throw new Error("STUDIO_UNAVAILABLE");
   return {
     rooms,
-    classes: classItems.map((item) => classRecord(scope, item)),
+    classes,
     disciplines,
   };
 }
@@ -243,8 +260,9 @@ export async function readStudioResource(
   kind: ResourceKind,
   id: string,
   readContext?: AccountReadContext,
+  signal = readContext?.signal,
 ) {
-  const backend = await studioBackend(scope, undefined, readContext);
+  const backend = await studioBackend(scope, signal, readContext);
   const selector: ManagementSelector =
     kind === "room"
       ? { operation: "room_save_v1", key: { room_id: id, include_details: true } }

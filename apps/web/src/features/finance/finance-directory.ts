@@ -52,6 +52,7 @@ export async function readFinanceDirectory(
   cursor?: string,
   signal?: AbortSignal,
   readContext?: AccountReadContext,
+  limit: 1 | 20 = 20,
 ) {
   const backend = await scopedBackend(scope, signal, readContext);
   const data = await queryBackendRead(
@@ -67,11 +68,11 @@ export async function readFinanceDirectory(
       ...(filters.query?.trim() ? { query: filters.query.trim() } : {}),
       ...(filters.kind ? { kind: filters.kind } : {}),
       ...(filters.method ? { method: filters.method } : {}),
-      page: { limit: 20, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
+      page: { limit, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
     },
     signal,
   );
-  if (data.view !== view || data.items.length > 20 || (cursor && data.next_cursor === cursor))
+  if (data.view !== view || data.items.length > limit || (cursor && data.next_cursor === cursor))
     throw new Error("FINANCE_DIRECTORY_UNAVAILABLE");
   z.iso.datetime({ offset: true }).parse(data.as_of);
   const ids = new Set<string>();

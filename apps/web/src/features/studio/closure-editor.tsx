@@ -64,19 +64,19 @@ export function StudioClosureEditor({
   }, []);
   const { accountId, orgId, centerId } = scope;
   useEffect(() => {
-    let active = true;
-    void readClosureContext({ accountId, orgId, centerId })
+    const controller = new AbortController();
+    void readClosureContext({ accountId, orgId, centerId }, undefined, controller.signal)
       .then((result) => {
-        if (active && mounted.current) {
+        if (!controller.signal.aborted && mounted.current) {
           setContext(result);
           setNotice("ready");
         }
       })
       .catch(() => {
-        if (active && mounted.current) setNotice("read-error");
+        if (!controller.signal.aborted && mounted.current) setNotice("read-error");
       });
     return () => {
-      active = false;
+      controller.abort();
     };
   }, [accountId, orgId, centerId]);
   useEffect(() => {

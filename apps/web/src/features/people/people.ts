@@ -34,6 +34,7 @@ export async function readPeoplePage(
   includeSummary = false,
   signal?: AbortSignal,
   context?: AccountReadContext,
+  limit: 6 | 20 = 20,
 ) {
   const backend = await scopedBackend(scope, signal, context);
   return queryBackendRead(
@@ -47,7 +48,7 @@ export async function readPeoplePage(
       ...(query.trim() ? { query: query.trim() } : {}),
       ...(status ? { student_status: status } : {}),
       ...(includeSummary ? { include_member_summary: true } : {}),
-      page: { limit: 20, ...(cursor ? { cursor } : {}) },
+      page: { limit, ...(cursor ? { cursor } : {}) },
     },
     signal,
   );
@@ -71,8 +72,9 @@ export async function readPerson(
   personId: string,
   options: { membershipDate?: boolean; memberSummary?: boolean } = {},
   context?: AccountReadContext,
+  signal = context?.signal,
 ) {
-  const backend = await scopedBackend(scope, undefined, context);
+  const backend = await scopedBackend(scope, signal, context);
   const person = await backend.call("person_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
@@ -122,16 +124,4 @@ export async function readPersonInvitationJob(scope: PeopleScope, job: JobRef) {
     center_id: scope.centerId,
     job_id: job.job_id,
   });
-}
-
-export async function readPeopleCenter(scope: PeopleScope, context?: AccountReadContext) {
-  const backend = await scopedBackend(scope, undefined, context);
-  const page = await backend.call("centers_list_v1", {
-    client_api_version: 1,
-    request_id: uuidv7(),
-    org_id: scope.orgId,
-    center_id: scope.centerId,
-    page: { limit: 1 },
-  });
-  return page.items.find((center) => center.id === scope.centerId && center.accessible) ?? null;
 }

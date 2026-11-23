@@ -18,6 +18,7 @@ import {
   readAutomations,
   automationAt,
   readSegments,
+  segmentPageQuery,
   automationIntent,
   writeAutomation,
   readAutomationReceipt,
@@ -91,18 +92,18 @@ export function AutomationContent({
     retry: false,
     refetchOnWindowFocus: false,
   });
-  const segments = useQuery({
-    queryKey: [...prefix, "segments", segmentCursors[segmentIndex]],
-    queryFn: async (context) => {
-      const page = await readSegments(scope, undefined, segmentCursors[segmentIndex], context);
-      if (page.next_cursor && segmentCursors.includes(page.next_cursor))
-        throw Error("AUTOMATION_CURSOR_UNAVAILABLE");
-      return page;
-    },
-    enabled: !!center,
-    retry: false,
-    refetchOnWindowFocus: false,
+  const segmentSource = useQuery({
+    ...segmentPageQuery(scope, segmentCursors[segmentIndex]),
+    enabled: !!center && tab === "segments",
   });
+  const segmentLoop =
+    !!segmentSource.data?.next_cursor && segmentCursors.includes(segmentSource.data.next_cursor);
+  const segments = {
+    error: segmentSource.error,
+    isFetching: segmentSource.isFetching,
+    data: segmentLoop ? undefined : segmentSource.data,
+    isError: segmentLoop || segmentSource.isError,
+  };
   const jobsSource = useQuery({
     queryKey: [...prefix, "jobs", jobsFor, jobState, jobCursors[jobIndex]],
     queryFn: async (context) => {
@@ -154,11 +155,8 @@ export function AutomationContent({
   async function refresh(segmentWritten = false) {
     const assertCurrent = capturePrivateReadback(queries);
     const choicesKey = ["automation-segment-choices", scope.accountId, scope.orgId, scope.centerId];
-    await invalidateCachedFamilies(
-      queries,
-      [prefix, choicesKey, automationDiscoveryKey(scope)],
-      segmentWritten ? [choicesKey] : [],
-    );
+    await invalidateCachedFamilies(queries, [prefix, choicesKey, automationDiscoveryKey(scope)]);
+    if (segmentWritten) queries.removeQueries({ queryKey: choicesKey });
     assertCurrent();
     // Every cursor family is stale; validate only the visible tab's first page.
     if (tab === "automations") {

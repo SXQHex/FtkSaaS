@@ -279,6 +279,7 @@ test("instructor day reads all scoped week pages and exact monthly currencies wi
   await closeWorkspaceNavigation(page);
   expect(reads.filter((row) => row.operation === "calendar_get_v1")).toHaveLength(2);
   expect(reads.filter((row) => row.operation === "earnings_list_v1")).toHaveLength(2);
+  expect(reads.filter((row) => row.operation === "attendance_get_v1")).toHaveLength(1);
   expect(
     reads.filter((row) =>
       [

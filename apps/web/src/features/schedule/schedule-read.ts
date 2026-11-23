@@ -2,18 +2,28 @@ import { v7 as uuidv7 } from "uuid";
 import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import { getTemporal } from "../../lib/temporal";
 import { BackendError, queryBackendRead } from "../../lib/backend";
-import type { CalendarItem, Interval, ResourceRef, SessionView } from "@ftksaas/api-contracts";
+import type {
+  CenterView,
+  CalendarItem,
+  Interval,
+  ResourceRef,
+  SessionView,
+} from "@ftksaas/api-contracts";
 import { readClosureContext } from "../studio/closure";
 import { readStudioResources } from "../studio/studio";
 import { readStudioInstructors } from "../studio/studio-reads";
 
-export async function readScheduleSources(scope: ClientScope, readContext?: AccountReadContext) {
-  const [context, resources, instructors] = await Promise.all([
-    readClosureContext(scope, readContext),
+export async function readScheduleSources(
+  scope: ClientScope,
+  readContext?: AccountReadContext,
+  verifiedCenter?: CenterView,
+) {
+  const [center, resources, instructors] = await Promise.all([
+    verifiedCenter ?? readClosureContext(scope, readContext).then((context) => context.center),
     readStudioResources(scope, readContext),
     readStudioInstructors(scope, undefined, readContext),
   ]);
-  return { scope: { ...scope }, center: context.center, resources, instructors };
+  return { scope: { ...scope }, center, resources, instructors };
 }
 export async function scheduleLocalDate(instant: string, timezone: string) {
   const temporal = await getTemporal();
@@ -69,6 +79,7 @@ export async function readScheduleRange(
   filters: { roomId?: string; instructorId?: string } = {},
   signal?: AbortSignal,
   readContext?: AccountReadContext,
+  projection: { includeRoomLabels?: boolean; sessionsStartingAfter?: number } = {},
 ): Promise<{
   entries: ScheduleReadItem[];
   reads: { resource: ResourceRef | null; asOf: string[] }[];
@@ -133,9 +144,13 @@ export async function readScheduleRange(
   const secondIds = pages[1]
     ? new Set(pages[1].items.map((item) => `${item.type}:${item.id}`))
     : undefined;
-  const items = first.items.filter(
-    (item) => !secondIds || secondIds.has(`${item.type}:${item.id}`),
-  );
+  const items = first.items.filter((item) => {
+    if (secondIds && !secondIds.has(`${item.type}:${item.id}`)) return false;
+    return (
+      projection.sessionsStartingAfter === undefined ||
+      (item.type === "session" && Date.parse(item.starts_at) > projection.sessionsStartingAfter)
+    );
+  });
   const entries: ScheduleReadItem[] = [];
   // CalendarItem intentionally has no lifecycle state. Hydrate real sessions in
   // bounded batches instead of guessing planned state or current assignments.
@@ -154,6 +169,7 @@ export async function readScheduleRange(
                 org_id: scope.orgId,
                 center_id: scope.centerId,
                 session_id: item.id,
+                ...(projection.includeRoomLabels ? { include_room_labels: true } : {}),
               },
               signal,
             ),
@@ -175,8 +191,12 @@ export async function readScheduleRange(
   return { entries, reads: pages.map(({ resource, asOf }) => ({ resource, asOf })) };
 }
 
-export async function readScheduleEditor(scope: ClientScope, sessionId: string) {
-  const backend = await scopedBackend(scope);
+export async function readScheduleEditor(
+  scope: ClientScope,
+  sessionId: string,
+  signal?: AbortSignal,
+) {
+  const backend = await scopedBackend(scope, signal);
   const [session, page] = await Promise.all([
     backend.call("session_get_v1", {
       client_api_version: 1,

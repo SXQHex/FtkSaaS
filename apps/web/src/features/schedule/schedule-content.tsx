@@ -1,3 +1,4 @@
+import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
@@ -158,39 +159,46 @@ export function ScheduleContent({
     },
     [queries, router, scope.accountId, scope.orgId, scope.centerId],
   );
+  const workspace = useWorkspaceQuery(scope.accountId, scope.orgId, false);
+  const center =
+    !workspace.isError && workspace.data?.selected?.id === scope.orgId
+      ? workspace.data.centers.find((row) => row.id === scope.centerId && row.accessible)
+      : undefined;
   const sources = useQuery({
-    queryKey: ["schedule-sources", scope.accountId, scope.orgId, scope.centerId],
+    queryKey: ["schedule-sources", scope.accountId, scope.orgId, scope.centerId, center?.version],
     queryFn: async ({ queryKey, client, signal }) => {
       try {
-        const source = await readScheduleSources(scope, { client, signal });
+        const source = await readScheduleSources(scope, { client, signal }, center);
         return { ...source, initialDate: await scheduleLocalDate(now, source.center.timezone) };
       } catch (failure) {
         if (accessLost(failure, queryKey)) command.abandon();
         throw failure;
       }
     },
+    enabled: !!center,
     retry: false,
   });
   const initialOpened = useRef(false);
   useEffect(() => {
     const source = sources.data;
     if (!source || initialOpened.current || (!initialSession && !initialCreate)) return;
-    let active = true;
+    const controller = new AbortController();
     if (initialCreate && !initialSession) {
       void Promise.resolve().then(() => {
-        if (!active || lost.current) return;
+        if (controller.signal.aborted || lost.current) return;
         initialOpened.current = true;
         setCreateSource(source);
         setCreateDraft(emptyCreate(source.initialDate));
         setCreateOpen(true);
       });
       return () => {
-        active = false;
+        controller.abort();
       };
     }
     void readScheduleEditor(
       { accountId: scope.accountId, orgId: scope.orgId, centerId: scope.centerId },
       initialSession!,
+      controller.signal,
     )
       .then(async (editor) => {
         const draft = await scheduleSessionDraft(
@@ -198,7 +206,7 @@ export function ScheduleContent({
           editor.resources,
           source.center.timezone,
         );
-        if (!active || lost.current) return;
+        if (controller.signal.aborted || lost.current) return;
         initialOpened.current = true;
         setSelected(editor);
         setSessionDraft(draft);
@@ -215,7 +223,7 @@ export function ScheduleContent({
         );
       })
       .catch((failure: unknown) => {
-        if (!active) return;
+        if (controller.signal.aborted) return;
         if (!accessLost(failure))
           setError(
             scheduleBackendError(
@@ -225,7 +233,7 @@ export function ScheduleContent({
           );
       });
     return () => {
-      active = false;
+      controller.abort();
     };
   }, [
     initialCreate,

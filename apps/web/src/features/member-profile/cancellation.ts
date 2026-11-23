@@ -20,9 +20,10 @@ export async function readCancellation(
   personId: string,
   id: string,
   sessionId: string,
+  signal?: AbortSignal,
 ): Promise<CancellationBase> {
   for (const value of [personId, id, sessionId]) z.uuid().parse(value);
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, signal);
   const page = await backend.call("management_state_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
@@ -46,7 +47,7 @@ export async function readCancellation(
     versions.length !== 1
   )
     throw new Error("PROFILE_CANCELLATION_UNAVAILABLE");
-  const row = await readProfileReservation(scope, personId, id, sessionId);
+  const row = await readProfileReservation(scope, personId, id, sessionId, signal);
   if (row.version !== versions[0]!.version || row.state !== "active")
     throw new Error("PROFILE_CANCELLATION_UNAVAILABLE");
   return { scope: { ...scope }, personId, reservation: row };

@@ -17,7 +17,7 @@ import { EventDetailView, type EventDetailAction } from "./event-detail-view";
 import { EventAttendanceView, type EventAttendanceAction } from "./event-attendance-view";
 import { EventActionController, type EventActionSelection } from "./event-action-controller";
 import { EventEditor } from "./event-editor";
-import { studioRoomsQuery } from "../studio/studio-rooms-query";
+import { studioRoomQuery } from "../studio/studio-rooms-query";
 import { EventRegistrationController } from "./event-registration-controller";
 import { eventDetailQuery, invalidateEventViews, type EventWriteEffects } from "./event-query";
 
@@ -60,9 +60,10 @@ export function EventDetailContent({
       ? source.data
       : undefined;
   const eventUnavailable = !event;
-  const rooms = useQuery({
-    ...studioRoomsQuery(scope),
-    enabled: event?.venue.kind === "internal" && !!event.venue.room_id,
+  const roomId = event?.venue.kind === "internal" ? (event.venue.room_id ?? undefined) : undefined;
+  const room = useQuery({
+    ...studioRoomQuery(queries, scope, roomId),
+    enabled: !!roomId,
   });
   const scopeIds = [scope.accountId, scope.orgId, scope.centerId] as const;
   const dutyIds = [...new Set((event?.duties ?? []).map((row) => row.person_id))].sort();
@@ -152,9 +153,9 @@ export function EventDetailContent({
     [queries, router, scope.accountId],
   );
   useEffect(() => {
-    for (const cause of [workspace.error, source.error, rooms.error, dutyNames.error])
+    for (const cause of [workspace.error, source.error, room.error, dutyNames.error])
       if (cause) accessLost(cause);
-  }, [workspace.error, source.error, rooms.error, dutyNames.error, accessLost]);
+  }, [workspace.error, source.error, room.error, dutyNames.error, accessLost]);
   const setPending = useCallback(
     (value: boolean) => {
       setLocked(value);
@@ -245,9 +246,9 @@ export function EventDetailContent({
             value:
               event.venue.kind === "external"
                 ? event.venue.name || unknown
-                : ((!rooms.isError ? rooms.data : undefined)?.find(
-                    (room) => room.active && room.id === event.venue.room_id,
-                  )?.name ?? unknown),
+                : !room.isError && room.data?.active
+                  ? room.data.name
+                  : unknown,
           },
           { label: t(($) => $.events.editor.timezone), value: event.timezone },
         ]}

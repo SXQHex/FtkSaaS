@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { getSupabaseClient } from "../../lib/supabase";
-import { getBackend } from "../../lib/backend";
+import { getBackend, queryBackendRead } from "../../lib/backend";
 
 export async function readFactors() {
   const { data, error } = await getSupabaseClient().auth.mfa.listFactors();
@@ -8,12 +8,13 @@ export async function readFactors() {
   return data;
 }
 
-export function readSecurityHistory(cursor?: string) {
-  return getBackend().call("account_security_history_get_v1", {
-    client_api_version: 1,
-    request_id: uuidv7(),
-    ...(cursor ? { cursor } : {}),
-  });
+export function readSecurityHistory(cursor?: string, signal?: AbortSignal) {
+  return queryBackendRead(
+    getBackend(),
+    "account_security_history_get_v1",
+    { client_api_version: 1, request_id: uuidv7(), ...(cursor ? { cursor } : {}) },
+    signal,
+  );
 }
 
 export async function enrollTotp() {

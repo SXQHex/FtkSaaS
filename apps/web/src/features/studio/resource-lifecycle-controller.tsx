@@ -91,7 +91,7 @@ export function ResourceLifecycleController({
   }
   const initialAccessLost = useEffectEvent(accessLost);
   useEffect(() => {
-    let active = true;
+    const controller = new AbortController();
     mounted.current = true;
     const assertCurrent = capturePrivateReadback(queries);
     async function load() {
@@ -99,18 +99,19 @@ export function ResourceLifecycleController({
         const next = await readResourceLifecycle(
           initial.current.scope,
           initial.current.selection,
+          controller.signal,
         ).finally(assertCurrent);
-        if (active) {
+        if (!controller.signal.aborted) {
           setBase(next);
           setNotice(next.active ? "ready" : "closed");
         }
       } catch (failure) {
-        if (active && !initialAccessLost(failure)) setNotice("read-error");
+        if (!controller.signal.aborted && !initialAccessLost(failure)) setNotice("read-error");
       }
     }
     void load();
     return () => {
-      active = false;
+      controller.abort();
       mounted.current = false;
     };
   }, [queries]);

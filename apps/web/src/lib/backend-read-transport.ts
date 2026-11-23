@@ -8,7 +8,10 @@ export async function fetchBackendOperation(
   const body = JSON.stringify(request);
   const edgeUrl = functionsUrl.replace(/\/$/, "");
   const nativePath = "/functions/v1/backend-v1";
-  const edge = () => fetch(`${edgeUrl}/${operation}`, { ...init, body });
+  const edge = () => {
+    init.signal?.throwIfAborted();
+    return fetch(`${edgeUrl}/${operation}`, { ...init, body });
+  };
   // JSONB adds separator whitespace. Keep requests near the original body limit on Edge.
   if (
     operation !== "centers_list_v1" ||

@@ -1,9 +1,10 @@
+import type { ReservationView } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
 import { getTemporal } from "../../lib/temporal";
 import type { ClientScope, AccountReadContext } from "../../lib/scoped-backend";
 import { readScheduleRange, type ScheduleReadItem } from "../schedule/schedule-read";
 import {
-  readSessionInstructors,
+  readAssignedSessionInstructors,
   readSessionParticipants,
 } from "../session-detail/session-detail-read";
 import { readStudioResource } from "../studio/studio";
@@ -35,9 +36,9 @@ export async function readOverviewDay(
   context?: AccountReadContext,
 ) {
   const period = await overviewDay(timezone, now),
-    result = context
-      ? await readScheduleRange(scope, period.interval, undefined, undefined, context)
-      : await readScheduleRange(scope, period.interval);
+    result = await readScheduleRange(scope, period.interval, undefined, context?.signal, context, {
+      includeRoomLabels: true,
+    });
   const sessions = result.entries
     .filter((r): r is OverviewSession => r.type === "session")
     .sort(
@@ -73,27 +74,30 @@ export async function readOverviewLabels(
     }
     return value;
   }
+  if (!sessions.length) return result;
+  const assigned = await readAssignedSessionInstructors(
+    scope,
+    { assignments: sessions.flatMap(({ session }) => session.assignments) },
+    context,
+  );
+  const instructors = new Map(assigned.map((row) => [row.id, row.person?.display_name]));
   for (let index = 0; index < sessions.length; index += 4)
     await Promise.all(
-      sessions.slice(index, index + 4).map(async (before) => {
-        const fresh = await readSessionInstructors(
-          scope,
-          before.session.id,
-          true,
-          ...(context ? ([context] as const) : []),
-        );
-        if (fresh.session.version !== before.session.version)
-          throw Error("OVERVIEW_SESSION_CHANGED");
-        const nativeRooms = fresh.session.room_labels?.map((r) => r.name) ?? [];
+      sessions.slice(index, index + 4).map(async ({ session, item }) => {
+        const nativeRooms = session.room_labels?.map((r) => r.name) ?? [];
         const names = nativeRooms.length
           ? nativeRooms
           : await Promise.all(
-              (before.item.resources?.filter((r) => r.kind === "room") ?? []).map((r) =>
-                roomName(r.id),
-              ),
+              (item.resources?.filter((r) => r.kind === "room") ?? []).map((r) => roomName(r.id)),
             );
-        result.set(before.session.id, {
-          instructors: fresh.instructors.flatMap((r) => (r.person ? [r.person.display_name] : [])),
+        const ids = new Set(
+          session.assignments.filter((r) => r.duty === "instructor").map((r) => r.person_id),
+        );
+        result.set(session.id, {
+          instructors: [...ids].flatMap((id) => {
+            const name = instructors.get(id);
+            return name === undefined ? [] : [name];
+          }),
           rooms: names.filter((name): name is string => name !== null),
         });
       }),
@@ -115,14 +119,20 @@ export async function readOverviewParticipants(
       sessionId,
       undefined,
       cursor,
-      ...(context ? ([context] as const) : []),
+      context,
+      (items) => {
+        const preview: ReservationView[] = [];
+        for (const row of items) {
+          if (seen.has(row.id)) throw Error("OVERVIEW_PARTICIPANTS_UNAVAILABLE");
+          seen.add(row.id);
+          if (row.state === "active" || row.state === "completed") preview.push(row);
+          if (rows.length + preview.length === 3) break;
+        }
+        return preview;
+      },
     );
-    for (const row of page.items) {
-      if (seen.has(row.reservation.id)) throw Error("OVERVIEW_PARTICIPANTS_UNAVAILABLE");
-      seen.add(row.reservation.id);
-      if (["active", "completed"].includes(row.reservation.state)) rows.push(row);
-      if (rows.length === 3) return rows;
-    }
+    rows.push(...page.items);
+    if (rows.length === 3) return rows;
     cursor = page.next_cursor ?? undefined;
     if (cursor && cursors.has(cursor)) throw Error("OVERVIEW_PARTICIPANTS_UNAVAILABLE");
     if (cursor) cursors.add(cursor);

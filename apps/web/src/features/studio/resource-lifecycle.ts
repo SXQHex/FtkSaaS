@@ -26,8 +26,9 @@ export interface ResourceLifecycleIntent {
 export async function readResourceLifecycle(
   scope: StudioScope,
   selection: ResourceLifecycleSelection,
+  signal?: AbortSignal,
 ): Promise<ResourceLifecycleBase> {
-  const backend = await studioBackend(scope);
+  const backend = await studioBackend(scope, signal);
   const selector =
     selection.kind === "rule"
       ? {

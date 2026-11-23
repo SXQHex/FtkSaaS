@@ -1,6 +1,17 @@
+import { queryOptions } from "@tanstack/react-query";
 import { v7 as uuidv7 } from "uuid";
 import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
+
+export function readOrganizationSettingsCatalogQuery(
+  scope: Pick<ClientScope, "accountId" | "orgId">,
+) {
+  return queryOptions({
+    queryKey: ["settings-organization-catalog", scope.accountId, scope.orgId],
+    queryFn: (context) => readOrganizationSettingsCatalog(scope, context),
+    retry: false,
+  });
+}
 
 export async function readOrganizationSettingsCatalog(
   scope: Pick<ClientScope, "accountId" | "orgId">,
@@ -25,7 +36,7 @@ export async function readOrganizationSettingsCatalog(
     return { state: "known" as const, catalog };
   } catch (error) {
     if (error instanceof BackendError && error.code === "FORBIDDEN")
-      return { state: "forbidden" as const };
+      return { state: "forbidden" as const, error };
     throw error;
   }
 }

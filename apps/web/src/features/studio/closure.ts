@@ -38,8 +38,9 @@ export class ClosureTimeError extends Error {
 export async function readClosureContext(
   scope: StudioScope,
   readContext?: AccountReadContext,
+  signal = readContext?.signal,
 ): Promise<ClosureContext> {
-  const backend = await studioBackend(scope, undefined, readContext);
+  const backend = await studioBackend(scope, signal, readContext);
   const centers = await studioPages((cursor) =>
     backend
       .call("centers_list_v1", {

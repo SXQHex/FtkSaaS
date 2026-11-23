@@ -66,24 +66,24 @@ export function DisciplineEditor({
   const sourceFailure = useEffectEvent(handleSourceFailure);
   useEffect(() => {
     mounted.current = true;
-    let active = true;
+    const controller = new AbortController();
     if (id) {
-      void readDisciplineBase({ accountId, orgId, centerId }, level, id)
+      void readDisciplineBase({ accountId, orgId, centerId }, level, id, false, controller.signal)
         .then((value) => {
-          if (!active) return;
+          if (controller.signal.aborted) return;
           setBase(value);
           setDraft(disciplineDraft(value));
           setLoaded(true);
         })
         .catch((failure) => {
-          if (active) sourceFailure(failure);
+          if (!controller.signal.aborted) sourceFailure(failure);
         })
         .finally(() => {
-          if (active) setReading(false);
+          if (!controller.signal.aborted) setReading(false);
         });
     }
     return () => {
-      active = false;
+      controller.abort();
       mounted.current = false;
     };
   }, [accountId, orgId, centerId, level, id]);

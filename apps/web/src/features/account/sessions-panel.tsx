@@ -52,7 +52,7 @@ export function SessionsPanel({ accountId }: { accountId: string }) {
   const sessions = useInfiniteQuery({
     queryKey: sessionKey,
     initialPageParam: undefined as string | undefined,
-    queryFn: ({ pageParam }) => readSessions(pageParam),
+    queryFn: ({ pageParam, signal }) => readSessions(pageParam, signal),
     getNextPageParam: (last) => last.next_cursor ?? undefined,
   });
   async function refresh(mode: SessionRefresh = "first-page") {
