@@ -212,7 +212,7 @@ describe("M06: cross-feature access reconciliation", () => {
     ).toBeUndefined();
     expect(actions.showLogin).not.toHaveBeenCalled();
     expect(actions.onChecking).toHaveBeenNthCalledWith(1, true);
-    expect(actions.onChecking).toHaveBeenLastCalledWith(false);
+    await vi.waitFor(() => expect(actions.onChecking).toHaveBeenLastCalledWith(false));
     stop();
   });
 
@@ -306,7 +306,9 @@ describe("M06: cross-feature access reconciliation", () => {
     await denied;
     await vi.waitFor(() => expect(actions.invalidateRoute).toHaveBeenCalledOnce());
     expect(queries.getQueryData(workspaceKeys.projection(accountId, orgId))).toEqual(revoked);
-    expect(queries.getQueryData(["leads", accountId, orgId, centerId, "first-page"])).toBeUndefined();
+    expect(
+      queries.getQueryData(["leads", accountId, orgId, centerId, "first-page"]),
+    ).toBeUndefined();
     expect(actions.onChecking.mock.calls.map(([value]) => value)).toEqual([true, false]);
     stop();
   });
