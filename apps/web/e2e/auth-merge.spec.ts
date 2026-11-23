@@ -6,7 +6,7 @@ import { clickWorkspaceLink, origin } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
 import type { PersonView, FinanceView, Preview, ManagementStateView } from "@ftksaas/api-contracts";
 const previewId = "019a7b00-0000-7000-8000-000000000081";
-async function mockMerge(page: Page, reuseStudio = false) {
+async function mockMerge(page: Page, reuseStudio = false, paginated = false) {
   if (!reuseStudio) await mockStudio(page);
   const state = {
     decision: "merge" as "merge" | "not_duplicate",
@@ -22,7 +22,7 @@ async function mockMerge(page: Page, reuseStudio = false) {
     effects: 0,
     keys: new Set<string>(),
     writes: [] as { op: string; key: string }[],
-    reads: [] as { status?: string; query?: string; cursor?: string }[],
+    reads: [] as { status?: string; query?: string; cursor?: string; afterWrite?: boolean }[],
   };
   const person = (id: string): PersonView => ({
     id,
@@ -87,6 +87,31 @@ async function mockMerge(page: Page, reuseStudio = false) {
       matching_kinds: kind === "suggested" ? ["email"] : [],
     },
   });
+  const otherReview = (position: "first" | "third"): ManagementStateView => {
+    const first = position === "first";
+    const sourceId = first ? I.room : I.lesson;
+    const targetId = first ? I.agreement : I.discipline;
+    const item = review("suggested");
+    item.entity = { type: "people", id: targetId };
+    item.versions = [sourceId, targetId].map((id) => ({
+      entity: { type: "people" as const, id },
+      version: 3,
+    }));
+    item.current = {
+      operation: "person_merge_preview_v1",
+      values: { source_id: sourceId, target_id: targetId },
+    };
+    item.merge_review = {
+      ...item.merge_review!,
+      source: { id: sourceId, display_name: "Diğer kaynak", version: 3 },
+      target: {
+        id: targetId,
+        display_name: first ? "İlk sayfa üyesi" : "Üçüncü sayfa üyesi",
+        version: 3,
+      },
+    };
+    return item;
+  };
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
     const op = new URL(route.request().url()).pathname.split("/").at(-1);
     const r = route.request().postDataJSON();
@@ -115,27 +140,40 @@ async function mockMerge(page: Page, reuseStudio = false) {
         expect(key).toEqual({ directory: "center", status: "suggested" });
         expect(r.page).not.toHaveProperty("cursor");
       }
-      state.reads.push({ ...key, cursor: r.page.cursor });
+      state.reads.push({ ...key, cursor: r.page.cursor, afterWrite: state.merged });
       if (state.directoryDenied)
         return route.fulfill({
           json: { ok: false, error: { code: "FORBIDDEN", retryable: false, trace_id: I.org } },
         });
       const kind = key.status as "suggested" | "completed" | "not_duplicate";
+      if (paginated && kind === "suggested" && !summaryOnly && r.page.cursor)
+        expect(r.page.cursor).toBe(state.merged ? "fresh-native-next" : "stale-native-next");
       const items =
-        kind === "suggested"
-          ? !state.merged && !state.dismissed
-            ? [review(kind)]
-            : []
-          : kind === "completed"
-            ? state.merged
+        paginated && kind === "suggested" && !summaryOnly
+          ? r.page.cursor
+            ? [state.merged ? otherReview("third") : review(kind)]
+            : [otherReview("first")]
+          : kind === "suggested"
+            ? !state.merged && !state.dismissed
               ? [review(kind)]
               : []
-            : state.dismissed
-              ? [review(kind)]
-              : [];
+            : kind === "completed"
+              ? state.merged
+                ? [review(kind)]
+                : []
+              : state.dismissed
+                ? [review(kind)]
+                : [];
       return send({
         items,
-        next_cursor: summaryOnly && items.length ? "summary-next" : null,
+        next_cursor:
+          paginated && kind === "suggested" && !summaryOnly && !r.page.cursor
+            ? state.merged
+              ? "fresh-native-next"
+              : "stale-native-next"
+            : summaryOnly && items.length
+              ? "summary-next"
+              : null,
         as_of: "2026-11-15T00:00:00Z",
         merge_review_summary: {
           total: summaryOnly ? 37 : 1,
@@ -477,4 +515,39 @@ test("Merge: returning to a warm canonical profile rereads old rights and debt i
   await expect(merge).toHaveAccessibleDescription("0 birleştirme önerisi");
   expect(state.summaryReads).toBe(2);
   expect(await page.evaluate(() => performance.timeOrigin)).toBe(documentTime);
+});
+test("Merge: confirmed write resets page-two cursor and reads only fresh first page", async ({
+  page,
+}) => {
+  const state = await mockMerge(page, false, true);
+  await openMerge(page);
+  await expect(page.getByText("İlk sayfa üyesi", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await expect(page.getByText("Örnek Eğitmen", { exact: true }).first()).toBeVisible();
+  await selectPair(page);
+  await page.getByLabel("Gerekçe", { exact: false }).fill("Kontrollü birleştirme");
+  await page.getByRole("button", { name: "Etkiyi önizle", exact: true }).click();
+  await expect(
+    page.getByText("Güncel birleşim önizlemesi yüklendi.", { exact: true }),
+  ).toBeVisible();
+  await review(page);
+  await page.getByRole("button", { name: "Kayıtları birleştir", exact: true }).click();
+  await expect(
+    page.getByText("İşlem kaydedildi ve güncel sonuç okundu.", { exact: true }).first(),
+  ).toBeVisible();
+
+  const afterWrite = state.reads.filter(
+    (read) => read.afterWrite && read.status === "suggested",
+  );
+  expect(afterWrite.filter((read) => read.cursor)).toHaveLength(0);
+  expect(afterWrite).toHaveLength(1);
+  expect(state.writes).toHaveLength(1);
+  await expect(page.getByText("İlk sayfa üyesi", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Önceki", exact: true })).toBeDisabled();
+  await page.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await expect(page.getByText("Üçüncü sayfa üyesi", { exact: true })).toBeVisible();
+  expect(state.reads.filter((read) => read.cursor === "fresh-native-next")).toHaveLength(1);
+  expect(state.reads.filter((read) => read.afterWrite && read.cursor === "stale-native-next"))
+    .toHaveLength(0);
+  expect(state.writes).toHaveLength(1);
 });
