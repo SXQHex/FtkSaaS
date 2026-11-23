@@ -3,7 +3,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import { getSupabaseClient } from "../../lib/supabase";
 import { BackendError } from "../../lib/backend";
 import { accountQuery } from "./account-query";
-import { workspaceQuery } from "../workspace/workspace-query";
+import { workspaceKeys, workspaceQuery } from "../workspace/workspace-query";
 import { hasDeletionReceipt } from "../account/deletion";
 import { takeInvitationReturn } from "../invitations/invitation";
 
@@ -44,14 +44,16 @@ async function prepareAccountAndWorkspace(
 ) {
   const account = await loadAccountProjection(context, includePlatformScope);
   const query = workspaceQuery(context.queryClient, account.id, organizationId);
-  if (organizationId) {
-    // Every scoped navigation (including history and deep links) checks native
-    // authority before exposing a previously cached privileged screen.
-    // Keep one canonical workspace queryFn for Router and its live observers.
-    await context.queryClient.fetchQuery({ ...query, staleTime: 0 });
+  const selected = organizationId
+    ? context.queryClient.getQueryState(workspaceKeys.projection(account.id, organizationId))
+    : undefined;
+  if (organizationId && !query.initialData && (!selected?.data || selected.isInvalidated)) {
+    // A direct link or a browser history transition has no fresh authority
+    // guarantee. Await the native scoped read before the route can render.
+    await context.queryClient.query(query);
   } else {
-    // The personal account has no privileged organization selection to protect.
-    // Workspace discovery remains non-blocking for the account shell.
+    // A forward SPA navigation reuses this document's already verified
+    // workspace; extra forced reads would restart live command readbacks.
     void context.queryClient.query(query).catch(() => {});
   }
   // Return no account DTO: Router coordinates; Query is the sole account cache.
