@@ -10,6 +10,7 @@ import { captureAuthCallback } from "./features/auth/callback";
 import { captureInvitation } from "./features/invitations/invitation";
 import { routeTree } from "./routeTree.gen";
 import { queryClient } from "./lib/query-client";
+import { workspaceKeys } from "./features/workspace/workspace-query";
 import "./index.css";
 
 captureAuthCallback();
@@ -22,6 +23,15 @@ function captureInvitationNavigation() {
   window.location.reload();
 }
 window.addEventListener("popstate", captureInvitationNavigation, { capture: true });
+// History must never re-expose a formerly authorized center from a warm Query
+// projection. Mark it stale synchronously before Router processes popstate.
+window.addEventListener(
+  "popstate",
+  () => {
+    void queryClient.invalidateQueries({ queryKey: workspaceKeys.all(), refetchType: "none" });
+  },
+  { capture: true },
+);
 window.addEventListener("hashchange", captureInvitationNavigation, { capture: true });
 
 const router = createRouter({
