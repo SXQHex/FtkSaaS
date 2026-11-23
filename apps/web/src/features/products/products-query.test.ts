@@ -8,8 +8,7 @@ const scope = { accountId: "actor-a", orgId: "org-a", centerId: "center-a" };
 const centerB = { ...scope, centerId: "center-b" };
 const centerC = { ...scope, centerId: "center-c" };
 const foreign = { ...scope, orgId: "org-b" };
-const catalog = (s: typeof scope) =>
-  ["profile-catalog", s.accountId, s.orgId, s.centerId] as const;
+const catalog = (s: typeof scope) => ["profile-catalog", s.accountId, s.orgId, s.centerId] as const;
 const terms = (centerId: string): ProductView["terms"] => ({
   name: "Sample",
   kind: "credits",
@@ -20,12 +19,14 @@ const terms = (centerId: string): ProductView["terms"] => ({
   refund: { method: "none" },
   freeze: { enabled: false, extends_validity: false },
   quota: null,
-  scopes: [{
-    scope_kind: "center_all_disciplines",
-    center_id: centerId,
-    discipline_id: null,
-    usage_targets: ["lesson"],
-  }],
+  scopes: [
+    {
+      scope_kind: "center_all_disciplines",
+      center_id: centerId,
+      discipline_id: null,
+      usage_targets: ["lesson"],
+    },
+  ],
 });
 
 it("stales member purchase, management and business catalogs for old and new product centers", async () => {
@@ -38,8 +39,7 @@ it("stales member purchase, management and business catalogs for old and new pro
     ["business-product-scope", scope.accountId, scope.orgId, scope.centerId],
   ];
   const unrelated = [catalog(centerC), catalog(foreign)];
-  for (const key of [...affected, ...unrelated])
-    queries.setQueryData(key, { revision: "before" });
+  for (const key of [...affected, ...unrelated]) queries.setQueryData(key, { revision: "before" });
 
   const read = vi.fn(async () => ({ revision: "after" }));
   const stop = new QueryObserver(queries, {
@@ -69,11 +69,14 @@ it("stales member purchase, management and business catalogs for old and new pro
 
 it("organization-wide product scopes update the known centers without crossing organizations", () => {
   const orgWide = terms(scope.centerId);
-  orgWide.scopes = [{
-    ...orgWide.scopes[0]!,
-    scope_kind: "organization_all_disciplines",
-    center_id: null,
-  }];
+  orgWide.scopes = [
+    {
+      scope_kind: "organization_all",
+      center_id: null,
+      discipline_id: null,
+      usage_targets: ["lesson"],
+    },
+  ];
   const families = affectedProductQueryFamilies(scope, orgWide, undefined, [
     centerB.centerId,
     centerC.centerId,

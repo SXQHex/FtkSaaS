@@ -1,4 +1,4 @@
-import { affectedProductQueryFamilies } from "./products-query";
+import { affectedProductQueryFamilies, productsKeys } from "./products-query";
 import { invalidateAndReadFirstPage } from "../../lib/cache-invalidation";
 import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useState } from "react";
@@ -230,14 +230,17 @@ export function ProductsContent({
           onLockChange={onLockChange}
           onAccessLost={accessLost}
           onRefresh={async (result) => {
+            const updated = result?.terms ?? editor.base?.terms;
             await invalidateAndReadFirstPage({
               queries,
-              families: affectedProductQueryFamilies(
-                scope,
-                result.terms,
-                editor.base?.terms,
-                current?.centers.map((center) => center.id) ?? [],
-              ),
+              families: updated
+                ? affectedProductQueryFamilies(
+                    scope,
+                    updated,
+                    editor.base?.terms,
+                    current?.centers.map((center) => center.id) ?? [],
+                  )
+                : [productsKeys.management(scope)],
               firstPageKey: [
                 "products-management",
                 scope.accountId,
@@ -272,7 +275,7 @@ function ProductEditorController({
   canWrite: boolean;
   usageCenters: { id: string; name: string }[];
   onClose: () => void;
-  onRefresh: (result: ProductView) => Promise<void>;
+  onRefresh: (result?: ProductView) => Promise<void>;
   onAccessLost: (error: unknown) => boolean;
   onLockChange: (locked: boolean) => void;
 }) {
