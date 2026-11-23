@@ -37,7 +37,7 @@ export function FreezeEditor({
   timezone: string;
   sourceAvailable: boolean;
   onClose: () => void;
-  onRefresh: (result: FreezeResult) => Promise<void>;
+  onRefresh: (result: FreezeResult, assertCurrent: () => void) => Promise<void>;
   onLockChange: (value: boolean) => void;
   onAccessLost: (error: unknown) => boolean;
 }) {

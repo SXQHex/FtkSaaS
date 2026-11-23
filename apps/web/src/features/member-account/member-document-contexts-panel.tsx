@@ -89,10 +89,7 @@ export function MemberDocumentContextsPanel({
           if (result.isError) throw result.error;
         }}
         onClose={() => {
-          if (!locked) {
-            setSelected(undefined);
-            void query.refetch();
-          }
+          if (!locked) setSelected(undefined);
         }}
       />
     );

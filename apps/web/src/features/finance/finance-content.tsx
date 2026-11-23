@@ -1,3 +1,4 @@
+import { cacheVerifiedReadback } from "../../lib/cache-invalidation";
 import { financeKeys, invalidateFinanceViews } from "./finance-query";
 import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useState } from "react";
@@ -20,9 +21,10 @@ import {
   type FinanceSelection,
   type CollectionIntent,
 } from "./finance";
-import { useFinanceCommand } from "./use-finance-command";
+import { useFinanceCommand, type FinanceReadback } from "./use-finance-command";
 import type { ClientScope } from "../../lib/scoped-backend";
 
+import { peopleKeys } from "../people/people-query";
 import { readPeoplePage } from "../people/people";
 import { BackendError } from "../../lib/backend";
 import { formatMinorAmount } from "../../lib/money";
@@ -100,14 +102,7 @@ export function FinanceContent({
         : undefined,
     center = current?.centers.find((row) => row.id === scope.centerId && row.accessible);
   const people = useQuery({
-    queryKey: [
-      "finance-people",
-      scope.accountId,
-      scope.orgId,
-      scope.centerId,
-      search,
-      personCursors[personPage],
-    ],
+    queryKey: [...peopleKeys.picker(scope), search.trim(), personCursors[personPage]],
     queryFn: ({ signal, client }) =>
       readPeoplePage(scope, search, personCursors[personPage], undefined, false, signal, {
         client,
@@ -194,21 +189,20 @@ export function FinanceContent({
     },
     [onLockChange],
   );
-  async function refreshFinance() {
+  const refreshFinance: FinanceReadback = async (firstPage, assertCurrent) => {
     if (!selection) throw new Error("FINANCE_SELECTION_UNAVAILABLE");
     await invalidateFinanceViews(queries, scope, selection.personId, selection.currency);
-    // All existing movement cursors predate this write. Refresh only the
-    // selected person's first page and never replay an old continuation.
-    await queries.fetchQuery({
-      queryKey: [...financeKeys.person(scope, selection.personId, selection.currency), undefined],
-      queryFn: ({ signal }) => readFinancePage(scope, selection, undefined, signal),
-      staleTime: 0,
-      retry: false,
-    });
+    assertCurrent();
+    await cacheVerifiedReadback(
+      queries,
+      [...financeKeys.person(scope, selection.personId, selection.currency), undefined],
+      firstPage,
+    );
+    assertCurrent();
     await onDirectoryReadback?.();
     setCursors([undefined]);
     setPageIndex(0);
-  }
+  };
   const formatDate = (value: string) =>
     new Intl.DateTimeFormat("tr-TR", {
       dateStyle: "short",
@@ -507,9 +501,7 @@ export function FinanceContent({
           personLabel={personLabel}
           sourceAvailable={!workspace.isError}
           onClose={() => setDebtAction(undefined)}
-          onRefresh={async () => {
-            await refreshFinance();
-          }}
+          onRefresh={refreshFinance}
           onLockChange={changeLock}
           onAccessLost={accessLost}
         />
@@ -523,9 +515,7 @@ export function FinanceContent({
           personLabel={personLabel}
           sourceAvailable={!workspace.isError}
           onClose={() => setCreditRefund(false)}
-          onRefresh={async () => {
-            await refreshFinance();
-          }}
+          onRefresh={refreshFinance}
           onLockChange={changeLock}
           onAccessLost={accessLost}
         />
@@ -540,9 +530,7 @@ export function FinanceContent({
           personLabel={personLabel}
           sourceAvailable={!workspace.isError}
           onClose={() => setCorrectionId(undefined)}
-          onRefresh={async () => {
-            await refreshFinance();
-          }}
+          onRefresh={refreshFinance}
           onLockChange={changeLock}
           onAccessLost={accessLost}
         />
@@ -556,9 +544,7 @@ export function FinanceContent({
           personLabel={personLabel}
           onClose={() => setCollect(false)}
           canWrite={!workspace.isError && !authority.isError && authority.data === true}
-          onRefresh={async () => {
-            await refreshFinance();
-          }}
+          onRefresh={refreshFinance}
           onAccessLost={accessLost}
           onLockChange={changeLock}
         />
@@ -583,7 +569,7 @@ export function CollectionEditor({
   personLabel: string;
   canWrite: boolean;
   onClose: () => void;
-  onRefresh: () => Promise<void>;
+  onRefresh: FinanceReadback;
   onAccessLost: (error: unknown) => boolean;
   onLockChange: (locked: boolean) => void;
 }) {
@@ -598,9 +584,7 @@ export function CollectionEditor({
     );
   const command = useFinanceCommand({
     onAccessLost,
-    onRefresh: async () => {
-      await onRefresh();
-    },
+    onRefresh,
   });
   const locked = preparing || command.locked;
   useEffect(() => {

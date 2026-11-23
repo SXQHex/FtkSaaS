@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+import { QueryClient } from "@tanstack/react-query";
 import {
   readSettingsDocument,
   parseSettingsDocumentPatch,
@@ -13,7 +14,7 @@ import {
   settingsPolicyIntent,
   writeSettingsPolicy,
 } from "./settings-policy-command";
-import { readSettingsSubscription } from "./settings-subscription";
+import { readSettingsSubscription, settingsSubscriptionQuery } from "./settings-subscription";
 import {
   settingsDowngradeIntent,
   writeSettingsDowngrade,
@@ -122,6 +123,20 @@ const snapshot = (
   as_of: at,
 });
 beforeEach(() => call.mockReset());
+it("shares the verified organization subscription across centers without caching a command scope", async () => {
+  call.mockResolvedValue(sub);
+  const queries = new QueryClient({ defaultOptions: { queries: { staleTime: 30_000 } } });
+  const first = await queries.query(settingsSubscriptionQuery(scope));
+  const second = await queries.query(settingsSubscriptionQuery({ ...scope, centerId: id(11) }));
+
+  expect(second).toBe(first);
+  expect(second).toEqual({ subscription: sub, readAt: expect.any(Number) });
+  expect(call).toHaveBeenCalledExactlyOnceWith("subscription_get_v1", {
+    client_api_version: 1,
+    request_id: expect.any(String),
+    org_id: scope.orgId,
+  });
+});
 it("enforces exact public field and consent array bounds rather than accepting arbitrary configuration", () => {
   expect(
     parseSettingsDocumentPatch({

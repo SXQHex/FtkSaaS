@@ -22,11 +22,11 @@ import { ScheduleChangeDialog } from "./schedule-change-dialog";
 import { ScheduleDiscardDialog } from "./schedule-discard-dialog";
 import {
   readScheduleSources,
-  readScheduleRange,
   readScheduleEditor,
   readScheduleSession,
   scheduleLocalDate,
 } from "./schedule-read";
+import { scheduleRangeQuery } from "./schedule-query";
 import {
   scheduleEvents,
   scheduleBackendError,
@@ -144,7 +144,6 @@ export function ScheduleContent({
         "schedule-group",
         "schedule-group-people",
         "schedule-group-rights",
-        "schedule-group-sessions",
         "schedule-replacements",
       ])
         queries.removeQueries({
@@ -237,36 +236,13 @@ export function ScheduleContent({
     accessLost,
     t,
   ]);
+  const calendarOptions = scheduleRangeQuery(scope, range, {
+    ...(room ? { roomId: room } : {}),
+    ...(instructor ? { instructorId: instructor } : {}),
+  });
   const calendar = useQuery({
-    queryKey: [
-      "schedule-range",
-      scope.accountId,
-      scope.orgId,
-      scope.centerId,
-      range?.starts_at,
-      range?.ends_at,
-      room,
-      instructor,
-    ],
+    ...calendarOptions,
     enabled: Boolean(sources.data && range),
-    queryFn: async ({ queryKey, signal, client }) => {
-      try {
-        return await readScheduleRange(
-          scope,
-          range!,
-          {
-            ...(room ? { roomId: room } : {}),
-            ...(instructor ? { instructorId: instructor } : {}),
-          },
-          signal,
-          { client, signal },
-        );
-      } catch (failure) {
-        if (accessLost(failure, queryKey)) command.abandon();
-        throw failure;
-      }
-    },
-    retry: false,
   });
   const command = useScheduleCommand({
     onAccessLost: accessLost,
@@ -274,8 +250,8 @@ export function ScheduleContent({
       await invalidateCachedFamilies(queries, [
         ["schedule-range", scope.accountId, scope.orgId, scope.centerId],
         ["session-detail", scope.accountId, scope.orgId, scope.centerId],
-        ["instructor-today", scope.accountId, scope.orgId, scope.centerId],
-        ["instructor-schedule", scope.accountId, scope.orgId, scope.centerId],
+        ["instructor-calendar", scope.accountId, scope.orgId, scope.centerId],
+        ["instructor-today-attendance", scope.accountId, scope.orgId, scope.centerId],
         ...(intent.operation === "replacement_session_create_v1"
           ? [
               [
@@ -338,6 +314,11 @@ export function ScheduleContent({
       setError(undefined);
     },
   });
+  const { abandon } = command;
+  useEffect(() => {
+    if (!lost.current && calendar.error && accessLost(calendar.error, calendarOptions.queryKey))
+      abandon();
+  }, [calendar.error, calendarOptions.queryKey, accessLost, abandon]);
   const locked = busy || command.locked || rosterLocked;
   const dirty = Object.keys(drafts).length > 0;
   const blocker = useBlocker({
@@ -413,9 +394,6 @@ export function ScheduleContent({
     if (!entry) return;
     if (entry.type === "event") {
       const eventId = entry.item.id;
-      queries.removeQueries({
-        queryKey: ["event-detail", scope.accountId, scope.orgId, scope.centerId, eventId],
-      });
       void navigate({
         to: "/o/$orgId/c/$centerId/events/$eventId",
         params: { orgId: scope.orgId, centerId: scope.centerId, eventId },

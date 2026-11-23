@@ -138,6 +138,7 @@ export async function readLessonRequests(
     ),
   ];
   const people = new Map<string, PersonView | undefined>();
+  const memberIds = new Set(details.map((row) => row.person_id));
   for (let offset = 0; offset < ids.length; offset += 4)
     await Promise.all(
       ids.slice(offset, offset + 4).map(async (id) => {
@@ -146,7 +147,7 @@ export async function readLessonRequests(
             ...common(scope),
             request_id: uuidv7(),
             person_id: id,
-            include_member_summary: true,
+            ...(memberIds.has(id) ? { include_member_summary: true } : {}),
           });
           if (person.id !== id) throw new Error("LESSON_REQUEST_PERSON_UNAVAILABLE");
           people.set(id, person);

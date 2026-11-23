@@ -1,7 +1,13 @@
 import { expect, it, vi, afterEach } from "vitest";
 const { call } = vi.hoisted(() => ({ call: vi.fn() }));
 vi.mock("../../lib/scoped-backend", () => ({ scopedBackend: vi.fn(async () => ({ call })) }));
-import { calendarCredential, readMemberCalendars, writeMemberCalendar } from "./member-calendar";
+import {
+  calendarCredential,
+  readCalendarLinks,
+  readMemberCalendars,
+  selectMemberCalendars,
+  writeMemberCalendar,
+} from "./member-calendar";
 import {
   readMemberPreferences,
   writeMemberPreference,
@@ -25,7 +31,7 @@ it("accepts HTTPS and isolated loopback credentials, rejects external cleartext 
 it("follows own metadata cursors while showing only selected organization links", async () => {
   call
     .mockResolvedValueOnce({
-      items: [{ id: "other", org_id: "other", version: 1 }],
+      items: [{ id: "other", org_id: "other", version: 1, kinds: ["lessons"] }],
       next_cursor: "second",
       service_ready: true,
       supported_kinds: ["lessons"],
@@ -36,7 +42,12 @@ it("follows own metadata cursors while showing only selected organization links"
       service_ready: true,
       supported_kinds: ["lessons"],
     });
-  const result = await readMemberCalendars(scope);
+  const snapshot = await readCalendarLinks(scope);
+  const result = selectMemberCalendars(scope, snapshot);
+  expect(
+    selectMemberCalendars({ ...scope, orgId: "other" }, snapshot).links.map((row) => row.id),
+  ).toEqual(["other"]);
+  expect(call).toHaveBeenCalledTimes(2);
   expect(result.links.map((row) => row.id)).toEqual(["own"]);
   expect(result.ready).toBe(true);
   expect(call.mock.calls[1][1].page.cursor).toBe("second");

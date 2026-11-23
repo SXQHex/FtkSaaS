@@ -1,3 +1,4 @@
+import { capturePrivateReadback } from "../../lib/cache-invalidation";
 import type { QueryClient } from "@tanstack/react-query";
 import type { ClientScope } from "../../lib/scoped-backend";
 
@@ -23,6 +24,7 @@ export async function invalidateFinanceViews(
   personId: string,
   currency: string,
 ) {
+  const assertCurrent = capturePrivateReadback(queries);
   const tenant = [scope.accountId, scope.orgId, scope.centerId] as const;
   const families: (readonly unknown[])[] = [
     financeKeys.person(scope, personId, currency),
@@ -64,6 +66,7 @@ export async function invalidateFinanceViews(
       queries.cancelQueries({ queryKey, exact: true }),
     ),
   ]);
+  assertCurrent();
   await Promise.all([
     ...families.map((queryKey) => queries.invalidateQueries({ queryKey, refetchType: "none" })),
     ...[...creditKeys, ...reportKeys].map((queryKey) =>

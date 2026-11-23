@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { PrivateSessionRevision } from "../auth/private-session-revision";
+import { capturePrivateReadback } from "../../lib/cache-invalidation";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useBlocker, useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
@@ -10,6 +12,8 @@ import type {
 } from "@ftksaas/api-contracts";
 import {
   readMemberCalendars,
+  readCalendarLinks,
+  selectMemberCalendars,
   writeMemberCalendar,
   calendarCredential,
   calendarLinkMatchesScope,
@@ -52,10 +56,14 @@ export function MemberCalendarPanel({
   const { t } = useTranslation(),
     router = useRouter(),
     queries = useQueryClient();
-  const queryKey = ["member-calendar", scope.accountId, scope.orgId, scope.studioCenterId];
+  const sessionRevision = useContext(PrivateSessionRevision);
+  const queryKey = scope.studioCenterId
+    ? ["member-calendar", scope.accountId, scope.orgId, scope.studioCenterId]
+    : ["member-calendar", scope.accountId, "personal"];
   const query = useQuery({
     queryKey,
-    queryFn: (readContext) => readMemberCalendars(scope, readContext),
+    queryFn: (readContext) => readCalendarLinks(scope, readContext),
+    select: (snapshot) => selectMemberCalendars(scope, snapshot),
     retry: false,
   });
   const [intent, setIntent] = useState<CalendarIntent>(),
@@ -64,10 +72,16 @@ export function MemberCalendarPanel({
     [notice, setNotice] = useState<
       "ready" | "unknown" | "saved-unread" | "saved" | "stale" | "rejected"
     >("ready"),
-    [credential, setCredential] = useState<string>(),
+    [credential, setCredential] = useState<{
+      value: string;
+      version: number;
+      id: string;
+      revision: number;
+    }>(),
     [copied, setCopied] = useState(false),
     [copyFailed, setCopyFailed] = useState(false);
   const executing = useRef(false),
+    writeRevision = useRef<number | undefined>(undefined),
     ack = useRef<PersonalCalendarMutation | PersonalCalendarCredentialMutation>(undefined);
   const locked = busy || notice === "unknown" || notice === "saved-unread";
   useEffect(() => {
@@ -82,6 +96,7 @@ export function MemberCalendarPanel({
   function select(next: CalendarIntent) {
     if (locked || disabled) return;
     ack.current = undefined;
+    writeRevision.current = undefined;
     setIntent(next);
     setReviewed(false);
     setNotice("ready");
@@ -105,14 +120,19 @@ export function MemberCalendarPanel({
       throw new Error("CALENDAR_RESULT_MISMATCH");
     // Revealing a native subscription credential requires a strict result read,
     // independent of the account proof used by the ordinary calendar Query.
+    const assertCurrent = capturePrivateReadback(queries);
     await queries.cancelQueries({ queryKey, exact: true });
+    assertCurrent();
     const next = await queries.fetchQuery({
       queryKey,
-      queryFn: () => readMemberCalendars(scope),
+      queryFn: ({ signal }) => readCalendarLinks(scope, undefined, signal),
       staleTime: 0,
       retry: false,
     });
-    const current = next.links.find((row) => row.id === result.link.id);
+    assertCurrent();
+    const current = next.links.find(
+      (row) => row.id === result.link.id && calendarLinkMatchesScope(scope, row),
+    );
     if (
       !current ||
       current.version < result.link.version ||
@@ -124,9 +144,15 @@ export function MemberCalendarPanel({
     if (
       current.version === result.link.version &&
       intent.action !== "revoke" &&
+      writeRevision.current === sessionRevision &&
       "subscription_url" in result
     ) {
-      setCredential(calendarCredential(result.subscription_url));
+      setCredential({
+        value: calendarCredential(result.subscription_url),
+        id: current.id,
+        version: current.version,
+        revision: sessionRevision,
+      });
     }
     setNotice("saved");
   }
@@ -145,6 +171,7 @@ export function MemberCalendarPanel({
             return;
           }
         }
+        writeRevision.current ??= sessionRevision;
         ack.current = await writeMemberCalendar(scope, intent);
         setNotice("saved-unread");
       }
@@ -176,9 +203,9 @@ export function MemberCalendarPanel({
     }
   }
   async function copyCredential() {
-    if (!credential) return;
+    if (!visibleCredential) return;
     try {
-      await navigator.clipboard.writeText(credential);
+      await navigator.clipboard.writeText(visibleCredential);
       setCopied(true);
       setCopyFailed(false);
     } catch {
@@ -198,10 +225,22 @@ export function MemberCalendarPanel({
     rotate: t(($) => $.memberAccount.calendarRotate),
     revoke: t(($) => $.memberAccount.calendarRevoke),
   };
-  const links = query.data?.links.filter((link) => link.kinds.includes(kind));
+  const links =
+    query.isError || query.isFetching
+      ? undefined
+      : query.data?.links.filter((link) => link.kinds.includes(kind));
+  const visibleCredential =
+    credential &&
+    credential.revision === sessionRevision &&
+    links?.some(
+      (link) =>
+        link.id === credential.id && link.version === credential.version && link.state === "active",
+    )
+      ? credential.value
+      : undefined;
   return (
     <>
-      {query.data && (
+      {links && (
         <ItemGroup>
           {links?.map((link) => (
             <Item role="listitem" key={link.id} size="xs">
@@ -227,7 +266,7 @@ export function MemberCalendarPanel({
                   <Button
                     size="sm"
                     variant="outline"
-                    isDisabled={disabled || locked || query.isError || !query.data.ready}
+                    isDisabled={disabled || locked || query.isError || !query.data?.ready}
                     onPress={() => select({ action: "rotate", link, key: uuidv7() })}
                   >
                     {names.rotate}
@@ -277,6 +316,7 @@ export function MemberCalendarPanel({
               disabled ||
               locked ||
               query.isError ||
+              query.isFetching ||
               !query.data?.ready ||
               !query.data.supportedKinds.includes(kind)
             }
@@ -315,9 +355,9 @@ export function MemberCalendarPanel({
               <AlertDescription>{noticeMessage}</AlertDescription>
             </Alert>
           )}
-          {credential && (
+          {visibleCredential && (
             <AccountCalendarView
-              credential={credential}
+              credential={visibleCredential}
               actions={
                 <Button
                   variant="outline"

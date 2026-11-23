@@ -214,7 +214,7 @@ export function LessonRequestsContent({
           onRefresh={async () => {
             await invalidateAndReadFirstPage({
               queries,
-              families: [prefix, ["schedule-range", scope.accountId, scope.orgId, scope.centerId]],
+              families: [prefix],
               firstPageKey: [...prefix, filter, undefined, focusedRequest],
               readFirstPage: () => readLessonRequests(scope, undefined, filter, focusedRequest),
             });

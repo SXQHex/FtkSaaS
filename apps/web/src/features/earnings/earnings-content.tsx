@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import type { ClientScope, AccountReadContext } from "../../lib/scoped-backend";
 import type { InstructorFinancePayment, Interval } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
+import { capturePrivateReadback, readIntoCurrentQuery } from "../../lib/cache-invalidation";
 
 import { instructorEarningMonths } from "../instructor/instructor-earnings-read";
 import { readDisciplineCatalog } from "../settings/discipline-reader";
@@ -27,28 +28,26 @@ type Editor =
 async function readVisibleCounts(
   scope: ClientScope,
   interval: Interval | undefined,
-  items: Awaited<ReturnType<typeof readEarningsDirectory>>["items"],
+  personIds: readonly string[],
   readContext?: AccountReadContext,
 ) {
-  const visible = items.filter((row) => row.kind === "instructor"),
-    result: Record<string, number> = {};
-  for (let at = 0; at < visible.length; at += 4) {
-    const batch = visible.slice(at, at + 4);
+  const result: Record<string, number> = {};
+  for (let at = 0; at < personIds.length; at += 4) {
+    const batch = personIds.slice(at, at + 4);
     const responses = await Promise.all(
-      batch.map((row) =>
-        readEarningsDirectory(
-          scope,
-          "instructors",
-          { personId: row.person_id, interval },
-          readContext,
-        ),
+      batch.map((personId) =>
+        readEarningsDirectory(scope, "instructors", { personId, interval }, readContext),
       ),
     );
     responses.forEach((response, offset) => {
-      result[batch[offset]!.person_id] = response.closed_session_count;
+      result[batch[offset]!] = response.closed_session_count;
     });
   }
   return result;
+}
+
+function instructorIds(items: Awaited<ReturnType<typeof readEarningsDirectory>>["items"]) {
+  return items.flatMap((row) => (row.kind === "instructor" ? [row.person_id] : [])).sort();
 }
 
 export function EarningsContent({
@@ -91,9 +90,16 @@ export function EarningsContent({
   const interval =
     period === "all" ? undefined : months.data?.find((row) => row.id === period)?.interval;
   const active =
-    !!current && !!timezone && !!months.data && !lost && (period === "all" || !!interval);
+    !!current &&
+    !workspace.isError &&
+    !!timezone &&
+    !!months.data &&
+    !lost &&
+    (period === "all" || !!interval);
   const view = tab === "lines" ? "earnings" : tab;
-  const page = useQuery({
+  const isCatalogView = view === "instructors" && !personId && !interval;
+  const sharesCatalogPage = isCatalogView && !cursors[index];
+  const directory = useQuery({
     queryKey: [...earningsKeys.directory(scope), view, personId, interval, cursors[index]],
     queryFn: (readContext) =>
       readEarningsDirectory(
@@ -106,7 +112,7 @@ export function EarningsContent({
         },
         readContext,
       ),
-    enabled: active,
+    enabled: active && !sharesCatalogPage,
     retry: false,
     refetchOnWindowFocus: false,
   });
@@ -120,6 +126,13 @@ export function EarningsContent({
     retry: false,
     refetchOnWindowFocus: false,
   });
+  const page = sharesCatalogPage
+    ? {
+        data: catalog.data?.pages[0],
+        isError: catalog.isError,
+        isFetching: catalog.isFetching,
+      }
+    : directory;
   const rawPeople =
     catalog.data?.pages.flatMap((value) =>
       value.items.filter((row) => row.kind === "instructor"),
@@ -139,10 +152,11 @@ export function EarningsContent({
         ]
       : [];
   // The native summary is requested only for visible instructors; no page rows are summed into a global count.
+  const visibleInstructors = instructorIds(!page.isError ? (page.data?.items ?? []) : []);
   const counts = useQuery({
-    queryKey: [...earningsKeys.visibleCounts(scope), interval, page.data],
-    enabled: active && !!page.data && view === "instructors" && !page.isError,
-    queryFn: (readContext) => readVisibleCounts(scope, interval, page.data!.items, readContext),
+    queryKey: [...earningsKeys.visibleCounts(scope), interval, visibleInstructors],
+    enabled: active && !personId && view === "instructors" && visibleInstructors.length > 0,
+    queryFn: (readContext) => readVisibleCounts(scope, interval, visibleInstructors, readContext),
     retry: false,
     refetchOnWindowFocus: false,
   });
@@ -177,34 +191,52 @@ export function EarningsContent({
     return denied;
   }, []);
   const readable = active && !page.isError ? page.data : undefined;
-  const mapped = readable ? earningsPresentation(readable, timezone!, t, counts.data) : undefined;
+  const visibleCounts =
+    readable && view === "instructors" && personId
+      ? { [personId]: readable.closed_session_count }
+      : !counts.isError
+        ? counts.data
+        : undefined;
+  const mapped = readable ? earningsPresentation(readable, timezone!, t, visibleCounts) : undefined;
   const resetPage = () => {
     setCursors([undefined]);
     setIndex(0);
     setSaved(false);
   };
   async function refresh() {
+    const assertCurrent = capturePrivateReadback(queries);
     await invalidateEarningsViews(queries, scope);
+    assertCurrent();
     // A payment or agreement may invalidate the historical cursor chain.
-    const first = await queries.fetchQuery({
-      queryKey: [...earningsKeys.directory(scope), view, personId, interval, undefined],
-      queryFn: () =>
-        readEarningsDirectory(scope, view, { personId: personId || undefined, interval }),
-      staleTime: 0,
-      retry: false,
-    });
+    const first = isCatalogView
+      ? await readIntoCurrentQuery(
+          queries,
+          earningsKeys.instructorCatalog(scope),
+          () => readEarningsDirectory(scope, "instructors"),
+          (value) => ({ pages: [value], pageParams: [undefined] }),
+        )
+      : await queries.fetchQuery({
+          queryKey: [...earningsKeys.directory(scope), view, personId, interval, undefined],
+          queryFn: () =>
+            readEarningsDirectory(scope, view, { personId: personId || undefined, interval }),
+          staleTime: 0,
+          retry: false,
+        });
+    assertCurrent();
+    const ids = instructorIds(first.items);
     const [result] = await Promise.all([
-      catalog.refetch(),
-      view === "instructors"
+      isCatalogView ? Promise.resolve() : catalog.refetch(),
+      view === "instructors" && !personId && ids.length
         ? queries.fetchQuery({
-            queryKey: [...earningsKeys.visibleCounts(scope), interval, first],
-            queryFn: () => readVisibleCounts(scope, interval, first.items),
+            queryKey: [...earningsKeys.visibleCounts(scope), interval, ids],
+            queryFn: () => readVisibleCounts(scope, interval, ids),
             staleTime: 0,
             retry: false,
           })
         : Promise.resolve(),
     ]);
-    if (result.isError) throw Error("EARNINGS_REFRESH_UNAVAILABLE");
+    if (result?.isError) throw Error("EARNINGS_REFRESH_UNAVAILABLE");
+    assertCurrent();
     setCursors([undefined]);
     setIndex(0);
   }
@@ -213,9 +245,9 @@ export function EarningsContent({
     setLost(false);
     await workspace.refetch();
     await router.invalidate();
-    void page.refetch();
+    if (!sharesCatalogPage) void directory.refetch();
     void catalog.refetch();
-    void counts.refetch();
+    if (!personId && view === "instructors" && visibleInstructors.length) void counts.refetch();
   }
   const sourceError =
     page.isError ||

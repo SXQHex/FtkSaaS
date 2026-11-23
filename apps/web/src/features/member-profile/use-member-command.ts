@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useBlocker } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { BackendError } from "../../lib/backend";
+import { capturePrivateReadback } from "../../lib/cache-invalidation";
 import type { Mutation, OperationStatusView } from "@ftksaas/api-contracts";
 
 export function useMemberCommand<Intent, Result>({
@@ -14,9 +16,10 @@ export function useMemberCommand<Intent, Result>({
   write: (intent: Intent) => Promise<Pick<Mutation, "primary_id">>;
   readReceipt?: (intent: Intent) => Promise<OperationStatusView>;
   readResult: (intent: Intent, id?: string) => Promise<Result>;
-  onRefresh?: (result: Result) => Promise<void>;
+  onRefresh?: (result: Result, assertCurrent: () => void) => Promise<void>;
   onAccessLost: (error: unknown) => boolean;
 }) {
+  const queries = useQueryClient();
   const [state, setState] = useState<
     "ready" | "writing" | "unknown" | "pending" | "saved-unread" | "saved" | "stale" | "rejected"
   >("ready");
@@ -53,9 +56,17 @@ export function useMemberCommand<Intent, Result>({
   }
   async function reread() {
     if (!intent.current || !acknowledged.current) return;
-    const result = await readResult(intent.current, primary.current);
-    if (!mounted.current || terminal.current) return;
-    await onRefresh?.(result);
+    const assertCurrent = capturePrivateReadback(queries);
+    try {
+      const result = await readResult(intent.current, primary.current);
+      if (!mounted.current || terminal.current) return;
+      assertCurrent();
+      await onRefresh?.(result, assertCurrent);
+      assertCurrent();
+    } catch (error) {
+      assertCurrent();
+      throw error;
+    }
     if (mounted.current && !terminal.current) setState("saved");
   }
   function failed(error: unknown) {
@@ -96,7 +107,11 @@ export function useMemberCommand<Intent, Result>({
     setState("writing");
     try {
       if (!acknowledged.current) {
-        const result = await write(intent.current);
+        const assertCurrent = capturePrivateReadback(queries);
+        const result = await write(intent.current).catch((error: unknown) => {
+          assertCurrent();
+          throw error;
+        });
         primary.current = result.primary_id;
         acknowledged.current = true;
       }
@@ -129,7 +144,12 @@ export function useMemberCommand<Intent, Result>({
     setBusy(true);
     try {
       if (!acknowledged.current && readReceipt) {
-        const receipt = await readReceipt(intent.current);
+        const assertCurrent = capturePrivateReadback(queries);
+        const receipt = await readReceipt(intent.current).catch((error: unknown) => {
+          assertCurrent();
+          throw error;
+        });
+        assertCurrent();
         if (receipt.status === "succeeded" || receipt.status === "result_expired") {
           acknowledged.current = true;
           primary.current = receipt.result_reference?.id;

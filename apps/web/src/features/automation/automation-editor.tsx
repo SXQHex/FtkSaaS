@@ -40,6 +40,7 @@ export interface AutomationEditorProps {
   centerName: string;
   onSaved: () => Promise<void>;
   onClose: () => void;
+  onReload: () => void;
   onLockChange: (value: boolean) => void;
   onAccessLost: (cause: unknown) => boolean;
 }
@@ -196,7 +197,7 @@ export function AutomationEditor(props: AutomationEditorProps) {
   }
   const notice = (
     <>
-      <EventCommandNotice command={command} onReload={props.onClose} />
+      <EventCommandNotice command={command} onReload={props.onReload} />
       <Alert>
         <AlertDescription>{t(($) => $.automation.nativeLimit)}</AlertDescription>
       </Alert>

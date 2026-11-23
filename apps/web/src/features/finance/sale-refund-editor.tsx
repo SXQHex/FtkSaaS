@@ -31,7 +31,7 @@ export function SaleRefundEditor({
   source: SaleRefundSource;
   sourceAvailable: boolean;
   onClose: () => void;
-  onRefresh: (result: SaleRefundResult) => Promise<void>;
+  onRefresh: (result: SaleRefundResult, assertCurrent: () => void) => Promise<void>;
   onLockChange: (locked: boolean) => void;
   onAccessLost: (error: unknown) => boolean;
 }) {
@@ -50,8 +50,8 @@ export function SaleRefundEditor({
     write: writeSaleRefund,
     readReceipt: readSaleRefundReceipt,
     readResult: readSaleRefundResult,
-    onRefresh: async (value) => {
-      await onRefresh(value);
+    onRefresh: async (value, assertCurrent) => {
+      await onRefresh(value, assertCurrent);
       if (mounted.current) setResult(value);
     },
     onAccessLost,

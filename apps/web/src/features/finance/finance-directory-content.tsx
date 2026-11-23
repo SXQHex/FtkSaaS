@@ -1,3 +1,7 @@
+import { cacheVerifiedReadback } from "../../lib/cache-invalidation";
+import { invalidateProductSalesViews } from "../products/products-query";
+import { profileRightsKey } from "../member-profile/profile-read";
+import { invalidateMemberReservationViews } from "../member-reservations/member-reservations-query";
 import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useState } from "react";
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -112,35 +116,22 @@ export function FinanceDirectoryContent({
   const creditRows = source && tab === "credits" && !personal ? source.items : [];
   const creditDebts = useQueries({
     queries: creditRows.map((row) => ({
-      queryKey: financeKeys.creditDebt(scope, row.person_id, row.currency),
+      queryKey: [...financeKeys.person(scope, row.person_id, row.currency), undefined],
       queryFn: ({ signal, client }: AccountReadContext) =>
-        guard(async () => {
-          try {
-            const finance = await readFinancePage(
-              scope,
-              { personId: row.person_id, currency: row.currency },
-              undefined,
-              signal,
-              { client, signal },
-            );
-            return formatMinorAmount(
-              finance.debts
-                .reduce((sum, debt) => sum + BigInt(debt.remaining_minor), 0n)
-                .toString(),
-              row.currency,
-            );
-          } catch (error) {
-            signal.throwIfAborted();
-            if (
-              (error instanceof BackendError &&
-                ["AUTH_REQUIRED", "SESSION_REVOKED"].includes(error.code)) ||
-              (error instanceof Error &&
-                ["AUTH_REQUIRED", "ACCOUNT_CHANGED"].includes(error.message))
-            )
-              throw error;
-            return null;
-          }
-        }),
+        guard(() =>
+          readFinancePage(
+            scope,
+            { personId: row.person_id, currency: row.currency },
+            undefined,
+            signal,
+            { client, signal },
+          ),
+        ),
+      select: (finance: Awaited<ReturnType<typeof readFinancePage>>) =>
+        formatMinorAmount(
+          finance.debts.reduce((sum, debt) => sum + BigInt(debt.remaining_minor), 0n).toString(),
+          row.currency,
+        ),
       retry: false,
     })),
   });
@@ -437,22 +428,24 @@ export function FinanceDirectoryContent({
               source={saleRefund}
               sourceAvailable={Boolean(center && !workspace.isError)}
               onClose={() => setSaleRefund(undefined)}
-              onRefresh={async (result) => {
-                await invalidateFinanceViews(
+              onRefresh={async (result, assertCurrent) => {
+                const { personId, currency } = saleRefund;
+                const rightsKey = profileRightsKey(scope, personId);
+                await Promise.all([
+                  invalidateFinanceViews(queries, scope, personId, currency),
+                  invalidateMemberReservationViews(queries, scope, personId),
+                  invalidateProductSalesViews(queries, scope),
+                ]);
+                assertCurrent();
+                const finance = cacheVerifiedReadback(
                   queries,
-                  scope,
-                  saleRefund.personId,
-                  saleRefund.currency,
-                );
-                // The command has already verified this person's native finance
-                // readback. Reuse it instead of issuing the same finance_get again.
-                queries.setQueryData(
-                  [
-                    ...financeKeys.person(scope, saleRefund.personId, saleRefund.currency),
-                    undefined,
-                  ],
+                  [...financeKeys.person(scope, personId, currency), undefined],
                   result.finance,
                 );
+                if (result.rights) await cacheVerifiedReadback(queries, rightsKey, result.rights);
+                else queries.removeQueries({ queryKey: rightsKey, exact: true });
+                await finance;
+                assertCurrent();
                 await readFirstDirectoryPage();
               }}
               onLockChange={changeLock}

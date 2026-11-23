@@ -212,7 +212,8 @@ export async function mockEventDetail(
       expect(r.center_id).toBe(I.center);
     }
     if (op === "event_get_v1") {
-      if (options.refreshFailure && state.cash && state.collectionReads++ === 1)
+      if (state.cash) state.collectionReads++;
+      if (options.refreshFailure && state.collectionReads === 1)
         return reject("SERVICE_UNAVAILABLE", true);
       if (state.failRead) {
         state.failRead = false;

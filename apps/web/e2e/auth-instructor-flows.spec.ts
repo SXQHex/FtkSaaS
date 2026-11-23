@@ -39,20 +39,27 @@ test("instructor today and weekly navigation retain center scope and open only t
   const actualTime = page.getByLabel("Fiilî başlangıç saati", { exact: true });
   await expect(actualTime).toHaveAttribute("aria-invalid", "false");
   await expect(actualTime).not.toHaveAttribute("aria-describedby", "actual-time-error");
+  const beforeWeekReads = state.calendarReads.length;
   await page.getByRole("button", { name: "Bugünkü derslerime dön", exact: true }).click();
   await expect(page).toHaveURL(`${origin}/instructor/today?org=${I.org}&center=${I.center}`);
   await expect(page.getByText(/Atanmış salon/).first()).toBeVisible();
+  await expect(page.getByRole("button", { name: /Sentetik seans/ })).toBeVisible();
+  expect(state.calendarReads.length).toBe(beforeWeekReads + 1);
+  const currentWeek = state.calendarReads.at(-1)?.interval;
   const weekButton = page.getByRole("button", { name: "Haftalık programım", exact: true });
   await expect(weekButton).toBeEnabled();
-  const beforeWeekReads = state.calendarReads.length;
   await weekButton.click();
   await expect(page).toHaveURL(`${origin}/instructor/schedule?org=${I.org}&center=${I.center}`);
   await expect(page).toHaveTitle("Programım · Fethiye Tango");
   await expect(page.getByText("Sentetik seans · Atanmış salon", { exact: true })).toBeVisible();
   expect(state.calendarReads.length - beforeWeekReads).toBe(1);
   await page.getByRole("button", { name: "Sonraki hafta", exact: true }).click();
+  await expect.poll(() => state.calendarReads.length).toBe(beforeWeekReads + 2);
+  expect(state.calendarReads.at(-1)?.interval).not.toEqual(currentWeek);
   await expect(page.getByText("Sentetik seans · Atanmış salon", { exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Önceki hafta", exact: true }).click();
+  await expect(page.getByText("Sentetik seans · Atanmış salon", { exact: true })).toBeVisible();
+  expect(state.calendarReads.length).toBe(beforeWeekReads + 2);
   await page.getByText("Sentetik seans · Atanmış salon", { exact: true }).click();
   await expect(page).toHaveURL(
     `${origin}/instructor/sessions/${S.session}?org=${I.org}&center=${I.center}`,

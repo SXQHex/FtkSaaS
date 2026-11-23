@@ -1,13 +1,23 @@
 import { z } from "zod";
-import { queryOptions } from "@tanstack/react-query";
+import { queryOptions, type QueryClient } from "@tanstack/react-query";
 import { v7 as uuidv7 } from "uuid";
-import { BackendError } from "../../lib/backend";
+import { BackendError, queryBackendRead } from "../../lib/backend";
 import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { Page_NotificationView, RequestNotificationsList } from "@ftksaas/api-contracts";
 export type InboxVisibility = NonNullable<RequestNotificationsList["visibility"]>;
 export type InboxFilter = "all" | "unread" | "todo" | "archived" | "deleted";
 export const inboxKey = (scope: ClientScope) =>
   ["inbox", scope.accountId, scope.orgId, scope.centerId] as const;
+
+export function organizationInboxReadKeys(queries: QueryClient, scope: ClientScope) {
+  return queries
+    .getQueryCache()
+    .findAll({
+      queryKey: ["inbox", scope.accountId, scope.orgId],
+      predicate: ({ queryKey }) => queryKey[4] === "list" || queryKey[4] === "state",
+    })
+    .map(({ queryKey }) => queryKey);
+}
 
 export function inboxListQuery(
   scope: ClientScope,
@@ -52,24 +62,29 @@ export async function readInbox(
   cursor?: string,
   options?: { query: string; workState: "all" | "pending"; visibility?: InboxVisibility },
   context?: AccountReadContext,
+  signal = context?.signal,
 ): Promise<Page_NotificationView> {
-  const page = await (
-    await scopedBackend(scope, undefined, context)
-  ).call("notifications_list_v1", {
-    ...common(scope),
-    request_id: uuidv7(),
-    unread_only: unreadOnly,
-    ...(options
-      ? {
-          ...(options.query ? { query: options.query } : {}),
-          work_state: options.workState,
-          include_work: true,
-          include_summary: true,
-          ...(options.visibility ? { visibility: options.visibility } : {}),
-        }
-      : {}),
-    page: { limit: 20, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
-  });
+  const backend = await scopedBackend(scope, signal, context);
+  const page = await queryBackendRead(
+    backend,
+    "notifications_list_v1",
+    {
+      ...common(scope),
+      request_id: uuidv7(),
+      unread_only: unreadOnly,
+      ...(options
+        ? {
+            ...(options.query ? { query: options.query } : {}),
+            work_state: options.workState,
+            include_work: true,
+            include_summary: true,
+            ...(options.visibility ? { visibility: options.visibility } : {}),
+          }
+        : {}),
+      page: { limit: 20, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
+    },
+    signal,
+  );
   z.iso.datetime({ offset: true }).parse(page.as_of);
   const seen = new Set<string>();
   if (page.items.length > 20) throw new Error("INBOX_SOURCE_UNAVAILABLE");

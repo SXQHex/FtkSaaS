@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { PersonSummary } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
+import { readIntoCurrentQuery } from "../../lib/cache-invalidation";
 import { readPerson } from "../people/people";
 import { invalidatePeoplePages } from "../people/people-query";
 import { useMemberCommand } from "../member-profile/use-member-command";
@@ -55,8 +56,9 @@ export function ApplicationEditor({
     [error, setError] = useState("");
   const executing = useRef(false),
     errorRef = useRef<HTMLDivElement>(null);
+  const key = ["lead-application", scope.accountId, scope.orgId, scope.centerId, id];
   const query = useQuery({
-    queryKey: ["lead-application", scope.accountId, scope.orgId, scope.centerId, id],
+    queryKey: key,
     queryFn: (context) => readApplicationsPage(scope, undefined, id, undefined, context),
     retry: false,
   });
@@ -64,11 +66,21 @@ export function ApplicationEditor({
   const command = useMemberCommand({
     write: writeLeadIntent,
     readReceipt: readLeadReceipt,
-    readResult: readLeadResult,
-    onRefresh: async (result) => {
+    readResult: (intent: Parameters<typeof readLeadResult>[0], primary) =>
+      readIntoCurrentQuery(
+        queries,
+        key,
+        async () => {
+          const result = await readLeadResult(intent, primary);
+          if (result.kind !== "application") throw Error("APPLICATION_RESULT_MISMATCH");
+          return result;
+        },
+        (result) => result.page,
+      ),
+    onRefresh: async (result, assertCurrent) => {
       if (result.kind === "application" && result.createdCandidate)
         await invalidatePeoplePages(queries, scope);
-      await query.refetch({ throwOnError: true });
+      assertCurrent();
       await onSaved();
     },
     onAccessLost: (error) => {

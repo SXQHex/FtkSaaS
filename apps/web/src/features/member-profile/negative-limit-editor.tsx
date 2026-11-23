@@ -40,7 +40,7 @@ export function NegativeLimitEditor({
   timezone: string;
   sourceAvailable: boolean;
   onClose: () => void;
-  onRefresh: (result: NegativeLimitResult) => Promise<void>;
+  onRefresh: (result: NegativeLimitResult, assertCurrent: () => void) => Promise<void>;
   onLockChange: (value: boolean) => void;
   onAccessLost: (error: unknown) => boolean;
 }) {

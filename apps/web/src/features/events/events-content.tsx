@@ -1,17 +1,17 @@
 import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { invalidateAndReadFirstPage } from "../../lib/cache-invalidation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { BackendError } from "../../lib/backend";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { formatMinorAmount } from "../../lib/money";
-import { getTemporal } from "../../lib/temporal";
 import { hasWorkspaceManagementScope } from "../workspace/workspace";
 import { EventsView, type EventRow, type EventFilter } from "./events-view";
 import { EventEditor } from "./event-editor";
-import { eventMonth, readEventsPage, readEventRooms } from "./events-read";
+import { eventMonth, readEventsPage } from "./events-read";
+import { studioRoomsQuery } from "../studio/studio-rooms-query";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { Button } from "@ftksaas/ui/components/button";
 import { Field, FieldLabel } from "@ftksaas/ui/components/field";
@@ -50,13 +50,6 @@ export function EventsContent({
     enabled: !!center,
     retry: false,
   });
-  const rooms = useQuery({
-    queryKey: ["event-choices", scope.accountId, scope.orgId, scope.centerId, "rooms"],
-    queryFn: (readContext) => readEventRooms(scope, readContext),
-    enabled: !!center,
-    retry: false,
-    refetchOnWindowFocus: false,
-  });
   const program = useQuery({
     queryKey: [
       ...prefix,
@@ -66,7 +59,7 @@ export function EventsContent({
       canReadSummary,
       cursors[pageIndex],
     ],
-    enabled: !!center && !!period.data,
+    enabled: !!center && !workspace.isError && !!period.data,
     queryFn: async ({ signal, client }) => {
       const page = await readEventsPage(
         scope,
@@ -85,6 +78,13 @@ export function EventsContent({
       return page;
     },
     retry: false,
+  });
+  const eventRows =
+    center && !workspace.isError && !program.isError ? program.data?.items : undefined;
+  const needsRooms = eventRows?.some((row) => row.venue.kind === "internal" && !!row.venue.room_id);
+  const rooms = useQuery({
+    ...studioRoomsQuery(scope),
+    enabled: Boolean(center && !workspace.isError && needsRooms),
   });
   const accessLost = useCallback(
     (cause: unknown) => {
@@ -105,22 +105,24 @@ export function EventsContent({
   useEffect(() => {
     for (const error of [workspace.error, program.error, rooms.error]) if (error) accessLost(error);
   }, [workspace.error, program.error, rooms.error, accessLost]);
-  const presentation = useQuery({
-    queryKey: [
-      "event-rows",
-      scope.accountId,
-      scope.orgId,
-      scope.centerId,
-      program.data,
-      rooms.data,
-    ],
-    enabled: !!program.data && !program.isError,
-    queryFn: async () => {
-      const T = await getTemporal();
-      return program.data!.items.map((row): EventRow => {
-        const start = T.Instant.from(row.interval.starts_at).toZonedDateTimeISO(row.timezone),
-          end = T.Instant.from(row.interval.ends_at).toZonedDateTimeISO(row.timezone);
-        const format = { hour: "2-digit", minute: "2-digit", hourCycle: "h23" } as const;
+  const usableRooms = rooms.isError ? undefined : rooms.data;
+  const rows = useMemo(
+    () =>
+      eventRows?.map((row): EventRow => {
+        const start = new Date(row.interval.starts_at),
+          end = new Date(row.interval.ends_at);
+        const time = new Intl.DateTimeFormat("tr-TR", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hourCycle: "h23",
+          timeZone: row.timezone,
+        });
+        const day = new Intl.DateTimeFormat("tr-TR", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+          timeZone: row.timezone,
+        });
         return {
           id: row.id,
           name: row.name,
@@ -128,21 +130,20 @@ export function EventsContent({
             row.terms.package_usage === "eligibility_only"
               ? t(($) => $.events.editor.practice)
               : t(($) => $.events.editor.workshop),
-          day: start.toLocaleString("tr-TR", { day: "numeric", month: "short", year: "numeric" }),
-          time: `${start.toLocaleString("tr-TR", format)} – ${end.toLocaleString("tr-TR", format)} · ${row.timezone}`,
+          day: day.format(start),
+          time: `${time.format(start)} – ${time.format(end)} · ${row.timezone}`,
           venue:
             row.venue.kind === "external"
               ? (row.venue.name ?? t(($) => $.events.unknown))
-              : (rooms.data?.find((room) => room.id === row.venue.room_id)?.name ??
+              : (usableRooms?.find((room) => room.active && room.id === row.venue.room_id)?.name ??
                 t(($) => $.events.unknown)),
           registrations: `${row.active_registration_count === undefined ? "—" : row.active_registration_count.toLocaleString("tr-TR")} / ${"kind" in row.capacity ? t(($) => $.events.unlimited) : row.capacity.maximum.toLocaleString("tr-TR")}`,
           fee: formatMinorAmount(row.terms.fee_minor, row.terms.currency),
           state: row.state,
         };
-      });
-    },
-    retry: false,
-  });
+      }) ?? null,
+    [eventRows, t, usableRooms],
+  );
   const lock = useCallback(
     (value: boolean) => {
       setLocked(value);
@@ -150,13 +151,13 @@ export function EventsContent({
     },
     [onLockChange],
   );
-  const summary = !program.isError ? program.data?.summary : undefined;
+  const summary = eventRows ? program.data?.summary : undefined;
   const creationPlanBlocked =
     program.error instanceof BackendError && program.error.code === "PLAN_FEATURE_UNAVAILABLE";
   return (
     <>
       <EventsView
-        rows={!program.isError && !presentation.isError ? (presentation.data ?? null) : null}
+        rows={rows}
         query={search}
         onQuery={(value) => {
           if (!locked) {
@@ -236,7 +237,7 @@ export function EventsContent({
                 </AlertDescription>
               </Alert>
             )}
-            {(!center || period.isError || program.isError || presentation.isError) && (
+            {(!center || period.isError || program.isError || (needsRooms && rooms.isError)) && (
               <Alert variant="destructive">
                 <AlertDescription>{t(($) => $.events.sourceError)}</AlertDescription>
               </Alert>
@@ -245,7 +246,11 @@ export function EventsContent({
               variant="outline"
               isDisabled={locked || program.isFetching}
               onPress={() => {
-                void Promise.all([period.refetch(), program.refetch(), rooms.refetch()]);
+                void Promise.all([
+                  period.refetch(),
+                  program.refetch(),
+                  ...(needsRooms ? [rooms.refetch()] : []),
+                ]);
               }}
             >
               {t(($) => $.events.reload)}

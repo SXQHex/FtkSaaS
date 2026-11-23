@@ -5,7 +5,8 @@ import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { Interval } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
-import { instructorPeriod, instructorRoomLabel, readInstructorCalendar } from "./instructor-read";
+import { instructorPeriod, instructorRoomLabel } from "./instructor-read";
+import { instructorCalendarQuery } from "./instructor-query";
 import { useInstructorScope } from "./use-instructor-scope";
 import { InstructorScheduleView } from "./instructor-schedule-view";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
@@ -41,18 +42,8 @@ export function InstructorScheduleContent({
   });
   const interval = range ?? period.data?.interval;
   const query = useQuery({
-    queryKey: [
-      "instructor-schedule",
-      scope.accountId,
-      scope.orgId,
-      scope.centerId,
-      personId,
-      interval?.starts_at,
-      interval?.ends_at,
-    ],
-    queryFn: (readContext) => readInstructorCalendar(scope, personId!, interval!, readContext),
+    ...instructorCalendarQuery(scope, personId, interval),
     enabled: Boolean(center && personId && weekStart && range),
-    retry: false,
   });
   const onRange = useCallback(
     (next: Interval) =>

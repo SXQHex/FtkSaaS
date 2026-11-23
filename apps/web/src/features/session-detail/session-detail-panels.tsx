@@ -28,7 +28,26 @@ import { NativeSelect, NativeSelectOption } from "@ftksaas/ui/components/native-
 import { Input } from "@ftksaas/ui/components/input";
 import { Textarea } from "@ftksaas/ui/components/textarea";
 import { Checkbox } from "@ftksaas/ui/components/checkbox";
+import {
+  Dialog,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@ftksaas/ui/components/dialog";
 import type { BookingCategory, BookingMode } from "@ftksaas/api-contracts";
+
+export function SessionCommandRecovery({ children }: { children: ReactNode }) {
+  const { t } = useTranslation();
+  return (
+    <Dialog isOpen isKeyboardDismissDisabled showCloseButton={false}>
+      <DialogHeader>
+        <DialogTitle>{t(($) => $.sessionDetail.title)}</DialogTitle>
+        <DialogDescription>{t(($) => $.sessionDetail.readFailed)}</DialogDescription>
+      </DialogHeader>
+      {children}
+    </Dialog>
+  );
+}
 
 export interface SessionBookingDraft {
   query: string;

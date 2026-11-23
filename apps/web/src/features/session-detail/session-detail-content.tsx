@@ -11,7 +11,7 @@ import { SessionBookingEditor } from "./session-booking-editor";
 import {
   readSessionParticipants,
   readSessionAttendance,
-  readSessionInstructors,
+  readAssignedSessionInstructors,
   readSessionHeader,
 } from "./session-detail-read";
 import { readScheduleSession } from "../schedule/schedule-read";
@@ -21,11 +21,22 @@ import { readPeoplePage } from "../people/people";
 import { CancelReservation } from "../member-profile/cancel-reservation";
 import { BackendError } from "../../lib/backend";
 import type { ClientScope } from "../../lib/scoped-backend";
+import { capturePrivateReadback } from "../../lib/cache-invalidation";
 import { Button } from "@ftksaas/ui/components/button";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { Skeleton } from "@ftksaas/ui/components/skeleton";
 import { Field, FieldLabel } from "@ftksaas/ui/components/field";
 import { NativeSelect, NativeSelectOption } from "@ftksaas/ui/components/native-select";
+
+function isSessionAccessLost(failure: unknown) {
+  const code =
+    failure instanceof BackendError
+      ? failure.code
+      : failure instanceof Error
+        ? failure.message
+        : undefined;
+  return !!code && ["AUTH_REQUIRED", "SESSION_REVOKED", "ACCOUNT_CHANGED"].includes(code);
+}
 
 export function SessionDetailContent({
   scope,
@@ -44,7 +55,7 @@ export function SessionDetailContent({
     router = useRouter(),
     navigate = useNavigate(),
     queries = useQueryClient();
-  const [invalid, setInvalid] = useState(false),
+  const [sourceRevoked, setSourceRevoked] = useState(false),
     [booking, setBooking] = useState(false),
     [bookingLocked, setBookingLocked] = useState(false),
     [cancelLocked, setCancelLocked] = useState(false),
@@ -53,6 +64,7 @@ export function SessionDetailContent({
   const locked = bookingLocked || cancelLocked || attendanceLocked || waitlistLocked;
   const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]),
     [page, setPage] = useState(0),
+    [tab, setTab] = useState(initialTab ?? "participants"),
     [refreshRevision, setRefreshRevision] = useState(0),
     [search, setSearch] = useState(""),
     [query, setQuery] = useState<string>();
@@ -60,25 +72,23 @@ export function SessionDetailContent({
     [peopleCursors, setPeopleCursors] = useState<(string | undefined)[]>([undefined]),
     [peoplePage, setPeoplePage] = useState(0);
   const [cancel, setCancel] = useState<{ id: string; personId: string; name: string }>();
+  const [verifiedSession, setVerifiedSession] =
+    useState<Awaited<ReturnType<typeof readScheduleSession>>>();
   const prefix = sessionDetailKeys.session(scope, sessionId);
+  const resetAccess = useCallback(() => {
+    queries.removeQueries({
+      queryKey: ["session-detail", scope.accountId, scope.orgId, scope.centerId],
+    });
+    void router.invalidate();
+  }, [queries, router, scope.accountId, scope.orgId, scope.centerId]);
   const accessLost = useCallback(
     (failure: unknown) => {
-      const code =
-        failure instanceof BackendError
-          ? failure.code
-          : failure instanceof Error
-            ? failure.message
-            : undefined;
-      if (!code || !["AUTH_REQUIRED", "SESSION_REVOKED", "ACCOUNT_CHANGED"].includes(code))
-        return false;
-      setInvalid(true);
-      queries.removeQueries({
-        queryKey: ["session-detail", scope.accountId, scope.orgId, scope.centerId],
-      });
-      void router.invalidate();
+      if (!isSessionAccessLost(failure)) return false;
+      setSourceRevoked(true);
+      resetAccess();
       return true;
     },
-    [queries, router, scope.accountId, scope.orgId, scope.centerId],
+    [resetAccess],
   );
   async function guardedRead<T>(read: () => Promise<T>): Promise<T> {
     try {
@@ -88,17 +98,12 @@ export function SessionDetailContent({
       throw failure;
     }
   }
-  const workspaceOptions = workspaceQuery(queries, scope.accountId, scope.orgId);
-  const workspace = useQuery({
-    ...workspaceOptions,
-    // Keep the session's immediate access-loss cleanup in the reader path.
-    queryFn: (context) =>
-      guardedRead(async () => {
-        const read = workspaceOptions.queryFn;
-        if (typeof read !== "function") throw new Error("WORKSPACE_READ_UNAVAILABLE");
-        return read(context);
-      }),
-  });
+  const workspace = useQuery(workspaceQuery(queries, scope.accountId, scope.orgId));
+  const workspaceRevoked = isSessionAccessLost(workspace.error);
+  const invalid = sourceRevoked || workspaceRevoked;
+  useEffect(() => {
+    if (workspaceRevoked) resetAccess();
+  }, [workspaceRevoked, resetAccess]);
   const center = !workspace.isError
     ? workspace.data?.centers.find((row) => row.id === scope.centerId && row.accessible)
     : undefined;
@@ -109,15 +114,20 @@ export function SessionDetailContent({
     enabled: Boolean(center && !invalid),
     retry: false,
   });
-  const native = !session.isError ? session.data : undefined;
+  const liveNative = center && !session.isError && !invalid ? session.data : undefined;
+  // Keep the controller instance across a failed readback. Only its command
+  // recovery can render while the source is unavailable.
+  if (liveNative && liveNative !== verifiedSession) setVerifiedSession(liveNative);
+  const native = liveNative ?? (locked || preservePending ? verifiedSession : undefined);
+  const recoveryOnly = !liveNative;
   const header = useQuery({
-    queryKey: [...prefix, "header", native?.version],
-    queryFn: (readContext) => guardedRead(() => readSessionHeader(scope, native!, readContext)),
-    enabled: Boolean(native && !invalid && center),
+    queryKey: [...prefix, "header", liveNative?.version],
+    queryFn: (readContext) => guardedRead(() => readSessionHeader(scope, liveNative!, readContext)),
+    enabled: Boolean(liveNative),
     retry: false,
   });
   const rooms = useQuery({
-    queryKey: [...prefix, "rooms", native?.version],
+    queryKey: [...prefix, "rooms", liveNative?.version],
     queryFn: (readContext) =>
       guardedRead(() =>
         Promise.all(
@@ -126,14 +136,14 @@ export function SessionDetailContent({
           ),
         ),
       ),
-    enabled: Boolean(header.data && !header.isError && !invalid && center),
+    enabled: Boolean(liveNative && header.data && !header.isError),
     retry: false,
   });
   const instructors = useQuery({
-    queryKey: [...prefix, "instructors", native?.version],
+    queryKey: [...prefix, "instructors", liveNative?.version],
     queryFn: (readContext) =>
-      guardedRead(() => readSessionInstructors(scope, sessionId, undefined, readContext)),
-    enabled: Boolean(native && center && !invalid),
+      guardedRead(() => readAssignedSessionInstructors(scope, liveNative!, readContext)),
+    enabled: Boolean(liveNative),
     retry: false,
   });
   const reservations = useQuery({
@@ -142,14 +152,14 @@ export function SessionDetailContent({
       guardedRead(() =>
         readSessionParticipants(scope, sessionId, person?.id, cursors[page], readContext),
       ),
-    enabled: Boolean(native && center && !invalid),
+    enabled: Boolean(liveNative),
     retry: false,
   });
   const attendance = useQuery({
-    queryKey: [...prefix, "attendance", native?.version],
+    queryKey: [...prefix, "attendance", liveNative?.version],
     queryFn: (readContext) =>
       guardedRead(() => readSessionAttendance(scope, sessionId, readContext)),
-    enabled: Boolean(native && center && !invalid),
+    enabled: Boolean(liveNative),
     retry: false,
   });
   const people = useQuery({
@@ -166,7 +176,7 @@ export function SessionDetailContent({
           readContext,
         ),
       ),
-    enabled: query !== undefined && Boolean(center && !invalid),
+    enabled: query !== undefined && Boolean(liveNative),
     retry: false,
   });
   useEffect(() => {
@@ -176,9 +186,13 @@ export function SessionDetailContent({
   async function refresh() {
     // Native receipt/result reading happens in the command. Mark all cached
     // variants stale, but never refetch a potentially invalid continuation.
+    const assertCurrent = capturePrivateReadback(queries);
     await invalidateSessionDetailViews(queries, scope, sessionId);
+    assertCurrent();
     const latest = await session.refetch({ throwOnError: true });
     if (!latest.data) throw new Error("SESSION_DETAIL_READBACK_UNAVAILABLE");
+    const version = latest.data.version;
+    assertCurrent();
     await queries.fetchQuery({
       queryKey: sessionDetailKeys.participants(scope, sessionId, person?.id),
       queryFn: () => guardedRead(() => readSessionParticipants(scope, sessionId, person?.id)),
@@ -187,49 +201,48 @@ export function SessionDetailContent({
     });
     // Other non-paginated, visible projections still need their native reads.
     // Do not reread the waitlist or participant cursor families here.
-    await Promise.all(
-      ["header", "rooms", "instructors", "attendance"].map((family) =>
-        queries.refetchQueries(
-          { queryKey: [...prefix, family], type: "active" },
-          { throwOnError: false },
+    assertCurrent();
+    if (version === native?.version)
+      await Promise.all(
+        ["header", "rooms", "instructors", "attendance"].map((family) =>
+          queries.refetchQueries(
+            { queryKey: [...prefix, family, version], exact: true, type: "active" },
+            { throwOnError: false },
+          ),
         ),
-      ),
-    );
+      );
+    assertCurrent();
     setCursors([undefined]);
     setPage(0);
     setRefreshRevision((value) => value + 1);
   }
-  if (invalid)
-    return (
+  const unavailable = invalid ? (
+    <Alert variant="destructive">
+      <AlertDescription>{t(($) => $.auth.readError)}</AlertDescription>
+    </Alert>
+  ) : session.isError || (!center && !preservePending && !workspace.isPending) ? (
+    <div className="p-6">
       <Alert variant="destructive">
-        <AlertDescription>{t(($) => $.auth.readError)}</AlertDescription>
+        <AlertDescription>{t(($) => $.sessionDetail.readFailed)}</AlertDescription>
       </Alert>
-    );
-  if (session.isError || (!center && !preservePending && !workspace.isPending))
-    return (
-      <div className="p-6">
-        <Alert variant="destructive">
-          <AlertDescription>{t(($) => $.sessionDetail.readFailed)}</AlertDescription>
-        </Alert>
-        <Button
-          variant="outline"
-          onPress={() => {
-            void workspace.refetch();
-            void session.refetch();
-          }}
-        >
-          {t(($) => $.sessionDetail.retry)}
-        </Button>
-      </div>
-    );
-  if (!native)
-    return (
-      <div className="flex flex-col gap-4 p-6">
-        <p role="status">{t(($) => $.sessionDetail.loading)}</p>
-        <Skeleton className="h-24" />
-        <Skeleton className="h-80" />
-      </div>
-    );
+      <Button
+        variant="outline"
+        onPress={() => {
+          void workspace.refetch();
+          void session.refetch();
+        }}
+      >
+        {t(($) => $.sessionDetail.retry)}
+      </Button>
+    </div>
+  ) : (
+    <div className="flex flex-col gap-4 p-6">
+      <p role="status">{t(($) => $.sessionDetail.loading)}</p>
+      <Skeleton className="h-24" />
+      <Skeleton className="h-80" />
+    </div>
+  );
+  if (!native) return unavailable;
   const unknown = t(($) => $.sessionDetail.unknown),
     currentAttendance =
       !attendance.isError &&
@@ -257,7 +270,7 @@ export function SessionDetailContent({
     setPerson(next);
   };
   const teacherRows = !instructors.isError
-    ? (instructors.data?.instructors.map((row) => ({
+    ? (instructors.data?.map((row) => ({
         id: row.id,
         name: row.person?.display_name ?? unknown,
       })) ?? [])
@@ -266,12 +279,14 @@ export function SessionDetailContent({
     <SessionWaitlistController
       scope={scope}
       session={native}
+      visible={tab === "waitlist"}
+      recoveryOnly={recoveryOnly}
       refreshRevision={refreshRevision}
       timezone={center?.timezone}
       ownPersonId={
         workspace.isError ? undefined : workspace.data?.selected?.self_context?.person_id
       }
-      disabled={booking || Boolean(cancel) || attendanceLocked || !center}
+      disabled={booking || Boolean(cancel) || attendanceLocked || recoveryOnly}
       onLockChange={setWaitlistLocked}
       onAccessLost={accessLost}
       onRefresh={refresh}
@@ -284,6 +299,7 @@ export function SessionDetailContent({
             workspaceRoles(workspace.data, scope.centerId).includes("center_manager")
           }
           session={native}
+          recoveryOnly={recoveryOnly}
           attendance={currentAttendance}
           names={
             new Map(
@@ -294,7 +310,7 @@ export function SessionDetailContent({
           }
           instructors={teacherRows}
           timezone={center?.timezone}
-          disabled={booking || Boolean(cancel) || waitlistLocked || !center}
+          disabled={booking || Boolean(cancel) || waitlistLocked || recoveryOnly}
           onLockChange={setAttendanceLocked}
           onAccessLost={accessLost}
           onRefresh={refresh}
@@ -304,7 +320,8 @@ export function SessionDetailContent({
         >
           {(attendanceUi) => (
             <SessionDetailView
-              initialTab={initialTab}
+              tab={tab}
+              onTab={setTab}
               title={title}
               badges={[
                 t(($) => $.schedule.sessionStates[native.state]),
@@ -342,7 +359,7 @@ export function SessionDetailContent({
               ]}
               instructors={
                 !instructors.isError
-                  ? (instructors.data?.instructors.map((row) => ({
+                  ? (instructors.data?.map((row) => ({
                       id: row.id,
                       name: row.person?.display_name ?? unknown,
                     })) ?? [])
@@ -597,6 +614,7 @@ export function SessionDetailContent({
               }
               attendance={attendanceUi.panel}
               waitlist={waitlistUi.panel}
+              fallback={recoveryOnly ? unavailable : undefined}
               overlays={
                 <>
                   {attendanceUi.overlays}
@@ -606,6 +624,7 @@ export function SessionDetailContent({
                       scope={scope}
                       session={native}
                       title={title}
+                      recoveryOnly={recoveryOnly}
                       onClose={() => setBooking(false)}
                       onLockChange={setBookingLocked}
                       onAccessLost={accessLost}
@@ -619,7 +638,8 @@ export function SessionDetailContent({
                       reservationId={cancel.id}
                       sessionId={sessionId}
                       label={cancel.name}
-                      sourceAvailable={Boolean(center && !reservations.isError)}
+                      sourceAvailable={!recoveryOnly && !reservations.isError}
+                      recoveryOnly={recoveryOnly}
                       onClose={() => setCancel(undefined)}
                       onLockChange={setCancelLocked}
                       onAccessLost={accessLost}

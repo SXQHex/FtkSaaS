@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { readStudioResources } from "../studio/studio";
+import { refreshStudioRooms, studioRoomsQuery } from "../studio/studio-rooms-query";
 import { StudioResourceEditor } from "../studio/resource-editor";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { Button } from "@ftksaas/ui/components/button";
@@ -29,8 +29,7 @@ export function useSettingsRooms({
     queries = useQueryClient();
   const [selection, setSelection] = useState<{ id?: string }>();
   const query = useQuery({
-    queryKey: ["settings-rooms", scope.accountId, scope.orgId, scope.centerId],
-    queryFn: (context) => readStudioResources(scope, context),
+    ...studioRoomsQuery(scope),
     enabled,
     retry: false,
     refetchOnWindowFocus: false,
@@ -44,7 +43,7 @@ export function useSettingsRooms({
   const table: SettingsTableData | undefined = source
     ? {
         columns: ["room", "capacity", "futureOperations", "active", "action"],
-        rows: source.rooms.map((room) => ({
+        rows: source.map((room) => ({
           id: room.id,
           cells: [
             room.name,
@@ -67,14 +66,7 @@ export function useSettingsRooms({
       }
     : undefined;
   async function refresh() {
-    const result = await query.refetch();
-    if (result.error) throw result.error;
-    if (!result.data) throw Error("STUDIO_UNAVAILABLE");
-    await queries.invalidateQueries(
-      { queryKey: ["studio", scope.accountId, scope.orgId] },
-      { throwOnError: true },
-    );
-    return result.data;
+    return { rooms: await refreshStudioRooms(queries, scope), classes: [], disciplines: [] };
   }
   return {
     table,
@@ -105,7 +97,7 @@ export function useSettingsRooms({
           key={`${scope.accountId}:${scope.orgId}:${scope.centerId}:${selection.id ?? "new"}`}
           scope={scope}
           selection={{ kind: "room", ...selection }}
-          resources={query.data}
+          resources={{ rooms: query.data, classes: [], disciplines: [] }}
           onRefresh={refresh}
           onClose={() => {
             if (!locked) setSelection(undefined);

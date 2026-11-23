@@ -22,6 +22,7 @@ import { Textarea } from "@ftksaas/ui/components/textarea";
 import type { CenterView, SettlementRequestView } from "@ftksaas/api-contracts";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { formatMinorAmount } from "../../lib/money";
+import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
 import { EventCommandNotice } from "../events/event-command-notice";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { SettingsReviewDialog } from "../settings/settings-review-dialog";
@@ -159,8 +160,25 @@ function Ledger({
       void client.invalidateQueries({ queryKey: key });
       return false;
     },
-    onRefresh: async () => {
-      await client.invalidateQueries({ queryKey: key });
+    onRefresh: async (result, assertCurrent) => {
+      const families = [...new Set([result.from_center_id, result.to_center_id])].flatMap(
+        (centerId) => {
+          const affected = settlementKey({ ...scope, centerId });
+          return [
+            [...affected, "movements"],
+            [...affected, "requests"],
+          ];
+        },
+      );
+      await invalidateCachedFamilies(client, families, families);
+      assertCurrent();
+      const visible = await Promise.allSettled([
+        movements.refetch({ throwOnError: true }),
+        requests.refetch({ throwOnError: true }),
+      ]);
+      for (const projection of visible) {
+        if (projection.status === "rejected") throw projection.reason;
+      }
     },
   });
   useEffect(() => {

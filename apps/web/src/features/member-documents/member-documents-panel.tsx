@@ -126,10 +126,7 @@ export function MemberDocumentsPanel({
                 if (result.error) throw result.error;
                 onAccepted();
               }}
-              onClose={() => {
-                setSelected(undefined);
-                void query.refetch();
-              }}
+              onClose={() => setSelected(undefined)}
             />
           )}
         </FieldGroup>

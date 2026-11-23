@@ -86,7 +86,7 @@ export function OrganizationLifecyclePanel({
     readReceipt: organizationLifecycleReceipt,
     readResult: readOrganizationLifecycleResult,
     onAccessLost: lost,
-    onRefresh: async (value) => {
+    onRefresh: async (value, assertCurrent) => {
       if (value.kind === "delete") {
         const current = organizationDeletionReceipt(scope);
         if (!current) throw Error("ORGANIZATION_RECOVERY_UNAVAILABLE");
@@ -94,9 +94,10 @@ export function OrganizationLifecyclePanel({
         saveOrganizationDeletionReceipt(scope, next);
         if (mounted.current) setReceipt(next);
       }
-      if (mounted.current) setResult(value);
       await onSaved();
+      assertCurrent();
       if (mounted.current) {
+        setResult(value);
         setReview(undefined);
         setMode(undefined);
         setPassword("");

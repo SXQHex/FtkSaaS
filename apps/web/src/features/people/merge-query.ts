@@ -1,3 +1,4 @@
+import { capturePrivateReadback } from "../../lib/cache-invalidation";
 import type { QueryClient, QueryKey } from "@tanstack/react-query";
 import type { ClientScope } from "../../lib/scoped-backend";
 
@@ -7,6 +8,7 @@ const affectedFamilies = new Set([
   "people",
   "merge-directory",
   "merge-approvals",
+  "lead-people",
   "merge-people",
   "profile-person",
   "profile-rights",
@@ -18,6 +20,7 @@ const affectedFamilies = new Set([
 ]);
 
 export async function invalidateMergeViews(queries: QueryClient, scope: ClientScope) {
+  const assertCurrent = capturePrivateReadback(queries);
   const affected = (queryKey: QueryKey) =>
     queryKey[1] === scope.accountId &&
     queryKey[2] === scope.orgId &&
@@ -27,6 +30,7 @@ export async function invalidateMergeViews(queries: QueryClient, scope: ClientSc
   // Prevent pre-write reads from winning a race against the mandatory native
   // first-page readback. Existing cursor pages stay cached but stale.
   await queries.cancelQueries({ predicate: ({ queryKey }) => affected(queryKey) });
+  assertCurrent();
   await queries.invalidateQueries({
     predicate: ({ queryKey }) => affected(queryKey),
     refetchType: "none",

@@ -28,7 +28,19 @@ window.addEventListener("popstate", captureInvitationNavigation, { capture: true
 window.addEventListener(
   "popstate",
   () => {
-    void queryClient.invalidateQueries({ queryKey: workspaceKeys.all(), refetchType: "none" });
+    const pathOrganization = window.location.pathname.match(/^\/o\/([^/]+)\/c\//)?.[1];
+    let organizationId: string | undefined;
+    try {
+      if (pathOrganization) organizationId = decodeURIComponent(pathOrganization);
+    } catch {
+      // An unrecognized destination keeps the conservative history fallback.
+    }
+    void queryClient.invalidateQueries({
+      queryKey: workspaceKeys.all(),
+      predicate: ({ queryKey }) =>
+        !organizationId || queryKey[2] === organizationId || queryKey[2] === null,
+      refetchType: "none",
+    });
   },
   { capture: true },
 );

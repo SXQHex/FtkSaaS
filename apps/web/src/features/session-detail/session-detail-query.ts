@@ -19,6 +19,8 @@ export async function invalidateSessionDetailViews(
   await invalidateCachedFamilies(queries, [
     sessionDetailKeys.session(scope, sessionId),
     ["schedule-range", ...tenant],
+    ["instructor-calendar", ...tenant],
+    ["instructor-today-attendance", ...tenant],
     ["profile-reservations", ...tenant],
   ]);
 }

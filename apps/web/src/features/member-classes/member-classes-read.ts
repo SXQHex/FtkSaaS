@@ -1,3 +1,4 @@
+import { queryBackendRead } from "../../lib/backend";
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
 import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
@@ -117,15 +118,20 @@ export async function readMemberClasses(
     cursors = new Set<string>();
   let cursor: string | undefined;
   do {
-    const page = await backend.call("calendar_get_v1", {
-      client_api_version: 1,
-      request_id: uuidv7(),
-      org_id: scope.orgId,
-      center_id: scope.centerId,
-      interval: { ...interval },
-      member_discovery: true,
-      page: { limit: 50, sort: "starts_at_asc", ...(cursor ? { cursor } : {}) },
-    });
+    const page = await queryBackendRead(
+      backend,
+      "calendar_get_v1",
+      {
+        client_api_version: 1,
+        request_id: uuidv7(),
+        org_id: scope.orgId,
+        center_id: scope.centerId,
+        interval: { ...interval },
+        member_discovery: true,
+        page: { limit: 50, sort: "starts_at_asc", ...(cursor ? { cursor } : {}) },
+      },
+      readContext?.signal,
+    );
     if (page.items.length > 50) throw Error("MEMBER_CLASSES_UNAVAILABLE");
     for (const row of page.items) {
       z.uuid().parse(row.id);

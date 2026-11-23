@@ -20,7 +20,9 @@ import {
   readRequestReceipt,
   readRequestResult,
 } from "./lesson-request-command";
-import { readStudioRooms } from "../studio/studio";
+import { studioRoomsQuery } from "../studio/studio-rooms-query";
+import { invalidateMemberPrivateLessonLists } from "../member-private-lessons/member-private-lessons-query";
+import { invalidateMemberReservationViews } from "../member-reservations/member-reservations-query";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { ScheduleTimeError } from "../schedule/schedule-time";
 import { scheduleBackendError } from "../schedule/schedule-presentation";
@@ -92,10 +94,8 @@ export function LessonRequestEditor({
     retry: false,
   });
   const rooms = useQuery({
-    queryKey: [...prefix, "rooms"],
-    queryFn: (readContext) => readStudioRooms(scope, readContext),
+    ...studioRoomsQuery(scope),
     enabled: Boolean(current && stage === "approve" && draft.mode === "create"),
-    retry: false,
   });
   const sessions = useQuery({
     queryKey: [...prefix, "sessions", current?.version],
@@ -114,9 +114,17 @@ export function LessonRequestEditor({
         (result) => result.request,
       ),
     onAccessLost,
-    onRefresh: async (result) => {
-      setSaved(result);
+    onRefresh: async (result, assertCurrent) => {
+      await Promise.all([
+        invalidateMemberPrivateLessonLists(queries, scope, result.request.person_id),
+        ...(result.reservation
+          ? [invalidateMemberReservationViews(queries, scope, result.request.person_id)]
+          : []),
+      ]);
+      assertCurrent();
       await onRefresh();
+      assertCurrent();
+      setSaved(result);
     },
   });
   const locked = busy || command.locked;

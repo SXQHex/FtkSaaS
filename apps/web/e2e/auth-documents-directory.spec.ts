@@ -128,6 +128,11 @@ test("document directory has native global summaries, cursor/search, actual read
   await page.goto(completionUrl("documents"));
   await expect(page.getByText("3 / 8", { exact: true })).toBeVisible();
   await expect(page.getByText("Sentetik hazır dosya", { exact: true })).toBeVisible();
+  expect(
+    requestsFor(f.requests, "document_directory_get_v1").filter(
+      ({ r }) => r.view === "documents" && !r.page.cursor && !r.query,
+    ),
+  ).toHaveLength(1);
   await page.getByRole("button", { name: "Sonraki sayfa", exact: true }).click();
   await expect(page.getByText("İkinci sentetik belge", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Önceki sayfa", exact: true }).click();

@@ -106,12 +106,17 @@ export async function readCreditRefundReceipt(intent: CreditRefundIntent) {
     throw new Error("FINANCE_RECEIPT_UNAVAILABLE");
   return result;
 }
-export async function readCreditRefundResult(intent: CreditRefundIntent, id?: string) {
+export async function readCreditRefundResult(
+  intent: CreditRefundIntent,
+  id?: string,
+  onFirstPage?: (view: Awaited<ReturnType<typeof readFinancePage>>) => void,
+) {
   z.uuid().parse(id);
   const seen = new Set<string>();
   let cursor: string | undefined;
   do {
     const data = await readFinancePage(intent.scope, intent.selection, cursor);
+    if (!cursor) onFirstPage?.(data);
     const row = data.movements.items.find((item) => item.id === id);
     if (row) {
       if (

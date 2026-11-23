@@ -1,6 +1,7 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
+import { queryBackendRead } from "../../lib/backend";
 import { reportsCommon } from "./reports-command";
 import type { ImportRowState } from "@ftksaas/api-contracts";
 export async function readImportRows(
@@ -11,17 +12,21 @@ export async function readImportRows(
   includeApplySummary = false,
   readContext?: AccountReadContext,
 ) {
-  const data = await (
-    await scopedBackend(scope, undefined, readContext)
-  ).call("import_rows_list_v1", {
-    ...reportsCommon(scope),
-    request_id: uuidv7(),
-    job_id: z.uuid().parse(jobId),
-    page: { limit: 20, ...(cursor ? { cursor } : {}) },
-    include_details: true,
-    ...(includeApplySummary ? { include_apply_summary: true } : {}),
-    ...(state ? { state } : {}),
-  });
+  const backend = await scopedBackend(scope, undefined, readContext);
+  const data = await queryBackendRead(
+    backend,
+    "import_rows_list_v1",
+    {
+      ...reportsCommon(scope),
+      request_id: uuidv7(),
+      job_id: z.uuid().parse(jobId),
+      page: { limit: 20, ...(cursor ? { cursor } : {}) },
+      include_details: true,
+      ...(includeApplySummary ? { include_apply_summary: true } : {}),
+      ...(state ? { state } : {}),
+    },
+    readContext?.signal,
+  );
   z.iso.datetime({ offset: true }).parse(data.as_of);
   if (
     data.items.length > 20 ||
@@ -44,14 +49,22 @@ export async function readImportRows(
   }
   return data;
 }
-export async function readImportPreview(scope: ClientScope, previewId: string) {
-  const data = await (
-    await scopedBackend(scope)
-  ).call("preview_get_v1", {
-    ...reportsCommon(scope),
-    request_id: uuidv7(),
-    preview_id: z.uuid().parse(previewId),
-  });
+export async function readImportPreview(
+  scope: ClientScope,
+  previewId: string,
+  readContext?: AccountReadContext,
+) {
+  const backend = await scopedBackend(scope, undefined, readContext);
+  const data = await queryBackendRead(
+    backend,
+    "preview_get_v1",
+    {
+      ...reportsCommon(scope),
+      request_id: uuidv7(),
+      preview_id: z.uuid().parse(previewId),
+    },
+    readContext?.signal,
+  );
   if (data.id !== previewId || !data.import_summary) throw Error("IMPORT_PREVIEW_INVALID");
   z.iso.datetime({ offset: true }).parse(data.expires_at);
   z.string().min(1).parse(data.token);

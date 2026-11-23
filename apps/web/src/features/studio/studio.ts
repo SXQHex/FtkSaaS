@@ -1,5 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
+import { queryBackendRead } from "../../lib/backend";
 import {
   scopedBackend as studioBackend,
   type ClientScope,
@@ -159,22 +160,35 @@ function classRecord(scope: StudioScope, item: ManagementStateView): ClassRecord
   };
 }
 
-export async function readStudioRooms(scope: StudioScope, readContext?: AccountReadContext) {
-  const backend = await studioBackend(scope, undefined, readContext);
+export async function readStudioRooms(
+  scope: StudioScope,
+  readContext?: AccountReadContext,
+  signal = readContext?.signal,
+) {
+  const backend = await studioBackend(scope, signal, readContext);
   const items = await studioPages((cursor) =>
-    backend.call("management_state_get_v1", {
-      client_api_version: 1,
-      request_id: uuidv7(),
-      org_id: scope.orgId,
-      center_id: scope.centerId,
-      operation: "room_save_v1",
-      selector: { operation: "room_save_v1", key: { include_details: true } },
-      page: { limit: 50, ...(cursor ? { cursor } : {}) },
-    }),
+    queryBackendRead(
+      backend,
+      "management_state_get_v1",
+      {
+        client_api_version: 1,
+        request_id: uuidv7(),
+        org_id: scope.orgId,
+        center_id: scope.centerId,
+        operation: "room_save_v1",
+        selector: { operation: "room_save_v1", key: { include_details: true } },
+        page: { limit: 50, ...(cursor ? { cursor } : {}) },
+      },
+      signal,
+    ),
   );
   return items.map((item) => roomRecord(scope, item));
 }
-export async function readStudioResources(scope: StudioScope, readContext?: AccountReadContext) {
+export async function readStudioResources(
+  scope: StudioScope,
+  readContext?: AccountReadContext,
+  readRooms?: () => ReturnType<typeof readStudioRooms>,
+) {
   const backend = await studioBackend(scope, undefined, readContext);
   const management = (selector: ManagementSelector, cursor?: string) =>
     backend.call("management_state_get_v1", {
@@ -186,10 +200,12 @@ export async function readStudioResources(scope: StudioScope, readContext?: Acco
       selector,
       page: { limit: 50, ...(cursor ? { cursor } : {}) },
     });
-  const [roomItems, classItems, disciplines] = await Promise.all([
-    studioPages((cursor) =>
-      management({ operation: "room_save_v1", key: { include_details: true } }, cursor),
-    ),
+  const [rooms, classItems, disciplines] = await Promise.all([
+    readRooms
+      ? readRooms()
+      : studioPages((cursor) =>
+          management({ operation: "room_save_v1", key: { include_details: true } }, cursor),
+        ).then((items) => items.map((item) => roomRecord(scope, item))),
     studioPages((cursor) =>
       management({ operation: "class_save_v1", key: { include_waitlist: true } }, cursor),
     ),
@@ -209,7 +225,7 @@ export async function readStudioResources(scope: StudioScope, readContext?: Acco
   if (disciplines.some((discipline) => !discipline.presentation))
     throw new Error("STUDIO_UNAVAILABLE");
   return {
-    rooms: roomItems.map((item) => roomRecord(scope, item)),
+    rooms,
     classes: classItems.map((item) => classRecord(scope, item)),
     disciplines,
   };

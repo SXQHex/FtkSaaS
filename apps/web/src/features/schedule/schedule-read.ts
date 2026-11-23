@@ -40,14 +40,19 @@ export async function readScheduleSession(
 ) {
   const backend = await scopedBackend(scope, undefined, readContext);
   return sessionIdentity(
-    await backend.call("session_get_v1", {
-      client_api_version: 1,
-      request_id: uuidv7(),
-      org_id: scope.orgId,
-      center_id: scope.centerId,
-      session_id: id,
-      ...(includeRoomLabels ? { include_room_labels: true } : {}),
-    }),
+    await queryBackendRead(
+      backend,
+      "session_get_v1",
+      {
+        client_api_version: 1,
+        request_id: uuidv7(),
+        org_id: scope.orgId,
+        center_id: scope.centerId,
+        session_id: id,
+        ...(includeRoomLabels ? { include_room_labels: true } : {}),
+      },
+      readContext?.signal,
+    ),
     id,
   );
 }

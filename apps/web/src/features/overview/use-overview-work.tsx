@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { ManagementWorkView } from "@ftksaas/api-contracts";
@@ -7,7 +7,9 @@ import { Button } from "@ftksaas/ui/components/button";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import type { OverviewTask } from "./overview-view";
 import { OverviewWorkPanel } from "./overview-work-panel";
-import { readOverviewWork } from "./overview-work";
+import { overviewWorkKey, readOverviewWork } from "./overview-work";
+import { invalidateLeadPages } from "../leads/leads-query";
+import { capturePrivateReadback } from "../../lib/cache-invalidation";
 
 export function useOverviewWork({
   scope,
@@ -23,12 +25,13 @@ export function useOverviewWork({
   onAccessLost: (cause: unknown) => boolean;
 }) {
   const { t } = useTranslation();
+  const queries = useQueryClient();
   const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]),
     [index, setIndex] = useState(0),
     [opened, setOpened] = useState<ManagementWorkView>(),
     [locked, setLocked] = useState(false);
   const query = useQuery({
-    queryKey: ["overview-work", scope.accountId, scope.orgId, scope.centerId, cursors[index]],
+    queryKey: [...overviewWorkKey(scope), cursors[index]],
     queryFn: async (context) => {
       const page = await readOverviewWork(scope, cursors[index], undefined, context);
       if (page.next_cursor && cursors.slice(0, index + 1).includes(page.next_cursor))
@@ -73,10 +76,7 @@ export function useOverviewWork({
         }))
       : null;
   function close() {
-    if (!locked) {
-      setOpened(undefined);
-      void query.refetch();
-    }
+    if (!locked) setOpened(undefined);
   }
   return {
     tasks,
@@ -147,10 +147,26 @@ export function useOverviewWork({
           scope={scope}
           task={opened}
           onClose={close}
+          onReload={() => {
+            close();
+            if (!locked) void query.refetch();
+          }}
           onLockChange={setLocked}
           onAccessLost={onAccessLost}
           onSaved={async () => {
-            await query.refetch({ throwOnError: true });
+            const assertCurrent = capturePrivateReadback(queries);
+            await invalidateLeadPages(queries, scope);
+            assertCurrent();
+            await queries.fetchQuery({
+              queryKey: [...overviewWorkKey(scope), undefined],
+              queryFn: ({ signal }) =>
+                readOverviewWork(scope, undefined, undefined, undefined, signal),
+              staleTime: 0,
+              retry: false,
+            });
+            assertCurrent();
+            setCursors([undefined]);
+            setIndex(0);
           }}
         />
       ) : null,

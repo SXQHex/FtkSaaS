@@ -38,3 +38,20 @@ export function affectedProductQueryFamilies(
       : []),
   ]);
 }
+
+export async function invalidateProductSalesViews(
+  queries: QueryClient,
+  scope: ClientScope,
+  productIds?: readonly string[],
+) {
+  const histories = queries
+    .getQueryCache()
+    .findAll({ queryKey: ["product-history", scope.accountId, scope.orgId, scope.centerId] })
+    .filter(
+      ({ queryKey }) =>
+        queryKey[5] === "sales" &&
+        (!productIds || (typeof queryKey[4] === "string" && productIds.includes(queryKey[4]))),
+    )
+    .map(({ queryKey }) => queryKey);
+  await invalidateCachedFamilies(queries, [productsKeys.management(scope), ...histories]);
+}

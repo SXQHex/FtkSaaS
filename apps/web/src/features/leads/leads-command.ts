@@ -332,6 +332,7 @@ export async function readLeadResult(intent: LeadIntent, id?: string) {
     return {
       kind: "application" as const,
       application,
+      page,
       createdCandidate: intent.request.action === "create_candidate",
     };
   }

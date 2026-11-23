@@ -11,15 +11,10 @@ import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { Button } from "@ftksaas/ui/components/button";
 import { Skeleton } from "@ftksaas/ui/components/skeleton";
 import { EventSheet } from "./event-sheet";
-import { EventCommandNotice } from "./event-command-notice";
+import { EventCommandNotice, EventCommandRecovery } from "./event-command-notice";
+import { studioRoomsQuery } from "../studio/studio-rooms-query";
 import { PreparationPicker } from "../settings/preparation-picker";
-import {
-  readEvent,
-  readEventRooms,
-  readEventDisciplines,
-  readEventPeople,
-  readEventProducts,
-} from "./events-read";
+import { readEvent, readEventDisciplines, readEventPeople, readEventProducts } from "./events-read";
 import {
   eventDraft,
   eventTermsDraft,
@@ -35,6 +30,7 @@ interface Props {
   scope: ClientScope;
   target: string | null;
   timezone: string;
+  recoveryOnly?: boolean;
   onClose: () => void;
   onSaved: () => Promise<void>;
   onLockChange: (value: boolean) => void;
@@ -51,7 +47,7 @@ export function EventEditor(props: Props) {
       props.scope.centerId,
       props.target,
     ],
-    enabled: !!props.target,
+    enabled: !!props.target && !props.recoveryOnly,
     queryFn: async (readContext) => {
       const before = await readEvent(props.scope, props.target!, undefined, readContext);
       return { before, draft: await eventDraft(before) };
@@ -64,7 +60,11 @@ export function EventEditor(props: Props) {
   useEffect(() => {
     if (source.error) onAccessLost(source.error);
   }, [source.error, onAccessLost]);
-  if (props.target && (source.isError || !source.isFetchedAfterMount || !source.data))
+  if (
+    props.target &&
+    !props.recoveryOnly &&
+    (source.isError || !source.isFetchedAfterMount || !source.data)
+  )
     return (
       <EventSheet
         draft={{ ...emptyEventDraft, timezone: props.timezone }}
@@ -113,6 +113,7 @@ function EventEditorForm({
   initial,
   initialDraft,
   timezone,
+  recoveryOnly = false,
   onClose,
   onSaved,
   onLockChange,
@@ -127,18 +128,19 @@ function EventEditorForm({
     [endOffsets, setEndOffsets] = useState<EventChoice[]>([]);
   const prefix = ["event-choices", scope.accountId, scope.orgId, scope.centerId];
   const rooms = useQuery({
-    queryKey: [...prefix, "rooms"],
-    queryFn: (readContext) => readEventRooms(scope, readContext),
-    retry: false,
+    ...studioRoomsQuery(scope),
+    enabled: !recoveryOnly && draft.venueKind === "internal",
   });
   const people = useQuery({
     queryKey: [...prefix, "people"],
     queryFn: (readContext) => readEventPeople(scope, readContext),
+    enabled: !recoveryOnly,
     retry: false,
   });
   const disciplines = useQuery({
     queryKey: [...prefix, "disciplines"],
     queryFn: (readContext) => readEventDisciplines(scope, readContext),
+    enabled: !recoveryOnly,
     retry: false,
   });
   const products = useInfiniteQuery({
@@ -147,6 +149,7 @@ function EventEditorForm({
       readEventProducts(scope, pageParam, { client, signal }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (page) => page.next_cursor ?? undefined,
+    enabled: !recoveryOnly,
     retry: false,
   });
   const command = useMemberCommand({
@@ -168,6 +171,12 @@ function EventEditorForm({
     for (const sourceError of [rooms.error, people.error, disciplines.error, products.error])
       if (sourceError) onAccessLost(sourceError);
   }, [rooms.error, people.error, disciplines.error, products.error, onAccessLost]);
+  if (recoveryOnly)
+    return (
+      <EventCommandRecovery locked={locked} onClose={onClose}>
+        <EventCommandNotice command={command} onReload={onClose} />
+      </EventCommandRecovery>
+    );
   function failure(cause: unknown) {
     if (onAccessLost(cause)) return;
     if (cause instanceof ScheduleTimeError) {
@@ -226,7 +235,9 @@ function EventEditorForm({
   for (const id of before?.terms.allowed_product_version_ids ?? [])
     if (!productChoices.some((row) => row.id === id))
       productChoices.push({ id, name: t(($) => $.events.existingProduct) });
-  const roomChoices = [...(rooms.data ?? [])];
+  const roomChoices: EventChoice[] = rooms.isError
+    ? []
+    : (rooms.data?.filter((row) => row.active) ?? []);
   if (
     before?.venue.kind === "internal" &&
     before.venue.room_id &&
@@ -235,7 +246,6 @@ function EventEditorForm({
     roomChoices.push({
       id: before.venue.room_id,
       name: t(($) => $.events.existingRoom),
-      capacity: null,
     });
   const personChoices = [...(people.data ?? [])];
   for (const row of before?.assignments ?? [])
@@ -314,7 +324,7 @@ function EventEditorForm({
                   isDisabled={locked}
                   onPress={() => {
                     void Promise.all([
-                      rooms.refetch(),
+                      ...(draft.venueKind === "internal" ? [rooms.refetch()] : []),
                       people.refetch(),
                       disciplines.refetch(),
                       products.refetch(),

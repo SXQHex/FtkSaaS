@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { EntitlementView, ProductView, ManagementStateView } from "@ftksaas/api-contracts";
+import { readIntoCurrentQuery } from "../../lib/cache-invalidation";
+import { invalidateEventViews } from "../events/event-query";
+import { invalidateMemberReservationViews } from "../member-reservations/member-reservations-query";
 import { formatMinorAmount } from "../../lib/money";
 import { SaleEventCancellation } from "./sale-event-cancellation";
 import { MemberActionSheet, type MemberEffect } from "./member-action-sheet";
@@ -54,9 +57,13 @@ export function SaleLifecycleEditor({
   onClose: () => void;
   onLockChange: (value: boolean) => void;
   onAccessLost: (error: unknown) => boolean;
-  onRefresh: (result: Awaited<ReturnType<typeof readSaleLifecycleResult>>) => Promise<void>;
+  onRefresh: (
+    result: Awaited<ReturnType<typeof readSaleLifecycleResult>>,
+    assertCurrent: () => void,
+  ) => Promise<void>;
 }) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(),
+    queries = useQueryClient();
   const [saleId, setSaleId] = useState(initialSaleId ?? ""),
     [draft, setDraft] = useState(emptyMemberDraft),
     [review, setReview] = useState<LifecycleReview>(),
@@ -76,15 +83,16 @@ export function SaleLifecycleEditor({
     };
   }, []);
   const source = sources.find((row) => row.sale_id === saleId);
+  const inventoryKey = [
+    "sale-lifecycle-inventory",
+    scope.accountId,
+    scope.orgId,
+    scope.centerId,
+    personId,
+    saleId,
+  ];
   const inventory = useQuery({
-    queryKey: [
-      "sale-lifecycle-inventory",
-      scope.accountId,
-      scope.orgId,
-      scope.centerId,
-      personId,
-      saleId,
-    ],
+    queryKey: inventoryKey,
     queryFn: (readContext) => readSaleInventory(scope, saleId, readContext),
     enabled: action === "change" && Boolean(source) && sourceAvailable,
     retry: false,
@@ -375,9 +383,20 @@ export function SaleLifecycleEditor({
                 disabled={preparing || command.locked || !sourceAvailable}
                 onLockChange={setEventLocked}
                 onAccessLost={onAccessLost}
-                onRefresh={async () => {
-                  const rows = await readProfileRights(scope, personId);
-                  await onRefresh({ rows, finance: undefined });
+                onRefresh={async (target, assertCurrent) => {
+                  await Promise.all([
+                    invalidateEventViews(queries, target.scope, target.eventId, { finance: true }),
+                    invalidateMemberReservationViews(queries, target.scope, personId),
+                  ]);
+                  assertCurrent();
+                  const [rows] = await Promise.all([
+                    readProfileRights(scope, personId),
+                    readIntoCurrentQuery(queries, inventoryKey, () =>
+                      readSaleInventory(scope, saleId),
+                    ),
+                  ]);
+                  assertCurrent();
+                  await onRefresh({ rows, finance: undefined }, assertCurrent);
                 }}
               />
               <Button

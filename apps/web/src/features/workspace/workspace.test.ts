@@ -15,6 +15,7 @@ const centerId = "019a7b00-0000-7000-8000-000000000004";
 let empty: boolean, multiple: boolean, scopeChanged: boolean;
 let selfRole: "instructor" | "student" | undefined;
 let roleReadError: string | undefined;
+let repeatedCursor: string | undefined;
 let selfManagement: OrganizationView["self_management_scope"];
 let organizationAccess: OrganizationView["access_mode"];
 const requests: { operation: string; bearer: string | null; body: Record<string, unknown> }[] = [];
@@ -24,6 +25,7 @@ beforeEach(() => {
   scopeChanged = false;
   selfRole = undefined;
   roleReadError = undefined;
+  repeatedCursor = undefined;
   selfManagement = undefined;
   organizationAccess = "normal";
   requests.length = 0;
@@ -98,7 +100,7 @@ beforeEach(() => {
                       ]
                     : []),
                 ],
-            next_cursor: null,
+            next_cursor: repeatedCursor === operation ? "repeated" : null,
             as_of: "2026-11-14T06:00:00Z",
           };
         else if (operation === "centers_list_v1")
@@ -121,7 +123,7 @@ beforeEach(() => {
                 version: 1,
               },
             ],
-            next_cursor: null,
+            next_cursor: repeatedCursor === operation ? "repeated" : null,
             as_of: "2026-11-14T06:00:00Z",
           };
         else if (roleReadError)
@@ -141,7 +143,7 @@ beforeEach(() => {
                 version: 1,
               },
             ],
-            next_cursor: null,
+            next_cursor: repeatedCursor === operation ? "repeated" : null,
             as_of: "2026-11-14T06:00:00Z",
           };
         return HttpResponse.json({ ok: true, data, trace_id: accountId });
@@ -153,6 +155,14 @@ afterEach(() => {
   vi.resetAllMocks();
   vi.unstubAllEnvs();
 });
+it.each(["organizations_list_v1", "centers_list_v1", "roles_list_v1"])(
+  "stops a repeated %s cursor after the second response",
+  async (operation) => {
+    repeatedCursor = operation;
+    await expect(readWorkspace(accountId)).rejects.toThrow("WORKSPACE_CURSOR_REPEATED");
+    expect(requests.filter((request) => request.operation === operation)).toHaveLength(2);
+  },
+);
 it("reads only the actor's organizations and exposes only accessible centers and own roles", async () => {
   const result = await readWorkspace(accountId);
   expect(result.selected?.id).toBe(orgId);

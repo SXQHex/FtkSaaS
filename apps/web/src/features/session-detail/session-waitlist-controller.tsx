@@ -16,7 +16,11 @@ import {
   type WaitlistIntent,
 } from "./session-waitlist";
 import { SessionWaitlist } from "./session-detail-view";
-import { SessionBookingSheet, type SessionBookingDraft } from "./session-detail-panels";
+import {
+  SessionBookingSheet,
+  SessionCommandRecovery,
+  type SessionBookingDraft,
+} from "./session-detail-panels";
 import { Button } from "@ftksaas/ui/components/button";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import {
@@ -35,6 +39,8 @@ export function SessionWaitlistController({
   ownPersonId,
   timezone,
   disabled,
+  visible,
+  recoveryOnly = false,
   onLockChange,
   onAccessLost,
   onRefresh,
@@ -46,6 +52,8 @@ export function SessionWaitlistController({
   ownPersonId?: string;
   timezone?: string;
   disabled: boolean;
+  visible: boolean;
+  recoveryOnly?: boolean;
   onLockChange: (locked: boolean) => void;
   onAccessLost: (error: unknown) => boolean;
   onRefresh: () => Promise<void>;
@@ -91,12 +99,14 @@ export function SessionWaitlistController({
     queryKey: [...prefix, "entries", entriesCursors[entriesPage]],
     queryFn: (readContext) =>
       readSessionWaitlist(scope, session.id, "entries", entriesCursors[entriesPage], readContext),
+    enabled: visible && !recoveryOnly,
     retry: false,
   });
   const offers = useQuery({
     queryKey: [...prefix, "offers", offersCursors[offersPage]],
     queryFn: (readContext) =>
       readSessionWaitlist(scope, session.id, "offers", offersCursors[offersPage], readContext),
+    enabled: visible && !recoveryOnly,
     retry: false,
   });
   const people = useQuery({
@@ -111,7 +121,7 @@ export function SessionWaitlistController({
         undefined,
         readContext,
       ),
-    enabled: query !== undefined && target?.action === "join",
+    enabled: !recoveryOnly && query !== undefined && target?.action === "join",
     retry: false,
   });
   // Non-waitlist session mutations also invalidate these directories. When
@@ -274,6 +284,16 @@ export function SessionWaitlistController({
       )}
     </>
   );
+  if (recoveryOnly)
+    return children({
+      panel: null,
+      overlay: locked && (
+        <SessionCommandRecovery>
+          {notice}
+          {recovery}
+        </SessionCommandRecovery>
+      ),
+    });
   const date = (value: string) =>
     timezone
       ? new Intl.DateTimeFormat("tr-TR", {

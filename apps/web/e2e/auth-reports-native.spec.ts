@@ -278,12 +278,21 @@ test("CRM import explicitly selects an off-page row and keeps same-job apply pen
   expect(f.writes.find((row) => row.op === "import_preview_v1")?.r.mapping.kind).toBe(
     "crm_applications",
   );
+  const applyRequest = f.requests.findIndex((row) => row.op === "import_apply_v1");
+  expect(applyRequest).toBeGreaterThan(-1);
+  const applyRows = () =>
+    f.requests
+      .slice(applyRequest + 1)
+      .filter((row) => row.op === "import_rows_list_v1" && row.r.job_id === f.jobId);
+  expect(applyRows()).toHaveLength(0);
   f.releaseApply();
   await dialog.getByRole("button", { name: "İş durumunu oku", exact: true }).click();
   await expect(dialog.getByText(/İş: succeeded/)).toBeVisible();
   await expect(
     dialog.getByRole("status").filter({ hasText: "3 satır · 1 aktarıldı · 2 atlandı" }),
   ).toBeVisible();
+  expect(applyRows()).toHaveLength(1);
+  expect(applyRows()[0]!.r).toMatchObject({ include_apply_summary: true });
   await dialog.getByRole("button", { name: "Satırları gör", exact: true }).click();
   await dialog.getByRole("radio", { name: "Uygulandı", exact: true }).click();
   await expect(dialog.getByText("İkinci sentetik", { exact: true })).toBeVisible();

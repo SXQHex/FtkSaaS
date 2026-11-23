@@ -1,23 +1,23 @@
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { EventView } from "@ftksaas/api-contracts";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
 import { readIntoCurrentQuery } from "../../lib/cache-invalidation";
-import { PrivateSessionRevision } from "../auth/private-session-revision";
 import { formatMinorAmount } from "../../lib/money";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { writeCollection, readCollectionReceipt } from "../finance/finance";
 import {
-  readRegisteredPayment,
+  checkedRegisteredPayment,
   prepareRegisteredCollection,
   readRegisteredCollectionResult,
 } from "./registered-event-collection";
+import { eventDetailQuery } from "./event-query";
 import { emptyEventCollection } from "./event-registration-draft";
 import { EventPaymentPanel } from "./event-payment-panel";
 import { EventActionDialog } from "./event-action-dialog";
-import { EventCommandNotice } from "./event-command-notice";
+import { EventCommandNotice, EventCommandRecovery } from "./event-command-notice";
 import { scheduleBackendError } from "../schedule/schedule-presentation";
 import {
   Sheet,
@@ -33,6 +33,7 @@ export function RegisteredEventPayment({
   before,
   registrationId,
   onClose,
+  recoveryOnly = false,
   onSaved,
   onLockChange,
   onAccessLost,
@@ -41,13 +42,13 @@ export function RegisteredEventPayment({
   before: EventView;
   registrationId: string;
   onClose: () => void;
-  onSaved: () => Promise<void>;
+  onSaved: (detailVerified?: boolean) => Promise<void>;
+  recoveryOnly?: boolean;
   onLockChange: (value: boolean) => void;
   onAccessLost: (cause: unknown) => boolean;
 }) {
   const { t } = useTranslation(),
     queries = useQueryClient();
-  const sessionRevision = useContext(PrivateSessionRevision);
   const expected = before.registrations?.find((row) => row.id === registrationId);
   const [draft, setDraft] = useState({ ...emptyEventCollection }),
     [confirmation, setConfirmation] = useState(false),
@@ -62,36 +63,29 @@ export function RegisteredEventPayment({
       mounted.current = false;
     };
   }, []);
-  const key = [
-    "registered-event-payment",
-    scope.accountId,
-    scope.orgId,
-    scope.centerId,
-    before.id,
-    registrationId,
-    expected?.person_id,
-    sessionRevision,
-  ];
+  const detail = eventDetailQuery(scope, before.id);
   const source = useQuery({
-    queryKey: key,
-    queryFn: (readContext) =>
-      readRegisteredPayment(scope, before.id, registrationId, expected!.person_id, readContext),
-    enabled: !!expected,
-    retry: false,
+    ...detail,
+    select: (event) =>
+      expected ? checkedRegisteredPayment(event, registrationId, expected.person_id) : undefined,
+    enabled: !!expected && !recoveryOnly,
     refetchOnMount: "always",
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
   });
   const command = useMemberCommand({
     write: writeCollection,
     readReceipt: readCollectionReceipt,
     readResult: (intent: Parameters<typeof readRegisteredCollectionResult>[0], id) =>
-      readIntoCurrentQuery(queries, key, () => readRegisteredCollectionResult(intent, id)),
+      readIntoCurrentQuery(queries, detail.queryKey, () =>
+        readRegisteredCollectionResult(intent, id, (event) => event),
+      ),
     onAccessLost,
-    onRefresh: onSaved,
+    onRefresh: () => onSaved(true),
   });
   const locked = preparing || command.locked;
-  const row = source.isSuccess && source.fetchStatus === "idle" ? source.data : undefined;
+  const row =
+    source.isSuccess && source.isFetchedAfterMount && source.fetchStatus === "idle"
+      ? source.data
+      : undefined;
   const payment = row?.payment_summary;
   const readOnly = locked || command.state !== "ready";
   useEffect(() => {
@@ -152,6 +146,12 @@ export function RegisteredEventPayment({
     }
   }
   const notice = <EventCommandNotice command={command} onReload={reload} />;
+  if (recoveryOnly)
+    return (
+      <EventCommandRecovery locked={locked} onClose={onClose}>
+        <EventCommandNotice command={command} onReload={onClose} />
+      </EventCommandRecovery>
+    );
   return (
     <>
       <Sheet

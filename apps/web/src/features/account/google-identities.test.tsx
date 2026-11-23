@@ -66,12 +66,23 @@ it("requires selected Google confirmation and retries only the read after known 
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   expect(unlink).toHaveBeenCalledExactlyOnceWith(google);
   expect(screen.queryByText("Bağlı", { exact: true })).not.toBeInTheDocument();
+  expect(screen.queryByText("Bağlı değil")).not.toBeInTheDocument();
   expect(screen.getByRole("button", { name: "Google ile bağla" })).toBeDisabled();
   expect(changed).toHaveBeenCalledOnce();
   read.mockResolvedValue([email]);
   await userEvent.click(screen.getByRole("button", { name: "Yeniden dene" }));
   await screen.findByRole("button", { name: "Google ile bağla" });
   expect(unlink).toHaveBeenCalledOnce();
+});
+it("hides a previously verified identity when a later native read fails", async () => {
+  read.mockResolvedValueOnce([email, google]).mockRejectedValueOnce(new Error("read"));
+  const { client } = setup();
+  expect(await screen.findByText("google@example.invalid")).toBeVisible();
+  await client.invalidateQueries({ queryKey: ["account-identities", "fixture"] });
+  await screen.findByText("Bağlı giriş yöntemleri okunamadı.", { exact: false });
+  expect(screen.queryByText("google@example.invalid")).not.toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Bağlantıyı kaldır" })).not.toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Yeniden dene" })).toBeEnabled();
 });
 it("preserves a native unlink denial and blocks removing the last native identity", async () => {
   read.mockResolvedValue([email, google]);

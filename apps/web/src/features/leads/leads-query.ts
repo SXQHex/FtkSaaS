@@ -1,6 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
+import { overviewWorkKey } from "../overview/overview-work";
 
 export const leadsKeys = {
   directory: (scope: ClientScope) =>
@@ -22,5 +23,6 @@ export function invalidateLeadPages(queries: QueryClient, scope: ClientScope) {
     leadsKeys.sourceFollowups(scope),
     leadsKeys.applications(scope),
     leadsKeys.summary(scope),
+    overviewWorkKey(scope),
   ]);
 }

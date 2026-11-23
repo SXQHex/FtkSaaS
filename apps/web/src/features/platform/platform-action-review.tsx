@@ -16,6 +16,7 @@ export function PlatformActionReview<Intent, Result>({
   read,
   onResult,
   onClose,
+  onReload = onClose,
   onDenied,
 }: {
   intent: Intent;
@@ -27,6 +28,7 @@ export function PlatformActionReview<Intent, Result>({
   read: (intent: Intent, id?: string) => Promise<Result>;
   onResult: (result: Result) => Promise<void>;
   onClose: () => void;
+  onReload?: () => void;
   onDenied: () => void;
 }) {
   const { t } = useTranslation();
@@ -73,11 +75,11 @@ export function PlatformActionReview<Intent, Result>({
       notice={failed ? t(($) => $.platform.billing.sourceChanged) : undefined}
       recoveryActions={
         failed ? (
-          <Button variant="outline" onPress={onClose}>
+          <Button variant="outline" onPress={onReload}>
             {t(($) => $.profile.loadCurrent)}
           </Button>
         ) : (
-          <EventCommandNotice command={command} receiptAvailable={false} onReload={onClose} />
+          <EventCommandNotice command={command} receiptAvailable={false} onReload={onReload} />
         )
       }
     />

@@ -2,6 +2,7 @@ import { getSupabaseClient } from "../../lib/supabase";
 import type { QueryClient } from "@tanstack/react-query";
 import { queryClient } from "../../lib/query-client";
 import { accountQuery } from "./account-query";
+import { clearPrivateQueries } from "../../lib/cache-invalidation";
 import { hasDeletionReceipt } from "../account/deletion";
 
 export async function loginWithPassword(
@@ -13,7 +14,7 @@ export async function loginWithPassword(
   if (!data.session) throw new Error("AUTH_REQUIRED");
   // An explicit new sign-in always ends the previous actor's Query lifetime,
   // including a different session for the same Supabase user UUID.
-  queries.clear();
+  clearPrivateQueries(queries);
   const assurance = await getSupabaseClient().auth.mfa.getAuthenticatorAssuranceLevel();
   if (assurance.error) throw assurance.error;
   if (assurance.data.nextLevel === "aal2" && assurance.data.currentLevel !== "aal2")

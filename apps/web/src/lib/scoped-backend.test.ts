@@ -320,6 +320,31 @@ describe("Query-owned scoped account validation", () => {
     );
   });
 
+  it("aborts the actual transport for a Query-owned call without retrying the request", async () => {
+    const queries = client();
+    let onRequest!: (signal: AbortSignal) => void;
+    const requestStarted = new Promise<AbortSignal>((resolve) => {
+      onRequest = resolve;
+    });
+    server.use(
+      http.post(`${host}/functions/v1/backend-v1/people_list_v1`, async ({ request: incoming }) => {
+        onRequest(incoming.signal);
+        await new Promise<void>((resolve) => {
+          incoming.signal.addEventListener("abort", () => resolve(), { once: true });
+        });
+        return envelope(page);
+      }),
+    );
+    const key = ["people", scope.accountId, 10];
+    const pending = queryPage(queries, 10).catch((error: unknown) => error);
+    const transport = await requestStarted;
+    expect(transport.aborted).toBe(false);
+    await queries.cancelQueries({ queryKey: key, exact: true });
+    expect(isCancelledError(await pending)).toBe(true);
+    expect(transport.aborted).toBe(true);
+    expect(queries.getQueryData(key)).toBeUndefined();
+  });
+
   it("retains independent fresh checks for native write, receipt and mandatory readback", async () => {
     const queries = client();
     await queries.query(accountQuery(nativeId));

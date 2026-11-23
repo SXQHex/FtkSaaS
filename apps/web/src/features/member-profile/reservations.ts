@@ -1,7 +1,7 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import type { AttendanceEntryView, ReservationView, SessionView } from "@ftksaas/api-contracts";
-import { BackendError } from "../../lib/backend";
+import { BackendError, queryBackendRead } from "../../lib/backend";
 import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { TFunction } from "i18next";
 import type { ProfileReservation } from "./member-profile-view";
@@ -37,6 +37,7 @@ export async function readMemberReservations(
   options: {
     sort?: "created_at_desc" | "starts_at_asc";
     includeSourceSummary?: boolean;
+    includeAttendance?: boolean;
     sessionId?: string;
   } = {},
   readContext?: AccountReadContext,
@@ -45,15 +46,20 @@ export async function readMemberReservations(
   if (options.sessionId) z.uuid().parse(options.sessionId);
   const backend = await scopedBackend(scope, undefined, readContext),
     common = { client_api_version: 1 as const, org_id: scope.orgId, center_id: scope.centerId };
-  const page = await backend.call("reservation_list_v1", {
-    ...common,
-    request_id: uuidv7(),
-    person_id: personId,
-    ...(options.sessionId ? { session_id: options.sessionId } : {}),
-    time_filter: timeFilter,
-    ...(options.includeSourceSummary ? { include_source_summary: true } : {}),
-    page: { limit: 20, sort: options.sort ?? "created_at_desc", ...(cursor ? { cursor } : {}) },
-  });
+  const page = await queryBackendRead(
+    backend,
+    "reservation_list_v1",
+    {
+      ...common,
+      request_id: uuidv7(),
+      person_id: personId,
+      ...(options.sessionId ? { session_id: options.sessionId } : {}),
+      time_filter: timeFilter,
+      ...(options.includeSourceSummary ? { include_source_summary: true } : {}),
+      page: { limit: 20, sort: options.sort ?? "created_at_desc", ...(cursor ? { cursor } : {}) },
+    },
+    readContext?.signal,
+  );
   z.iso.datetime({ offset: true }).parse(page.as_of);
   if (page.items.length > 20 || (cursor && page.next_cursor === cursor))
     throw new Error("PROFILE_RESERVATIONS_UNAVAILABLE");
@@ -79,11 +85,16 @@ export async function readMemberReservations(
       sessionIds.slice(i, i + 4).map(async (id) => {
         let native: SessionView;
         try {
-          native = await backend.call("session_get_v1", {
-            ...common,
-            request_id: uuidv7(),
-            session_id: id,
-          });
+          native = await queryBackendRead(
+            backend,
+            "session_get_v1",
+            {
+              ...common,
+              request_id: uuidv7(),
+              session_id: id,
+            },
+            readContext?.signal,
+          );
         } catch (error) {
           if (accessLost(error)) throw error;
           if (!(error instanceof BackendError)) throw error;
@@ -109,14 +120,23 @@ export async function readMemberReservations(
           attendance_state: native.attendance_state,
           version: native.version,
         };
+        if (options.includeAttendance === false) {
+          sessions.set(id, { session });
+          return;
+        }
         // Do not retain participant/contact metadata from SessionView or another member's roster entries.
         let entries: AttendanceEntryView[] | undefined;
         try {
-          const attendance = await backend.call("attendance_get_v1", {
-            ...common,
-            request_id: uuidv7(),
-            session_id: id,
-          });
+          const attendance = await queryBackendRead(
+            backend,
+            "attendance_get_v1",
+            {
+              ...common,
+              request_id: uuidv7(),
+              session_id: id,
+            },
+            readContext?.signal,
+          );
           if (
             attendance.session_id !== id ||
             attendance.session_version !== session.version ||
@@ -152,7 +172,9 @@ export async function readMemberReservations(
     items,
     nextCursor: page.next_cursor,
     asOf: page.as_of,
-    partial: items.some((x) => !x.session || !x.attendanceAvailable),
+    partial: items.some(
+      (x) => !x.session || (options.includeAttendance !== false && !x.attendanceAvailable),
+    ),
   };
 }
 export function memberReservationRows(

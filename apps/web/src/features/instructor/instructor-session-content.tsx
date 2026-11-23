@@ -32,7 +32,7 @@ export function InstructorSessionContent({
   const { t } = useTranslation(),
     router = useRouter(),
     queries = useQueryClient();
-  const { center, identity, self } = useInstructorScope(scope, preservePending);
+  const { workspace, center, identity, self } = useInstructorScope(scope, preservePending);
   const duties: ("instructor" | "assistant")[] = [];
   if (self?.instructor) duties.push("instructor");
   if (self?.assistant) duties.push("assistant");
@@ -44,12 +44,13 @@ export function InstructorSessionContent({
     scope.centerId,
     personId,
     sessionId,
+    duties,
   ];
   const query = useQuery({
     queryKey: prefix,
     queryFn: (readContext) =>
       readInstructorSession(scope, personId!, duties, sessionId, readContext),
-    enabled: Boolean(center && personId),
+    enabled: Boolean(!workspace.isError && center && personId),
     retry: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
@@ -142,22 +143,27 @@ export function InstructorSessionContent({
     },
     [onLockChange],
   );
-  const source = (center && personId) || preservePending ? query.data : undefined;
+  const sourceUnavailable =
+    workspace.isError || !center || !personId || query.isError || !query.data;
+  const [verifiedSession, setVerifiedSession] = useState<typeof query.data>();
+  const liveSession = sourceUnavailable ? undefined : query.data;
+  if (liveSession && liveSession !== verifiedSession) setVerifiedSession(liveSession);
+  const source = liveSession ?? (locked || preservePending ? verifiedSession : undefined);
   const { refetch } = query;
   const refresh = useCallback(async () => {
     const result = await refetch({ throwOnError: true });
     if (!result.data) throw new Error("INSTRUCTOR_SESSION_UNAVAILABLE");
     await invalidateCachedFamilies(queries, [
-      ["instructor-today", scope.accountId, scope.orgId, scope.centerId],
-      ["instructor-schedule", scope.accountId, scope.orgId, scope.centerId],
+      ["instructor-calendar", scope.accountId, scope.orgId, scope.centerId],
+      ["instructor-today-attendance", scope.accountId, scope.orgId, scope.centerId],
       ["instructor-month-earnings", scope.accountId, scope.orgId, scope.centerId],
     ]);
   }, [refetch, queries, scope.accountId, scope.orgId, scope.centerId]);
-  const error = !center || !personId || query.isError;
+  const error = !center || !personId || query.isError || workspace.isError;
   const retry = (
     <Button
       variant="outline"
-      isDisabled={locked || query.isFetching || !center || !personId}
+      isDisabled={locked || query.isFetching || !center || !personId || workspace.isError}
       onPress={() => {
         void query.refetch();
       }}
@@ -165,28 +171,28 @@ export function InstructorSessionContent({
       {t(($) => $.instructorSession.retry)}
     </Button>
   );
-  if (!source || !center)
-    return (
-      <div className="flex flex-col gap-4 p-6">
-        <h1 className="text-2xl font-semibold">{t(($) => $.instructorSession.title)}</h1>
-        <Alert variant="destructive">
-          <AlertDescription>{t(($) => $.instructorSession.sourceError)}</AlertDescription>
-        </Alert>
-        {retry}
-      </div>
-    );
+  const unavailable = (
+    <div className="flex flex-col gap-4 p-6">
+      <h1 className="text-2xl font-semibold">{t(($) => $.instructorSession.title)}</h1>
+      <Alert variant="destructive">
+        <AlertDescription>{t(($) => $.instructorSession.sourceError)}</AlertDescription>
+      </Alert>
+      {retry}
+    </div>
+  );
+  if (!source) return unavailable;
   const attendance =
-    source.attendance.status === "available" && !query.isError
+    source.attendance.status === "available" && !sourceUnavailable
       ? source.attendance.attendance
       : undefined;
   const fmt = new Intl.DateTimeFormat("tr-TR", {
     dateStyle: "medium",
     timeStyle: "short",
-    timeZone: center.timezone,
+    timeZone: center?.timezone,
   });
   return (
     <SessionAttendanceController
-      key={`${personId}:${sessionId}`}
+      key={sessionId}
       scope={scope}
       audience="instructor"
       startTime={startAt}
@@ -199,8 +205,9 @@ export function InstructorSessionContent({
           id: row.person_id,
           name: source.names.get(row.person_id) ?? t(($) => $.instructorToday.unknown),
         }))}
-      timezone={center.timezone}
+      timezone={center?.timezone}
       disabled={error}
+      recoveryOnly={sourceUnavailable}
       onLockChange={lock}
       onAccessLost={accessLost}
       onRefresh={refresh}
@@ -210,6 +217,7 @@ export function InstructorSessionContent({
     >
       {(ui) => (
         <InstructorSessionView
+          fallback={sourceUnavailable ? unavailable : undefined}
           title={source.header.title}
           subtitle={fmt.format(new Date(source.session.starts_at))}
           badges={[
@@ -246,7 +254,7 @@ export function InstructorSessionContent({
               value: String(source.session.capacity.held),
             },
           ]}
-          timezone={t(($) => $.instructorToday.timezone, { timezone: center.timezone })}
+          timezone={t(($) => $.instructorToday.timezone, { timezone: center?.timezone ?? "" })}
           locked={locked}
           onBack={onBack}
           onStart={ui.onStart}

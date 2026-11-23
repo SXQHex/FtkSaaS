@@ -1,3 +1,4 @@
+import { queryBackendRead } from "../../lib/backend";
 import { v7 as uuidv7 } from "uuid";
 import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { PersonalCalendarLink } from "@ftksaas/api-contracts";
@@ -18,30 +19,43 @@ export function calendarLinkMatchesScope(scope: CalendarScope, link: PersonalCal
       : !link.kinds.includes("studio_program"))
   );
 }
-export async function readMemberCalendars(scope: CalendarScope, readContext?: AccountReadContext) {
-  const backend = await scopedBackend(scope, undefined, readContext);
+export async function readCalendarLinks(
+  scope: CalendarScope,
+  readContext?: AccountReadContext,
+  signal = readContext?.signal,
+) {
+  const backend = await scopedBackend(scope, signal, readContext);
   const links: PersonalCalendarLink[] = [];
   const seen = new Set<string>();
   let cursor: string | undefined;
   let ready = false;
   let supportedKinds: CalendarKind[] = [];
   do {
-    const page = await backend.call("calendar_links_get_v1", {
-      client_api_version: 1,
-      request_id: uuidv7(),
-      page: { limit: 50, cursor },
-      ...(scope.studioCenterId && {
-        studio_program_scope: { org_id: scope.orgId, center_id: scope.studioCenterId },
-      }),
-    });
+    const page = await queryBackendRead(
+      backend,
+      "calendar_links_get_v1",
+      {
+        client_api_version: 1,
+        request_id: uuidv7(),
+        page: { limit: 50, cursor },
+        ...(scope.studioCenterId && {
+          studio_program_scope: { org_id: scope.orgId, center_id: scope.studioCenterId },
+        }),
+      },
+      signal,
+    );
     ready = page.service_ready;
     supportedKinds = scope.studioCenterId ? ["studio_program"] : page.supported_kinds;
     for (const link of page.items) {
       if (seen.has(link.id) || !Number.isSafeInteger(link.version) || link.version < 1)
         throw new Error("CALENDAR_METADATA_UNAVAILABLE");
       seen.add(link.id);
-      if (!scope.studioCenterId && link.org_id !== scope.orgId) continue;
-      if (!calendarLinkMatchesScope(scope, link)) throw new Error("CALENDAR_METADATA_UNAVAILABLE");
+      if (
+        scope.studioCenterId
+          ? !calendarLinkMatchesScope(scope, link)
+          : link.center_id || link.kinds.includes("studio_program")
+      )
+        throw new Error("CALENDAR_METADATA_UNAVAILABLE");
       links.push(link);
     }
     const next = page.next_cursor ?? undefined;
@@ -51,7 +65,20 @@ export async function readMemberCalendars(scope: CalendarScope, readContext?: Ac
   } while (cursor);
   return { links, ready, supportedKinds };
 }
-export type CalendarSnapshot = Awaited<ReturnType<typeof readMemberCalendars>>;
+export type CalendarSnapshot = Awaited<ReturnType<typeof readCalendarLinks>>;
+export function selectMemberCalendars(
+  scope: CalendarScope,
+  snapshot: CalendarSnapshot,
+): CalendarSnapshot {
+  return {
+    ...snapshot,
+    links: snapshot.links.filter((link) => calendarLinkMatchesScope(scope, link)),
+  };
+}
+
+export async function readMemberCalendars(scope: CalendarScope, readContext?: AccountReadContext) {
+  return selectMemberCalendars(scope, await readCalendarLinks(scope, readContext));
+}
 export type CalendarIntent = { key: string } & (
   | { action: "create"; kind: CalendarKind }
   | { action: "rotate" | "revoke"; link: PersonalCalendarLink }

@@ -2,6 +2,42 @@ import { useTranslation } from "react-i18next";
 import type { useMemberCommand } from "../member-profile/use-member-command";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { Button } from "@ftksaas/ui/components/button";
+import {
+  Dialog,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@ftksaas/ui/components/dialog";
+import type { ReactNode } from "react";
+
+export function EventCommandRecovery({
+  locked,
+  onClose,
+  children,
+}: {
+  locked: boolean;
+  onClose: () => void;
+  children: ReactNode;
+}) {
+  const { t } = useTranslation();
+  return (
+    <Dialog
+      isOpen
+      showCloseButton={!locked}
+      isDismissable={!locked}
+      isKeyboardDismissDisabled={locked}
+      onOpenChange={(open) => {
+        if (!open && !locked) onClose();
+      }}
+    >
+      <DialogHeader>
+        <DialogTitle>{t(($) => $.eventDetail.title)}</DialogTitle>
+        <DialogDescription>{t(($) => $.events.sourceError)}</DialogDescription>
+      </DialogHeader>
+      {children}
+    </Dialog>
+  );
+}
 
 export function EventCommandNotice({
   command,

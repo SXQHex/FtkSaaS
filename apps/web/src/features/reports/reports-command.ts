@@ -1,7 +1,7 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
-import { createBackend, readEnvelope } from "../../lib/backend";
+import { scopedBackend, type AccountReadContext, type ClientScope } from "../../lib/scoped-backend";
+import { createBackend, queryBackendRead, readEnvelope } from "../../lib/backend";
 import { getSupabaseClient } from "../../lib/supabase";
 import type {
   RequestReportExportStart,
@@ -68,11 +68,15 @@ export async function readReportJob(intent: ReportJobIntent, id?: string) {
     throw Error("REPORT_JOB_INVALID");
   return readJob(intent.scope, id);
 }
-export async function readJob(scope: ClientScope, id: string) {
+export async function readJob(scope: ClientScope, id: string, readContext?: AccountReadContext) {
   z.uuid().parse(id);
-  const data = await (
-    await scopedBackend(scope)
-  ).call("job_status_get_v1", { ...reportsCommon(scope), request_id: uuidv7(), job_id: id });
+  const backend = await scopedBackend(scope, undefined, readContext);
+  const data = await queryBackendRead(
+    backend,
+    "job_status_get_v1",
+    { ...reportsCommon(scope), request_id: uuidv7(), job_id: id },
+    readContext?.signal,
+  );
   if (data.id !== id) throw Error("REPORT_JOB_INVALID");
   z.enum(["pending", "running", "retry_wait", "succeeded", "failed", "cancelled"]).parse(
     data.state,

@@ -23,7 +23,9 @@ import { readPeoplePage } from "../people/people";
 import { readProfileRights } from "../member-profile/profile-read";
 import { CancelReservation } from "../member-profile/cancel-reservation";
 import { useMemberCommand } from "../member-profile/use-member-command";
-import { readScheduleRange, readScheduleSession } from "./schedule-read";
+import { readScheduleSession } from "./schedule-read";
+import { scheduleRangeQuery } from "./schedule-query";
+import { invalidateMemberReservationViews } from "../member-reservations/member-reservations-query";
 import { scheduleBackendError } from "./schedule-presentation";
 import {
   readGroupStudents,
@@ -126,17 +128,8 @@ export function ScheduleRoster({
     retry: false,
   });
   const sessions = useQuery({
-    queryKey: [
-      "schedule-group-sessions",
-      scope.accountId,
-      scope.orgId,
-      scope.centerId,
-      interval.starts_at,
-      interval.ends_at,
-    ],
-    queryFn: (readContext) => readScheduleRange(scope, interval, undefined, undefined, readContext),
+    ...scheduleRangeQuery(scope, interval),
     enabled: editing,
-    retry: false,
   });
   const command = useMemberCommand({
     write: async (intent: Parameters<typeof writePriority>[0]) => {
@@ -151,7 +144,9 @@ export function ScheduleRoster({
     readReceipt: readPriorityReceipt,
     readResult: readPriorityResult,
     onAccessLost,
-    onRefresh: async () => {
+    onRefresh: async (result, assertCurrent) => {
+      await invalidateMemberReservationViews(queries, scope, result.reservation.person_id);
+      assertCurrent();
       await Promise.all([refreshRoster(), rights.refetch({ throwOnError: true }), onRefresh()]);
     },
   });

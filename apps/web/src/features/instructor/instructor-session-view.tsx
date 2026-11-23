@@ -20,6 +20,7 @@ export function InstructorSessionView({
   startEditor,
   overlays,
   notice,
+  fallback,
   onBack,
   onStart,
   locked = false,
@@ -33,11 +34,19 @@ export function InstructorSessionView({
   startEditor?: ReactNode;
   overlays?: ReactNode;
   notice?: ReactNode;
+  fallback?: ReactNode;
   onBack: () => void;
   onStart?: () => void;
   locked?: boolean;
 }) {
   const { t } = useTranslation();
+  if (fallback)
+    return (
+      <>
+        {fallback}
+        {overlays}
+      </>
+    );
   return (
     <div className="@container flex min-w-0 flex-col gap-5 p-4 md:p-6">
       <div>

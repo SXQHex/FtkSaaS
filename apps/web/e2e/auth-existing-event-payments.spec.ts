@@ -165,7 +165,7 @@ for (const status of ["no_cash_due", "missing", "restricted"] as const)
     expect(state.writes).toHaveLength(0);
   });
 
-test("existing collection retains its pending frame when the main event refresh fails after ACK", async ({
+test("existing collection retains its pending frame when the required event read fails after ACK", async ({
   page,
 }) => {
   const { state, confirmation } = await openPayment(page, "normal", false, true);
@@ -183,4 +183,19 @@ test("existing collection retains its pending frame when the main event refresh 
     .click();
   await expect(confirmation.getByText(saved, { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(1);
+});
+
+test("existing collection reuses one confirmed event read for the sheet and detail", async ({
+  page,
+}) => {
+  const { state, sheet, confirmation } = await openPayment(page);
+  await collect(page);
+  await expect(confirmation.getByText(saved, { exact: true })).toBeVisible();
+  expect(state.writes).toHaveLength(1);
+  expect(state.collectionReads).toBe(1);
+  await confirmation.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await expect(sheet).toContainText("200,00");
+  await sheet.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await expect(page.getByRole("row", { name: /Mevcut kayıt/ })).toContainText("200,00");
+  expect(state.collectionReads).toBe(1);
 });

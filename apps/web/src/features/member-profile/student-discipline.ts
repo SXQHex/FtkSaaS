@@ -89,7 +89,10 @@ export async function studentDisciplineReceipt(intent: StudentDisciplineIntent) 
   return receipt;
 }
 export async function readStudentDisciplineResult(intent: StudentDisciplineIntent) {
-  const person = await readPerson(intent.scope, intent.personId);
+  const person = await readPerson(intent.scope, intent.personId, {
+    membershipDate: true,
+    memberSummary: true,
+  });
   const rows = person.discipline_relationships.filter(
     (row) =>
       row.center_id === intent.scope.centerId &&

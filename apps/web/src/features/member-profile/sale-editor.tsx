@@ -40,7 +40,7 @@ export function SaleEditor({
   productNames: SaleProductNames;
   sourceAvailable: boolean;
   onClose: () => void;
-  onRefresh: (result: SaleResult) => Promise<void>;
+  onRefresh: (result: SaleResult, assertCurrent: () => void) => Promise<void>;
   onCollect: (currency: string) => void;
   onLockChange: (locked: boolean) => void;
   onAccessLost: (error: unknown) => boolean;

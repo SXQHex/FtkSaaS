@@ -69,6 +69,7 @@ export function MemberReservationsContent({
     queryKey: [...prefix, "waitlist", entryCursors.at(-1)],
     queryFn: (readContext) =>
       readOwnWaitlist(scope, "entries", entryCursors.at(-1), undefined, readContext),
+    enabled: !offerId,
     retry: false,
   });
   const offers = useQuery({
@@ -156,12 +157,14 @@ export function MemberReservationsContent({
         staleTime: 0,
         retry: false,
       }),
-      queries.fetchQuery({
-        queryKey: [...prefix, "waitlist", undefined],
-        queryFn: () => readOwnWaitlist(scope, "entries"),
-        staleTime: 0,
-        retry: false,
-      }),
+      offerId
+        ? Promise.resolve()
+        : queries.fetchQuery({
+            queryKey: [...prefix, "waitlist", undefined],
+            queryFn: () => readOwnWaitlist(scope, "entries"),
+            staleTime: 0,
+            retry: false,
+          }),
       queries.fetchQuery({
         queryKey: [...prefix, "offers", undefined, offerId],
         queryFn: () =>
@@ -411,7 +414,7 @@ export function MemberReservationsContent({
                 offers.isFetching
               }
               onPress={() => {
-                void waiting.refetch();
+                if (!offerId) void waiting.refetch();
                 void offers.refetch();
                 void up.refetch();
                 void past.refetch();

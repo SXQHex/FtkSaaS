@@ -1,3 +1,4 @@
+import { cacheVerifiedReadback } from "../../lib/cache-invalidation";
 import { useEffect, useId, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
@@ -61,7 +62,7 @@ export function StudioSetupRequestCard({
     readReceipt: readStudioSetupReceipt,
     readResult: readStudioSetupResult,
     onRefresh: async (result) => {
-      queries.setQueryData(queryKey, result);
+      await cacheVerifiedReadback(queries, queryKey, result);
     },
     onAccessLost: (cause) => {
       const code =

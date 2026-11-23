@@ -7,13 +7,18 @@ import type { ClientScope } from "../../lib/scoped-backend";
 import type { NotificationReadSelection, NotificationView } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
 import { useMemberCommand } from "../member-profile/use-member-command";
-import { invalidateAndReadFirstPage } from "../../lib/cache-invalidation";
+import {
+  cacheVerifiedReadback,
+  invalidateAndReadFirstPage,
+  invalidateCachedFamilies,
+} from "../../lib/cache-invalidation";
 import { EventCommandNotice } from "../events/event-command-notice";
 import { scheduleBackendError } from "../schedule/schedule-presentation";
 import { InboxView, type InboxRow } from "./inbox-view";
 import {
   inboxKey,
   inboxListQuery,
+  organizationInboxReadKeys,
   readInbox,
   readNotificationState,
   type InboxFilter,
@@ -128,28 +133,39 @@ export function InboxContent({
     for (const cause of [list.error, source.error, nativeSource.error])
       if (cause) accessLost(cause);
   }, [list.error, source.error, nativeSource.error, accessLost]);
-  async function refreshFirstPage() {
+  async function refreshFirstPage(assertCurrent: () => void, allUnread = false) {
+    const families = allUnread ? organizationInboxReadKeys(queries, scope) : [[...prefix, "list"]];
     await invalidateAndReadFirstPage({
       queries,
-      families: [[...prefix, "list"]],
+      families,
       firstPageKey: [...prefix, "list", query, filter, undefined],
-      readFirstPage: () =>
-        readInbox(scope, filter === "unread", undefined, {
-          query,
-          workState: filter === "todo" ? "pending" : "all",
-          visibility: filter === "archived" || filter === "deleted" ? filter : undefined,
-        }),
+      readFirstPage: ({ signal }) =>
+        readInbox(
+          scope,
+          filter === "unread",
+          undefined,
+          {
+            query,
+            workState: filter === "todo" ? "pending" : "all",
+            visibility: filter === "archived" || filter === "deleted" ? filter : undefined,
+          },
+          undefined,
+          signal,
+        ),
     });
+    assertCurrent();
     // The member navigation bell consumes the unfiltered first-page cache.
     // Reading a filtered page alone leaves its unread badge stale.
     if (query || filter !== "all") {
       await queries.fetchQuery({
         ...inboxListQuery(scope),
-        queryFn: () => readInbox(scope, false, undefined, { query: "", workState: "all" }),
+        queryFn: ({ signal }) =>
+          readInbox(scope, false, undefined, { query: "", workState: "all" }, undefined, signal),
         staleTime: 0,
         retry: false,
       });
     }
+    assertCurrent();
     setCursors([undefined]);
     setIndex(0);
   }
@@ -161,9 +177,10 @@ export function InboxContent({
       rows: await readNotificationSetResult(intent, id),
     }),
     onAccessLost: accessLost,
-    onRefresh: async ({ intent, rows }) => {
+    onRefresh: async ({ intent, rows }, assertCurrent) => {
       if ("personId" in intent) {
-        await refreshFirstPage();
+        await refreshFirstPage(assertCurrent, true);
+        assertCurrent();
         setChecked([]);
         setSelected(undefined);
         setUndo(undefined);
@@ -171,8 +188,18 @@ export function InboxContent({
         setIndex(0);
         return;
       }
-      for (const row of rows) queries.setQueryData([...prefix, "state", row.id], row);
-      await refreshFirstPage();
+      const stateKeys = rows.map((row) => [...prefix, "state", row.id]);
+      await invalidateCachedFamilies(queries, stateKeys);
+      assertCurrent();
+      await Promise.all(
+        rows.map(async (row, index) => {
+          const key = stateKeys[index]!;
+          if (queries.getQueryState(key)) await cacheVerifiedReadback(queries, key, row);
+        }),
+      );
+      assertCurrent();
+      await refreshFirstPage(assertCurrent);
+      assertCurrent();
       setChecked([]);
       if (typeof intent.change !== "boolean") setSelected(undefined);
       const changed = new Set(intent.changedIds);

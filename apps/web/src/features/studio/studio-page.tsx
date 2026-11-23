@@ -3,7 +3,11 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate, useRouter } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { invalidateEarningsViews } from "../earnings/earnings-query";
-import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
+import {
+  cacheVerifiedReadback,
+  capturePrivateReadback,
+  invalidateCachedFamilies,
+} from "../../lib/cache-invalidation";
 import { useTranslation } from "react-i18next";
 import { useAccountProjection } from "../auth/use-account-projection";
 import { workspaceRoles } from "../workspace/workspace";
@@ -23,6 +27,7 @@ import { StudioClosureEditor } from "./closure-editor";
 import { StudioResourceEditor } from "./resource-editor";
 import { StudioAvailabilityReader } from "./availability-reader";
 import { readStudioSnapshot, type StudioSnapshot } from "./management-snapshot";
+import { refreshStudioRooms, studioRoomsQuery } from "./studio-rooms-query";
 import { studioViewData } from "./studio-data";
 import type { StudioScope } from "./studio";
 import { NewInstructorPerson } from "./new-instructor-person";
@@ -197,7 +202,7 @@ function StudioContent({
     !workspace.isError &&
     workspace.data?.selected?.id === scope.orgId &&
     workspaceRoles(workspace.data, scope.centerId).includes("owner");
-  const queryKey = ["studio", scope.accountId, scope.orgId, scope.centerId, canReadPlan];
+  const queryKey = ["studio", scope.accountId, scope.orgId, scope.centerId, canReadPlan] as const;
   const query = useQuery({
     queryKey,
     queryFn: (readContext) =>
@@ -207,14 +212,17 @@ function StudioContent({
           ? async () => (await queries.fetchQuery(settingsSubscriptionQuery(scope))).subscription
           : undefined,
         readContext,
+        () => queries.query(studioRoomsQuery(scope)),
       ),
     retry: false,
   });
   async function refreshStudio() {
+    const assertCurrent = capturePrivateReadback(queries);
     await invalidateCachedFamilies(queries, [
       ["studio", scope.accountId, scope.orgId, scope.centerId],
       ["schedule-sources", scope.accountId, scope.orgId, scope.centerId],
     ]);
+    assertCurrent();
     // Several native commands use this snapshot as their mandatory result.
     // Keep both the snapshot and its plan read on the strict account path.
     const data = await queries.fetchQuery({
@@ -230,6 +238,21 @@ function StudioContent({
       retry: false,
     });
     return { data };
+  }
+  async function refreshRoom() {
+    const assertCurrent = capturePrivateReadback(queries);
+    const filters = { queryKey, exact: true };
+    const source = queries.getQueryCache().find(filters);
+    const rooms = await refreshStudioRooms(queries, scope);
+    assertCurrent();
+    const current = source?.state.data as StudioSnapshot | undefined;
+    if (!current || queries.getQueryCache().find(filters) !== source)
+      throw new Error("STUDIO_UNAVAILABLE");
+    const resources = { ...current.resources, rooms };
+    const setup = { ...current.setup, activeRooms: rooms.filter((room) => room.active).length };
+    await cacheVerifiedReadback(queries, queryKey, { ...current, resources, setup });
+    await queries.invalidateQueries({ ...filters, refetchType: "none" });
+    return resources;
   }
   useEffect(() => {
     const error = query.error;
@@ -321,6 +344,7 @@ function StudioContent({
               classMeta={capturedData.classes.find((item) => item.id === selection.id)}
               onLockChange={publishLock}
               onRefresh={async () => {
+                if (selection.kind === "room") return refreshRoom();
                 const result = await refreshStudio();
                 if (!result.data) throw new Error("STUDIO_UNAVAILABLE");
                 return result.data.resources;

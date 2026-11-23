@@ -21,6 +21,7 @@ import {
 } from "@ftksaas/ui/components/combobox";
 import { Button } from "@ftksaas/ui/components/button";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
+import { peopleKeys } from "./people-query";
 import { readPeoplePage, type PeopleScope } from "./people";
 import type { PersonSummary } from "@ftksaas/api-contracts";
 
@@ -118,17 +119,9 @@ function PersonPicker({
     return () => clearTimeout(timer);
   }, [search]);
   const people = useQuery({
-    queryKey: [
-      "merge-people",
-      scope.accountId,
-      scope.orgId,
-      scope.centerId,
-      index,
-      query,
-      cursors[page],
-    ],
+    queryKey: [...peopleKeys.picker(scope), query, cursors[page]],
     queryFn: (context) =>
-      readPeoplePage(scope, query, cursors[page], undefined, undefined, undefined, context),
+      readPeoplePage(scope, query, cursors[page], undefined, undefined, context.signal, context),
     retry: false,
   });
   const items = people.isError ? [] : (people.data?.items ?? []);

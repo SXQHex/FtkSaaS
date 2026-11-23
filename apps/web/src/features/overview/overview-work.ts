@@ -1,10 +1,14 @@
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
-import { BackendError } from "../../lib/backend";
+import { BackendError, queryBackendRead } from "../../lib/backend";
 import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { ManagementWorkView } from "@ftksaas/api-contracts";
 import { requestDetail } from "../lesson-requests/lesson-requests-read";
 import { readEvent } from "../events/events-read";
+
+export const overviewWorkKey = (scope: ClientScope) =>
+  ["overview-work", scope.accountId, scope.orgId, scope.centerId] as const;
+
 const positive = z.number().int().positive().safe(),
   count = z.number().int().nonnegative().safe(),
   instant = z.iso.datetime({ offset: true });
@@ -63,17 +67,22 @@ export async function readOverviewWork(
   cursor?: string,
   limit = 20,
   context?: AccountReadContext,
+  signal = context?.signal,
 ) {
-  const page = await (
-    await scopedBackend(scope, undefined, context)
-  ).call("management_work_list_v1", {
-    client_api_version: 1,
-    request_id: uuidv7(),
-    org_id: scope.orgId,
-    center_id: scope.centerId,
-    kind: "all",
-    page: { limit, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
-  });
+  const backend = await scopedBackend(scope, signal, context);
+  const page = await queryBackendRead(
+    backend,
+    "management_work_list_v1",
+    {
+      client_api_version: 1,
+      request_id: uuidv7(),
+      org_id: scope.orgId,
+      center_id: scope.centerId,
+      kind: "all",
+      page: { limit, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
+    },
+    signal,
+  );
   instant.parse(page.as_of);
   const seen = new Set<string>();
   for (const row of page.items) {

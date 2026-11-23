@@ -1,4 +1,5 @@
 import { v7 as uuidv7 } from "uuid";
+import { readScheduleSession } from "../schedule/schedule-read";
 import { z } from "zod";
 import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
@@ -8,7 +9,6 @@ import type {
   WaitlistEntryView,
   SessionView,
 } from "@ftksaas/api-contracts";
-import { readScheduleSession } from "../schedule/schedule-read";
 
 export async function readSessionHeader(
   scope: ClientScope,
@@ -181,14 +181,12 @@ export async function readSessionAttendance(
     sessionId,
   );
 }
-export async function readSessionInstructors(
+export async function readAssignedSessionInstructors(
   scope: ClientScope,
-  sessionId: string,
-  includeRoomLabels = false,
+  session: Pick<SessionView, "assignments">,
   readContext?: AccountReadContext,
 ) {
-  const session = await readScheduleSession(scope, sessionId, includeRoomLabels, readContext),
-    backend = await scopedBackend(scope, undefined, readContext);
+  const backend = await scopedBackend(scope, undefined, readContext);
   const ids = [
     ...new Set(
       session.assignments.filter((row) => row.duty === "instructor").map((row) => row.person_id),
@@ -201,7 +199,20 @@ export async function readSessionInstructors(
         .slice(i, i + 4)
         .map(async (id) => people.set(id, await visiblePerson(backend, scope, id))),
     );
-  return { session, instructors: ids.map((id) => ({ id, person: people.get(id) })) };
+  return ids.map((id) => ({ id, person: people.get(id) }));
+}
+
+export async function readSessionInstructors(
+  scope: ClientScope,
+  sessionId: string,
+  includeRoomLabels = false,
+  readContext?: AccountReadContext,
+) {
+  const session = await readScheduleSession(scope, sessionId, includeRoomLabels, readContext);
+  return {
+    session,
+    instructors: await readAssignedSessionInstructors(scope, session, readContext),
+  };
 }
 
 export async function readPersonSessionWaitlist(

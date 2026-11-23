@@ -81,7 +81,10 @@ export function StudentStateEditor({
   onClose: () => void;
   onLockChange: (value: boolean) => void;
   onAccessLost: (error: unknown) => boolean;
-  onRefresh: (person: Awaited<ReturnType<typeof readPerson>>) => Promise<void>;
+  onRefresh: (
+    person: Awaited<ReturnType<typeof readPerson>>,
+    assertCurrent: () => void,
+  ) => Promise<void>;
 }) {
   const { t } = useTranslation(),
     [reason, setReason] = useState(""),

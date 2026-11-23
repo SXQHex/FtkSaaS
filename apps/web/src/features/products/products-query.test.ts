@@ -2,7 +2,11 @@ import { QueryClient, QueryObserver } from "@tanstack/react-query";
 import type { ProductView } from "@ftksaas/api-contracts";
 import { expect, it, vi } from "vitest";
 import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
-import { affectedProductQueryFamilies } from "./products-query";
+import {
+  affectedProductQueryFamilies,
+  invalidateProductSalesViews,
+  productsKeys,
+} from "./products-query";
 
 const scope = { accountId: "actor-a", orgId: "org-a", centerId: "center-a" };
 const centerB = { ...scope, centerId: "center-b" };
@@ -85,4 +89,23 @@ it("organization-wide product scopes update the known centers without crossing o
   expect(families).toContainEqual(catalog(centerB));
   expect(families).toContainEqual(catalog(centerC));
   expect(families.every((key) => key[2] === scope.orgId)).toBe(true);
+});
+
+it("stales product sales and counts in the affected center while preserving version history", async () => {
+  const queries = new QueryClient();
+  const history = (s: typeof scope, view: "sales" | "versions") => [
+    ...productsKeys.history(s, "product-a"),
+    view,
+    "second",
+  ];
+  const affected = [productsKeys.management(scope), history(scope, "sales")];
+  const outside = [
+    history(scope, "versions"),
+    history(centerB, "sales"),
+    history(foreign, "sales"),
+  ];
+  for (const key of [...affected, ...outside]) queries.setQueryData(key, { revision: 1 });
+  await invalidateProductSalesViews(queries, scope, ["product-a"]);
+  for (const key of affected) expect(queries.getQueryState(key)?.isInvalidated).toBe(true);
+  for (const key of outside) expect(queries.getQueryState(key)?.isInvalidated).toBe(false);
 });

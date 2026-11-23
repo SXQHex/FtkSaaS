@@ -1,3 +1,4 @@
+import { cacheVerifiedReadback } from "../../lib/cache-invalidation";
 import { useEffect, useId, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -52,7 +53,7 @@ export function SettingsTaxProfile({
     readReceipt: readBillingTaxReceipt,
     readResult: readBillingTaxResult,
     onRefresh: async (result) => {
-      queries.setQueryData(queryKey, result);
+      await cacheVerifiedReadback(queries, queryKey, result);
       setDraft(undefined);
     },
     onAccessLost: (error) => {

@@ -333,7 +333,11 @@ export function productTermsEqual(left: ProductTerms, right: ProductTerms) {
   });
   return JSON.stringify(normalize(left)) === JSON.stringify(normalize(right));
 }
-export async function readProductResult(intent: ProductIntent, versionId?: string) {
+export async function readProductResult(
+  intent: ProductIntent,
+  versionId?: string,
+  onHistoryFirstPage?: (page: Awaited<ReturnType<typeof readProductHistory>>) => void,
+) {
   if (intent.operation === "product_state_set_v1") {
     const backend = await scopedBackend(intent.scope);
     const result = await backend.call("products_management_list_v1", {
@@ -373,6 +377,7 @@ export async function readProductResult(intent: ProductIntent, versionId?: strin
   do {
     if (intent.base?.version) {
       const page = await readProductHistory(intent.scope, intent.base.id, "versions", cursor);
+      if (!cursor) onHistoryFirstPage?.(page);
       const row = page.items.find((entry) => entry.id === versionId);
       if (row) {
         if (!("product_id" in row) || !productTermsEqual(row.terms, intent.request.terms))

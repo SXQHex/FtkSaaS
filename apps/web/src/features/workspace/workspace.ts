@@ -5,6 +5,13 @@ import { getSupabaseClient } from "../../lib/supabase";
 import { sameNativeSession } from "../auth/native-session-id";
 import type { OrganizationView, CenterView, RoleView } from "@ftksaas/api-contracts";
 
+function nextWorkspaceCursor(next: string | null | undefined, seen: Set<string>) {
+  if (!next) return undefined;
+  if (seen.has(next)) throw new Error("WORKSPACE_CURSOR_REPEATED");
+  seen.add(next);
+  return next;
+}
+
 export async function readWorkspace(
   accountId: string,
   organizationId?: string,
@@ -36,6 +43,7 @@ export async function readWorkspace(
   signal?.throwIfAborted();
   if (account.id !== accountId) throw new Error("ACCOUNT_CHANGED");
   const organizations: OrganizationView[] = [];
+  const cursors = new Set<string>();
   let cursor: string | undefined;
   do {
     const page = await backend.read(
@@ -49,7 +57,7 @@ export async function readWorkspace(
       signal,
     );
     organizations.push(...page.items);
-    cursor = page.next_cursor ?? undefined;
+    cursor = nextWorkspaceCursor(page.next_cursor, cursors);
   } while (cursor);
   const selected = organizationId
     ? organizations.find((org) => org.id === organizationId)
@@ -59,6 +67,7 @@ export async function readWorkspace(
   const centers: CenterView[] = [],
     roles: RoleView[] = [];
   if (selected) {
+    cursors.clear();
     do {
       const page = await backend.read(
         "centers_list_v1",
@@ -71,10 +80,11 @@ export async function readWorkspace(
         signal,
       );
       centers.push(...page.items.filter((center) => center.accessible));
-      cursor = page.next_cursor ?? undefined;
+      cursor = nextWorkspaceCursor(page.next_cursor, cursors);
     } while (cursor);
     const personId = selected.self_context?.person_id;
     if (personId) {
+      cursors.clear();
       try {
         do {
           const page = await backend.read(
@@ -89,7 +99,7 @@ export async function readWorkspace(
             signal,
           );
           roles.push(...page.items.filter((role) => role.state === "active"));
-          cursor = page.next_cursor ?? undefined;
+          cursor = nextWorkspaceCursor(page.next_cursor, cursors);
         } while (cursor);
       } catch (error) {
         if (!(error instanceof BackendError)) throw error;
