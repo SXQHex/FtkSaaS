@@ -26,7 +26,9 @@ test('Availability and policies through real Auth -> Edge -> RPC',async t=>{
  const interval={starts_at:at.toISOString(),ends_at:new Date(+at+3600000).toISOString()};
  const sessionBody={discipline_id:discipline,format:'group',interval,resources:[resource],assignments:[],capacity:{total:4}};
  let saved,session,trigger;
- const effective_at=new Date(Date.now()-5000).toISOString();
+ // Keep policy ordering on the DB clock, after the organization's initial policy.
+ const policyTime=async(seconds=0)=>(await rows(`select to_char(clock_timestamp() at time zone 'UTC' + $1 * interval '1 second','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') effective_at`,[seconds]))[0].effective_at;
+ const effective_at=await policyTime();
  const publish=(k,value,mandatory=false,b={},u=owner,opkey=key())=>mut('policy_publish_v1',{center_id:null,key:k,value,effective_at,mandatory,...b},opkey,u);
  const get=(keys=[],b={},u=owner)=>must(u,'policies_get_v1',scope({keys,...b}));
  const centerVersion=async()=>Number((await rows('select version from core.centers where id=$1',[center]))[0].version);
@@ -146,10 +148,10 @@ test('Availability and policies through real Auth -> Edge -> RPC',async t=>{
   await publish('waitlist_offer_minutes',{kind:'integer',value:30});
   await publish('waitlist_offer_minutes',{kind:'integer',value:20},false,{center_id:center});
   assert.equal((await get(['waitlist_offer_minutes']))[0].value.value,20);
-  const future=new Date(Date.now()+60000).toISOString();
+  const future=await policyTime(60);
   await publish('waitlist_offer_minutes',{kind:'integer',value:10},true,{effective_at:future});
   assert.equal((await get(['waitlist_offer_minutes']))[0].value.value,20);
-  await publish('waitlist_offer_minutes',{kind:'integer',value:15},true,{effective_at:new Date(Date.now()-100).toISOString()});
+  await publish('waitlist_offer_minutes',{kind:'integer',value:15},true,{effective_at:await policyTime()});
   assert.equal((await get(['waitlist_offer_minutes']))[0].value.value,15);
   assert.equal((await get(['waitlist_offer_minutes']))[0].scope.kind,'organization');
   await fail('policy_publish_v1',{key:'waitlist_offer_minutes',value:{kind:'integer',value:40},effective_at,mandatory:false},'FORBIDDEN');
@@ -188,17 +190,23 @@ test('Availability and policies through real Auth -> Edge -> RPC',async t=>{
   assert.equal((await rows('select count(*)::int n from core.reservations where session_id=$1',[session]))[0].n,n);
  });
  await t.test('reservation window, typed cancellation snapshot and mandatory policy selection are applied by existing API',async()=>{
+  const initial=(await get(['negative_default']))[0];assert.deepEqual(initial.value,{kind:'integer',value:0});assert.equal(initial.version,1);
+  assert(Date.parse(effective_at)>=Date.parse(initial.effective_at),'Fixture policy time must follow the organization bootstrap');
   await publish('student_cancel_group',{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'consume',no_show:'consume'}},true);
-  await publish('negative_default',{kind:'integer',value:20});
-  await publish('negative_upper',{kind:'integer',value:20},true);
+  const negative=await publish('negative_default',{kind:'integer',value:20});
+  const upper=await publish('negative_upper',{kind:'integer',value:20},true);
+  assert.deepEqual((await get(['negative_default','negative_upper'])).map(({key,value,version})=>({key,value,version})),[
+   {key:'negative_default',value:{kind:'integer',value:20},version:negative.version},
+   {key:'negative_upper',value:{kind:'integer',value:20},version:upper.version}
+  ]);
   const si={...sessionBody,resources:[],interval:{starts_at:new Date(+at+5*86400000).toISOString(),ends_at:new Date(+at+5*86400000+3600000).toISOString()}};
   const sid=(await mut('session_create_v1',si)).primary_id;
-  await publish('reservation_window',{kind:'window',opens_minutes_before:0,closes_minutes_before:0,manager_exception:true},false,{effective_at:new Date(Date.now()-50).toISOString()});
+  await publish('reservation_window',{kind:'window',opens_minutes_before:0,closes_minutes_before:0,manager_exception:true},false,{effective_at:await policyTime()});
   await fail('reservation_create_v1',{session_id:sid,person_id:student.p,mode:'flexible'},'FORBIDDEN');
-  await publish('reservation_window',{kind:'window',opens_minutes_before:20000,closes_minutes_before:0,manager_exception:false},false,{effective_at:new Date(Date.now()-50).toISOString()});
+  await publish('reservation_window',{kind:'window',opens_minutes_before:20000,closes_minutes_before:0,manager_exception:false},false,{effective_at:await policyTime()});
   const res=await mut('reservation_create_v1',{session_id:sid,person_id:student.p,mode:'flexible'});
   const original=(await rows('select policy_version_id from core.reservations where id=$1',[res.primary_id]))[0].policy_version_id;
-  await publish('student_cancel_group',{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'consume',after_cutoff:'consume',no_show:'consume'}},true,{effective_at:new Date(Date.now()-50).toISOString()});
+  await publish('student_cancel_group',{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'consume',after_cutoff:'consume',no_show:'consume'}},true,{effective_at:await policyTime()});
   assert.equal((await rows('select policy_version_id from core.reservations where id=$1',[res.primary_id]))[0].policy_version_id,original);
   await mut('reservation_cancel_v1',{reservation_id:res.primary_id,expected_version:1,reason:'Snapshot'});
   assert.equal((await rows("select count(*)::int n from core.credit_deficits where reservation_id=$1 and state in ('reserved','consumed')",[res.primary_id]))[0].n,0);
@@ -208,7 +216,7 @@ test('Availability and policies through real Auth -> Edge -> RPC',async t=>{
   await publish('negative_valuation',{kind:'valuation',discipline_id:discipline,format:'private',amount_minor:'500',currency:'TRY'});
   await fail('reservation_create_v1',{session_id:sid,person_id:student.p,mode:'flexible'},'POLICY_NOT_CONFIGURED');
   assert.equal((await rows('select count(*)::int n from core.reservations where session_id=$1',[sid]))[0].n,0);
-  const policy=await publish('negative_valuation',{kind:'valuation',discipline_id:discipline,format:'group',amount_minor:'500',currency:'TRY'},false,{effective_at:new Date(Date.now()-50).toISOString()});
+  const policy=await publish('negative_valuation',{kind:'valuation',discipline_id:discipline,format:'group',amount_minor:'500',currency:'TRY'},false,{effective_at:await policyTime()});
   const reservation=await mut('reservation_create_v1',{session_id:sid,person_id:student.p,mode:'flexible'});
   const stored=(await rows('select negative_basis_policy_id,negative_basis_minor from core.reservations where id=$1',[reservation.primary_id]))[0];
   assert.equal(stored.negative_basis_policy_id,policy.primary_id);assert.equal(stored.negative_basis_minor,'500');

@@ -1,4 +1,11 @@
-import { I18nProvider, RouterProvider as AriaRouterProvider } from "react-aria-components";
+import {
+  Dialog,
+  I18nProvider,
+  Modal,
+  ModalOverlay,
+  RouterProvider as AriaRouterProvider,
+} from "react-aria-components";
+import { UNSAFE_PortalProvider } from "react-aria/PortalProvider";
 import { useTranslation } from "react-i18next";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -16,11 +23,12 @@ const FormPreview = isDevelopment ? lazy(() => import("../examples/form-preview"
 const StateGallery = isDevelopment ? lazy(() => import("../examples/state-gallery")) : () => null;
 
 export function RootLayout() {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const router = useRouter();
   const queries = useQueryClient();
   const [checkingAccess, setCheckingAccess] = useState(false);
   const [sameActorHandoff, setSameActorHandoff] = useState(false);
+  const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(null);
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const anonymousProgram = pathname.startsWith("/public/");
   const authReady = useAuthSession(!anonymousProgram, setSameActorHandoff);
@@ -47,6 +55,7 @@ export function RootLayout() {
     });
   }, [unscopedRoute, queries, router]);
   const privateAuthPending = !authReady && !unscopedRoute;
+  const privatePresentationHidden = (checkingAccess || privateAuthPending) && !unscopedRoute;
   // Preserve in-flight native commands without exposing any old private UI.
   // Queries were already evicted and Router guards must finish before reveal.
   const preserveCommandTree = privateAuthPending && sameActorHandoff;
@@ -65,27 +74,43 @@ export function RootLayout() {
         <NetworkNotice />
         <div
           className="contents"
-          style={{ display: preserveCommandTree ? "none" : undefined }}
-          inert={(checkingAccess || privateAuthPending) && !unscopedRoute}
-          aria-hidden={(checkingAccess || privateAuthPending) && !unscopedRoute}
+          style={{ display: privatePresentationHidden ? "none" : undefined }}
+          inert={privatePresentationHidden}
+          aria-hidden={privatePresentationHidden}
         >
-          <Suspense fallback={<RoutePendingPage />}>
-            {privateAuthPending && !preserveCommandTree ? (
-              <RoutePendingPage />
-            ) : showStates ? (
-              <StateGallery />
-            ) : showExample ? (
-              <FormPreview />
-            ) : (
-              <Outlet />
+          <UNSAFE_PortalProvider getContainer={() => portalContainer}>
+            {portalContainer && (
+              <Suspense fallback={<RoutePendingPage />}>
+                {privateAuthPending && !preserveCommandTree ? (
+                  <RoutePendingPage />
+                ) : showStates ? (
+                  <StateGallery />
+                ) : showExample ? (
+                  <FormPreview />
+                ) : (
+                  <Outlet />
+                )}
+              </Suspense>
             )}
-          </Suspense>
+          </UNSAFE_PortalProvider>
+          {/* Mount open overlays only once their native focus/aria hooks have a connected host. */}
+          <div ref={setPortalContainer} className="contents" />
         </div>
-        {(checkingAccess || preserveCommandTree) && !unscopedRoute && (
-          <div className="fixed inset-0 z-50 bg-background">
-            <StateView kind="loading" />
-          </div>
-        )}
+        <ModalOverlay
+          isOpen={privatePresentationHidden}
+          isDismissable={false}
+          isKeyboardDismissDisabled
+          className="fixed inset-0 z-50 bg-background"
+        >
+          <Modal className="size-full outline-none">
+            <Dialog
+              aria-label={t(($) => $.states.content.loading.title)}
+              className="size-full outline-none"
+            >
+              <StateView kind="loading" />
+            </Dialog>
+          </Modal>
+        </ModalOverlay>
         <Suspense fallback={null}>
           <Devtools />
         </Suspense>

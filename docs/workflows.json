@@ -314,8 +314,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "c506f8550c93c2a698e52c4f5ebcd6b89db7d474d21bd67662c162ad1087fe3c",
-        "reason": "Ortak protokol ve değişen kaynaklar incelendi: aynı validator ve handler baytları JavaScript girişinden yüklenir; dağıtım entrypoint kimliği ve hata anı native tanısı kaynak bağına dahildir; API ve hata kabulü gevşetilmedi."
+        "fingerprint": "64046d7da5219ad6a03aac5ec54969c4a91ae00ff20be9cb18712658aa469d90",
+        "reason": "API11 fixture DB saatine bağlandı; yalnız suite kaynak SHA ve tam satır sahipliği yenilendi. Manifest, typed hata/kurtarma ve bütün kabul kapsamı incelendi; ortak istemci davranışı aynı."
       }
     },
     {
@@ -541,8 +541,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "f96e83c9a87729abee38684b0287b59c317fc31f982edd08117e3adf9b4f353e",
-        "reason": "Stüdyo kuyruğunda rol, kendi talep kapsamı, aynı sıra ve canlı veri değişikliğinde cursor reddi incelendi."
+        "fingerprint": "e056753343aa60c94b9c83d286a599178919a4be360c619f5aa070d62cee61e5",
+        "reason": "Organizasyonun başlangıç sıfır politikası ve effective_at seçimi SQL/test kaynaklarından incelendi. Test hazırlığı artık DB saatiyle başlangıçtan sonra; kurulum yetkileri, varsayılanlar ve rehber aynı."
       }
     },
     {
@@ -660,8 +660,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "d285994dd6f5380ee474186d44b23e3677331a7c40cda5f417096c8b229e2739",
-        "reason": "Paylaşılan kabul dosyasına eklenen rapor, stüdyo kuyruğu ve fatura sayfalama senaryoları incelendi."
+        "fingerprint": "7fd61e4aafb707cd53c643964bcf52d79b7528784468e7129859fd22b09b0f9c",
+        "reason": "Politika effective_at/sürüm seçimi, rezervasyon kredi kapısı ve snapshot testleri incelendi. DB saatli fixture ve etkin limit assertionları eklendi; program/seans/rezervasyon iş kuralları ve rehber değişmedi."
       }
     },
     {
