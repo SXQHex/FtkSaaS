@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useBlocker } from "@tanstack/react-router";
+import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
+import { invalidateMemberReservationViews } from "../member-reservations/member-reservations-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
@@ -134,14 +136,14 @@ export function CancelReservation({
     if (!intent.current || !ack.current) return;
     const result = await readCancellationResult(intent.current, primary.current);
     if (!mounted.current || terminal.current) return;
-    await Promise.all(
-      ["member-classes", "member-reservations", "member-entitlements"].map((view) =>
-        queries.invalidateQueries({
-          queryKey: [view, accountId, orgId, centerId, personId],
-          refetchType: "none",
-        }),
-      ),
-    );
+    const subject = [accountId, orgId, centerId, personId] as const;
+    await Promise.all([
+      invalidateMemberReservationViews(queries, scope, personId),
+      invalidateCachedFamilies(queries, [
+        ["profile-ledger", ...subject],
+        ["profile-rights", ...subject],
+      ]),
+    ]);
     await onRefresh(result);
     if (mounted.current && !terminal.current) setState("saved");
   }

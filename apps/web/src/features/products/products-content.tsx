@@ -12,6 +12,7 @@ import {
   productDraft,
   productIntent,
   productStateIntent,
+  readProductHistory,
   readProductsManagementPage,
   type ProductPublishIntent,
 } from "./products";
@@ -232,16 +233,25 @@ export function ProductsContent({
           onAccessLost={accessLost}
           onRefresh={async (result) => {
             const updated = result?.terms ?? editor.base?.terms;
+            const publishedProductId =
+              result && editor.base && result.version_id !== editor.base.version_id
+                ? result.id
+                : undefined;
+            const families = updated
+              ? affectedProductQueryFamilies(
+                  scope,
+                  updated,
+                  editor.base?.terms,
+                  current?.centers.map((center) => center.id) ?? [],
+                  publishedProductId,
+                )
+              : [productsKeys.management(scope)];
             await invalidateAndReadFirstPage({
               queries,
-              families: updated
-                ? affectedProductQueryFamilies(
-                    scope,
-                    updated,
-                    editor.base?.terms,
-                    current?.centers.map((center) => center.id) ?? [],
-                  )
-                : [productsKeys.management(scope)],
+              families,
+              infiniteFamilies: families.filter(
+                (key) => key[0] === "event-choices" || key[0] === "business-product-scope",
+              ),
               firstPageKey: [
                 "products-management",
                 scope.accountId,
@@ -253,6 +263,18 @@ export function ProductsContent({
               ],
               readFirstPage: () => readProductsManagementPage(scope, filter, searchQuery),
             });
+            if (publishedProductId)
+              await queries.fetchQuery({
+                queryKey: [
+                  ...productsKeys.history(scope, publishedProductId),
+                  "versions",
+                  undefined,
+                ],
+                queryFn: (context) =>
+                  readProductHistory(scope, publishedProductId, "versions", undefined, context),
+                staleTime: 0,
+                retry: false,
+              });
             setCursors([undefined]);
             setPageIndex(0);
           }}

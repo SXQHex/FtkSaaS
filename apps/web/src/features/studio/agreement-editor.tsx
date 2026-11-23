@@ -214,10 +214,7 @@ export function StudioAgreementEditor({
   async function finishRead() {
     const current = pending.current;
     if (!current || !acknowledged.current) return;
-    const [versions] = await Promise.all([
-      readStudioAgreements(scope, current.payload.person_id),
-      onRefresh(),
-    ]);
+    const versions = await readStudioAgreements(scope, current.payload.person_id);
     if (
       !versions.some(
         (item) =>
@@ -227,6 +224,8 @@ export function StudioAgreementEditor({
       )
     )
       throw new Error("STUDIO_UNAVAILABLE");
+    if (!mounted.current) return;
+    await onRefresh();
     if (mounted.current) {
       pending.current = undefined;
       acknowledged.current = undefined;

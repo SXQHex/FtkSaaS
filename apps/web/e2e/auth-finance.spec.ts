@@ -18,6 +18,7 @@ async function setup(
     openProfileFirst?: boolean;
     stale?: boolean;
     blocked?: boolean;
+    directoryReadback?: () => Promise<void>;
   } = {},
 ) {
   const studio = await mockStudio(page),
@@ -37,6 +38,7 @@ async function setup(
       }
     : undefined;
   let correction: CashSummary | undefined, prepared: Record<string, unknown> | undefined;
+  const directoryReads: Record<string, unknown>[] = [];
   const corrections: Record<string, unknown>[] = [],
     previews: Record<string, unknown>[] = [];
   const remainingDebt = () =>
@@ -45,10 +47,32 @@ async function setup(
     const op = new URL(route.request().url()).pathname.split("/").at(-1),
       req = route.request().postDataJSON(),
       send = (data: unknown) => route.fulfill({ json: { ok: true, data, trace_id: I.role } });
-    if (op === "finance_directory_get_v1")
-      return route.fulfill({
-        json: { ok: false, error: { code: "FORBIDDEN", retryable: false, trace_id: I.role } },
+    if (op === "finance_directory_get_v1") {
+      if (!options.directoryReadback)
+        return route.fulfill({
+          json: { ok: false, error: { code: "FORBIDDEN", retryable: false, trace_id: I.role } },
+        });
+      directoryReads.push(req);
+      if (movement) await options.directoryReadback();
+      return send({
+        view: req.view,
+        items: [],
+        next_cursor: null,
+        as_of: new Date().toISOString(),
+        totals: [
+          {
+            currency: "TRY",
+            sales_minor: "0",
+            collections_minor: movement?.amount_minor ?? "0",
+            refunds_minor: "0",
+            debt_minor: remainingDebt(),
+            credit_minor: "0",
+            debt_people: 1,
+            credit_people: 0,
+          },
+        ],
       });
+    }
     if (op === "person_get_v1" && options.openProfileFirst) {
       expect(req).toMatchObject({ org_id: I.org, center_id: I.center, person_id: I.instructor });
       return send({
@@ -229,13 +253,15 @@ async function setup(
   } else {
     await page.goto(`${centerPath}/finance`);
   }
+  if (options.directoryReadback)
+    await expect(page.getByText("TRY ₺1.000,00", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Üye bazlı finans", exact: true }).click();
   await page.getByLabel("Üye", { exact: true }).selectOption(I.instructor);
   await page.getByLabel("Para birimi", { exact: true }).fill("TRY");
   await page.getByRole("button", { name: "Finansı getir", exact: true }).click();
   await expect.poll(() => reads.length).toBeGreaterThan(0);
   await expect(page.getByRole("grid", { name: "Hareketler", exact: true })).toBeVisible();
-  return { studio, writes, reads, corrections, previews };
+  return { studio, writes, reads, corrections, previews, directoryReads };
 }
 async function fillCollection(page: Page) {
   await page.getByRole("button", { name: "Tahsilat al", exact: true }).click();
@@ -562,4 +588,36 @@ test("a stale correction apply cannot be repeated until a fresh preview and appr
   expect(state.corrections).toHaveLength(1);
   expect(state.writes).toHaveLength(0);
   await panel.getByRole("button", { name: "Kapat", exact: true }).click();
+});
+
+test("personal collection verifies the directory first page before returning to its totals", async ({
+  page,
+}) => {
+  let release!: () => void;
+  const readback = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const state = await setup(page, { directoryReadback: () => readback });
+  const panel = await fillCollection(page);
+  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+  await panel.getByRole("button", { name: "Tahsilatı kaydet", exact: true }).click();
+  try {
+    await expect.poll(() => state.directoryReads.length).toBe(2);
+    expect(state.directoryReads.at(-1)?.page).toEqual({ limit: 20, sort: "created_at_asc" });
+    await expect(
+      panel.getByText("Tahsilat ve güncel finans doğrulandı.", { exact: true }),
+    ).toHaveCount(0);
+  } finally {
+    release();
+  }
+  await expect(
+    panel.getByText("Tahsilat ve güncel finans doğrulandı.", { exact: true }),
+  ).toBeVisible();
+  await panel.getByRole("button", { name: "Kapat", exact: true }).click();
+  await page.getByRole("button", { name: "Merkez finansına dön", exact: true }).click();
+  await expect(page.getByText("TRY ₺600,00", { exact: true })).toBeVisible();
+  await expect(page.getByText("TRY ₺1.000,00", { exact: true })).toHaveCount(0);
+  expect(state.directoryReads).toHaveLength(2);
+  expect(state.writes).toHaveLength(1);
 });

@@ -1,5 +1,6 @@
 import type { QueryClient } from "@tanstack/react-query";
 import type { ClientScope } from "../../lib/scoped-backend";
+import { invalidateEarningsViews } from "../earnings/earnings-query";
 import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
 
 export const sessionDetailKeys = {
@@ -19,5 +20,24 @@ export async function invalidateSessionDetailViews(
     sessionDetailKeys.session(scope, sessionId),
     ["schedule-range", ...tenant],
     ["profile-reservations", ...tenant],
+  ]);
+}
+
+export async function invalidateAttendanceEffects(
+  queries: QueryClient,
+  scope: ClientScope,
+  personIds: readonly string[],
+) {
+  const tenant = [scope.accountId, scope.orgId, scope.centerId];
+  await Promise.all([
+    invalidateEarningsViews(queries, scope),
+    invalidateCachedFamilies(queries, [
+      ["people", ...tenant],
+      ...personIds.flatMap((personId) => [
+        ["profile-rights", ...tenant, personId],
+        ["profile-ledger", ...tenant, personId],
+        ["member-entitlements", ...tenant, personId],
+      ]),
+    ]),
   ]);
 }

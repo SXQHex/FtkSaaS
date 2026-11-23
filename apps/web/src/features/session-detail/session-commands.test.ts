@@ -276,5 +276,24 @@ it("instructor result recovery rereads native attendance without member rights r
   readAttendance.mockResolvedValue({ ...attendance, session_version: 4 });
   const result = await readSessionAttendanceResult(intent, false);
   expect(result.attendance.actual_started_at).toBe(attendance.actual_started_at);
+  expect(result.affectedPeople).toBeUndefined();
+  expect(readRights).not.toHaveBeenCalled();
+});
+
+it("identifies affected members after a verified instructor attendance closure", async () => {
+  const before = {
+    ...attendance,
+    entries: attendance.entries.map((row) => ({ ...row, result: "attended" as const })),
+  };
+  const intent = attendanceCloseIntent(scope, session, before, true, [id(10)]);
+  readSession.mockResolvedValue({ ...session, version: 4, attendance_state: "closed" });
+  readAttendance.mockResolvedValue({
+    ...before,
+    session_version: 4,
+    closure_state: "closed",
+    revision: 1,
+  });
+  const result = await readSessionAttendanceResult(intent, false);
+  expect(result.affectedPeople).toEqual([id(7)]);
   expect(readRights).not.toHaveBeenCalled();
 });

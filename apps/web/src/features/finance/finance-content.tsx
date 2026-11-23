@@ -50,11 +50,13 @@ export function FinanceContent({
   onLockChange,
   preservePending = false,
   initialContext,
+  onDirectoryReadback,
 }: {
   scope: ClientScope;
   onLockChange: (locked: boolean) => void;
   preservePending?: boolean;
   initialContext?: FinanceInitialContext;
+  onDirectoryReadback?: () => Promise<void>;
 }) {
   const { t } = useTranslation(),
     router = useRouter(),
@@ -203,6 +205,7 @@ export function FinanceContent({
       staleTime: 0,
       retry: false,
     });
+    await onDirectoryReadback?.();
     setCursors([undefined]);
     setPageIndex(0);
   }

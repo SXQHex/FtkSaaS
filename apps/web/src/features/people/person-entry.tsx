@@ -168,8 +168,8 @@ export function PersonEntry({
     const result = await readPersonInvitationJob(scope, current);
     if (result.id !== current.job_id) throw new Error("INVITATION_READ_UNAVAILABLE");
     if (!mounted.current) return;
-    // Access directory users need the confirmed invitation result reflected in
-    // both first pages; other PersonEntry consumers retain their own readback.
+    // The host refreshes or invalidates its scoped access directories only
+    // after the job identity has been verified.
     await onInvitationReadback?.();
     if (mounted.current) {
       setJobStatus(result);

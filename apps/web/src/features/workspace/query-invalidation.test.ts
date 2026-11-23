@@ -1,10 +1,15 @@
 import { QueryClient, QueryObserver } from "@tanstack/react-query";
 import { expect, it, vi } from "vitest";
 import { invalidatePeoplePages, peopleKeys } from "../people/people-query";
-import { invalidateProductPages, productsKeys } from "../products/products-query";
+import {
+  affectedProductQueryFamilies,
+  invalidateProductPages,
+  productsKeys,
+} from "../products/products-query";
 import { invalidateLeadPages, leadsKeys } from "../leads/leads-query";
 import { financeKeys, invalidateFinanceViews } from "../finance/finance-query";
 import {
+  invalidateAttendanceEffects,
   invalidateSessionDetailViews,
   sessionDetailKeys,
 } from "../session-detail/session-detail-query";
@@ -324,4 +329,87 @@ it("A-ortak: M01–M05 share one cache with tenant isolation and fresh cursors",
   for (const scenario of scenarios)
     for (const key of scenario.foreign)
       expect(queries.getQueryData(key), scenario.name).toEqual({ fixture: true });
+});
+
+it("marks product history and event selectors stale after a scoped publication", () => {
+  const families = affectedProductQueryFamilies(
+    scope,
+    {
+      scopes: [
+        {
+          scope_kind: "center_all_disciplines",
+          center_id: scope.centerId,
+          discipline_id: null,
+          usage_targets: ["event"],
+        },
+      ],
+    },
+    undefined,
+    [other.centerId],
+    "product-a",
+  );
+  expect(families).toContainEqual([
+    "product-history",
+    scope.accountId,
+    scope.orgId,
+    scope.centerId,
+    "product-a",
+    "versions",
+  ]);
+  expect(families).toContainEqual([
+    "event-choices",
+    scope.accountId,
+    scope.orgId,
+    scope.centerId,
+    "products",
+  ]);
+  expect(families).not.toContainEqual([
+    "event-choices",
+    scope.accountId,
+    scope.orgId,
+    other.centerId,
+    "products",
+  ]);
+});
+
+it("marks instructor balance reports stale after an earnings write within their center", async () => {
+  const queries = new QueryClient();
+  const report = [
+    "report-view",
+    scope,
+    "balances",
+    "instructor_balances",
+    undefined,
+    { center_ids: [scope.centerId] },
+    "cursor-2",
+  ];
+  const foreign = ["report-view", other, "balances", "instructor_balances"];
+  const sales = ["report-view", scope, "weeks", "sales"];
+  for (const key of [report, foreign, sales]) cache(queries, key);
+  await invalidateEarningsViews(queries, scope);
+  expect(queries.getQueryState(report)?.isInvalidated).toBe(true);
+  expect(queries.getQueryState(foreign)?.isInvalidated).toBe(false);
+  expect(queries.getQueryState(sales)?.isInvalidated).toBe(false);
+});
+
+it("invalidates closed attendance rights only for affected members and earnings only for the center", async () => {
+  const queries = new QueryClient();
+  const key = (s: typeof scope, personId: string) => [
+    "profile-rights",
+    s.accountId,
+    s.orgId,
+    s.centerId,
+    personId,
+  ];
+  const affected = [
+    key(scope, "student-a"),
+    key(scope, "student-b"),
+    earningsKeys.directory(scope),
+  ];
+  const intact = [key(scope, "student-c"), key(other, "student-a"), earningsKeys.directory(other)];
+  for (const queryKey of [...affected, ...intact]) cache(queries, queryKey);
+  await invalidateAttendanceEffects(queries, scope, ["student-a", "student-b"]);
+  for (const queryKey of affected)
+    expect(queries.getQueryState(queryKey)?.isInvalidated).toBe(true);
+  for (const queryKey of intact) expect(queries.getQueryState(queryKey)?.isInvalidated).toBe(false);
 });

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { invalidatePeoplePages } from "../people/people-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useBlocker, useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
@@ -222,6 +223,7 @@ function LeadEditorForm({
     enabled: Boolean(before),
     retry: false,
   });
+  const queries = useQueryClient();
   const command = useMemberCommand({
     write: writeLeadIntent,
     readReceipt: readLeadReceipt,
@@ -233,6 +235,7 @@ function LeadEditorForm({
         return;
       }
       if (result.kind === "lead") {
+        if (result.converted) await invalidatePeoplePages(queries, scope);
         setBefore(result.detail);
         setDraft(leadDraft(result.detail));
       }

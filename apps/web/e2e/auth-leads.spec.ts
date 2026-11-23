@@ -1,4 +1,5 @@
 import { test, expect } from "./test.js";
+import { clickWorkspaceLink } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
 import { mockLeads, openLead, closeLead, leadIds } from "./leads-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
@@ -196,8 +197,15 @@ test("a known followup is completed with its exact activity version", async ({ p
   await expect(tasks).toHaveAccessibleDescription("Bekleyen iş sayısı 0");
   await expect(applications).toHaveAccessibleDescription("Bekleyen iş sayısı 1");
 });
-test("conversion keeps the same person and creates no sale or invitation", async ({ page }) => {
+test("conversion keeps the same person, refreshes Members and creates no sale or invitation", async ({
+  page,
+}) => {
   const state = await mockLeads(page);
+  const memberGrid = page.getByRole("grid", { name: "Üyeler", exact: true });
+  const candidate = memberGrid.getByRole("row").filter({ hasText: "Aday A" });
+  await clickWorkspaceLink(page, "Üyeler");
+  await expect(candidate.getByText("Öğrencilik yok", { exact: true })).toBeVisible();
+  await clickWorkspaceLink(page, "Adaylar");
   const dialog = await openLead(page);
   await dialog.getByRole("button", { name: "Üyeliğe çevir", exact: true }).click();
   await dialog
@@ -217,6 +225,12 @@ test("conversion keeps the same person and creates no sale or invitation", async
     page.getByRole("dialog").getByRole("button", { name: "Üyeliğe çevir", exact: true }),
   ).toBeDisabled();
   await closeLead(page);
+  await clickWorkspaceLink(page, "Üyeler");
+  await expect(candidate.getByText("Aktif", { exact: true })).toBeVisible();
+  const directoryReads = state.reads.filter(
+    ({ operation, request }) => operation === "people_list_v1" && request.include_member_summary,
+  );
+  expect(directoryReads).toHaveLength(2);
 });
 test("native staff conversion denial preserves the candidate", async ({ page }) => {
   const state = await mockLeads(page, { staff: true });

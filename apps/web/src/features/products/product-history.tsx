@@ -12,6 +12,7 @@ import {
   ItemTitle,
   ItemDescription,
 } from "@ftksaas/ui/components/item";
+import { productsKeys } from "./products-query";
 import { readProductHistory } from "./products";
 
 export function ProductHistory(props: {
@@ -41,15 +42,7 @@ function HistoryPage({
   const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]);
   const [index, setIndex] = useState(0);
   const query = useQuery({
-    queryKey: [
-      "product-history",
-      scope.accountId,
-      scope.orgId,
-      scope.centerId,
-      productId,
-      view,
-      cursors[index],
-    ],
+    queryKey: [...productsKeys.history(scope, productId), view, cursors[index]],
     queryFn: (context) => readProductHistory(scope, productId, view, cursors[index], context),
     retry: false,
   });

@@ -1,3 +1,4 @@
+import { productsKeys } from "../products/products-query";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Button } from "@ftksaas/ui/components/button";
@@ -23,14 +24,14 @@ export function EventPreparationFields({
 }) {
   const { t } = useTranslation();
   const catalog = useInfiniteQuery({
-    queryKey: ["event-choices", scope.accountId, scope.orgId, scope.centerId, "products"],
+    queryKey: productsKeys.eventChoices(scope),
     queryFn: (context) => readEventProducts(scope, context.pageParam, context),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (page) => page.next_cursor ?? undefined,
     retry: false,
   });
   const choices =
-    (catalog.isError ? undefined : catalog.data)?.pages.flatMap((page) =>
+    (catalog.isError || catalog.isRefetching ? undefined : catalog.data)?.pages.flatMap((page) =>
       page.items.map((product) => ({ id: product.version_id, name: product.terms.name })),
     ) ?? [];
   for (const id of draft.productIds)

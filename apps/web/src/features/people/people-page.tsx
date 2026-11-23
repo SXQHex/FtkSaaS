@@ -1,3 +1,4 @@
+import { invalidateAccessDirectories } from "../access/access-query";
 import { peopleKeys } from "./people-query";
 import { invalidateAndReadFirstPage } from "../../lib/cache-invalidation";
 import { useCallback, useEffect, useState } from "react";
@@ -337,6 +338,7 @@ function PeopleContent({
           }}
           onLockChange={publishLock}
           onCreated={created}
+          onInvitationReadback={() => invalidateAccessDirectories(queries, scope)}
         />
       )}
     </>

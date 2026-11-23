@@ -19,6 +19,7 @@ export async function invalidateEarningsViews(queries: QueryClient, scope: Clien
     earningsKeys.paymentSource(scope),
     earningsKeys.paymentChain(scope),
     ["earnings-agreement-status", scope],
+    ["report-view", scope, "balances", "instructor_balances"],
     ["instructor-earning-page", ...tenant],
     ["instructor-account-payments", ...tenant],
     ["instructor-account-agreements", ...tenant],
