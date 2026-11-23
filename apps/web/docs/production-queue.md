@@ -2,18 +2,17 @@
 
 **Tek sıra sahibi:** Bu dosya _neye önce başlanacağını ve hangi noktada durulacağını_ belirler. İşlerin ve testlerin tam ölçütleri [remaining-work.md](remaining-work.md), güncel repo/PR/CI/ortam kanıtı [handover.md](handover.md) sahibindedir. Teknik gerekçe [development.md](development.md#router--query-birleşik-veri-yaşam-döngüsü) altındadır. Burada ayrı backlog ya da tarihsel kabul defteri oluşturulmaz.
 
-**Kaynak incelemesi:** 23 Kasım 2026 · `main` `1ecad263a392a8112665cb6dd1d3b57e670c27fe`. M01–M05'in bağımsız kaynak/CI/merge/main kanıtları kapandı; A-ortak alanlar arası kabul açık. `main` değişmişse önce kod ve açık iş farkını uzlaştır.
+**Kaynak incelemesi:** 23 Kasım 2026 · `main` `0e14ba3cc5e8e1897bfa1d7c059cd650fdf8d18f`. M01–M05 ve A-ortak bağımsız/birleşik kaynak/CI/merge/main kanıtları kapandı; sıradaki iş oturum/kapsam doğruluğudur. `main` değişmişse önce kod ve açık iş farkını uzlaştır.
 
 ## Aktif sıra
 
 | Öncelik | Teslim dilimi                                                                                          | Kontrol noktası                                                                                                                    |
 | ------- | ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
-| 1       | [A-ortak cache/mutation kabulü](remaining-work.md#router-query-birlesik)                               | Eski cursor/filtre, zorunlu readback, başka tenant ve bilinmeyen ACK testleri. İlgili key aileleri dışında gereksiz `refetch` yok. |
-| 2       | [M06–M07, M11–M12 oturum/scope ve veri sahibi](remaining-work.md#router-query-birlesik)                | MFA, same-user/new-session, rol iptali, Router history, workspace tek `queryFn`; yanlış/eskimiş yetki görünümü yok.                |
-| 3       | [M08–M10 trafik ve iptal](remaining-work.md#router-query-birlesik)                                     | Önce/sonra istek sayısı ve gecikme ölçülür. Native write/receipt doğrulaması bozulmaz.                                             |
-| 4       | [M13 koşullu, M14 test kararlılığı ve D01–D05 birleşik kabul](remaining-work.md#router-query-birlesik) | Ölçülmemiş optimizasyon yapılmaz; tam birim/Chromium, sonra dört profil ve gerekli gerçek ortam kabulü.                            |
+| 1       | [M06–M07, M11–M12 oturum/scope ve veri sahibi](remaining-work.md#router-query-birlesik)                | MFA, same-user/new-session, rol iptali, Router history, workspace tek `queryFn`; yanlış/eskimiş yetki görünümü yok.                |
+| 2       | [M08–M10 trafik ve iptal](remaining-work.md#router-query-birlesik)                                     | Önce/sonra istek sayısı ve gecikme ölçülür. Native write/receipt doğrulaması bozulmaz.                                             |
+| 3       | [M13 koşullu, M14 test kararlılığı ve D01–D05 birleşik kabul](remaining-work.md#router-query-birlesik) | Ölçülmemiş optimizasyon yapılmaz; tam birim/Chromium, sonra dört profil ve gerekli gerçek ortam kabulü.                            |
 
-**PR sınırı:** M01 PR #375, M02 PR #378, M03 PR #380, M04 PR #382 ve M05 PR #384 ile bağımsız doğrulandı. Kalan işlerde tercihen iki mantıksal büyük PR: (1) alan kabulleri + oturum/scope doğruluğu, (2) ağ maliyeti + AbortSignal. Aynı sınıra bağlı birkaç iş bir PR'da kapanabilir; tam CI gereksiz sık çalıştırılmaz. Her PR ayrı branch ve Draft ile başlar; kod, test ve kabul aynı kaynak SHA'sına bağlıdır. Yeni kullanıcı yetkisi olmadan merge veya production değişikliği yapılmaz.
+**PR sınırı:** M01 PR #375, M02 PR #378, M03 PR #380, M04 PR #382 ve M05 PR #384 ile bağımsız, A-ortak PR #387 ile birleşik doğrulandı. Kalan işlerde tercihen iki mantıksal büyük PR: (1) alan kabulleri + oturum/scope doğruluğu, (2) ağ maliyeti + AbortSignal. Aynı sınıra bağlı birkaç iş bir PR'da kapanabilir; tam CI gereksiz sık çalıştırılmaz. Her PR ayrı branch ve Draft ile başlar; kod, test ve kabul aynı kaynak SHA'sına bağlıdır. Yeni kullanıcı yetkisi olmadan merge veya production değişikliği yapılmaz.
 
 <a id="tip-guvenligi-sirasi"></a>
 
