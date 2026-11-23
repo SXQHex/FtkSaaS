@@ -8,7 +8,7 @@ Cache doğruluğu ve oturum kapsamı [kabul edildi](remaining-work.md#final-cach
 
 | Öncelik | Teslim dilimi                                                      | Kontrol noktası                                                                          |
 | ------- | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
-| 1       | [M08–M10, M13 ve C-ortak](remaining-work.md#router-query-birlesik) | Kalan alt okumalar, taşıma iptali, hashing/bellek ve aynı fixture'da ağ karşılaştırması. |
+| 1       | [M09–M10, M13 ve C-ortak](remaining-work.md#router-query-birlesik) | Kalan alt okumalar, taşıma iptali, hashing/bellek ve aynı fixture'da ağ karşılaştırması. |
 | 2       | [M14 ve D01–D05](remaining-work.md#router-query-birlesik)          | Kalan değişikliklerin birleşik regresyonu, dört tarayıcı ve gerekli gerçek ortam kabulü. |
 
 Her teslim ayrı branch ve Draft PR ile başlar. Kod, test ve kabul aynı kaynak SHA'sına bağlıdır. Merge ve production değişikliği açık yetkiye bağlıdır.
