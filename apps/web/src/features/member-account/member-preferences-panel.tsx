@@ -30,7 +30,7 @@ export function MemberPreferencesPanel({
     key = ["member-preferences", scope.accountId, scope.orgId, scope.centerId];
   const query = useQuery({
     queryKey: key,
-    queryFn: () => readMemberPreferences(scope),
+    queryFn: (readContext) => readMemberPreferences(scope, readContext),
     retry: false,
   });
   const command = useMemberCommand({

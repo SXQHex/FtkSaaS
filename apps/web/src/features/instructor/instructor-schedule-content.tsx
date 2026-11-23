@@ -50,7 +50,7 @@ export function InstructorScheduleContent({
       interval?.starts_at,
       interval?.ends_at,
     ],
-    queryFn: () => readInstructorCalendar(scope, personId!, interval!),
+    queryFn: (readContext) => readInstructorCalendar(scope, personId!, interval!, readContext),
     enabled: Boolean(center && personId && weekStart && range),
     retry: false,
   });

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
 import type { PolicyKey } from "@ftksaas/api-contracts";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { SettingsLevel } from "./settings-document";
 
 export const settingsPolicyKeys = [
@@ -28,9 +28,13 @@ export const settingsPolicyKeys = [
 ] as const satisfies readonly PolicyKey[];
 
 /** The native reader returns the effective policy, including mandatory organization inheritance. */
-export async function readSettingsPolicies(scope: ClientScope, level: SettingsLevel) {
+export async function readSettingsPolicies(
+  scope: ClientScope,
+  level: SettingsLevel,
+  readContext?: AccountReadContext,
+) {
   const items = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, readContext)
   ).call("policies_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),

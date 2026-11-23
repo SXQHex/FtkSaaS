@@ -4,10 +4,10 @@ import { CallbackPage } from "../features/auth/callback-page";
 
 export const Route = createFileRoute("/auth/callback")({
   staleTime: Infinity,
-  loader: async () => {
+  loader: async ({ context }) => {
     let destination: string;
     try {
-      destination = await completeCallback(capturedCallback());
+      destination = await completeCallback(capturedCallback(), context.queryClient);
     } catch {
       return null;
     }

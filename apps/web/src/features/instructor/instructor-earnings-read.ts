@@ -1,7 +1,7 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { getTemporal } from "../../lib/temporal";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { Interval } from "@ftksaas/api-contracts";
 
 export async function instructorEarningMonths(timezone: string, now: string) {
@@ -29,6 +29,7 @@ export async function readInstructorEarningPage(
   personId: string,
   interval?: Interval,
   cursor?: string,
+  readContext?: AccountReadContext,
 ) {
   z.uuid().parse(personId);
   if (interval) {
@@ -38,7 +39,7 @@ export async function readInstructorEarningPage(
       throw Error("INSTRUCTOR_EARNINGS_UNAVAILABLE");
   }
   const result = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, readContext)
   ).call("instructor_account_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
@@ -141,10 +142,11 @@ export async function readInstructorAccount(
   view: "agreements" | "payments",
   interval?: Interval,
   cursor?: string,
+  readContext?: AccountReadContext,
 ) {
   z.uuid().parse(personId);
   const result = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, readContext)
   ).call("instructor_account_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),

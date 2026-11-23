@@ -1,13 +1,13 @@
 import { v7 as uuidv7 } from "uuid";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { PreferenceId } from "./member-account-view";
 export const preferenceFields = {
   inApp: "in_app_reminders",
   package: "package_reminders_enabled",
   marketing: "in_app_marketing",
 } as const;
-export async function readMemberPreferences(scope: ClientScope) {
-  const backend = await scopedBackend(scope),
+export async function readMemberPreferences(scope: ClientScope, readContext?: AccountReadContext) {
+  const backend = await scopedBackend(scope, undefined, readContext),
     base = { client_api_version: 1 as const, org_id: scope.orgId };
   const [catalog, settings, notifications] = await Promise.all([
     backend.call("settings_catalog_get_v1", { ...base, request_id: uuidv7(), scope: "member" }),

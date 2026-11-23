@@ -1,20 +1,24 @@
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
 import { BackendError } from "../../lib/backend";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { SettingsLevel } from "./settings-document";
 const common = (scope: ClientScope, level: SettingsLevel) => ({
   client_api_version: 1 as const,
   org_id: scope.orgId,
   ...(level === "center" ? { center_id: scope.centerId } : {}),
 });
-export async function readSettingsIdentity(scope: ClientScope, level: SettingsLevel) {
+export async function readSettingsIdentity(
+  scope: ClientScope,
+  level: SettingsLevel,
+  readContext?: AccountReadContext,
+) {
   const operation =
     level === "organization" ? ("organization_update_v1" as const) : ("center_update_v1" as const);
   const id = level === "organization" ? scope.orgId : scope.centerId,
     type = level === "organization" ? "organizations" : "centers";
   const page = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, readContext)
   ).call("management_state_get_v1", {
     ...common(scope, level),
     request_id: uuidv7(),

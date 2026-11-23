@@ -48,7 +48,7 @@ export function PlatformOrganizationDetail({
   const key = ["platform-organization", accountId, organizationId];
   const detail = useQuery({
     queryKey: key,
-    queryFn: () => readPlatformOrganization(accountId, organizationId),
+    queryFn: (context) => readPlatformOrganization(accountId, organizationId, context),
     retry: false,
     refetchOnMount: "always",
     gcTime: 0,

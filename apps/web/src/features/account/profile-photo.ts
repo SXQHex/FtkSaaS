@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import type { SettingsImageUpload, SettingsMediaAsset } from "@ftksaas/api-contracts";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import { getBackend } from "../../lib/backend";
 
 export type PhotoDraft = { upload: SettingsImageUpload; file: File } | null | undefined;
@@ -34,8 +34,14 @@ export async function preparePhoto(file: File): Promise<SettingsImageUpload> {
   });
   return { mime, data_base64: data, checksum: await checksum(decode(data)) };
 }
-export async function readPhoto(expected: SettingsMediaAsset, organization?: ClientScope) {
-  const backend = organization ? await scopedBackend(organization) : getBackend();
+export async function readPhoto(
+  expected: SettingsMediaAsset,
+  organization?: ClientScope,
+  readContext?: AccountReadContext,
+) {
+  const backend = organization
+    ? await scopedBackend(organization, undefined, readContext)
+    : getBackend();
   const { asset, data_base64 } = await backend.call("media_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),

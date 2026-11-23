@@ -2,7 +2,7 @@ import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
 import { BackendError } from "../../lib/backend";
 import { platformInvoice } from "../../lib/invoice";
-import { scopedBackend } from "../../lib/scoped-backend";
+import { scopedBackend, type AccountReadContext } from "../../lib/scoped-backend";
 import type {
   PlatformDirectoryOrganization,
   RequestPlatformDirectoryGet,
@@ -67,8 +67,12 @@ export function platformAccessDenied(error: unknown) {
   return error instanceof Error && ["AUTH_REQUIRED", "ACCOUNT_CHANGED"].includes(error.message);
 }
 
-export async function readPlatformOrganizations(accountId: string, cursor?: string) {
-  const backend = await scopedBackend({ accountId });
+export async function readPlatformOrganizations(
+  accountId: string,
+  cursor?: string,
+  readContext?: AccountReadContext,
+) {
+  const backend = await scopedBackend({ accountId }, undefined, readContext);
   return readDirectory(backend, { view: "organizations" }, platformOrganization, cursor);
 }
 
@@ -78,8 +82,13 @@ const directoryInvoice = platformInvoice.extend({
   published_at: timestamp.nullable(),
 });
 
-export async function readPlatformInvoices(accountId: string, orgId: string, cursor?: string) {
-  const backend = await scopedBackend({ accountId });
+export async function readPlatformInvoices(
+  accountId: string,
+  orgId: string,
+  cursor?: string,
+  readContext?: AccountReadContext,
+) {
+  const backend = await scopedBackend({ accountId }, undefined, readContext);
   return readDirectory(
     backend,
     { view: "invoices", scope: { org_id: z.uuid().parse(orgId) } },
@@ -100,8 +109,12 @@ export async function organizationAt(backend: Backend, id: string) {
   return result.items[0];
 }
 
-export async function readPlatformOrganization(accountId: string, id: string) {
-  const backend = await scopedBackend({ accountId });
+export async function readPlatformOrganization(
+  accountId: string,
+  id: string,
+  readContext?: AccountReadContext,
+) {
+  const backend = await scopedBackend({ accountId }, undefined, readContext);
   const organization = await organizationAt(backend, id);
   if (!organization) return null;
   const result = await readDirectory(backend, { view: "owners", scope: { org_id: id } }, owner);

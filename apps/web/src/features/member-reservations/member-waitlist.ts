@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type {
   MemberWaitlistSession,
   WaitlistEntryView,
@@ -17,10 +17,15 @@ export interface OwnWaitlistRow {
   entry: WaitlistEntryView;
   offer?: SeatOfferView;
 }
-export async function readSeatOffer(scope: ClientScope, offerId: string, personId?: string) {
+export async function readSeatOffer(
+  scope: ClientScope,
+  offerId: string,
+  personId?: string,
+  readContext?: AccountReadContext,
+) {
   z.uuid().parse(offerId);
   const operation = "seat_offer_accept_v1";
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, readContext);
   const page = await backend.call("management_state_get_v1", {
     client_api_version: 1,
     org_id: scope.orgId,
@@ -67,9 +72,10 @@ export async function readOwnWaitlist(
   view: "entries" | "offers",
   cursor?: string,
   exactOffer?: { id: string; personId: string },
+  readContext?: AccountReadContext,
 ) {
   if (exactOffer) z.uuid().parse(exactOffer.id);
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, readContext);
   const key =
     view === "entries"
       ? { directory: "self" as const, view, status: "waiting" as const }

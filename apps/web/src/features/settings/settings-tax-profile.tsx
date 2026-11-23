@@ -38,7 +38,7 @@ export function SettingsTaxProfile({
   const queryKey = ["billing-tax", scope.accountId, scope.orgId];
   const profile = useQuery({
     queryKey,
-    queryFn: () => readBillingTax(scope),
+    queryFn: (context) => readBillingTax(scope, context),
     retry: false,
     refetchOnWindowFocus: false,
     gcTime: 0,

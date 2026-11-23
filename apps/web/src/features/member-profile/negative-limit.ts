@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { RequestNegativeLimitSet, ReservationProtectionPreview } from "@ftksaas/api-contracts";
 import { readProfileRights } from "./profile-read";
 import { readProfileReservation } from "./reservations";
@@ -19,10 +19,11 @@ export async function readNegativeLimit(
   scope: ClientScope,
   personId: string,
   disciplineId: string,
+  readContext?: AccountReadContext,
 ) {
   z.uuid().parse(personId);
   z.uuid().parse(disciplineId);
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, readContext);
   const row = await backend.call("negative_limits_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),

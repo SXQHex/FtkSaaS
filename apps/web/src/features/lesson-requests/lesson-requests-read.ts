@@ -1,7 +1,7 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { BackendError } from "../../lib/backend";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { LessonRequestView, ManagementStateView, PersonView } from "@ftksaas/api-contracts";
 import { getTemporal } from "../../lib/temporal";
 import { readScheduleSession } from "../schedule/schedule-read";
@@ -70,9 +70,13 @@ export function requestDetail(
   }
   return detail;
 }
-export async function readLessonRequest(scope: ClientScope, id: string) {
+export async function readLessonRequest(
+  scope: ClientScope,
+  id: string,
+  readContext?: AccountReadContext,
+) {
   z.uuid().parse(id);
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, readContext);
   const page = await backend.call("management_state_get_v1", {
     ...common(scope),
     request_id: uuidv7(),
@@ -89,8 +93,9 @@ export async function readLessonRequests(
   cursor?: string,
   status: RequestFilter = "pending",
   requestId?: string,
+  readContext?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, readContext);
   const page = await backend.call("management_state_get_v1", {
     ...common(scope),
     request_id: uuidv7(),
@@ -183,8 +188,12 @@ export async function requestInterval(request: LessonRequestView) {
     instructorId: request.preferred_instructor_id ?? undefined,
   };
 }
-export async function readRequestSessions(scope: ClientScope, request: LessonRequestView) {
-  const backend = await scopedBackend(scope),
+export async function readRequestSessions(
+  scope: ClientScope,
+  request: LessonRequestView,
+  readContext?: AccountReadContext,
+) {
+  const backend = await scopedBackend(scope, undefined, readContext),
     { interval, instructorId } = await requestInterval(request),
     seen = new Set<string>(),
     ids = new Set<string>();
@@ -210,7 +219,7 @@ export async function readRequestSessions(scope: ClientScope, request: LessonReq
   } while (cursor);
   const sessions = [];
   for (const id of ids) {
-    const session = await readScheduleSession(scope, id);
+    const session = await readScheduleSession(scope, id, undefined, readContext);
     if (
       session.format === "private" &&
       session.discipline_id === request.discipline_id &&
@@ -227,8 +236,12 @@ export async function readRequestSessions(scope: ClientScope, request: LessonReq
   }
   return sessions;
 }
-export async function readRequestInstructors(scope: ClientScope, personId: string) {
-  const backend = await scopedBackend(scope),
+export async function readRequestInstructors(
+  scope: ClientScope,
+  personId: string,
+  readContext?: AccountReadContext,
+) {
+  const backend = await scopedBackend(scope, undefined, readContext),
     items: { id: string; name: string }[] = [],
     seen = new Set<string>(),
     ids = new Set<string>();

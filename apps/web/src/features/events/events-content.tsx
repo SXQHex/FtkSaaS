@@ -52,7 +52,7 @@ export function EventsContent({
   });
   const rooms = useQuery({
     queryKey: ["event-choices", scope.accountId, scope.orgId, scope.centerId, "rooms"],
-    queryFn: () => readEventRooms(scope),
+    queryFn: (readContext) => readEventRooms(scope, readContext),
     enabled: !!center,
     retry: false,
     refetchOnWindowFocus: false,
@@ -67,7 +67,7 @@ export function EventsContent({
       cursors[pageIndex],
     ],
     enabled: !!center && !!period.data,
-    queryFn: async ({ signal }) => {
+    queryFn: async ({ signal, client }) => {
       const page = await readEventsPage(
         scope,
         period.data!.interval,
@@ -78,6 +78,7 @@ export function EventsContent({
           includeSummary: canReadSummary,
         },
         signal,
+        { client, signal },
       );
       if (page.next_cursor && cursors.includes(page.next_cursor))
         throw new Error("EVENT_PAGE_UNAVAILABLE");

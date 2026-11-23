@@ -84,16 +84,19 @@ export function MergeContent({
       query,
       cursors[page],
     ],
-    queryFn: async ({ queryKey }) => {
+    queryFn: async (context) => {
       try {
         return filter === "approvals"
-          ? { kind: "approvals" as const, ...(await readMergeApprovals(scope, cursors[page])) }
+          ? {
+              kind: "approvals" as const,
+              ...(await readMergeApprovals(scope, cursors[page], context)),
+            }
           : {
               kind: "reviews" as const,
-              ...(await readMergeDirectory(scope, state, query, cursors[page])),
+              ...(await readMergeDirectory(scope, state, query, cursors[page], undefined, context)),
             };
       } catch (error) {
-        if (accessLost(error, queryKey)) command.abandon();
+        if (accessLost(error, context.queryKey)) command.abandon();
         throw error;
       }
     },

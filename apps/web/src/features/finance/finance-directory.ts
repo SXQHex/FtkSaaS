@@ -1,7 +1,7 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { queryBackendRead } from "../../lib/backend";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import { getTemporal } from "../../lib/temporal";
 import { formatMinorAmount } from "../../lib/money";
 import type {
@@ -51,8 +51,9 @@ export async function readFinanceDirectory(
   filters: { query?: string; kind?: DirectoryKind; method?: DirectoryMethod } = {},
   cursor?: string,
   signal?: AbortSignal,
+  readContext?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope, signal);
+  const backend = await scopedBackend(scope, signal, readContext);
   const data = await queryBackendRead(
     backend,
     "finance_directory_get_v1",

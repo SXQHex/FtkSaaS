@@ -71,18 +71,19 @@ export function MemberPrivateLessonsContent({
   const prefix = memberPrivateLessonKeys.person(scope, personId);
   const list = useQuery({
     queryKey: [...prefix, "list", cursors.at(-1), requestId],
-    queryFn: () => readOwnRequests(scope, personId, cursors.at(-1), requestId),
+    queryFn: (readContext) =>
+      readOwnRequests(scope, personId, cursors.at(-1), requestId, readContext),
     ...(requestId ? { staleTime: 0 } : {}),
     retry: false,
   });
   const disciplines = useQuery({
     queryKey: [...prefix, "disciplines"],
-    queryFn: () => readOwnRequestChoices(scope, personId, "disciplines"),
+    queryFn: (readContext) => readOwnRequestChoices(scope, personId, "disciplines", readContext),
     retry: false,
   });
   const instructors = useQuery({
     queryKey: [...prefix, "instructors"],
-    queryFn: () => readOwnRequestChoices(scope, personId, "instructors"),
+    queryFn: (readContext) => readOwnRequestChoices(scope, personId, "instructors", readContext),
     retry: false,
   });
   const accessLost = useCallback(

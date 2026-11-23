@@ -1,3 +1,4 @@
+import type { AccountReadContext } from "../../lib/scoped-backend";
 import { v7 as uuidv7 } from "uuid";
 import { studioBackend, studioPages, type StudioScope } from "./studio";
 import type {
@@ -45,8 +46,9 @@ async function management(
   scope: StudioScope,
   selector: ManagementSelector,
   client?: Awaited<ReturnType<typeof studioBackend>>,
+  readContext?: AccountReadContext,
 ) {
-  const backend = client ?? (await studioBackend(scope));
+  const backend = client ?? (await studioBackend(scope, undefined, readContext));
   return studioPages((cursor) =>
     backend.call("management_state_get_v1", {
       client_api_version: 1,
@@ -63,8 +65,9 @@ async function management(
 export async function readStudioInstructors(
   scope: StudioScope,
   personId?: string,
+  readContext?: AccountReadContext,
 ): Promise<InstructorRecord[]> {
-  const backend = await studioBackend(scope);
+  const backend = await studioBackend(scope, undefined, readContext);
   const assignments = await studioPages((cursor) =>
     backend.call("management_state_get_v1", {
       client_api_version: 1,
@@ -121,30 +124,39 @@ export async function readStudioInstructors(
   return records.map(({ personId, ...record }) => ({ ...record, person: people.get(personId)! }));
 }
 
-export function readStudioPrograms(scope: StudioScope, classId: string) {
-  return management(scope, { operation: "program_preview_v1", key: { class_id: classId } }).then(
-    (items) => {
-      return items.map((item) => {
-        if (
-          item.current?.operation !== "program_preview_v1" ||
-          item.current.values.class_id !== classId
-        )
-          throw new Error("STUDIO_UNAVAILABLE");
-        return item;
-      });
-    },
-  );
+export function readStudioPrograms(
+  scope: StudioScope,
+  classId: string,
+  readContext?: AccountReadContext,
+) {
+  return management(
+    scope,
+    { operation: "program_preview_v1", key: { class_id: classId } },
+    undefined,
+    readContext,
+  ).then((items) => {
+    return items.map((item) => {
+      if (
+        item.current?.operation !== "program_preview_v1" ||
+        item.current.values.class_id !== classId
+      )
+        throw new Error("STUDIO_UNAVAILABLE");
+      return item;
+    });
+  });
 }
 
 export async function readStudioAvailability(
   scope: StudioScope,
   resource: ResourceRef,
   client?: Awaited<ReturnType<typeof studioBackend>>,
+  readContext?: AccountReadContext,
 ): Promise<AvailabilityRecord[]> {
   const items = await management(
     scope,
     { operation: "availability_save_v1", key: { resource } },
     client,
+    readContext,
   );
   if (items.some((item) => item.state !== "active" && item.state !== "inactive"))
     throw new Error("STUDIO_UNAVAILABLE");
@@ -168,11 +180,17 @@ export async function readStudioAvailability(
 export async function readStudioClosures(
   scope: StudioScope,
   resource: ResourceRef,
+  readContext?: AccountReadContext,
 ): Promise<ClosureRecord[]> {
-  const items = await management(scope, {
-    operation: "availability_exception_save_v1",
-    key: { resource },
-  });
+  const items = await management(
+    scope,
+    {
+      operation: "availability_exception_save_v1",
+      key: { resource },
+    },
+    undefined,
+    readContext,
+  );
   return items.map((item) => {
     if (
       (item.state !== "active" && item.state !== "cancelled") ||
@@ -193,8 +211,12 @@ export async function readStudioClosures(
   });
 }
 
-export async function readStudioAgreements(scope: StudioScope, personId: string) {
-  const backend = await studioBackend(scope);
+export async function readStudioAgreements(
+  scope: StudioScope,
+  personId: string,
+  readContext?: AccountReadContext,
+) {
+  const backend = await studioBackend(scope, undefined, readContext);
   const items = await studioPages((cursor) =>
     backend.call("instructor_agreements_list_v1", {
       client_api_version: 1,

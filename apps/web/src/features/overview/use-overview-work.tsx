@@ -29,8 +29,8 @@ export function useOverviewWork({
     [locked, setLocked] = useState(false);
   const query = useQuery({
     queryKey: ["overview-work", scope.accountId, scope.orgId, scope.centerId, cursors[index]],
-    queryFn: async () => {
-      const page = await readOverviewWork(scope, cursors[index]);
+    queryFn: async (context) => {
+      const page = await readOverviewWork(scope, cursors[index], undefined, context);
       if (page.next_cursor && cursors.slice(0, index + 1).includes(page.next_cursor))
         throw Error("WORK_CURSOR_UNAVAILABLE");
       return page;

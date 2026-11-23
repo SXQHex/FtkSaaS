@@ -52,7 +52,7 @@ export function AgreementDocumentSheet({
       binding.agreement.id,
       binding.agreement.version,
     ],
-    queryFn: () => readAgreementDocument(binding),
+    queryFn: (readContext) => readAgreementDocument(binding, readContext),
     retry: false,
     staleTime: 0,
     refetchOnWindowFocus: false,

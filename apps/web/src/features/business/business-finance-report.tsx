@@ -12,7 +12,7 @@ import {
 } from "@ftksaas/ui/components/table";
 import type { CenterView, Interval, ReportTotal } from "@ftksaas/api-contracts";
 import { formatMinorAmount } from "../../lib/money";
-import type { ClientScope } from "../../lib/scoped-backend";
+import type { ClientScope, AccountReadContext } from "../../lib/scoped-backend";
 import { readScopedReport, reportInterval } from "../reports/reports-read";
 
 const metrics = ["sales", "collections", "debt"] as const;
@@ -33,11 +33,12 @@ async function readFinance(
   centerIds: string[],
   interval: Interval,
   aggregate: boolean,
+  readContext?: AccountReadContext,
 ): Promise<Finance> {
   const filters = { interval, center_ids: centerIds };
   const [sales, receivables] = await Promise.all([
-    readScopedReport(scope, "sales", filters, { aggregate, limit: 1 }),
-    readScopedReport(scope, "collections_debts", filters, { aggregate, limit: 1 }),
+    readScopedReport(scope, "sales", filters, { aggregate, limit: 1 }, readContext),
+    readScopedReport(scope, "collections_debts", filters, { aggregate, limit: 1 }, readContext),
   ]);
   return {
     sales: groupAmounts(sales.totals.filter((row) => row.group_key?.startsWith("gross_sales:"))),
@@ -73,18 +74,21 @@ export function BusinessFinanceReport({
   const centerIds = centers.map((center) => center.id);
   const query = useQuery({
     queryKey: ["business-finance-report", scope, centerIds, aggregate, range, timezone, anchor],
-    queryFn: async ({ signal }) => {
+    queryFn: async (context) => {
+      const { signal } = context;
       const interval = await reportInterval(timezone, range, "", "", anchor);
       const rows = [];
       for (const centerId of centerIds) {
         signal.throwIfAborted();
         rows.push({
           id: centerId,
-          amounts: await readFinance({ ...scope, centerId }, [centerId], interval, false),
+          amounts: await readFinance({ ...scope, centerId }, [centerId], interval, false, context),
         });
       }
       signal.throwIfAborted();
-      const total = aggregate ? await readFinance(scope, centerIds, interval, true) : undefined;
+      const total = aggregate
+        ? await readFinance(scope, centerIds, interval, true, context)
+        : undefined;
       return { rows, total };
     },
     retry: false,

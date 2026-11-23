@@ -1,7 +1,7 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import type { DigitalDocumentContent, RequestContentCatalogSave } from "@ftksaas/api-contracts";
-import type { ClientScope } from "../../lib/scoped-backend";
+import type { ClientScope, AccountReadContext } from "../../lib/scoped-backend";
 import { scopedBackend } from "../../lib/scoped-backend";
 
 export function documentCatalogScope(
@@ -24,10 +24,11 @@ export async function readDocumentCatalog(
   scope: ClientScope,
   organization: boolean,
   documentId: string,
+  context?: AccountReadContext,
 ) {
   const source = documentCatalogScope(scope, organization, documentId);
   const result = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, context)
   ).call("content_catalog_get_v1", {
     ...source,
     client_api_version: 1,

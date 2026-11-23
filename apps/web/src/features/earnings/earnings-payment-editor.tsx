@@ -80,16 +80,25 @@ export function EarningsPaymentEditor({
   });
   const authority = useQuery({
     queryKey: ["earnings-payment-authority", scope, draft.personId, before?.id],
-    queryFn: () =>
-      readEarningsPaymentAuthority(scope, { personId: draft.personId, paymentId: before?.id }),
+    queryFn: (readContext) =>
+      readEarningsPaymentAuthority(
+        scope,
+        { personId: draft.personId, paymentId: before?.id },
+        readContext,
+      ),
     enabled: !!draft.personId,
     retry: false,
   });
   const earnings = useInfiniteQuery({
     queryKey: [...earningsKeys.paymentSource(scope), draft.personId],
     initialPageParam: undefined as string | undefined,
-    queryFn: ({ pageParam }) =>
-      readEarningsDirectory(scope, "earnings", { personId: draft.personId, cursor: pageParam }),
+    queryFn: ({ pageParam, client, signal }) =>
+      readEarningsDirectory(
+        scope,
+        "earnings",
+        { personId: draft.personId, cursor: pageParam },
+        { client, signal },
+      ),
     getNextPageParam: (page) => page.next_cursor ?? undefined,
     enabled: !!draft.personId && !before,
     retry: false,
@@ -97,7 +106,8 @@ export function EarningsPaymentEditor({
   });
   const chain = useQuery({
     queryKey: [...earningsKeys.paymentChain(scope), before?.id],
-    queryFn: () => readEarningsPaymentChain(scope, before!.person_id, before!.id),
+    queryFn: (readContext) =>
+      readEarningsPaymentChain(scope, before!.person_id, before!.id, readContext),
     enabled: !!before,
     retry: false,
     refetchOnWindowFocus: false,

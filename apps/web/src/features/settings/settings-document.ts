@@ -2,7 +2,7 @@ import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
 import type { SettingsImageUpload, OrganizationSettingsValues } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 export type SettingsLevel = "organization" | "center";
 export const publicPageSlug = z
   .string()
@@ -224,8 +224,12 @@ const common = (scope: ClientScope, level: SettingsLevel) =>
         center_id: scope.centerId,
       }
     : { client_api_version: 1 as const, scope: "organization" as const, org_id: scope.orgId };
-export async function readSettingsDocument(scope: ClientScope, level: SettingsLevel) {
-  const backend = await scopedBackend(scope);
+export async function readSettingsDocument(
+  scope: ClientScope,
+  level: SettingsLevel,
+  readContext?: AccountReadContext,
+) {
+  const backend = await scopedBackend(scope, undefined, readContext);
   const [catalog, document] = await Promise.all([
     backend.call("settings_catalog_get_v1", { ...common(scope, level), request_id: uuidv7() }),
     backend.call("settings_get_v1", { ...common(scope, level), request_id: uuidv7() }),

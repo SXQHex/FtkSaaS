@@ -80,8 +80,8 @@ export function AutomationContent({
       : undefined;
   const autos = useQuery({
     queryKey: [...prefix, "automations", autoCursors[autoIndex]],
-    queryFn: async () => {
-      const page = await readAutomations(scope, undefined, autoCursors[autoIndex]);
+    queryFn: async (context) => {
+      const page = await readAutomations(scope, undefined, autoCursors[autoIndex], context);
       if (page.next_cursor && autoCursors.includes(page.next_cursor))
         throw Error("AUTOMATION_CURSOR_UNAVAILABLE");
       return page;
@@ -92,8 +92,8 @@ export function AutomationContent({
   });
   const segments = useQuery({
     queryKey: [...prefix, "segments", segmentCursors[segmentIndex]],
-    queryFn: async () => {
-      const page = await readSegments(scope, undefined, segmentCursors[segmentIndex]);
+    queryFn: async (context) => {
+      const page = await readSegments(scope, undefined, segmentCursors[segmentIndex], context);
       if (page.next_cursor && segmentCursors.includes(page.next_cursor))
         throw Error("AUTOMATION_CURSOR_UNAVAILABLE");
       return page;
@@ -104,11 +104,12 @@ export function AutomationContent({
   });
   const jobsSource = useQuery({
     queryKey: [...prefix, "jobs", jobsFor, jobState, jobCursors[jobIndex]],
-    queryFn: async () => {
+    queryFn: async (context) => {
       const page = await readAutomationQueue(
         scope,
         { automationId: jobsFor || undefined, state: jobState },
         jobCursors[jobIndex],
+        context,
       );
       if (page.nextCursor && jobCursors.includes(page.nextCursor))
         throw Error("AUTOMATION_CURSOR_UNAVAILABLE");

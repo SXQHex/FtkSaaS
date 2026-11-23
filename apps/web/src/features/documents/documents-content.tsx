@@ -60,8 +60,12 @@ export function DocumentsContent({
   const catalog = useInfiniteQuery({
     queryKey: ["document-catalog", scope, level],
     initialPageParam: undefined as string | undefined,
-    queryFn: ({ pageParam }) =>
-      readDocumentDirectory(scope, { view: "documents", level, cursor: pageParam }),
+    queryFn: (context) =>
+      readDocumentDirectory(
+        scope,
+        { view: "documents", level, cursor: context.pageParam },
+        context,
+      ),
     getNextPageParam: (page) => page.next_cursor ?? undefined,
     enabled: active,
     retry: false,
@@ -78,13 +82,17 @@ export function DocumentsContent({
   const versions = useInfiniteQuery({
     queryKey: ["document-versions", scope, level, versionTarget?.document_id],
     initialPageParam: undefined as string | undefined,
-    queryFn: ({ pageParam }) =>
-      readDocumentDirectory(scope, {
-        view: "versions",
-        level,
-        documentId: versionTarget!.document_id!,
-        cursor: pageParam,
-      }),
+    queryFn: (context) =>
+      readDocumentDirectory(
+        scope,
+        {
+          view: "versions",
+          level,
+          documentId: versionTarget!.document_id!,
+          cursor: context.pageParam,
+        },
+        context,
+      ),
     getNextPageParam: (page) => page.next_cursor ?? undefined,
     enabled: active && !!versionTarget?.document_id && !versionTarget.read_only,
     retry: false,
@@ -103,15 +111,19 @@ export function DocumentsContent({
       query,
       cursors[index],
     ],
-    queryFn: () =>
-      readDocumentDirectory(scope, {
-        view: tab === "documents" ? "documents" : "acceptances",
-        level,
-        ...(tab === "acceptance" ? { documentId, versionId: versionId || undefined } : {}),
-        filter: tab === "acceptance" ? filter : "all",
-        query: query || undefined,
-        cursor: cursors[index],
-      }),
+    queryFn: (context) =>
+      readDocumentDirectory(
+        scope,
+        {
+          view: tab === "documents" ? "documents" : "acceptances",
+          level,
+          ...(tab === "acceptance" ? { documentId, versionId: versionId || undefined } : {}),
+          filter: tab === "acceptance" ? filter : "all",
+          query: query || undefined,
+          cursor: cursors[index],
+        },
+        context,
+      ),
     enabled: active && (tab === "documents" || (tab === "acceptance" && !!documentId)),
     retry: false,
     // After a native readback, returning from an old cursor to page one must

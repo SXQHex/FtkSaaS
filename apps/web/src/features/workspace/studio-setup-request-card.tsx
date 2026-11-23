@@ -52,7 +52,7 @@ export function StudioSetupRequestCard({
   const queryKey = ["studio-setup-own", accountId];
   const query = useQuery({
     queryKey,
-    queryFn: () => readOwnStudioSetup(accountId),
+    queryFn: (context) => readOwnStudioSetup(accountId, context),
     retry: false,
     refetchOnWindowFocus: false,
   });

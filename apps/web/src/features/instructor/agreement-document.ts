@@ -1,7 +1,7 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { BackendError } from "../../lib/backend";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { AgreementVersionView, DigitalAgreementView } from "@ftksaas/api-contracts";
 
 export interface AgreementDocumentBinding {
@@ -13,9 +13,10 @@ async function readBoundAgreement(
   agreementId: string,
   personId: string,
   expected?: AgreementVersionView,
+  readContext?: AccountReadContext,
 ) {
   const view = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, readContext)
   ).call("instructor_agreement_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
@@ -66,9 +67,12 @@ async function readBoundAgreement(
   }
   return view;
 }
-export function readAgreementDocument({ scope, agreement }: AgreementDocumentBinding) {
+export function readAgreementDocument(
+  { scope, agreement }: AgreementDocumentBinding,
+  readContext?: AccountReadContext,
+) {
   // Self discovery authorizes historical aliases. Do not rewrite their immutable person IDs.
-  return readBoundAgreement(scope, agreement.id, agreement.person_id, agreement);
+  return readBoundAgreement(scope, agreement.id, agreement.person_id, agreement, readContext);
 }
 
 function hasCurrentAgreementEvidence(view: DigitalAgreementView) {
@@ -88,8 +92,13 @@ export function ownServerAcceptance(view: DigitalAgreementView, accountId: strin
   return view.acceptance?.account_id === accountId && hasCurrentAgreementEvidence(view);
 }
 
-export async function readManagedAgreementStatus(scope: ClientScope, personId: string, id: string) {
-  const view = await readBoundAgreement(scope, id, personId);
+export async function readManagedAgreementStatus(
+  scope: ClientScope,
+  personId: string,
+  id: string,
+  readContext?: AccountReadContext,
+) {
+  const view = await readBoundAgreement(scope, id, personId, undefined, readContext);
   if (view.acceptance && view.acceptance.person_id !== personId)
     throw Error("AGREEMENT_DOCUMENT_UNAVAILABLE");
   const status = !view.rendered_document

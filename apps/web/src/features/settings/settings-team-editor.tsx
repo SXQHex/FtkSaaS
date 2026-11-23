@@ -63,14 +63,14 @@ export function SettingsTeamEditor({
   }, []);
   const people = useQuery({
     queryKey: ["settings-team-picker", scope, manager, query, cursors[index]],
-    queryFn: () => readTeamPeople(scope, query, cursors[index], manager),
+    queryFn: (context) => readTeamPeople(scope, query, cursors[index], manager, context),
     enabled: !person && query.trim().length >= 2,
     retry: false,
     refetchOnWindowFocus: false,
   });
   const roles = useQuery({
     queryKey: ["settings-team-person-roles", scope, manager, person?.id],
-    queryFn: () => readTeamPersonRoles(scope, person!.id, manager),
+    queryFn: (context) => readTeamPersonRoles(scope, person!.id, manager, context),
     enabled: !!person,
     retry: false,
     refetchOnWindowFocus: false,

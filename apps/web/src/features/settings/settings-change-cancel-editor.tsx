@@ -49,7 +49,7 @@ export function SettingsChangeCancelEditor({
       before.subscription.pending_change?.id,
       before.subscription.billing?.pending_period_change?.id,
     ],
-    queryFn: () => readSettingsCancelSource(before),
+    queryFn: (context) => readSettingsCancelSource(before, context),
     retry: false,
     refetchOnMount: "always",
     refetchOnWindowFocus: false,

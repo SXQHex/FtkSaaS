@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useBlocker, useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { v7 as uuidv7 } from "uuid";
@@ -50,10 +50,12 @@ export function MemberCalendarPanel({
   disabled?: boolean;
 }) {
   const { t } = useTranslation(),
-    router = useRouter();
+    router = useRouter(),
+    queries = useQueryClient();
+  const queryKey = ["member-calendar", scope.accountId, scope.orgId, scope.studioCenterId];
   const query = useQuery({
-    queryKey: ["member-calendar", scope.accountId, scope.orgId, scope.studioCenterId],
-    queryFn: () => readMemberCalendars(scope),
+    queryKey,
+    queryFn: (readContext) => readMemberCalendars(scope, readContext),
     retry: false,
   });
   const [intent, setIntent] = useState<CalendarIntent>(),
@@ -101,8 +103,16 @@ export function MemberCalendarPanel({
       !expectedKinds.every((item) => result.link.kinds.includes(item))
     )
       throw new Error("CALENDAR_RESULT_MISMATCH");
-    const next = await query.refetch({ throwOnError: true });
-    const current = next.data?.links.find((row) => row.id === result.link.id);
+    // Revealing a native subscription credential requires a strict result read,
+    // independent of the account proof used by the ordinary calendar Query.
+    await queries.cancelQueries({ queryKey, exact: true });
+    const next = await queries.fetchQuery({
+      queryKey,
+      queryFn: () => readMemberCalendars(scope),
+      staleTime: 0,
+      retry: false,
+    });
+    const current = next.links.find((row) => row.id === result.link.id);
     if (
       !current ||
       current.version < result.link.version ||

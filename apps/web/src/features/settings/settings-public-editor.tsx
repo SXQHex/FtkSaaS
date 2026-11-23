@@ -87,14 +87,14 @@ export function SettingsPublicEditor({
   const forms = useInfiniteQuery({
     queryKey: ["settings-public-forms", before.scope, before.level],
     initialPageParam: undefined as string | undefined,
-    queryFn: ({ pageParam }) => readPublicForms(before.scope, before.level, pageParam),
+    queryFn: (context) => readPublicForms(before.scope, before.level, context.pageParam, context),
     getNextPageParam: (page) => page.next_cursor ?? undefined,
     retry: false,
     refetchOnWindowFocus: false,
   });
   const sources = useQuery({
     queryKey: ["settings-public-consent-sources", before.scope, before.level, lookup],
-    queryFn: () => readPublicConsentSources(before.scope, before.level, lookup),
+    queryFn: (context) => readPublicConsentSources(before.scope, before.level, lookup, context),
     enabled: !!lookup,
     retry: false,
     refetchOnWindowFocus: false,

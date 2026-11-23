@@ -19,7 +19,7 @@ import { financeKeys, invalidateFinanceViews } from "./finance-query";
 import type { SaleRefundSource } from "./sale-refund";
 
 import { BackendError } from "../../lib/backend";
-import type { ClientScope } from "../../lib/scoped-backend";
+import type { ClientScope, AccountReadContext } from "../../lib/scoped-backend";
 import type { FinanceDirectoryEntry } from "@ftksaas/api-contracts";
 import { formatMinorAmount } from "../../lib/money";
 import { Button } from "@ftksaas/ui/components/button";
@@ -98,9 +98,12 @@ export function FinanceDirectoryContent({
   });
   const directory = useQuery({
     queryKey: [...financeKeys.directory(scope), tab, period.data?.interval, filters, cursors[page]],
-    queryFn: ({ signal }) =>
+    queryFn: ({ signal, client }) =>
       guard(() =>
-        readFinanceDirectory(scope, tab, period.data!.interval, filters, cursors[page], signal),
+        readFinanceDirectory(scope, tab, period.data!.interval, filters, cursors[page], signal, {
+          client,
+          signal,
+        }),
       ),
     enabled: Boolean(center && period.data && !period.isError && !personal),
     retry: false,
@@ -110,7 +113,7 @@ export function FinanceDirectoryContent({
   const creditDebts = useQueries({
     queries: creditRows.map((row) => ({
       queryKey: financeKeys.creditDebt(scope, row.person_id, row.currency),
-      queryFn: ({ signal }: { signal: AbortSignal }) =>
+      queryFn: ({ signal, client }: AccountReadContext) =>
         guard(async () => {
           try {
             const finance = await readFinancePage(
@@ -118,6 +121,7 @@ export function FinanceDirectoryContent({
               { personId: row.person_id, currency: row.currency },
               undefined,
               signal,
+              { client, signal },
             );
             return formatMinorAmount(
               finance.debts

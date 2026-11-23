@@ -1,5 +1,5 @@
 import { v7 as uuidv7 } from "uuid";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { ManagementStateView, ManagementStatePage } from "@ftksaas/api-contracts";
 import type {
   AccessAccountRow,
@@ -13,8 +13,9 @@ export async function readInvitationDirectory(
   scope: ClientScope,
   status: InvitationFilter,
   cursor?: string,
+  context?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, context);
   return backend.call("management_state_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
@@ -30,8 +31,9 @@ export async function readAccountDirectory(
   status: AccountFilter,
   query: string,
   cursor?: string,
+  context?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, context);
   return backend.call("management_state_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),

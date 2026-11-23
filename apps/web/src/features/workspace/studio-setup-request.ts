@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
-import { scopedBackend } from "../../lib/scoped-backend";
+import { scopedBackend, type AccountReadContext } from "../../lib/scoped-backend";
 
 export const studioSetupName = z.string().trim().min(1).max(200);
 const pageSize = 50;
@@ -35,16 +35,20 @@ async function readStudioSetupPage(
   );
 }
 
-export async function readPlatformStudioQueue(accountId: string, cursor?: string) {
-  const backend = await scopedBackend({ accountId });
+export async function readPlatformStudioQueue(
+  accountId: string,
+  cursor?: string,
+  context?: AccountReadContext,
+) {
+  const backend = await scopedBackend({ accountId }, undefined, context);
   const result = await readStudioSetupPage(backend, cursor, true);
   if (result.items.some((row) => row.state !== "pending"))
     throw Error("STUDIO_SETUP_SOURCE_INVALID");
   return result;
 }
 
-export async function readOwnStudioSetup(accountId: string) {
-  const backend = await scopedBackend({ accountId });
+export async function readOwnStudioSetup(accountId: string, context?: AccountReadContext) {
+  const backend = await scopedBackend({ accountId }, undefined, context);
   const rows = new Map<string, z.infer<typeof request>>();
   const cursors = new Set<string>();
   let cursor: string | undefined;

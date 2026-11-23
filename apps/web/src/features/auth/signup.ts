@@ -1,8 +1,22 @@
+import type { QueryClient } from "@tanstack/react-query";
+import type { Session } from "@supabase/supabase-js";
 import { checkSignup } from "../../lib/public-gateway";
 import { getSupabaseClient } from "../../lib/supabase";
-import { readAccount } from "../../lib/account";
+import { queryClient } from "../../lib/query-client";
+import { accountQuery } from "./account-query";
+import { sameNativeSession } from "./native-session-id";
 
-export async function registerAccount(values: { name: string; email: string; password: string }) {
+async function verifySignupSession(expected: Session) {
+  const { data, error } = await getSupabaseClient().auth.getSession();
+  if (error) throw error;
+  if (!data.session || !sameNativeSession(expected, data.session))
+    throw new Error("ACCOUNT_CHANGED");
+}
+
+export async function registerAccount(
+  values: { name: string; email: string; password: string },
+  queries: QueryClient = queryClient,
+) {
   const origin = import.meta.env.VITE_APP_ORIGIN?.trim();
   if (!origin) throw new Error("APP_ORIGIN_REQUIRED");
   const check = await checkSignup(values.email);
@@ -18,10 +32,13 @@ export async function registerAccount(values: { name: string; email: string; pas
   if (!data.user) throw new Error("SIGNUP_UNCONFIRMED");
   if (data.user.identities?.length === 0) throw new Error("ACCOUNT_EXISTS");
   if (!data.session) return "/verify-email" as const;
-  const assurance = await auth.mfa.getAuthenticatorAssuranceLevel();
+  queries.clear();
+  const assurance = await auth.mfa.getAuthenticatorAssuranceLevel(data.session.access_token);
   if (assurance.error) throw assurance.error;
+  await verifySignupSession(data.session);
   if (assurance.data.nextLevel === "aal2" && assurance.data.currentLevel !== "aal2")
     return "/mfa" as const;
-  await readAccount();
+  await queries.query(accountQuery(data.session.user.id, true));
+  await verifySignupSession(data.session);
   return "/account" as const;
 }

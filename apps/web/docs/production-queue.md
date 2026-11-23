@@ -2,7 +2,7 @@
 
 **Tek sıra sahibi:** Bu dosya _neye önce başlanacağını ve hangi noktada durulacağını_ belirler. İşlerin ve testlerin tam ölçütleri [remaining-work.md](remaining-work.md), güncel repo/PR/CI/ortam kanıtı [handover.md](handover.md) sahibindedir. Teknik gerekçe [development.md](development.md#router--query-birleşik-veri-yaşam-döngüsü) altındadır. Burada ayrı backlog ya da tarihsel kabul defteri oluşturulmaz.
 
-**Kaynak incelemesi:** 23 Kasım 2026 · `main` `0e14ba3cc5e8e1897bfa1d7c059cd650fdf8d18f`. M01–M05 ve A-ortak bağımsız/birleşik kaynak/CI/merge/main kanıtları kapandı; sıradaki iş oturum/kapsam doğruluğudur. `main` değişmişse önce kod ve açık iş farkını uzlaştır.
+**Aktif kullanıcı görevi:** M08'in frontend genelinde incelenmesi ve hesap okuma tekrarlarının giderilmesi. Güncel taban ve doğrulama [devir kaydındadır](handover.md#kaynak-ve-kontrol-noktası). M01–M05 ve A-ortak kabulü kapalıdır; diğer maddelerin kendi açık kabulleri M08 değişikliğiyle kapanmaz. Bu adayın zorunlu CI ve merge/main kanıtından sonra M09–M10 trafik/iptal işlerine geçilir. `main` değişmişse önce kod ve açık iş farkını uzlaştır.
 
 ## Aktif sıra
 

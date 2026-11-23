@@ -100,7 +100,8 @@ export function useSettingsTeam({
     [error, setError] = useState(false);
   const page = useQuery({
     queryKey: ["settings-team-directory", scope, level, role, state, frame.cursors[frame.index]],
-    queryFn: () => readTeamPage(scope, role, frame.cursors[frame.index], level, state),
+    queryFn: (context) =>
+      readTeamPage(scope, role, frame.cursors[frame.index], level, state, context),
     enabled: enabled && visible,
     retry: false,
     refetchOnWindowFocus: false,
@@ -108,7 +109,7 @@ export function useSettingsTeam({
   const records = enabled && !page.isError ? page.data?.records : undefined;
   const permissions = useQuery({
     queryKey: ["settings-team-permissions", scope, person?.id, permissionKeys],
-    queryFn: () => readTeamPermissions(scope, person!.id, permissionKeys),
+    queryFn: (context) => readTeamPermissions(scope, person!.id, permissionKeys, context),
     enabled: enabled && visible && level === "center" && !!person,
     retry: false,
     refetchOnWindowFocus: false,

@@ -72,7 +72,8 @@ export function BusinessSettlementAuthority({
   const directory = useInfiniteQuery({
     queryKey: ["business-settlement-managers", scope.accountId, scope.orgId, scope.centerId, role],
     initialPageParam: undefined as string | undefined,
-    queryFn: ({ pageParam }) => readTeamPage(scope, role, pageParam),
+    queryFn: (context) =>
+      readTeamPage(scope, role, context.pageParam, undefined, undefined, context),
     getNextPageParam: (last) => last.next_cursor ?? undefined,
     gcTime: 0,
     retry: false,
@@ -84,7 +85,7 @@ export function BusinessSettlementAuthority({
   const key = ["business-settlement-admin", scope.accountId, scope.orgId, scope.centerId, target];
   const read = useQuery({
     queryKey: key,
-    queryFn: () => settlementAuthority(scope, target),
+    queryFn: (context) => settlementAuthority(scope, target, context),
     enabled: Boolean(person),
     gcTime: 0,
     retry: false,

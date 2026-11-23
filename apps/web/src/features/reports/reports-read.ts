@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import { getTemporal } from "../../lib/temporal";
 import type {
   Interval,
@@ -49,8 +49,9 @@ export async function readReport(
   report: ReportKind,
   filters: ReportFilters,
   cursor?: string,
+  readContext?: AccountReadContext,
 ): Promise<ReportView> {
-  return readScopedReport(scope, report, filters, { cursor });
+  return readScopedReport(scope, report, filters, { cursor }, readContext);
 }
 
 export async function readScopedReport(
@@ -62,6 +63,7 @@ export async function readScopedReport(
     aggregate = false,
     limit = 20,
   }: { cursor?: string; aggregate?: boolean; limit?: number },
+  readContext?: AccountReadContext,
 ): Promise<ReportView> {
   const ids = new Set(filters.center_ids);
   if (
@@ -71,7 +73,7 @@ export async function readScopedReport(
   )
     throw Error("REPORT_SCOPE_INVALID");
   const data = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, readContext)
   ).call("report_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
@@ -131,9 +133,13 @@ export async function readScopedReport(
   }
   return data;
 }
-export async function readImportDirectory(scope: ClientScope, cursor?: string) {
+export async function readImportDirectory(
+  scope: ClientScope,
+  cursor?: string,
+  readContext?: AccountReadContext,
+) {
   const data = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, readContext)
   ).call("import_directory_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),

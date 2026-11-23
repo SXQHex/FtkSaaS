@@ -1,3 +1,4 @@
+import type { AccountReadContext } from "../../lib/scoped-backend";
 import { readStudioResources, type StudioScope } from "./studio";
 import {
   readStudioAgreements,
@@ -12,10 +13,11 @@ import type { ResourceRef, SubscriptionView } from "@ftksaas/api-contracts";
 export async function readStudioSnapshot(
   scope: StudioScope,
   readPlan?: () => Promise<SubscriptionView>,
+  readContext?: AccountReadContext,
 ) {
   const [resources, instructors] = await Promise.all([
-    readStudioResources(scope),
-    readStudioInstructors(scope),
+    readStudioResources(scope, readContext),
+    readStudioInstructors(scope, undefined, readContext),
   ]);
   const personIds = [...new Set(instructors.map((item) => item.person.id))];
   const closureResources: ResourceRef[] = [
@@ -34,18 +36,22 @@ export async function readStudioSnapshot(
       .map((id) => ({ kind: "person" as const, id })),
   ];
   const [agreements, programs, closures, setup] = await Promise.all([
-    Promise.all(personIds.map((id) => readStudioAgreements(scope, id))).catch((error: unknown) => {
-      if (error instanceof BackendError && error.code === "PLAN_FEATURE_UNAVAILABLE") return null;
-      throw error;
-    }),
+    Promise.all(personIds.map((id) => readStudioAgreements(scope, id, readContext))).catch(
+      (error: unknown) => {
+        if (error instanceof BackendError && error.code === "PLAN_FEATURE_UNAVAILABLE") return null;
+        throw error;
+      },
+    ),
     Promise.all(
       resources.classes.map(async (item) => ({
         classId: item.id,
-        items: await readStudioPrograms(scope, item.id),
+        items: await readStudioPrograms(scope, item.id, readContext),
       })),
     ),
-    Promise.all(closureResources.map((resource) => readStudioClosures(scope, resource))),
-    readStudioSetup(scope, resources, instructors, readPlan),
+    Promise.all(
+      closureResources.map((resource) => readStudioClosures(scope, resource, readContext)),
+    ),
+    readStudioSetup(scope, resources, instructors, readPlan, readContext),
   ]);
   const agreementsPlanBlocked =
     agreements === null || (setup.plan.state === "known" && setup.plan.value?.plan === "starter");

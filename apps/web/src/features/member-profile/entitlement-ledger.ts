@@ -1,15 +1,16 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 export async function readEntitlementLedger(
   scope: ClientScope,
   personId: string,
   saleId: string,
   cursor?: string,
+  readContext?: AccountReadContext,
 ) {
   z.uuid().parse(personId);
   z.uuid().parse(saleId);
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, readContext);
   const rows = await backend.call("entitlements_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),

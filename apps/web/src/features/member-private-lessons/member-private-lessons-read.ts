@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import { requestDetail } from "../lesson-requests/lesson-requests-read";
 const common = (scope: ClientScope) => ({
   client_api_version: 1 as const,
@@ -13,9 +13,10 @@ export async function readOwnRequests(
   personId: string,
   cursor?: string,
   requestId?: string,
+  readContext?: AccountReadContext,
 ) {
   z.uuid().parse(personId);
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, readContext);
   const page = await backend.call("management_state_get_v1", {
     ...common(scope),
     operation: "lesson_request_create_v1",
@@ -64,9 +65,10 @@ export async function readOwnRequestChoices(
   scope: ClientScope,
   personId: string,
   kind: "disciplines" | "instructors",
+  readContext?: AccountReadContext,
 ) {
   z.uuid().parse(personId);
-  const backend = await scopedBackend(scope),
+  const backend = await scopedBackend(scope, undefined, readContext),
     items: { id: string; name: string }[] = [],
     ids = new Set<string>(),
     cursors = new Set<string>();

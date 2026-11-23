@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { EntitlementView, Interval, RequestReservationCreate } from "@ftksaas/api-contracts";
 import { readProfileRights } from "../member-profile/profile-read";
 import { readScheduleSession } from "./schedule-read";
@@ -17,8 +17,9 @@ export async function readGroupStudents(
   interval: Interval,
   query = "",
   cursor?: string,
+  readContext?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, readContext);
   const page = await backend.call("management_state_get_v1", {
     ...request(scope),
     operation: "reservation_cancel_v1",

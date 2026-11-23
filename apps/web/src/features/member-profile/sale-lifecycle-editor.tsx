@@ -85,7 +85,7 @@ export function SaleLifecycleEditor({
       personId,
       saleId,
     ],
-    queryFn: () => readSaleInventory(scope, saleId),
+    queryFn: (readContext) => readSaleInventory(scope, saleId, readContext),
     enabled: action === "change" && Boolean(source) && sourceAvailable,
     retry: false,
   });

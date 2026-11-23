@@ -64,14 +64,14 @@ export function AuditContent({
   };
   const records = useQuery({
     queryKey: ["audit-directory", scope, input],
-    queryFn: () => readAudit(scope, input),
+    queryFn: (context) => readAudit(scope, input, context),
     enabled: !!timezone && tab === "records",
     retry: false,
     refetchOnWindowFocus: false,
   });
   const tracking = useQuery({
     queryKey: ["tracking-directory", scope, input, kind, state],
-    queryFn: () => readTracking(scope, { ...input, kind, state }),
+    queryFn: (context) => readTracking(scope, { ...input, kind, state }, context),
     enabled: !!timezone && tab === "operations",
     retry: false,
     refetchOnWindowFocus: false,

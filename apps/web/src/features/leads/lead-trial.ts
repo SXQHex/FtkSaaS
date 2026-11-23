@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
-import type { ClientScope } from "../../lib/scoped-backend";
+import type { ClientScope, AccountReadContext } from "../../lib/scoped-backend";
 import { scopedBackend } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
 import type {
@@ -29,9 +29,10 @@ async function directory(
   leadId: string,
   kind: "products" | "history",
   cursor?: string,
+  context?: AccountReadContext,
 ) {
   const page = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, context)
   ).call("management_state_get_v1", {
     ...base(scope),
     operation: "trial_offer_create_v1",
@@ -50,8 +51,13 @@ async function directory(
   if (cursor && cursor === page.next_cursor) throw Error("TRIAL_CURSOR_REPEATED");
   return page;
 }
-export async function readTrialProducts(scope: ClientScope, leadId: string, cursor?: string) {
-  const page = await directory(scope, leadId, "products", cursor);
+export async function readTrialProducts(
+  scope: ClientScope,
+  leadId: string,
+  cursor?: string,
+  context?: AccountReadContext,
+) {
+  const page = await directory(scope, leadId, "products", cursor, context);
   return {
     ...page,
     items: page.items.map((row) => {
@@ -61,8 +67,13 @@ export async function readTrialProducts(scope: ClientScope, leadId: string, curs
     }),
   };
 }
-export async function readTrialHistory(scope: ClientScope, leadId: string, cursor?: string) {
-  const page = await directory(scope, leadId, "history", cursor);
+export async function readTrialHistory(
+  scope: ClientScope,
+  leadId: string,
+  cursor?: string,
+  context?: AccountReadContext,
+) {
+  const page = await directory(scope, leadId, "history", cursor, context);
   return {
     ...page,
     items: page.items.map((row) => {
@@ -105,13 +116,24 @@ async function freshLead(scope: ClientScope, lead: LeadDetail) {
   if (current.version !== lead.version || current.state !== "open")
     throw new BackendError({ code: "VERSION_CONFLICT", retryable: false, trace_id: uuidv7() });
 }
-export async function readTrialSessions(scope: ClientScope, timezone: string, day: string) {
+export async function readTrialSessions(
+  scope: ClientScope,
+  timezone: string,
+  day: string,
+  context?: AccountReadContext,
+) {
   const T = await getTemporal(),
     date = day ? T.PlainDate.from(day) : T.Now.plainDateISO(timezone);
-  const result = await readScheduleRange(scope, {
-    starts_at: date.toZonedDateTime(timezone).toInstant().toString(),
-    ends_at: date.add({ days: 1 }).toZonedDateTime(timezone).toInstant().toString(),
-  });
+  const result = await readScheduleRange(
+    scope,
+    {
+      starts_at: date.toZonedDateTime(timezone).toInstant().toString(),
+      ends_at: date.add({ days: 1 }).toZonedDateTime(timezone).toInstant().toString(),
+    },
+    undefined,
+    undefined,
+    context,
+  );
   return {
     day: date.toString(),
     entries: result.entries.filter(

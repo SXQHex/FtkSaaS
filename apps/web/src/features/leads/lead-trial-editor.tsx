@@ -63,7 +63,7 @@ export function LeadTrialEditor({
   }, []);
   const products = useInfiniteQuery({
     queryKey: ["lead-trial-products", scope.accountId, scope.orgId, scope.centerId, lead.id],
-    queryFn: ({ pageParam }) => readTrialProducts(scope, lead.id, pageParam),
+    queryFn: (context) => readTrialProducts(scope, lead.id, context.pageParam, context),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (page) => page.next_cursor ?? undefined,
     enabled: mode === "offer",
@@ -74,7 +74,7 @@ export function LeadTrialEditor({
   });
   const history = useInfiniteQuery({
     queryKey: ["lead-trial-history", scope.accountId, scope.orgId, scope.centerId, lead.id],
-    queryFn: ({ pageParam }) => readTrialHistory(scope, lead.id, pageParam),
+    queryFn: (context) => readTrialHistory(scope, lead.id, context.pageParam, context),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (page) => page.next_cursor ?? undefined,
     retry: false,
@@ -84,7 +84,7 @@ export function LeadTrialEditor({
   });
   const sessions = useQuery({
     queryKey: ["lead-trial-sessions", scope.accountId, scope.orgId, scope.centerId, timezone, day],
-    queryFn: () => readTrialSessions(scope, timezone, day),
+    queryFn: (context) => readTrialSessions(scope, timezone, day, context),
     enabled: mode === "offer",
     retry: false,
     refetchOnWindowFocus: false,

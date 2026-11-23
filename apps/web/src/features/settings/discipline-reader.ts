@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type {
   DisciplinePresentationView,
   DisciplineView,
@@ -80,8 +80,12 @@ const presentedDiscipline = z.object({
 });
 
 /** Explicit presentation opt-in, native pagination, no inference from omitted metadata. */
-export async function readDisciplineCatalog(scope: ClientScope, level: DisciplineLevel) {
-  const backend = await scopedBackend(scope),
+export async function readDisciplineCatalog(
+  scope: ClientScope,
+  level: DisciplineLevel,
+  readContext?: AccountReadContext,
+) {
+  const backend = await scopedBackend(scope, undefined, readContext),
     items: PresentedDiscipline[] = [],
     cursors = new Set<string>(),
     ids = new Set<string>();

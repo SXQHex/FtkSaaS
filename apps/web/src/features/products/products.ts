@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type {
   ProductView,
   ProductTerms,
@@ -16,8 +16,9 @@ export async function readProductsManagementPage(
   filter: ProductFilter,
   query: string,
   cursor?: string,
+  context?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, context);
   const result = await backend.call("products_management_list_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
@@ -44,8 +45,12 @@ export async function readProductsManagementPage(
   return { ...result, items };
 }
 
-export async function readProductsPage(scope: ClientScope, cursor?: string) {
-  const backend = await scopedBackend(scope);
+export async function readProductsPage(
+  scope: ClientScope,
+  cursor?: string,
+  context?: AccountReadContext,
+) {
+  const backend = await scopedBackend(scope, undefined, context);
   const result = await backend.call("products_list_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
@@ -143,8 +148,9 @@ export async function readProductHistory(
   productId: string,
   view: "versions" | "sales",
   cursor?: string,
+  context?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, context);
   const result = await backend.call("products_management_list_v1", {
     client_api_version: 1,
     request_id: uuidv7(),

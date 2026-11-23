@@ -7,7 +7,7 @@ import type {
   PlatformInvoice,
   RequestOrganizationBillingTaxSet,
 } from "@ftksaas/api-contracts";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 
 const taxFields = z.object({
   tax_office: z.string().trim().min(1).max(200).nullable(),
@@ -30,8 +30,8 @@ const organizationRequest = (scope: ClientScope) => ({
   request_id: uuidv7(),
 });
 
-export async function readBillingTax(scope: ClientScope) {
-  const backend = await scopedBackend(scope);
+export async function readBillingTax(scope: ClientScope, readContext?: AccountReadContext) {
+  const backend = await scopedBackend(scope, undefined, readContext);
   const profile = taxProfile.parse(
     await backend.call("organization_billing_tax_get_v1", organizationRequest(scope)),
   );
@@ -101,8 +101,12 @@ export async function readBillingTaxResult(intent: BillingTaxIntent, id?: string
   return profile;
 }
 
-export async function readInvoicePage(scope: ClientScope, cursor: string | null) {
-  const backend = await scopedBackend(scope);
+export async function readInvoicePage(
+  scope: ClientScope,
+  cursor: string | null,
+  readContext?: AccountReadContext,
+) {
+  const backend = await scopedBackend(scope, undefined, readContext);
   const page = invoicePage.parse(
     await backend.call("organization_invoices_list_v1", {
       ...organizationRequest(scope),

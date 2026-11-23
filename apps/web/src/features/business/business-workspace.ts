@@ -6,8 +6,8 @@ import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 export function businessWorkspaceQuery(scope: ClientScope) {
   return queryOptions({
     queryKey: ["business-workspace", scope.accountId, scope.orgId, scope.centerId],
-    queryFn: async () => {
-      const backend = await scopedBackend(scope);
+    queryFn: async (context) => {
+      const backend = await scopedBackend(scope, undefined, context);
       const end = Date.now();
       try {
         const result = await backend.call("report_get_v1", {

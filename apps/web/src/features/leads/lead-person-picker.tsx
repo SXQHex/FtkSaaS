@@ -35,7 +35,8 @@ export function LeadPersonPicker({
   }, [search]);
   const people = useQuery({
     queryKey: ["lead-people", scope.accountId, scope.orgId, scope.centerId, query, cursors[index]],
-    queryFn: () => readPeoplePage(scope, query, cursors[index]),
+    queryFn: (context) =>
+      readPeoplePage(scope, query, cursors[index], undefined, undefined, undefined, context),
     retry: false,
   });
   const items = people.isError ? [] : (people.data?.items ?? []),

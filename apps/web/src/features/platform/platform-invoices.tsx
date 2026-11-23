@@ -66,7 +66,7 @@ export function PlatformInvoices({
   const history = useInfiniteQuery({
     queryKey: ["platform-invoices", accountId, orgId],
     initialPageParam: undefined as string | undefined,
-    queryFn: ({ pageParam }) => readPlatformInvoices(accountId, orgId, pageParam),
+    queryFn: (context) => readPlatformInvoices(accountId, orgId, context.pageParam, context),
     getNextPageParam: (last) => last.next_cursor ?? undefined,
     retry: false,
     refetchOnMount: "always",

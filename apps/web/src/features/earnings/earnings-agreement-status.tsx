@@ -21,11 +21,11 @@ export function EarningsAgreementStatus({
   const status = useQuery({
     queryKey: ["earnings-agreement-status", scope, personId, agreementIds],
     enabled: requested,
-    queryFn: async ({ signal }) => {
+    queryFn: async ({ signal, client }) => {
       const rows = [];
       for (const id of agreementIds) {
         signal.throwIfAborted();
-        rows.push(await readManagedAgreementStatus(scope, personId, id));
+        rows.push(await readManagedAgreementStatus(scope, personId, id, { client, signal }));
       }
       return rows;
     },

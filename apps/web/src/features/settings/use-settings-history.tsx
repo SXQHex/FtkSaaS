@@ -32,7 +32,7 @@ export function useSettingsHistory({
     cursor = stack.at(-1);
   const query = useQuery({
     queryKey: ["settings-history", scope.accountId, scope.orgId, scope.centerId, level, cursor],
-    queryFn: () => readSettingsHistory(scope, level, cursor),
+    queryFn: (context) => readSettingsHistory(scope, level, cursor, context),
     enabled,
     retry: false,
     refetchOnWindowFocus: false,

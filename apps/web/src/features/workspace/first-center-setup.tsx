@@ -62,10 +62,10 @@ function NextCenterSetup({ scope }: { scope: ClientScope }) {
   const { t } = useTranslation();
   const resources = useQuery({
     queryKey: ["center-setup-resources", scope],
-    queryFn: async () => {
+    queryFn: async (context) => {
       const [rooms, disciplines] = await Promise.all([
-        readStudioRooms(scope),
-        readDisciplineCatalog(scope, "center"),
+        readStudioRooms(scope, context),
+        readDisciplineCatalog(scope, "center", context),
       ]);
       return {
         roomMissing: !rooms.some((room) => room.active),
@@ -159,7 +159,8 @@ export function FirstCenterSetup({
     !workspace!.centers.length;
   const catalog = useQuery({
     queryKey: ["first-center-authority", accountId, organizationId],
-    queryFn: () => readOrganizationSettingsCatalog({ accountId, orgId: organizationId! }),
+    queryFn: (context) =>
+      readOrganizationSettingsCatalog({ accountId, orgId: organizationId! }, context),
     enabled: initial,
     retry: false,
   });

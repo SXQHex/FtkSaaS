@@ -1,6 +1,10 @@
+import type { QueryClient } from "@tanstack/react-query";
+import type { Session } from "@supabase/supabase-js";
 import { getSupabaseClient } from "../../lib/supabase";
-import { readAccount } from "../../lib/account";
+import { queryClient } from "../../lib/query-client";
 import { hasDeletionReceipt } from "../account/deletion";
+import { accountQuery } from "./account-query";
+import { sameNativeSession } from "./native-session-id";
 import { rememberRecoverySession, requireRecoverySession } from "./password-recovery";
 
 export function safeNext(next: unknown) {
@@ -32,7 +36,17 @@ export function capturedCallback() {
 
 let exchange: { code: string; result: Promise<string> } | undefined;
 
-export function completeCallback(input: CallbackInput): Promise<string> {
+async function verifyCallbackSession(expected: Session) {
+  const { data, error } = await getSupabaseClient().auth.getSession();
+  if (error) throw error;
+  if (!data.session || !sameNativeSession(expected, data.session))
+    throw new Error("ACCOUNT_CHANGED");
+}
+
+export function completeCallback(
+  input: CallbackInput,
+  queries: QueryClient = queryClient,
+): Promise<string> {
   if (input.providerError || !input.code) return Promise.reject(new Error("AUTH_CALLBACK_INVALID"));
   if (exchange?.code === input.code) return exchange.result;
   const code = input.code;
@@ -48,16 +62,21 @@ export function completeCallback(input: CallbackInput): Promise<string> {
     const { data, error } = response;
     if (error) throw error;
     if (!data.session) throw new Error("AUTH_REQUIRED");
+    // A completed native exchange starts a new private Query lifetime, even
+    // when this browser signs in as the same user again.
+    queries.clear();
     if (recovery) await rememberRecoverySession(data.session);
     const next = safeNext(input.next);
     if (next === "/reset-password") await requireRecoverySession();
-    const assurance = await auth.mfa.getAuthenticatorAssuranceLevel();
+    const assurance = await auth.mfa.getAuthenticatorAssuranceLevel(data.session.access_token);
     if (assurance.error) throw assurance.error;
+    await verifyCallbackSession(data.session);
     if (assurance.data.nextLevel === "aal2" && assurance.data.currentLevel !== "aal2")
       return "/mfa";
     if (next !== "/reset-password" && hasDeletionReceipt(data.session.user.id))
       return "/account/deletion";
-    await readAccount();
+    await queries.query(accountQuery(data.session.user.id, next === "/account"));
+    await verifyCallbackSession(data.session);
     return next;
   })();
   exchange = { code, result };

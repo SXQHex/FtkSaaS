@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
 import { BackendError } from "../../lib/backend";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { ManagementWorkView } from "@ftksaas/api-contracts";
 import { requestDetail } from "../lesson-requests/lesson-requests-read";
 import { readEvent } from "../events/events-read";
@@ -58,9 +58,14 @@ function checkTask(task: ManagementWorkView) {
   }
   throw Error("WORK_SOURCE_UNAVAILABLE");
 }
-export async function readOverviewWork(scope: ClientScope, cursor?: string, limit = 20) {
+export async function readOverviewWork(
+  scope: ClientScope,
+  cursor?: string,
+  limit = 20,
+  context?: AccountReadContext,
+) {
   const page = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, context)
   ).call("management_work_list_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
@@ -92,12 +97,16 @@ export async function readOverviewWork(scope: ClientScope, cursor?: string, limi
     throw Error("WORK_SOURCE_UNAVAILABLE");
   return page;
 }
-async function readManagement(scope: ClientScope, task: ManagementWorkView) {
+async function readManagement(
+  scope: ClientScope,
+  task: ManagementWorkView,
+  context?: AccountReadContext,
+) {
   checkTask(task);
   if (task.target.operation !== "management_state_get_v1") throw Error("WORK_SOURCE_UNAVAILABLE");
   const selector = task.target.selector;
   const page = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, context)
   ).call("management_state_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
@@ -127,12 +136,16 @@ async function readManagement(scope: ClientScope, task: ManagementWorkView) {
   if (versions.length !== 1) throw Error("WORK_SOURCE_UNAVAILABLE");
   return { row, version: positive.parse(versions[0]!.version), selector };
 }
-export async function readOverviewWorkSource(scope: ClientScope, task: ManagementWorkView) {
+export async function readOverviewWorkSource(
+  scope: ClientScope,
+  task: ManagementWorkView,
+  context?: AccountReadContext,
+) {
   checkTask(task);
   const base = `/o/${scope.orgId}/c/${scope.centerId}`;
   if (task.target.operation === "session_get_v1") {
     const session = await (
-      await scopedBackend(scope)
+      await scopedBackend(scope, undefined, context)
     ).call("session_get_v1", {
       client_api_version: 1,
       request_id: uuidv7(),
@@ -155,7 +168,7 @@ export async function readOverviewWorkSource(scope: ClientScope, task: Managemen
     };
   }
   if (task.target.operation === "event_get_v1") {
-    const event = await readEvent(scope, task.id);
+    const event = await readEvent(scope, task.id, undefined, context);
     if (
       event.version !== task.version ||
       event.attendance_state === "closed" ||
@@ -164,7 +177,7 @@ export async function readOverviewWorkSource(scope: ClientScope, task: Managemen
       throw Error("WORK_SOURCE_CHANGED");
     return { kind: "flow" as const, href: `${base}/events/${task.id}`, scope: { ...scope }, task };
   }
-  const source = await readManagement(scope, task);
+  const source = await readManagement(scope, task, context);
   if (source.version !== task.version) throw Error("WORK_SOURCE_CHANGED");
   if (task.kind === "lesson_request") {
     const detail = requestDetail(source.row, scope, source.selector.operation, task.id);

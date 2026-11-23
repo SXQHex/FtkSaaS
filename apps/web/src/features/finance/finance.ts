@@ -1,7 +1,7 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { BackendError, queryBackendRead } from "../../lib/backend";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { FinanceView, RequestCollectionRecord } from "@ftksaas/api-contracts";
 import type { FinanceDraft } from "./finance-action-sheet";
 import { getTemporal } from "../../lib/temporal";
@@ -20,10 +20,11 @@ export async function readFinancePage(
   selection: FinanceSelection,
   cursor?: string,
   signal?: AbortSignal,
+  readContext?: AccountReadContext,
 ): Promise<FinanceView> {
   z.uuid().parse(selection.personId);
   currency.parse(selection.currency);
-  const backend = await scopedBackend(scope, signal);
+  const backend = await scopedBackend(scope, signal, readContext);
   const data = await queryBackendRead(
     backend,
     "finance_get_v1",
@@ -64,8 +65,12 @@ export async function readFinancePage(
   signal?.throwIfAborted();
   return data;
 }
-export async function readCollectionAuthority(scope: ClientScope, personId: string) {
-  const backend = await scopedBackend(scope);
+export async function readCollectionAuthority(
+  scope: ClientScope,
+  personId: string,
+  readContext?: AccountReadContext,
+) {
+  const backend = await scopedBackend(scope, undefined, readContext);
   try {
     const page = await backend.call("management_state_get_v1", {
       client_api_version: 1,

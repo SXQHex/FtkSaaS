@@ -48,8 +48,8 @@ export function PlatformCreate({
   const [createdId, setCreatedId] = useState<string>();
   const source = useQuery({
     queryKey: ["platform-create-source", accountId, requestId],
-    queryFn: async () => ({
-      plans: await readPlatformPlans(accountId),
+    queryFn: async (context) => ({
+      plans: await readPlatformPlans(accountId, context),
       request: requestId ? await findStudioRequest(accountId, requestId) : undefined,
     }),
     retry: false,
@@ -57,8 +57,8 @@ export function PlatformCreate({
   });
   const owner = useQuery({
     queryKey: ["platform-create-owner", accountId, lookup],
-    queryFn: async () =>
-      lookup ? ((await readVerifiedPlatformAccount(accountId, lookup)) ?? null) : null,
+    queryFn: async (context) =>
+      lookup ? ((await readVerifiedPlatformAccount(accountId, lookup, context)) ?? null) : null,
     enabled: Boolean(lookup),
     retry: false,
     gcTime: 0,

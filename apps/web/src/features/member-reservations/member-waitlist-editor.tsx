@@ -79,7 +79,8 @@ export function MemberWaitlistEditor({
       personId,
       before.session.id,
     ],
-    queryFn: () => readBookingRights(scope, personId, before.session.id, "flexible"),
+    queryFn: (readContext) =>
+      readBookingRights(scope, personId, before.session.id, "flexible", readContext),
     enabled: action === "accept",
     retry: false,
   });

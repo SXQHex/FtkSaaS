@@ -88,7 +88,8 @@ export function ScheduleRoster({
       interval.ends_at,
       cursors[page],
     ],
-    queryFn: () => readGroupStudents(scope, classId, interval, "", cursors[page]),
+    queryFn: (readContext) =>
+      readGroupStudents(scope, classId, interval, "", cursors[page], readContext),
     retry: false,
   });
   const people = useQuery({
@@ -100,13 +101,22 @@ export function ScheduleRoster({
       query,
       peopleCursors[peoplePage],
     ],
-    queryFn: () => readPeoplePage(scope, query ?? "", peopleCursors[peoplePage], "active"),
+    queryFn: (readContext) =>
+      readPeoplePage(
+        scope,
+        query ?? "",
+        peopleCursors[peoplePage],
+        "active",
+        undefined,
+        undefined,
+        readContext,
+      ),
     enabled: editing && query !== undefined,
     retry: false,
   });
   const rights = useQuery({
     queryKey: ["schedule-group-rights", scope.accountId, scope.orgId, scope.centerId, personId],
-    queryFn: () => readProfileRights(scope, personId),
+    queryFn: (readContext) => readProfileRights(scope, personId, undefined, readContext),
     enabled: editing && Boolean(personId),
     retry: false,
   });
@@ -119,7 +129,7 @@ export function ScheduleRoster({
       interval.starts_at,
       interval.ends_at,
     ],
-    queryFn: () => readScheduleRange(scope, interval),
+    queryFn: (readContext) => readScheduleRange(scope, interval, undefined, undefined, readContext),
     enabled: editing,
     retry: false,
   });

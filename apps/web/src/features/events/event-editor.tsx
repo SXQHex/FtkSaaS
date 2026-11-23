@@ -51,8 +51,8 @@ export function EventEditor(props: Props) {
       props.target,
     ],
     enabled: !!props.target,
-    queryFn: async () => {
-      const before = await readEvent(props.scope, props.target!);
+    queryFn: async (readContext) => {
+      const before = await readEvent(props.scope, props.target!, undefined, readContext);
       return { before, draft: await eventDraft(before) };
     },
     retry: false,
@@ -127,22 +127,23 @@ function EventEditorForm({
   const prefix = ["event-choices", scope.accountId, scope.orgId, scope.centerId];
   const rooms = useQuery({
     queryKey: [...prefix, "rooms"],
-    queryFn: () => readEventRooms(scope),
+    queryFn: (readContext) => readEventRooms(scope, readContext),
     retry: false,
   });
   const people = useQuery({
     queryKey: [...prefix, "people"],
-    queryFn: () => readEventPeople(scope),
+    queryFn: (readContext) => readEventPeople(scope, readContext),
     retry: false,
   });
   const disciplines = useQuery({
     queryKey: [...prefix, "disciplines"],
-    queryFn: () => readEventDisciplines(scope),
+    queryFn: (readContext) => readEventDisciplines(scope, readContext),
     retry: false,
   });
   const products = useInfiniteQuery({
     queryKey: [...prefix, "products"],
-    queryFn: ({ pageParam }) => readEventProducts(scope, pageParam),
+    queryFn: ({ pageParam, client, signal }) =>
+      readEventProducts(scope, pageParam, { client, signal }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (page) => page.next_cursor ?? undefined,
     retry: false,

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { BackendError } from "../../lib/backend";
-import type { ClientScope } from "../../lib/scoped-backend";
+import type { ClientScope, AccountReadContext } from "../../lib/scoped-backend";
 import { readPeopleCenter } from "../people/people";
 import { PersonEntry } from "../people/person-entry";
 import { AccessActionController } from "./access-controller";
@@ -45,7 +45,7 @@ export function AccessContent({
   const [entryGeneration, setEntryGeneration] = useState(0);
   const center = useQuery({
     queryKey: ["access-center", scope.accountId, scope.orgId, scope.centerId],
-    queryFn: () => readPeopleCenter(scope),
+    queryFn: (context) => readPeopleCenter(scope, context),
     retry: false,
   });
   const timezone = center.data?.timezone;
@@ -61,23 +61,23 @@ export function AccessContent({
     queryText,
     cursor,
   ];
-  const readInvitations = async (cursor?: string) => {
-    const page = await readInvitationDirectory(scope, invitationFilter, cursor);
+  const readInvitations = async (cursor?: string, context?: AccountReadContext) => {
+    const page = await readInvitationDirectory(scope, invitationFilter, cursor, context);
     return { page, rows: invitationDirectoryRows(page, scope.centerId, timezone) };
   };
-  const readAccounts = async (cursor?: string) => {
-    const page = await readAccountDirectory(scope, accountFilter, queryText, cursor);
+  const readAccounts = async (cursor?: string, context?: AccountReadContext) => {
+    const page = await readAccountDirectory(scope, accountFilter, queryText, cursor, context);
     return { page, rows: accountDirectoryRows(page) };
   };
   const invitations = useQuery({
     queryKey: invitationKey(invitationCursors[invitationIndex]),
-    queryFn: () => readInvitations(invitationCursors[invitationIndex]),
+    queryFn: (context) => readInvitations(invitationCursors[invitationIndex], context),
     enabled: !center.isPending,
     retry: false,
   });
   const accounts = useQuery({
     queryKey: accountKey(accountCursors[accountIndex]),
-    queryFn: () => readAccounts(accountCursors[accountIndex]),
+    queryFn: (context) => readAccounts(accountCursors[accountIndex], context),
     retry: false,
   });
   const publishLock = useCallback(

@@ -51,7 +51,7 @@ export function EventDetailContent({
   const prefix = ["event-detail", scope.accountId, scope.orgId, scope.centerId, eventId];
   const source = useQuery({
     queryKey: prefix,
-    queryFn: () => readDetailedEvent(scope, eventId),
+    queryFn: (readContext) => readDetailedEvent(scope, eventId, readContext),
     enabled: !!center,
     retry: false,
     refetchOnWindowFocus: false,
@@ -60,7 +60,7 @@ export function EventDetailContent({
   const event = !source.isError || locked ? source.data : undefined;
   const rooms = useQuery({
     queryKey: ["event-choices", scope.accountId, scope.orgId, scope.centerId, "rooms"],
-    queryFn: () => readEventRooms(scope),
+    queryFn: (readContext) => readEventRooms(scope, readContext),
     enabled: !!center,
     retry: false,
   });
@@ -69,7 +69,7 @@ export function EventDetailContent({
     placeholderData: keepPreviousData,
     enabled: !!event,
     retry: false,
-    queryFn: async () => {
+    queryFn: async (readContext) => {
       const T = await getTemporal(),
         value = event!;
       const fmt = new Intl.DateTimeFormat("tr-TR", {
@@ -78,7 +78,7 @@ export function EventDetailContent({
         timeZone: value.timezone,
       });
       const names = new Map<string, string>(),
-        backend = await scopedBackend(scope);
+        backend = await scopedBackend(scope, undefined, readContext);
       // Only the event's known duty subjects, not the organization directory.
       const ids = [...new Set((value.duties ?? []).map((row) => row.person_id))];
       for (let index = 0; index < ids.length; index += 4)

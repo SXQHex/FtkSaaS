@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import { reportsCommon } from "./reports-command";
 import type { ImportRowState } from "@ftksaas/api-contracts";
 export async function readImportRows(
@@ -9,9 +9,10 @@ export async function readImportRows(
   state?: ImportRowState,
   cursor?: string,
   includeApplySummary = false,
+  readContext?: AccountReadContext,
 ) {
   const data = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, readContext)
   ).call("import_rows_list_v1", {
     ...reportsCommon(scope),
     request_id: uuidv7(),

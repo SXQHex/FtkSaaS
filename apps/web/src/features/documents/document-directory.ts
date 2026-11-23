@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type {
   DocumentDirectoryDocument,
   DocumentDirectoryPage,
@@ -41,6 +41,7 @@ export type DocumentDirectoryInput = {
 export async function readDocumentDirectory(
   scope: ClientScope,
   input: DocumentDirectoryInput,
+  context?: AccountReadContext,
 ): Promise<DocumentDirectoryPage> {
   if (input.documentId) z.uuid().parse(input.documentId);
   if (input.versionId) z.uuid().parse(input.versionId);
@@ -53,7 +54,7 @@ export async function readDocumentDirectory(
   const query = input.query?.trim();
   if (query) z.string().max(200).parse(query);
   const data = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, context)
   ).call("document_directory_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),

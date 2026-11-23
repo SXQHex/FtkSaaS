@@ -47,7 +47,7 @@ export function MemberDocumentContextsPanel({
       scope.centerId,
       cursors.at(-1),
     ],
-    queryFn: () => readMemberDocumentContexts(scope, cursors.at(-1)),
+    queryFn: (readContext) => readMemberDocumentContexts(scope, cursors.at(-1), readContext),
     retry: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,

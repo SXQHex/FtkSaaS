@@ -36,17 +36,17 @@ export function MemberEntitlementsContent({
   const prefix = ["member-entitlements", scope.accountId, scope.orgId, scope.centerId, personId];
   const rights = useQuery({
     queryKey: [...prefix, "rights"],
-    queryFn: () => readOwnPackages(scope, personId),
+    queryFn: (readContext) => readOwnPackages(scope, personId, readContext),
     retry: false,
   });
   const debt = useQuery({
     queryKey: [...prefix, "debt"],
-    queryFn: () => readOwnDebt(scope, personId),
+    queryFn: (readContext) => readOwnDebt(scope, personId, readContext),
     retry: false,
   });
   const currencies = useQuery({
     queryKey: [...prefix, "currencies"],
-    queryFn: () => readOwnFinanceCurrencies(scope, personId),
+    queryFn: (readContext) => readOwnFinanceCurrencies(scope, personId, readContext),
     retry: false,
   });
   const currency = !currencies.isError
@@ -55,8 +55,11 @@ export function MemberEntitlementsContent({
     : undefined;
   const payments = useQuery({
     queryKey: [...prefix, "payments", currency, paymentCursors.at(-1)],
-    queryFn: ({ signal }) =>
-      readFinancePage(scope, { personId, currency: currency! }, paymentCursors.at(-1), signal),
+    queryFn: ({ signal, client }) =>
+      readFinancePage(scope, { personId, currency: currency! }, paymentCursors.at(-1), signal, {
+        client,
+        signal,
+      }),
     enabled: !!currency,
     retry: false,
   });
@@ -66,7 +69,8 @@ export function MemberEntitlementsContent({
     (selection === "" && sources?.length === 1 ? sources[0] : undefined);
   const ledger = useQuery({
     queryKey: [...prefix, "ledger", selected?.id, cursors.at(-1)],
-    queryFn: () => readEntitlementLedger(scope, personId, selected!.id, cursors.at(-1)),
+    queryFn: (readContext) =>
+      readEntitlementLedger(scope, personId, selected!.id, cursors.at(-1), readContext),
     enabled: Boolean(selected),
     retry: false,
   });

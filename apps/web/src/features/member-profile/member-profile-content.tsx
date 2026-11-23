@@ -92,25 +92,26 @@ export function MemberProfileContent({
     rightsKey = ["profile-rights", scope.accountId, scope.orgId, scope.centerId, personId];
   const person = useQuery({
     queryKey: personKey,
-    queryFn: () => readPerson(scope, personId, { membershipDate: true, memberSummary: true }),
+    queryFn: (readContext) =>
+      readPerson(scope, personId, { membershipDate: true, memberSummary: true }, readContext),
     enabled: Boolean(center),
     retry: false,
   });
   const rights = useQuery({
     queryKey: rightsKey,
-    queryFn: () => readProfileRights(scope, personId),
+    queryFn: (readContext) => readProfileRights(scope, personId, undefined, readContext),
     enabled: Boolean(center && person.data),
     retry: false,
   });
   const catalog = useQuery({
     queryKey: ["profile-catalog", scope.accountId, scope.orgId, scope.centerId],
-    queryFn: () => readProfileCatalog(scope),
+    queryFn: (readContext) => readProfileCatalog(scope, readContext),
     enabled: Boolean(center && person.data),
     retry: false,
   });
   const disciplines = useQuery({
     queryKey: ["profile-disciplines", scope.accountId, scope.orgId, scope.centerId],
-    queryFn: () => readProfileDisciplines(scope),
+    queryFn: (readContext) => readProfileDisciplines(scope, readContext),
     enabled: Boolean(center && person.data),
     retry: false,
   });
@@ -124,8 +125,15 @@ export function MemberProfileContent({
       filter,
       reservationCursors[reservationIndex],
     ],
-    queryFn: () =>
-      readMemberReservations(scope, personId, reservationCursors[reservationIndex], filter),
+    queryFn: (readContext) =>
+      readMemberReservations(
+        scope,
+        personId,
+        reservationCursors[reservationIndex],
+        filter,
+        undefined,
+        readContext,
+      ),
     enabled: Boolean(center && person.data && tab === "reservations"),
     retry: false,
   });
@@ -139,7 +147,7 @@ export function MemberProfileContent({
   ];
   const negativeLimit = useQuery({
     queryKey: negativeKey,
-    queryFn: () => readNegativeLimit(scope, personId, negativeDiscipline),
+    queryFn: (readContext) => readNegativeLimit(scope, personId, negativeDiscipline, readContext),
     enabled: Boolean(center && person.data && negativeDiscipline),
     retry: false,
   });
@@ -154,8 +162,11 @@ export function MemberProfileContent({
   ];
   const finance = useQuery({
     queryKey: financeKey(currency ?? "", cursors[index]),
-    queryFn: ({ signal }) =>
-      readFinancePage(scope, { personId, currency: currency! }, cursors[index], signal),
+    queryFn: ({ signal, client }) =>
+      readFinancePage(scope, { personId, currency: currency! }, cursors[index], signal, {
+        client,
+        signal,
+      }),
     enabled: Boolean(center && person.data && currency),
     retry: false,
   });

@@ -1,5 +1,5 @@
 import { v7 as uuidv7 } from "uuid";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import { getTemporal } from "../../lib/temporal";
 import { BackendError, queryBackendRead } from "../../lib/backend";
 import type { CalendarItem, Interval, ResourceRef, SessionView } from "@ftksaas/api-contracts";
@@ -7,11 +7,11 @@ import { readClosureContext } from "../studio/closure";
 import { readStudioResources } from "../studio/studio";
 import { readStudioInstructors } from "../studio/studio-reads";
 
-export async function readScheduleSources(scope: ClientScope) {
+export async function readScheduleSources(scope: ClientScope, readContext?: AccountReadContext) {
   const [context, resources, instructors] = await Promise.all([
-    readClosureContext(scope),
-    readStudioResources(scope),
-    readStudioInstructors(scope),
+    readClosureContext(scope, readContext),
+    readStudioResources(scope, readContext),
+    readStudioInstructors(scope, undefined, readContext),
   ]);
   return { scope: { ...scope }, center: context.center, resources, instructors };
 }
@@ -36,8 +36,9 @@ export async function readScheduleSession(
   scope: ClientScope,
   id: string,
   includeRoomLabels = false,
+  readContext?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, readContext);
   return sessionIdentity(
     await backend.call("session_get_v1", {
       client_api_version: 1,
@@ -62,6 +63,7 @@ export async function readScheduleRange(
   interval: Interval,
   filters: { roomId?: string; instructorId?: string } = {},
   signal?: AbortSignal,
+  readContext?: AccountReadContext,
 ): Promise<{
   entries: ScheduleReadItem[];
   reads: { resource: ResourceRef | null; asOf: string[] }[];
@@ -70,7 +72,7 @@ export async function readScheduleRange(
   const start = temporal.Instant.from(interval.starts_at),
     end = temporal.Instant.from(interval.ends_at);
   if (temporal.Instant.compare(start, end) >= 0) throw new Error("SCHEDULE_RANGE_INVALID");
-  const backend = await scopedBackend(scope, signal);
+  const backend = await scopedBackend(scope, signal, readContext);
   async function calendar(resource: ResourceRef | null) {
     const items: CalendarItem[] = [],
       asOf: string[] = [];
@@ -220,8 +222,12 @@ export async function readScheduleEditor(scope: ClientScope, sessionId: string) 
   return { session, resources: item.current.values.patch.resources };
 }
 
-export async function readScheduleReplacements(scope: ClientScope, replacesId: string) {
-  const backend = await scopedBackend(scope);
+export async function readScheduleReplacements(
+  scope: ClientScope,
+  replacesId: string,
+  readContext?: AccountReadContext,
+) {
+  const backend = await scopedBackend(scope, undefined, readContext);
   const items: { id: string; version: number; state: SessionView["state"]; interval: Interval }[] =
     [];
   const ids = new Set<string>(),

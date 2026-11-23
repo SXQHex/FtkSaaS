@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type {
   EntitlementView,
   ProductView,
@@ -26,9 +26,10 @@ export interface SaleInventory {
 export async function readSaleInventory(
   scope: ClientScope,
   saleId: string,
+  readContext?: AccountReadContext,
 ): Promise<SaleInventory> {
   z.uuid().parse(saleId);
-  const backend = await scopedBackend(scope),
+  const backend = await scopedBackend(scope, undefined, readContext),
     seen = new Set<string>(),
     ids = new Set<string>();
   const items: ManagementStateView[] = [];

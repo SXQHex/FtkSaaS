@@ -90,7 +90,8 @@ function Managers({ scope, organization }: { scope: ClientScope; organization: b
   const read = useInfiniteQuery({
     queryKey: ["business-managers", scope.accountId, scope.orgId, scope.centerId, role],
     initialPageParam: undefined as string | undefined,
-    queryFn: ({ pageParam }) => readTeamPage(scope, role, pageParam),
+    queryFn: (context) =>
+      readTeamPage(scope, role, context.pageParam, undefined, undefined, context),
     getNextPageParam: (last) => last.next_cursor ?? undefined,
     gcTime: 0,
     retry: false,
@@ -173,7 +174,7 @@ function Disciplines({ scope }: { scope: ClientScope }) {
   const { t } = useTranslation();
   const read = useQuery({
     queryKey: ["business-disciplines", scope.accountId, scope.orgId, scope.centerId],
-    queryFn: () => readDisciplineCatalog(scope, "center"),
+    queryFn: (context) => readDisciplineCatalog(scope, "center", context),
     gcTime: 0,
     retry: false,
   });

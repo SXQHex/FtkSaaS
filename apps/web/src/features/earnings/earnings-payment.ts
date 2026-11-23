@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import { getTemporal } from "../../lib/temporal";
 import type {
   InstructorFinanceEarning,
@@ -183,6 +183,7 @@ export async function readEarningsPaymentChain(
   scope: ClientScope,
   personId: string,
   rootId: string,
+  readContext?: AccountReadContext,
 ) {
   z.uuid().parse(rootId);
   const found = new Map<string, InstructorFinancePayment>(),
@@ -190,7 +191,7 @@ export async function readEarningsPaymentChain(
   let cursor: string | undefined;
   let root: InstructorFinancePayment | undefined;
   do {
-    const page = await readEarningsDirectory(scope, "payments", { personId, cursor });
+    const page = await readEarningsDirectory(scope, "payments", { personId, cursor }, readContext);
     for (const row of page.items)
       if (row.kind === "payment" && row.root_payment_id === rootId) {
         if (found.has(row.id)) throw Error("EARNINGS_CHAIN_UNAVAILABLE");
@@ -228,8 +229,9 @@ export async function readEarningsPaymentResult(intent: EarningsPaymentIntent, p
 export async function readEarningsPaymentAuthority(
   scope: ClientScope,
   target: { personId: string; paymentId?: string },
+  readContext?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, readContext);
   const operation = target.paymentId
     ? "instructor_payment_correct_v1"
     : "instructor_payment_record_v1";

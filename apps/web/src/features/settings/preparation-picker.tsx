@@ -49,9 +49,9 @@ export function PreparationPicker({
   const key = ["preparation-catalog", scope.accountId, scope.orgId, scope.centerId];
   const catalog = useQuery({
     queryKey: key,
-    queryFn: async () => {
+    queryFn: async (queryContext) => {
       const result = await (
-        await scopedBackend(scope)
+        await scopedBackend(scope, undefined, queryContext)
       ).call("settings_catalog_get_v1", {
         ...context,
         request_id: uuidv7(),
@@ -79,10 +79,10 @@ export function PreparationPicker({
   const source = options.find((item) => sourceKey(item.source) === selected)?.source;
   const resolved = useQuery({
     queryKey: [...key, kind, selected, collectionCurrency ?? null],
-    queryFn: async () => {
+    queryFn: async (queryContext) => {
       if (!source) throw Error("PREPARATION_SOURCE_UNAVAILABLE");
       const result = await (
-        await scopedBackend(scope)
+        await scopedBackend(scope, undefined, queryContext)
       ).call("settings_preparation_resolve_v1", {
         ...context,
         request_id: uuidv7(),

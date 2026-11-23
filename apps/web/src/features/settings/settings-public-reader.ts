@@ -1,15 +1,20 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import type { ClientScope } from "../../lib/scoped-backend";
+import type { ClientScope, AccountReadContext } from "../../lib/scoped-backend";
 import { scopedBackend } from "../../lib/scoped-backend";
 import type { SettingsLevel } from "./settings-document";
-export async function readPublicForms(scope: ClientScope, level: SettingsLevel, cursor?: string) {
+export async function readPublicForms(
+  scope: ClientScope,
+  level: SettingsLevel,
+  cursor?: string,
+  readContext?: AccountReadContext,
+) {
   const target =
     level === "center"
       ? { scope: "center" as const, center_id: scope.centerId }
       : { scope: "organization" as const };
   const data = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, readContext)
   ).call("settings_catalog_get_v1", {
     ...target,
     client_api_version: 1,
@@ -41,11 +46,12 @@ export async function readPublicConsentSources(
   scope: ClientScope,
   level: SettingsLevel,
   code: string,
+  readContext?: AccountReadContext,
 ) {
   const scopeKey =
     level === "center" ? `center:${scope.orgId}:${scope.centerId}` : `organization:${scope.orgId}`;
   const data = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, readContext)
   ).call("content_catalog_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),

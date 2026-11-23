@@ -106,8 +106,11 @@ export function FinanceContent({
       search,
       personCursors[personPage],
     ],
-    queryFn: ({ signal }) =>
-      readPeoplePage(scope, search, personCursors[personPage], undefined, false, signal),
+    queryFn: ({ signal, client }) =>
+      readPeoplePage(scope, search, personCursors[personPage], undefined, false, signal, {
+        client,
+        signal,
+      }),
     enabled: Boolean(center) && !locked,
     retry: false,
   });
@@ -140,7 +143,8 @@ export function FinanceContent({
       selection?.currency,
       cursors[pageIndex],
     ],
-    queryFn: ({ signal }) => readFinancePage(scope, selection!, cursors[pageIndex], signal),
+    queryFn: ({ signal, client }) =>
+      readFinancePage(scope, selection!, cursors[pageIndex], signal, { client, signal }),
     enabled: Boolean(center && selection),
     retry: false,
   });
@@ -152,7 +156,7 @@ export function FinanceContent({
       scope.centerId,
       selection?.personId,
     ],
-    queryFn: () => readCollectionAuthority(scope, selection!.personId),
+    queryFn: (readContext) => readCollectionAuthority(scope, selection!.personId, readContext),
     enabled: Boolean(center && selection),
     retry: false,
   });

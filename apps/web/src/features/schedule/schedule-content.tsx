@@ -159,9 +159,9 @@ export function ScheduleContent({
   );
   const sources = useQuery({
     queryKey: ["schedule-sources", scope.accountId, scope.orgId, scope.centerId],
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey, client, signal }) => {
       try {
-        const source = await readScheduleSources(scope);
+        const source = await readScheduleSources(scope, { client, signal });
         return { ...source, initialDate: await scheduleLocalDate(now, source.center.timezone) };
       } catch (failure) {
         if (accessLost(failure, queryKey)) command.abandon();
@@ -249,7 +249,7 @@ export function ScheduleContent({
       instructor,
     ],
     enabled: Boolean(sources.data && range),
-    queryFn: async ({ queryKey, signal }) => {
+    queryFn: async ({ queryKey, signal, client }) => {
       try {
         return await readScheduleRange(
           scope,
@@ -259,6 +259,7 @@ export function ScheduleContent({
             ...(instructor ? { instructorId: instructor } : {}),
           },
           signal,
+          { client, signal },
         );
       } catch (failure) {
         if (accessLost(failure, queryKey)) command.abandon();

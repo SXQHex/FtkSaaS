@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import type { ClientScope } from "../../lib/scoped-backend";
+import type { ClientScope, AccountReadContext } from "../../lib/scoped-backend";
 import { scopedBackend } from "../../lib/scoped-backend";
 import type {
   InstructorRevocationPreview,
@@ -46,8 +46,9 @@ export async function readTeamPage(
   cursor?: string,
   level: "center" | "organization" = "center",
   state: "active" | "inactive" = "active",
+  readContext?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, readContext);
   const organization = level === "organization" || role === "org_manager";
   const page = await backend.call("roles_list_v1", {
     ...(organization ? organizationCommon(scope) : common(scope)),
@@ -107,8 +108,9 @@ export async function readTeamPeople(
   query: string,
   cursor?: string,
   manager?: ManagerRole,
+  readContext?: AccountReadContext,
 ) {
-  return (await scopedBackend(scope)).call("people_list_v1", {
+  return (await scopedBackend(scope, undefined, readContext)).call("people_list_v1", {
     ...(manager ? organizationCommon(scope) : common(scope)),
     request_id: uuidv7(),
     query: z.string().trim().min(2).max(200).parse(query),
@@ -126,8 +128,9 @@ export async function readTeamPersonRoles(
   scope: ClientScope,
   personId: string,
   manager?: ManagerRole,
+  readContext?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope),
+  const backend = await scopedBackend(scope, undefined, readContext),
     items: RoleView[] = [];
   let cursor: string | undefined;
   do {
@@ -188,8 +191,9 @@ export async function readTeamPermissions(
   scope: ClientScope,
   personId: string,
   permissions: readonly TeamPermission[] = teamPermissions,
+  readContext?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, readContext);
   return Promise.all(
     permissions.map((permission) => readTeamPermission(scope, personId, permission, backend)),
   );

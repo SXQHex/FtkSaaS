@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { EventRegistrationView } from "@ftksaas/api-contracts";
-import type { ClientScope } from "../../lib/scoped-backend";
+import type { ClientScope, AccountReadContext } from "../../lib/scoped-backend";
 import { readDetailedEvent } from "./event-registration-read";
 import {
   readCollectionAuthority,
@@ -25,8 +25,9 @@ export async function readRegisteredPayment(
   eventId: string,
   id: string,
   personId: string,
+  readContext?: AccountReadContext,
 ) {
-  const event = await readDetailedEvent(scope, eventId);
+  const event = await readDetailedEvent(scope, eventId, readContext);
   const row = event.registrations?.find((row) => row.id === id && row.person_id === personId);
   if (!row?.payment_summary) throw Error("EVENT_REGISTRATION_PAYMENT_UNAVAILABLE");
   return row;

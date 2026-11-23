@@ -48,6 +48,7 @@ test("native OAuth callback exchanges once and enters the protected account", as
   await expect(page).toHaveURL(`${origin}/account`);
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   expect(calls.exchange).toBe(1);
+  expect(calls.account).toBe(1);
 });
 
 test("resending confirmation is explicit and does not claim email verification", async ({

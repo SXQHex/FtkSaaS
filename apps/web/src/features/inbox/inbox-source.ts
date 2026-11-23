@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { NotificationSourceState } from "@ftksaas/api-contracts";
 import { requestDetail } from "../lesson-requests/lesson-requests-read";
 import { readSeatOffer } from "../member-reservations/member-waitlist";
@@ -10,8 +10,16 @@ export async function readMemberSessionNotice(
   scope: ClientScope,
   personId: string,
   sessionId: string,
+  context?: AccountReadContext,
 ) {
-  const page = await readMemberReservations(scope, personId, undefined, "all", { sessionId });
+  const page = await readMemberReservations(
+    scope,
+    personId,
+    undefined,
+    "all",
+    { sessionId },
+    context,
+  );
   const own = page.items.find(
     ({ reservation, session }) => session?.id === sessionId && reservation.state === "active",
   );
@@ -35,6 +43,7 @@ export async function readInboxSource(
   scope: ClientScope,
   source: NotificationSourceState,
   memberPersonId?: string,
+  context?: AccountReadContext,
 ) {
   const selector = source.selector;
   if (selector?.operation === "seat_offer_accept_v1") z.uuid().parse(selector.key.offer_id);
@@ -51,7 +60,12 @@ export async function readInboxSource(
   const centerId = z.uuid().parse(source.center_id);
   const targetScope = { ...scope, centerId };
   if (selector.operation === "seat_offer_accept_v1") {
-    const { offer, asOf } = await readSeatOffer(targetScope, selector.key.offer_id, memberPersonId);
+    const { offer, asOf } = await readSeatOffer(
+      targetScope,
+      selector.key.offer_id,
+      memberPersonId,
+      context,
+    );
     const search = new URLSearchParams({ org: scope.orgId, center: centerId, offer: offer.id });
     return {
       kind: "offer" as const,
@@ -70,7 +84,7 @@ export async function readInboxSource(
     };
   }
   const page = await (
-    await scopedBackend(targetScope)
+    await scopedBackend(targetScope, undefined, context)
   ).call("management_state_get_v1", {
     client_api_version: 1,
     org_id: scope.orgId,

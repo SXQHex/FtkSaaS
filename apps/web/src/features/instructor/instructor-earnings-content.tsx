@@ -91,12 +91,13 @@ export function InstructorEarningsContent({
       selected === "all" ? "all" : period?.id,
       tab === "lines" ? cursor : undefined,
     ],
-    queryFn: () =>
+    queryFn: (readContext) =>
       readInstructorEarningPage(
         scope,
         personId!,
         period?.interval,
         tab === "lines" ? cursor : undefined,
+        readContext,
       ),
     enabled: Boolean(center && personId && (period || selected === "all") && tab === "lines"),
     retry: false,
@@ -111,13 +112,14 @@ export function InstructorEarningsContent({
       selected === "all" ? "all" : period?.id,
       tab === "payments" ? cursor : undefined,
     ],
-    queryFn: () =>
+    queryFn: (readContext) =>
       readInstructorAccount(
         scope,
         personId!,
         "payments",
         period?.interval,
         tab === "payments" ? cursor : undefined,
+        readContext,
       ),
     enabled: Boolean(center && personId && (period || selected === "all")),
     retry: false,
@@ -131,8 +133,15 @@ export function InstructorEarningsContent({
       personId,
       agreementCursors.at(-1),
     ],
-    queryFn: () =>
-      readInstructorAccount(scope, personId!, "agreements", undefined, agreementCursors.at(-1)),
+    queryFn: (readContext) =>
+      readInstructorAccount(
+        scope,
+        personId!,
+        "agreements",
+        undefined,
+        agreementCursors.at(-1),
+        readContext,
+      ),
     enabled: Boolean(center && personId),
     retry: false,
   });

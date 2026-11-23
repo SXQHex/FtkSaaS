@@ -169,26 +169,27 @@ function PeopleContent({
       filter,
       cursors[index],
     ],
-    queryFn: ({ signal }) =>
+    queryFn: (context) =>
       readPeoplePage(
         scope,
         queryText,
         cursors[index],
         filter === "all" ? undefined : filter,
         true,
-        signal,
+        context.signal,
+        context,
       ),
     retry: false,
   });
   const center = useQuery({
     queryKey: ["people-center", scope.accountId, scope.orgId, scope.centerId],
-    queryFn: () => readPeopleCenter(scope),
+    queryFn: (context) => readPeopleCenter(scope, context),
     retry: false,
   });
   const mergeCount = useQuery({
     queryKey: ["merge-directory", scope.accountId, scope.orgId, scope.centerId, "suggestion-count"],
-    queryFn: async () =>
-      (await readMergeDirectory(scope, "suggested", "", undefined, 1)).summary.filtered,
+    queryFn: async (context) =>
+      (await readMergeDirectory(scope, "suggested", "", undefined, 1, context)).summary.filtered,
     retry: false,
   });
   useEffect(() => {
