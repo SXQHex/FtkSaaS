@@ -49,9 +49,9 @@ export function ProfileLedger({
       revision,
       cursors[index],
     ],
-    queryFn: async () => {
+    queryFn: async (readContext) => {
       try {
-        return await readEntitlementLedger(scope, personId, saleId, cursors[index]);
+        return await readEntitlementLedger(scope, personId, saleId, cursors[index], readContext);
       } catch (error) {
         if (
           (error instanceof BackendError &&

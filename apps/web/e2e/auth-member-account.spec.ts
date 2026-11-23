@@ -134,6 +134,14 @@ test("member calendar creates rotates and revokes with explicit review and versi
   expect(state.links[0]!.state).toBe("revoked");
   expect(state.writes).toHaveLength(3);
   expect(state.writes[2]!.request.expected_version).toBe(2);
+  const operations = state.reads.map(({ operation }) => operation);
+  for (const action of ["create", "rotate", "revoke"]) {
+    const write = operations.indexOf(`calendar_link_${action}_v1`);
+    const readback = operations.indexOf("calendar_links_get_v1", write + 1);
+    expect(write).toBeGreaterThan(-1);
+    expect(readback).toBeGreaterThan(write);
+    expect(operations.slice(write + 1, readback)).toContain("account_get_v1");
+  }
 });
 test("instructor account creates its own assigned-lesson calendar and hides the secret on reload", async ({
   page,

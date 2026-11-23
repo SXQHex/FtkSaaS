@@ -22,7 +22,7 @@ export function SettingsInvoiceHistory({
   const { t } = useTranslation();
   const history = useInfiniteQuery({
     queryKey: ["billing-invoices", scope.accountId, scope.orgId],
-    queryFn: ({ pageParam }) => readInvoicePage(scope, pageParam),
+    queryFn: (context) => readInvoicePage(scope, context.pageParam, context),
     initialPageParam: null as string | null,
     getNextPageParam: (page) => page.next_cursor,
     retry: false,

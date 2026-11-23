@@ -7,7 +7,7 @@ import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { v7 as uuidv7 } from "uuid";
 import { BackendError } from "../../lib/backend";
-import type { ClientScope } from "../../lib/scoped-backend";
+import type { AccountReadContext, ClientScope } from "../../lib/scoped-backend";
 import type {
   ReportFilters,
   ReportKind,
@@ -130,12 +130,13 @@ export function ReportsContent({
         filters,
         cursor(item.name),
       ],
-      queryFn: () =>
+      queryFn: (context: AccountReadContext) =>
         readReport(
           scope,
           item.kind,
           { ...filters!, ...(item.breakdown ? { breakdown: item.breakdown } : {}) },
           cursor(item.name),
+          context,
         ),
       enabled: active && !!filters && item.enabled,
       retry: false,
@@ -150,30 +151,42 @@ export function ReportsContent({
   ) as Partial<Record<(typeof definitions)[number]["name"], ReportView>>;
   const finance = useQuery({
     queryKey: ["report-finance-summary", scope, filters],
-    queryFn: ({ signal }) =>
-      readFinanceDirectory(scope, "movements", filters!.interval, {}, undefined, signal),
+    queryFn: (context) =>
+      readFinanceDirectory(
+        scope,
+        "movements",
+        filters!.interval,
+        {},
+        undefined,
+        context.signal,
+        context,
+      ),
     enabled: active && !!filters && tab === "collections",
     retry: false,
     refetchOnWindowFocus: false,
   });
   const imports = useQuery({
     queryKey: ["report-import-directory", scope, cursor("imports")],
-    queryFn: () => readImportDirectory(scope, cursor("imports")),
+    queryFn: (context) => readImportDirectory(scope, cursor("imports"), context),
     enabled: active && tab === "files",
     retry: false,
     refetchOnWindowFocus: false,
   });
   const exports = useQuery({
     queryKey: ["report-export-directory", scope, cursor("exports")],
-    queryFn: () =>
-      readTracking(scope, {
-        period: "all",
-        anchor,
-        timezone: timezone!,
-        kind: "job",
-        query: "report_build_v1",
-        cursor: cursor("exports"),
-      }),
+    queryFn: (context) =>
+      readTracking(
+        scope,
+        {
+          period: "all",
+          anchor,
+          timezone: timezone!,
+          kind: "job",
+          query: "report_build_v1",
+          cursor: cursor("exports"),
+        },
+        context,
+      ),
     enabled: active && tab === "files",
     retry: false,
     refetchOnWindowFocus: false,

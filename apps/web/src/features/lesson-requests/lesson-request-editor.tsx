@@ -75,7 +75,7 @@ export function LessonRequestEditor({
   ];
   const source = useQuery({
     queryKey: [...prefix, "source"],
-    queryFn: () => readLessonRequest(scope, initial.id),
+    queryFn: (readContext) => readLessonRequest(scope, initial.id, readContext),
     retry: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
@@ -83,7 +83,7 @@ export function LessonRequestEditor({
   const current = source.isError ? undefined : (saved?.request ?? source.data);
   const instructors = useQuery({
     queryKey: [...prefix, "instructors", current?.person_id],
-    queryFn: () => readRequestInstructors(scope, current!.person_id),
+    queryFn: (readContext) => readRequestInstructors(scope, current!.person_id, readContext),
     enabled: Boolean(
       current && (stage === "alternative" || (stage === "approve" && draft.mode === "create")),
     ),
@@ -91,13 +91,13 @@ export function LessonRequestEditor({
   });
   const rooms = useQuery({
     queryKey: [...prefix, "rooms"],
-    queryFn: () => readStudioRooms(scope),
+    queryFn: (readContext) => readStudioRooms(scope, readContext),
     enabled: Boolean(current && stage === "approve" && draft.mode === "create"),
     retry: false,
   });
   const sessions = useQuery({
     queryKey: [...prefix, "sessions", current?.version],
-    queryFn: () => readRequestSessions(scope, current!),
+    queryFn: (readContext) => readRequestSessions(scope, current!, readContext),
     enabled: Boolean(current && stage === "approve" && draft.mode === "existing"),
     retry: false,
   });

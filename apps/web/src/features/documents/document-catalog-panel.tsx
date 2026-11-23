@@ -66,7 +66,7 @@ export function DocumentCatalogPanel({
   ];
   const query = useQuery({
     queryKey: key,
-    queryFn: () => readDocumentCatalog(scope, organization, documentId),
+    queryFn: (context) => readDocumentCatalog(scope, organization, documentId, context),
     retry: false,
     gcTime: 0,
   });

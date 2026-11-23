@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import type { ClientScope } from "../../lib/scoped-backend";
+import type { ClientScope, AccountReadContext } from "../../lib/scoped-backend";
 import { scopedBackend } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
 import { getTemporal } from "../../lib/temporal";
@@ -50,9 +50,10 @@ export async function readInstructorCalendar(
   scope: ClientScope,
   personId: string,
   interval: Interval,
+  readContext?: AccountReadContext,
 ) {
   z.uuid().parse(personId);
-  const backend = await scopedBackend(scope),
+  const backend = await scopedBackend(scope, undefined, readContext),
     seen = new Set<string>(),
     ids = new Set<string>();
   const calendar: CalendarItem[] = [];
@@ -91,7 +92,12 @@ export async function readInstructorCalendar(
   for (let i = 0; i < calendar.length; i += 4) {
     const entries = await Promise.all(
       calendar.slice(i, i + 4).map(async (item) => {
-        const session = await readScheduleSession(scope, item.id, true);
+        const session = await readScheduleSession(
+          scope,
+          item.id,
+          true,
+          ...(readContext ? ([readContext] as const) : []),
+        );
         if (
           Date.parse(session.starts_at) !== Date.parse(item.starts_at) ||
           Date.parse(session.ends_at) !== Date.parse(item.ends_at)
@@ -116,9 +122,17 @@ export function instructorReadStatus(error: unknown) {
     return "not_enabled" as const;
   throw error;
 }
-export async function readInstructorAttendance(scope: ClientScope, session: SessionView) {
+export async function readInstructorAttendance(
+  scope: ClientScope,
+  session: SessionView,
+  readContext?: AccountReadContext,
+) {
   try {
-    const attendance = await readSessionAttendance(scope, session.id);
+    const attendance = await readSessionAttendance(
+      scope,
+      session.id,
+      ...(readContext ? ([readContext] as const) : []),
+    );
     if (
       attendance.session_version !== session.version ||
       attendance.closure_state !== session.attendance_state
@@ -133,8 +147,9 @@ export async function readInstructorEarnings(
   scope: ClientScope,
   personId: string,
   interval: Interval,
+  readContext?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope),
+  const backend = await scopedBackend(scope, undefined, readContext),
     seen = new Set<string>(),
     ids = new Set<string>();
   const items: EarningView[] = [];
@@ -187,10 +202,16 @@ export async function readInstructorSession(
   personId: string,
   duties: ("instructor" | "assistant")[],
   sessionId: string,
+  readContext?: AccountReadContext,
 ) {
   z.uuid().parse(sessionId);
   z.uuid().parse(personId);
-  const session = await readScheduleSession(scope, sessionId, true);
+  const session = await readScheduleSession(
+    scope,
+    sessionId,
+    true,
+    ...(readContext ? ([readContext] as const) : []),
+  );
   const assigned =
     session.assignments.some((row) => row.person_id === personId && duties.includes(row.duty)) ||
     Boolean(
@@ -199,7 +220,7 @@ export async function readInstructorSession(
       ),
     );
   if (!assigned) throw new Error("INSTRUCTOR_SESSION_UNAVAILABLE");
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, readContext);
   const headerPage = await backend.call("calendar_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
@@ -238,7 +259,11 @@ export async function readInstructorSession(
     Date.parse(matches[0]!.ends_at) !== Date.parse(session.ends_at)
   )
     throw new Error("INSTRUCTOR_SESSION_UNAVAILABLE");
-  const attendance = await readInstructorAttendance(scope, session);
+  const attendance = await readInstructorAttendance(
+    scope,
+    session,
+    ...(readContext ? ([readContext] as const) : []),
+  );
   const ids = [
     ...new Set([
       personId,

@@ -87,8 +87,8 @@ export function AutomationEditor(props: AutomationEditorProps) {
   }, [locked, onLockChange]);
   const choices = useInfiniteQuery({
     queryKey: ["automation-segment-choices", scope.accountId, scope.orgId, scope.centerId],
-    queryFn: async ({ pageParam }) => {
-      const page = await readSegments(scope, undefined, pageParam);
+    queryFn: async (context) => {
+      const page = await readSegments(scope, undefined, context.pageParam, context);
       const prior = queries.getQueryData<{ pageParams: (string | undefined)[] }>([
         "automation-segment-choices",
         scope.accountId,
@@ -97,7 +97,7 @@ export function AutomationEditor(props: AutomationEditorProps) {
       ]);
       if (
         page.next_cursor &&
-        (page.next_cursor === pageParam || prior?.pageParams.includes(page.next_cursor))
+        (page.next_cursor === context.pageParam || prior?.pageParams.includes(page.next_cursor))
       )
         throw Error("AUTOMATION_CURSOR_UNAVAILABLE");
       return page;
@@ -109,7 +109,7 @@ export function AutomationEditor(props: AutomationEditorProps) {
   });
   const templates = useQuery({
     queryKey: ["automation-preparations", scope.accountId, scope.orgId, scope.centerId],
-    queryFn: () => readAutomationPreparations(scope),
+    queryFn: (context) => readAutomationPreparations(scope, context),
     enabled: selection.kind === "automation",
     retry: false,
   });

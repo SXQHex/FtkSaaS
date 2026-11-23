@@ -110,7 +110,7 @@ export function LeadsContent({
   const assignees = useInfiniteQuery({
     queryKey: ["lead-assignees", scope.accountId, scope.orgId, scope.centerId],
     initialPageParam: undefined as string | undefined,
-    queryFn: ({ pageParam }) => readLeadAssignees(scope, pageParam),
+    queryFn: (context) => readLeadAssignees(scope, context.pageParam, context),
     getNextPageParam: (page) => page.next_cursor ?? undefined,
     enabled: Boolean(current),
     retry: false,
@@ -133,8 +133,15 @@ export function LeadsContent({
       filters,
       cursors[index],
     ],
-    queryFn: () =>
-      readLeadsPage(scope, query, cursors[index]?.token, filters, cursors[index]?.pipeline),
+    queryFn: (context) =>
+      readLeadsPage(
+        scope,
+        query,
+        cursors[index]?.token,
+        filters,
+        cursors[index]?.pipeline,
+        context,
+      ),
     enabled: Boolean(current),
     retry: false,
   });
@@ -147,7 +154,8 @@ export function LeadsContent({
       owner,
       followupCursors[followupIndex],
     ],
-    queryFn: () => readLeadFollowups(scope, followupCursors[followupIndex], filters.assignedTo),
+    queryFn: (context) =>
+      readLeadFollowups(scope, followupCursors[followupIndex], filters.assignedTo, context),
     enabled: Boolean(current) && tab === "tasks" && followupKind === "manual",
     retry: false,
   });
@@ -160,9 +168,9 @@ export function LeadsContent({
       followupKind,
       followupCursors[followupIndex],
     ],
-    queryFn: () => {
+    queryFn: (context) => {
       if (followupKind === "manual") throw Error("FOLLOWUP_KIND_UNAVAILABLE");
-      return readSourceFollowups(scope, followupKind, followupCursors[followupIndex]);
+      return readSourceFollowups(scope, followupKind, followupCursors[followupIndex], context);
     },
     enabled: Boolean(current) && tab === "tasks" && followupKind !== "manual",
     retry: false,
@@ -177,14 +185,20 @@ export function LeadsContent({
       appFilter,
       appCursors[appIndex],
     ],
-    queryFn: () =>
-      readApplicationsPage(scope, appCursors[appIndex], undefined, applicationStates[appFilter]),
+    queryFn: (context) =>
+      readApplicationsPage(
+        scope,
+        appCursors[appIndex],
+        undefined,
+        applicationStates[appFilter],
+        context,
+      ),
     enabled: Boolean(current) && tab === "apps",
     retry: false,
   });
   const workSummary = useQuery({
     queryKey: ["lead-work-summary", scope.accountId, scope.orgId, scope.centerId],
-    queryFn: async () => (await readOverviewWork(scope, undefined, 1)).summary,
+    queryFn: async (context) => (await readOverviewWork(scope, undefined, 1, context)).summary,
     enabled: Boolean(current),
     refetchOnMount: "always",
     retry: false,

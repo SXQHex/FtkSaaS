@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
-import { scopedBackend } from "../../lib/scoped-backend";
+import { scopedBackend, type AccountReadContext } from "../../lib/scoped-backend";
 import { readPlatformStudioQueue } from "../workspace/studio-setup-request";
 import { platformRequest, readDirectory, readPlatformOrganization } from "./platform-directory";
 
@@ -72,14 +72,18 @@ async function lookup(backend: Backend, email: string) {
   return result.items[0]?.account_id;
 }
 
-export async function readVerifiedPlatformAccount(accountId: string, email: string) {
-  return lookup(await scopedBackend({ accountId }), email);
+export async function readVerifiedPlatformAccount(
+  accountId: string,
+  email: string,
+  readContext?: AccountReadContext,
+) {
+  return lookup(await scopedBackend({ accountId }, undefined, readContext), email);
 }
-export async function readPlatformPlans(accountId: string) {
-  return allRows(await scopedBackend({ accountId }), "initial_plans", plan);
+export async function readPlatformPlans(accountId: string, readContext?: AccountReadContext) {
+  return allRows(await scopedBackend({ accountId }, undefined, readContext), "initial_plans", plan);
 }
-export async function readPlatformOperators(accountId: string) {
-  return allRows(await scopedBackend({ accountId }), "operators", operator);
+export async function readPlatformOperators(accountId: string, readContext?: AccountReadContext) {
+  return allRows(await scopedBackend({ accountId }, undefined, readContext), "operators", operator);
 }
 
 export function provisionIntent(intent: Omit<ProvisioningIntent, "key">): ProvisioningIntent {

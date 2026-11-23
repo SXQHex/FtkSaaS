@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import type { AccountReadContext } from "../../lib/scoped-backend";
 import { useInfiniteQuery, useQueries } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { StarterRetainedScope } from "@ftksaas/api-contracts";
@@ -82,7 +83,7 @@ export function SettingsDowngradeEditor({
   );
   const centers = useInfiniteQuery({
     queryKey: ["downgrade-centers", before.scope],
-    queryFn: ({ pageParam }) => readDowngradeCenters(before, pageParam),
+    queryFn: (context) => readDowngradeCenters(before, context.pageParam, context),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (page) => page.next_cursor ?? undefined,
     enabled: !!target?.kept_center_required,
@@ -103,13 +104,14 @@ export function SettingsDowngradeEditor({
         kind,
         pages[kind],
       ],
-      queryFn: () =>
+      queryFn: (context: AccountReadContext) =>
         readDowngradeSource(
           before,
           targetId!,
           centerId,
           kind,
           pages[kind]?.cursors[pages[kind]!.index],
+          context,
         ),
       enabled: target?.plan === "starter" && !!centerId,
       retry: false,

@@ -2,7 +2,7 @@ import { readKnownAutomationJob } from "./automation-discovery";
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
 import { BackendError } from "../../lib/backend";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type {
   AutomationDefinition,
   AutomationJobView,
@@ -87,8 +87,13 @@ const configurationScope = (scope: ClientScope) => ({
   kind: "center" as const,
   center_id: scope.centerId,
 });
-async function readPage(scope: ClientScope, selector: ManagementSelector, cursor?: string) {
-  return (await scopedBackend(scope)).call("management_state_get_v1", {
+async function readPage(
+  scope: ClientScope,
+  selector: ManagementSelector,
+  cursor?: string,
+  context?: AccountReadContext,
+) {
+  return (await scopedBackend(scope, undefined, context)).call("management_state_get_v1", {
     ...common(scope),
     request_id: uuidv7(),
     operation: selector.operation,
@@ -96,7 +101,12 @@ async function readPage(scope: ClientScope, selector: ManagementSelector, cursor
     page: { limit: 20, ...(cursor ? { cursor } : {}) },
   });
 }
-export async function readSegments(scope: ClientScope, id?: string, cursor?: string) {
+export async function readSegments(
+  scope: ClientScope,
+  id?: string,
+  cursor?: string,
+  context?: AccountReadContext,
+) {
   const page = await readPage(
       scope,
       {
@@ -107,6 +117,7 @@ export async function readSegments(scope: ClientScope, id?: string, cursor?: str
         },
       },
       cursor,
+      context,
     ),
     seen = new Set<string>();
   const items = page.items.map((row) => {
@@ -142,7 +153,12 @@ export async function readSegments(scope: ClientScope, id?: string, cursor?: str
   });
   return { items, next_cursor: page.next_cursor };
 }
-export async function readAutomations(scope: ClientScope, id?: string, cursor?: string) {
+export async function readAutomations(
+  scope: ClientScope,
+  id?: string,
+  cursor?: string,
+  context?: AccountReadContext,
+) {
   const page = await readPage(
       scope,
       {
@@ -153,6 +169,7 @@ export async function readAutomations(scope: ClientScope, id?: string, cursor?: 
         },
       },
       cursor,
+      context,
     ),
     seen = new Set<string>();
   const items = page.items.map((row) => {
@@ -407,9 +424,9 @@ export async function readAutomationResult(intent: AutomationIntent, id?: string
     throw Error("AUTOMATION_RESULT_UNREAD");
   return value;
 }
-export async function readAutomationPreparations(scope: ClientScope) {
+export async function readAutomationPreparations(scope: ClientScope, context?: AccountReadContext) {
   const catalog = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, context)
   ).call("settings_catalog_get_v1", { ...common(scope), request_id: uuidv7(), scope: "center" });
   if (catalog.scope !== "center") throw Error("AUTOMATION_TEMPLATE_UNAVAILABLE");
   return catalog.preparation_templates?.automations;

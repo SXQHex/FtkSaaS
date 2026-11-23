@@ -2,7 +2,7 @@ import { redirect } from "@tanstack/react-router";
 import type { QueryClient } from "@tanstack/react-query";
 import { getSupabaseClient } from "../../lib/supabase";
 import { BackendError } from "../../lib/backend";
-import { accountQuery } from "./account-query";
+import { verifiedAccountProjection } from "./account-query";
 import { workspaceKeys, workspaceQuery } from "../workspace/workspace-query";
 import { hasDeletionReceipt } from "../account/deletion";
 import { takeInvitationReturn } from "../invitations/invitation";
@@ -29,7 +29,7 @@ async function loadAccountProjection(
   includePlatformScope: boolean,
 ) {
   try {
-    return await queryClient.query(accountQuery(authUserId, includePlatformScope));
+    return await verifiedAccountProjection(queryClient, authUserId, includePlatformScope);
   } catch (error) {
     if (error instanceof BackendError && ["AUTH_REQUIRED", "SESSION_REVOKED"].includes(error.code))
       throw redirect({ to: "/login" });

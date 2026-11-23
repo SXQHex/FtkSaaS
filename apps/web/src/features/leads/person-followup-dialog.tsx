@@ -20,7 +20,7 @@ export function PersonFollowupDialog({
   const { t } = useTranslation();
   const activity = useQuery({
     queryKey: ["lead-person-followup", scope, followup.personId, followup.id],
-    queryFn: () => readPersonFollowup(scope, followup.personId, followup.id),
+    queryFn: (context) => readPersonFollowup(scope, followup.personId, followup.id, context),
     refetchOnMount: "always",
     retry: false,
   });

@@ -1,3 +1,4 @@
+import type { AccountReadContext } from "../../lib/scoped-backend";
 import { v7 as uuidv7 } from "uuid";
 import { BackendError } from "../../lib/backend";
 import { getTemporal } from "../../lib/temporal";
@@ -24,8 +25,9 @@ export async function readStudioSetup(
   resources: StudioResources,
   instructors: InstructorRecord[],
   readPlan?: () => Promise<SubscriptionView>,
+  readContext?: AccountReadContext,
 ) {
-  const backend = await studioBackend(scope);
+  const backend = await studioBackend(scope, undefined, readContext);
   const common = {
     client_api_version: 1 as const,
     request_id: uuidv7(),
@@ -128,7 +130,7 @@ export async function readStudioSetup(
           availability.push({
             personId,
             rules: await readable(() =>
-              readStudioAvailability(scope, { kind: "person", id: personId }, backend),
+              readStudioAvailability(scope, { kind: "person", id: personId }, backend, readContext),
             ),
           });
         }

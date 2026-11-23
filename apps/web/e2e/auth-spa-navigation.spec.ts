@@ -7,6 +7,19 @@ test("sidebar navigation preserves the document and cached studio reads", async 
 }, info) => {
   const reads: Record<string, number> = {};
   const managementReads: Record<string, number> = {};
+  const phases: { name: string; durationMs: number; accountReads: number }[] = [];
+  let phaseStarted = performance.now();
+  let previousAccounts = 0;
+  const recordPhase = (name: string) => {
+    const accounts = reads.account_get_v1 ?? 0;
+    phases.push({
+      name,
+      durationMs: performance.now() - phaseStarted,
+      accountReads: accounts - previousAccounts,
+    });
+    previousAccounts = accounts;
+    phaseStarted = performance.now();
+  };
   let documents = 0;
   page.on("request", (request) => {
     if (request.isNavigationRequest() && request.frame() === page.mainFrame()) documents++;
@@ -21,6 +34,7 @@ test("sidebar navigation preserves the document and cached studio reads", async 
   });
   await mockStudio(page);
   await openStudio(page);
+  recordPhase("login-and-studio");
   const lifetime = await page.evaluate("window.__spaLifetime = performance.timeOrigin");
   const before = { ...reads };
   const beforeManagement = { ...managementReads };
@@ -29,18 +43,23 @@ test("sidebar navigation preserves the document and cached studio reads", async 
   const initialDocuments = documents;
   await clickWorkspaceLink(page, "Üyeler");
   await expect(page.getByRole("heading", { name: "Üyeler", exact: true })).toBeVisible();
+  recordPhase("members");
   await clickWorkspaceLink(page, "Stüdyo");
   await expect(page.getByRole("button", { name: /Örnek Eğitmen/ })).toBeVisible();
+  recordPhase("studio");
   await page.goBack();
   await expect(page.getByRole("heading", { name: "Üyeler", exact: true })).toBeVisible();
+  recordPhase("back-to-members");
   await page.goForward();
   await expect(page.getByRole("heading", { name: "Stüdyo", exact: true })).toBeVisible();
+  recordPhase("forward-to-studio");
   await info.attach("navigation-read-counts", {
     body: JSON.stringify({
       before,
       after: reads,
       beforeManagement,
       afterManagement: managementReads,
+      phases,
       documents: documents - initialDocuments,
     }),
     contentType: "application/json",
@@ -52,6 +71,7 @@ test("sidebar navigation preserves the document and cached studio reads", async 
   expect(mergeReads).toBe(1);
   expect(cachedReads).toEqual(beforeManagement);
   expect(reads.subscription_get_v1).toBe(1);
+  expect(reads.account_get_v1).toBe(before.account_get_v1);
 });
 
 test("auth links use SPA history while modified clicks retain native new-tab navigation", async ({

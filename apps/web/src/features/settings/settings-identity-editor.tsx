@@ -48,7 +48,7 @@ export function SettingsIdentityEditor({
   }, []);
   const source = useQuery({
     queryKey: ["settings-identity", scope.accountId, scope.orgId, scope.centerId, level],
-    queryFn: () => readSettingsIdentity(scope, level),
+    queryFn: (context) => readSettingsIdentity(scope, level, context),
     retry: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,

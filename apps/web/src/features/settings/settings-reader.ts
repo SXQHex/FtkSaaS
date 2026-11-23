@@ -1,11 +1,12 @@
 import { v7 as uuidv7 } from "uuid";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
 
 export async function readOrganizationSettingsCatalog(
   scope: Pick<ClientScope, "accountId" | "orgId">,
+  readContext?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, readContext);
   try {
     const catalog = await backend.call("settings_catalog_get_v1", {
       client_api_version: 1,

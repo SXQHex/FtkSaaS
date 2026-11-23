@@ -47,7 +47,8 @@ export function InstructorSessionContent({
   ];
   const query = useQuery({
     queryKey: prefix,
-    queryFn: () => readInstructorSession(scope, personId!, duties, sessionId),
+    queryFn: (readContext) =>
+      readInstructorSession(scope, personId!, duties, sessionId, readContext),
     enabled: Boolean(center && personId),
     retry: false,
     refetchOnWindowFocus: false,

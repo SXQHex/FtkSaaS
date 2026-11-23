@@ -1,5 +1,5 @@
 import { v7 as uuidv7 } from "uuid";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { PersonalCalendarLink } from "@ftksaas/api-contracts";
 export type CalendarScope = Pick<ClientScope, "accountId" | "orgId"> & { studioCenterId?: string };
 export type CalendarKind = PersonalCalendarLink["kinds"][number];
@@ -18,8 +18,8 @@ export function calendarLinkMatchesScope(scope: CalendarScope, link: PersonalCal
       : !link.kinds.includes("studio_program"))
   );
 }
-export async function readMemberCalendars(scope: CalendarScope) {
-  const backend = await scopedBackend(scope);
+export async function readMemberCalendars(scope: CalendarScope, readContext?: AccountReadContext) {
+  const backend = await scopedBackend(scope, undefined, readContext);
   const links: PersonalCalendarLink[] = [];
   const seen = new Set<string>();
   let cursor: string | undefined;

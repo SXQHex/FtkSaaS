@@ -26,7 +26,7 @@ export function BusinessProductScope({
   const catalog = useInfiniteQuery({
     queryKey: ["business-product-scope", scope.accountId, scope.orgId, scope.centerId],
     initialPageParam: undefined as string | undefined,
-    queryFn: ({ pageParam }) => readProductsManagementPage(scope, "all", "", pageParam),
+    queryFn: (context) => readProductsManagementPage(scope, "all", "", context.pageParam, context),
     getNextPageParam: (last) => last.next_cursor ?? undefined,
     gcTime: 0,
     retry: false,

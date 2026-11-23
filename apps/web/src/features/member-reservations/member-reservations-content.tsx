@@ -53,27 +53,30 @@ export function MemberReservationsContent({
   const prefix = memberReservationKeys.person(scope, personId);
   const up = useQuery({
     queryKey: [...prefix, "upcoming", upCursors.at(-1), sessionId],
-    queryFn: () => readOwnReservations(scope, personId, "upcoming", upCursors.at(-1), sessionId),
+    queryFn: (readContext) =>
+      readOwnReservations(scope, personId, "upcoming", upCursors.at(-1), sessionId, readContext),
     ...(sessionId ? { staleTime: 0 } : {}),
     retry: false,
   });
   const past = useQuery({
     queryKey: [...prefix, "past", pastCursors.at(-1), sessionId],
-    queryFn: () => readOwnReservations(scope, personId, "past", pastCursors.at(-1), sessionId),
+    queryFn: (readContext) =>
+      readOwnReservations(scope, personId, "past", pastCursors.at(-1), sessionId, readContext),
     ...(sessionId ? { staleTime: 0 } : {}),
     retry: false,
   });
   const waiting = useQuery({
     queryKey: [...prefix, "waitlist", entryCursors.at(-1)],
-    queryFn: () => readOwnWaitlist(scope, "entries", entryCursors.at(-1)),
+    queryFn: (readContext) =>
+      readOwnWaitlist(scope, "entries", entryCursors.at(-1), undefined, readContext),
     retry: false,
   });
   const offers = useQuery({
     queryKey: [...prefix, "offers", offerCursors.at(-1), offerId],
-    queryFn: () =>
+    queryFn: (readContext) =>
       offerId
-        ? readOwnWaitlist(scope, "offers", undefined, { id: offerId, personId })
-        : readOwnWaitlist(scope, "offers", offerCursors.at(-1)),
+        ? readOwnWaitlist(scope, "offers", undefined, { id: offerId, personId }, readContext)
+        : readOwnWaitlist(scope, "offers", offerCursors.at(-1), undefined, readContext),
     ...(offerId ? { staleTime: 0 } : {}),
     retry: false,
   });

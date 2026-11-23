@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
 import { BackendError } from "../../lib/backend";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import { readSettingsSubscription, type SettingsSubscriptionSource } from "./settings-subscription";
 
 function pendingId(source: SettingsSubscriptionSource) {
@@ -11,10 +11,10 @@ function pendingId(source: SettingsSubscriptionSource) {
     throw Error("SUBSCRIPTION_SOURCE_UNAVAILABLE");
   return z.uuid().parse(period ?? change?.id);
 }
-async function readChange(scope: ClientScope, id: string) {
+async function readChange(scope: ClientScope, id: string, readContext?: AccountReadContext) {
   const operation = "subscription_change_cancel_v1" as const;
   const page = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, readContext)
   ).call("management_state_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
@@ -45,11 +45,14 @@ async function readChange(scope: ClientScope, id: string) {
     state: row.state,
   };
 }
-export async function readSettingsCancelSource(before: SettingsSubscriptionSource) {
+export async function readSettingsCancelSource(
+  before: SettingsSubscriptionSource,
+  readContext?: AccountReadContext,
+) {
   const id = pendingId(before);
   const [change, current] = await Promise.all([
-    readChange(before.scope, id),
-    readSettingsSubscription(before.scope),
+    readChange(before.scope, id, readContext),
+    readSettingsSubscription(before.scope, readContext),
   ]);
   if (change.state !== "scheduled" || pendingId(current) !== id)
     throw Error("SUBSCRIPTION_SOURCE_UNAVAILABLE");

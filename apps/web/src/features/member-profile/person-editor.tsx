@@ -48,7 +48,7 @@ export function PersonEditor(props: Props) {
       props.scope.centerId,
       props.personId,
     ],
-    queryFn: () => readPerson(props.scope, props.personId),
+    queryFn: (readContext) => readPerson(props.scope, props.personId, undefined, readContext),
     retry: false,
     staleTime: 0,
     refetchOnWindowFocus: false,

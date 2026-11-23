@@ -1,7 +1,7 @@
 import { queryBackendRead } from "../../lib/backend";
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { JobRef, PersonView } from "@ftksaas/api-contracts";
 
 export type PeopleScope = ClientScope;
@@ -33,8 +33,9 @@ export async function readPeoplePage(
   status?: "active" | "inactive",
   includeSummary = false,
   signal?: AbortSignal,
+  context?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope, signal);
+  const backend = await scopedBackend(scope, signal, context);
   return queryBackendRead(
     backend,
     "people_list_v1",
@@ -69,8 +70,9 @@ export async function readPerson(
   scope: PeopleScope,
   personId: string,
   options: { membershipDate?: boolean; memberSummary?: boolean } = {},
+  context?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, context);
   const person = await backend.call("person_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
@@ -122,8 +124,8 @@ export async function readPersonInvitationJob(scope: PeopleScope, job: JobRef) {
   });
 }
 
-export async function readPeopleCenter(scope: PeopleScope) {
-  const backend = await scopedBackend(scope);
+export async function readPeopleCenter(scope: PeopleScope, context?: AccountReadContext) {
+  const backend = await scopedBackend(scope, undefined, context);
   const page = await backend.call("centers_list_v1", {
     client_api_version: 1,
     request_id: uuidv7(),

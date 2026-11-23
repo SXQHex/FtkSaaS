@@ -65,19 +65,22 @@ export function SessionBookingEditor({
   ];
   const people = useQuery({
     queryKey: [...prefix, "people", query, cursors[page]],
-    queryFn: () => readPeoplePage(scope, query!, cursors[page], "active"),
+    queryFn: (readContext) =>
+      readPeoplePage(scope, query!, cursors[page], "active", undefined, undefined, readContext),
     enabled: query !== undefined,
     retry: false,
   });
   const rights = useQuery({
     queryKey: [...prefix, "rights", draft.personId, draft.mode],
-    queryFn: () => readBookingRights(scope, draft.personId, session.id, draft.mode),
+    queryFn: (readContext) =>
+      readBookingRights(scope, draft.personId, session.id, draft.mode, readContext),
     enabled: Boolean(draft.personId),
     retry: false,
   });
   const override = useQuery({
     queryKey: [...prefix, "override", draft.personId, draft.saleId],
-    queryFn: () => readCapacityOverride(scope, draft.personId, session.id, draft.saleId),
+    queryFn: (readContext) =>
+      readCapacityOverride(scope, draft.personId, session.id, draft.saleId, readContext),
     enabled: Boolean(draft.personId && draft.saleId),
     retry: false,
   });

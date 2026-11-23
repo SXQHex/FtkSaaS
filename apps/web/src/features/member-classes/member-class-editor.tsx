@@ -120,7 +120,8 @@ export function MemberClassEditor({
       before.id,
       draft.mode,
     ],
-    queryFn: () => readBookingRights(scope, personId, before.id, draft.mode),
+    queryFn: (readContext) =>
+      readBookingRights(scope, personId, before.id, draft.mode, readContext),
     enabled: action === "book" || action === "accept",
     retry: false,
   });

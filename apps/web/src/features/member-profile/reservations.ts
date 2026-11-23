@@ -2,7 +2,7 @@ import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import type { AttendanceEntryView, ReservationView, SessionView } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { TFunction } from "i18next";
 import type { ProfileReservation } from "./member-profile-view";
 
@@ -39,10 +39,11 @@ export async function readMemberReservations(
     includeSourceSummary?: boolean;
     sessionId?: string;
   } = {},
+  readContext?: AccountReadContext,
 ) {
   z.uuid().parse(personId);
   if (options.sessionId) z.uuid().parse(options.sessionId);
-  const backend = await scopedBackend(scope),
+  const backend = await scopedBackend(scope, undefined, readContext),
     common = { client_api_version: 1 as const, org_id: scope.orgId, center_id: scope.centerId };
   const page = await backend.call("reservation_list_v1", {
     ...common,

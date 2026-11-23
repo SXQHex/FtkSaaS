@@ -226,7 +226,7 @@ function PlatformOrganizationList({
   const query = useInfiniteQuery({
     queryKey: platformOrganizationsKey(accountId),
     initialPageParam: undefined as string | undefined,
-    queryFn: ({ pageParam }) => readPlatformOrganizations(accountId, pageParam),
+    queryFn: (context) => readPlatformOrganizations(accountId, context.pageParam, context),
     getNextPageParam: (last) => last.next_cursor ?? undefined,
     retry: false,
     refetchOnMount: "always",

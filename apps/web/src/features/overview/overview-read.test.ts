@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+import { QueryClient } from "@tanstack/react-query";
 import type { SessionView, ReservationView } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
 import {
@@ -144,6 +145,34 @@ it("previews at most three native registered members, following only the selecte
   expect(result.map((r) => r.reservation.id)).toEqual([id(21), id(22), id(23)]);
   expect(participants).toHaveBeenCalledTimes(2);
   expect(participants).toHaveBeenLastCalledWith(scope, session.id, undefined, "next");
+});
+it("shares the owning Query context through overview sources and subsequent cursor reads", async () => {
+  const context = { client: new QueryClient(), signal: new AbortController().signal };
+  range.mockResolvedValue({ entries: [entry], reads: [] });
+  instructors.mockResolvedValue({ session, instructors: [] });
+  room.mockResolvedValue({ name: "Atanmış salon" });
+  participants
+    .mockResolvedValueOnce({ items: [row(21)], next_cursor: "next" })
+    .mockResolvedValueOnce({ items: [row(22)], next_cursor: null });
+
+  await readOverviewDay(scope, "Europe/Istanbul", "2026-11-16T12:00:00Z", context);
+  await readOverviewLabels(scope, [entry], context);
+  await readOverviewParticipants(scope, session.id, context);
+
+  expect(range).toHaveBeenCalledWith(
+    scope,
+    {
+      starts_at: "2026-11-15T21:00:00Z",
+      ends_at: "2026-11-16T21:00:00Z",
+    },
+    undefined,
+    undefined,
+    context,
+  );
+  expect(instructors).toHaveBeenCalledExactlyOnceWith(scope, session.id, true, context);
+  expect(room).toHaveBeenCalledExactlyOnceWith(scope, "room", id(6), context);
+  expect(participants).toHaveBeenNthCalledWith(1, scope, session.id, undefined, undefined, context);
+  expect(participants).toHaveBeenNthCalledWith(2, scope, session.id, undefined, "next", context);
 });
 it("rejects repeated native reservation evidence across preview pages", async () => {
   participants

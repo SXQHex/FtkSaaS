@@ -1,14 +1,15 @@
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { SettingsLevel } from "./settings-document";
 
 export async function readSettingsHistory(
   scope: ClientScope,
   level: SettingsLevel,
   cursor?: string,
+  readContext?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, readContext);
   if (cursor !== undefined)
     z.string()
       .min(1)

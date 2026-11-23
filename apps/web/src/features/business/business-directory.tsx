@@ -32,8 +32,16 @@ export function BusinessPeople({ scope, centers }: { scope: ClientScope; centers
   const people = useInfiniteQuery({
     queryKey: ["business-people", scope.accountId, scope.orgId, term],
     initialPageParam: undefined as string | undefined,
-    queryFn: ({ pageParam }) =>
-      readPeoplePage({ accountId: scope.accountId, orgId: scope.orgId }, term, pageParam),
+    queryFn: (context) =>
+      readPeoplePage(
+        { accountId: scope.accountId, orgId: scope.orgId },
+        term,
+        context.pageParam,
+        undefined,
+        undefined,
+        undefined,
+        context,
+      ),
     getNextPageParam: (last) => last.next_cursor ?? undefined,
     retry: false,
     gcTime: 0,
@@ -184,8 +192,8 @@ export function BusinessApplications({
   const applications = useInfiniteQuery({
     queryKey: key,
     initialPageParam: undefined as string | undefined,
-    queryFn: ({ pageParam }) =>
-      readApplicationsPage(organization, pageParam, undefined, ["pending"]),
+    queryFn: (context) =>
+      readApplicationsPage(organization, context.pageParam, undefined, ["pending"], context),
     getNextPageParam: (last) => last.next_cursor ?? undefined,
     retry: false,
     gcTime: 0,

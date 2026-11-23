@@ -51,7 +51,7 @@ export function PlatformPayments({ accountId, orgId }: { accountId: string; orgI
   const query = useInfiniteQuery({
     queryKey: [...platformPaymentsKey(accountId), orgId, state],
     initialPageParam: undefined as string | undefined,
-    queryFn: ({ pageParam }) => readPayments(accountId, orgId, state, pageParam),
+    queryFn: (context) => readPayments(accountId, orgId, state, context.pageParam, context),
     getNextPageParam: (last) => last.next_cursor ?? undefined,
     retry: false,
     refetchOnMount: "always",
@@ -201,7 +201,7 @@ export function PlatformPaymentDetail({
   const key = ["platform-payment", accountId, orgId, paymentId];
   const query = useQuery({
     queryKey: key,
-    queryFn: () => readPaymentDetail(accountId, orgId, paymentId),
+    queryFn: (context) => readPaymentDetail(accountId, orgId, paymentId, context),
     retry: false,
     refetchOnMount: "always",
     gcTime: 0,

@@ -55,7 +55,7 @@ export function ApplicationEditor({
     errorRef = useRef<HTMLDivElement>(null);
   const query = useQuery({
     queryKey: ["lead-application", scope.accountId, scope.orgId, scope.centerId, id],
-    queryFn: () => readApplicationsPage(scope, undefined, id),
+    queryFn: (context) => readApplicationsPage(scope, undefined, id, undefined, context),
     retry: false,
   });
   const before = !query.isError && query.data?.items.length === 1 ? query.data.items[0] : undefined;

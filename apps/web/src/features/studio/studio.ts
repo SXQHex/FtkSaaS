@@ -1,6 +1,10 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { scopedBackend as studioBackend, type ClientScope } from "../../lib/scoped-backend";
+import {
+  scopedBackend as studioBackend,
+  type ClientScope,
+  type AccountReadContext,
+} from "../../lib/scoped-backend";
 import type {
   ClassWaitlistImpact,
   DisciplineView,
@@ -155,8 +159,8 @@ function classRecord(scope: StudioScope, item: ManagementStateView): ClassRecord
   };
 }
 
-export async function readStudioRooms(scope: StudioScope) {
-  const backend = await studioBackend(scope);
+export async function readStudioRooms(scope: StudioScope, readContext?: AccountReadContext) {
+  const backend = await studioBackend(scope, undefined, readContext);
   const items = await studioPages((cursor) =>
     backend.call("management_state_get_v1", {
       client_api_version: 1,
@@ -170,8 +174,8 @@ export async function readStudioRooms(scope: StudioScope) {
   );
   return items.map((item) => roomRecord(scope, item));
 }
-export async function readStudioResources(scope: StudioScope) {
-  const backend = await studioBackend(scope);
+export async function readStudioResources(scope: StudioScope, readContext?: AccountReadContext) {
+  const backend = await studioBackend(scope, undefined, readContext);
   const management = (selector: ManagementSelector, cursor?: string) =>
     backend.call("management_state_get_v1", {
       client_api_version: 1,
@@ -218,8 +222,13 @@ export function eligibleDisciplines(items: DisciplineView[]) {
   );
 }
 
-export async function readStudioResource(scope: StudioScope, kind: ResourceKind, id: string) {
-  const backend = await studioBackend(scope);
+export async function readStudioResource(
+  scope: StudioScope,
+  kind: ResourceKind,
+  id: string,
+  readContext?: AccountReadContext,
+) {
+  const backend = await studioBackend(scope, undefined, readContext);
   const selector: ManagementSelector =
     kind === "room"
       ? { operation: "room_save_v1", key: { room_id: id, include_details: true } }

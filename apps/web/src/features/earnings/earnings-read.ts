@@ -1,7 +1,7 @@
 import { getTemporal } from "../../lib/temporal";
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { Interval, InstructorAccountTotal } from "@ftksaas/api-contracts";
 export type EarningsDirectoryView = "instructors" | "earnings" | "payments";
 const instant = z.iso.datetime({ offset: true });
@@ -33,6 +33,7 @@ export async function readEarningsDirectory(
   scope: ClientScope,
   view: EarningsDirectoryView,
   input: { personId?: string; interval?: Interval; cursor?: string } = {},
+  readContext?: AccountReadContext,
 ) {
   const temporal = await getTemporal();
   if (input.personId) z.uuid().parse(input.personId);
@@ -43,7 +44,7 @@ export async function readEarningsDirectory(
       throw new Error("EARNINGS_INTERVAL_INVALID");
   }
   const data = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, readContext)
   ).call("instructor_finance_directory_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),

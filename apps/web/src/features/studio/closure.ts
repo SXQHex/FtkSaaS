@@ -1,3 +1,4 @@
+import type { AccountReadContext } from "../../lib/scoped-backend";
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { getTemporal } from "../../lib/temporal";
@@ -34,8 +35,11 @@ export class ClosureTimeError extends Error {
     this.endOffsets = endOffsets;
   }
 }
-export async function readClosureContext(scope: StudioScope): Promise<ClosureContext> {
-  const backend = await studioBackend(scope);
+export async function readClosureContext(
+  scope: StudioScope,
+  readContext?: AccountReadContext,
+): Promise<ClosureContext> {
+  const backend = await studioBackend(scope, undefined, readContext);
   const centers = await studioPages((cursor) =>
     backend
       .call("centers_list_v1", {

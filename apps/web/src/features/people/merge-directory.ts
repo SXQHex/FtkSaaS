@@ -1,5 +1,5 @@
 import { v7 as uuidv7 } from "uuid";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { ManagementStatePage, MergeReviewDetail } from "@ftksaas/api-contracts";
 
 export type MergeReviewState = MergeReviewDetail["state"];
@@ -45,8 +45,9 @@ export async function readMergeDirectory(
   query = "",
   cursor?: string,
   limit = 20,
+  context?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, context);
   const page = await backend.call("management_state_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),

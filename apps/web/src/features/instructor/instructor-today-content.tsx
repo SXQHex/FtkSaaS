@@ -62,9 +62,9 @@ export function InstructorTodayContent({
     ],
     enabled,
     retry: false,
-    queryFn: async () => {
+    queryFn: async (readContext) => {
       const period = await instructorPeriod(center!.timezone, weekStart!, now);
-      const entries = await readInstructorCalendar(scope, personId!, period.interval);
+      const entries = await readInstructorCalendar(scope, personId!, period.interval, readContext);
       const T = await getTemporal();
       const items = entries.map((row) => ({
         ...row,
@@ -78,7 +78,10 @@ export function InstructorTodayContent({
       for (let i = 0; i < today.length; i += 4)
         await Promise.all(
           today.slice(i, i + 4).map(async (row) => {
-            attendance.set(row.session.id, await readInstructorAttendance(scope, row.session));
+            attendance.set(
+              row.session.id,
+              await readInstructorAttendance(scope, row.session, readContext),
+            );
           }),
         );
       return { period, items, attendance };
@@ -95,11 +98,16 @@ export function InstructorTodayContent({
     ],
     enabled: enabled && Boolean(query.data) && !query.isError,
     retry: false,
-    queryFn: async () => {
+    queryFn: async (readContext) => {
       try {
         return {
           status: "available" as const,
-          totals: await readInstructorEarnings(scope, personId!, query.data!.period.month),
+          totals: await readInstructorEarnings(
+            scope,
+            personId!,
+            query.data!.period.month,
+            readContext,
+          ),
         };
       } catch (error) {
         return { status: instructorReadStatus(error) };

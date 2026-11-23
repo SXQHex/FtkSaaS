@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
 import { BackendError } from "../../lib/backend";
-import { scopedBackend } from "../../lib/scoped-backend";
+import { scopedBackend, type AccountReadContext } from "../../lib/scoped-backend";
 import { organizationAt, platformRequest, readDirectory } from "./platform-directory";
 
 const instant = z.iso.datetime({ offset: true });
@@ -38,8 +38,9 @@ export async function readPayments(
   orgId?: string,
   state?: z.infer<typeof paymentState>,
   cursor?: string,
+  readContext?: AccountReadContext,
 ) {
-  const backend = await scopedBackend({ accountId });
+  const backend = await scopedBackend({ accountId }, undefined, readContext);
   const result = await readDirectory(
     backend,
     {
@@ -68,8 +69,13 @@ async function paymentAt(backend: Backend, orgId: string, id: string) {
     throw Error("PLATFORM_PAYMENT_SOURCE_INVALID");
   return result.items[0];
 }
-export async function readPaymentDetail(accountId: string, orgId: string, id: string) {
-  const backend = await scopedBackend({ accountId });
+export async function readPaymentDetail(
+  accountId: string,
+  orgId: string,
+  id: string,
+  readContext?: AccountReadContext,
+) {
+  const backend = await scopedBackend({ accountId }, undefined, readContext);
   const [row, organization] = await Promise.all([
     paymentAt(backend, orgId, id),
     organizationAt(backend, orgId),
@@ -112,8 +118,12 @@ async function graceAt(backend: Backend, orgId: string) {
     untilAfter,
   };
 }
-export async function readGraceDetail(accountId: string, orgId: string) {
-  const backend = await scopedBackend({ accountId });
+export async function readGraceDetail(
+  accountId: string,
+  orgId: string,
+  readContext?: AccountReadContext,
+) {
+  const backend = await scopedBackend({ accountId }, undefined, readContext);
   const organization = await organizationAt(backend, orgId);
   if (
     !organization ||

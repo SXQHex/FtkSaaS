@@ -1,6 +1,6 @@
 import { BackendError } from "../../lib/backend";
 import { getTemporal } from "../../lib/temporal";
-import type { ClientScope } from "../../lib/scoped-backend";
+import type { ClientScope, AccountReadContext } from "../../lib/scoped-backend";
 import { readScheduleRange, type ScheduleReadItem } from "../schedule/schedule-read";
 import {
   readSessionInstructors,
@@ -32,9 +32,12 @@ export async function readOverviewDay(
   scope: ClientScope,
   timezone: string,
   now = new Date().toISOString(),
+  context?: AccountReadContext,
 ) {
   const period = await overviewDay(timezone, now),
-    result = await readScheduleRange(scope, period.interval);
+    result = context
+      ? await readScheduleRange(scope, period.interval, undefined, undefined, context)
+      : await readScheduleRange(scope, period.interval);
   const sessions = result.entries
     .filter((r): r is OverviewSession => r.type === "session")
     .sort(
@@ -50,13 +53,17 @@ export async function readOverviewDay(
 const hidden = (cause: unknown) =>
   cause instanceof BackendError &&
   ["FORBIDDEN", "NOT_FOUND", "PLAN_FEATURE_UNAVAILABLE"].includes(cause.code);
-export async function readOverviewLabels(scope: ClientScope, sessions: OverviewSession[]) {
+export async function readOverviewLabels(
+  scope: ClientScope,
+  sessions: OverviewSession[],
+  context?: AccountReadContext,
+) {
   const result = new Map<string, { instructors: string[]; rooms: string[] }>(),
     rooms = new Map<string, Promise<string | null>>();
   function roomName(id: string) {
     let value = rooms.get(id);
     if (!value) {
-      value = readStudioResource(scope, "room", id)
+      value = readStudioResource(scope, "room", id, ...(context ? ([context] as const) : []))
         .then((row) => row.name)
         .catch((cause: unknown) => {
           if (hidden(cause)) return null;
@@ -69,7 +76,12 @@ export async function readOverviewLabels(scope: ClientScope, sessions: OverviewS
   for (let index = 0; index < sessions.length; index += 4)
     await Promise.all(
       sessions.slice(index, index + 4).map(async (before) => {
-        const fresh = await readSessionInstructors(scope, before.session.id, true);
+        const fresh = await readSessionInstructors(
+          scope,
+          before.session.id,
+          true,
+          ...(context ? ([context] as const) : []),
+        );
         if (fresh.session.version !== before.session.version)
           throw Error("OVERVIEW_SESSION_CHANGED");
         const nativeRooms = fresh.session.room_labels?.map((r) => r.name) ?? [];
@@ -88,13 +100,23 @@ export async function readOverviewLabels(scope: ClientScope, sessions: OverviewS
     );
   return result;
 }
-export async function readOverviewParticipants(scope: ClientScope, sessionId: string) {
+export async function readOverviewParticipants(
+  scope: ClientScope,
+  sessionId: string,
+  context?: AccountReadContext,
+) {
   const rows: Awaited<ReturnType<typeof readSessionParticipants>>["items"] = [],
     cursors = new Set<string>(),
     seen = new Set<string>();
   let cursor: string | undefined;
   do {
-    const page = await readSessionParticipants(scope, sessionId, undefined, cursor);
+    const page = await readSessionParticipants(
+      scope,
+      sessionId,
+      undefined,
+      cursor,
+      ...(context ? ([context] as const) : []),
+    );
     for (const row of page.items) {
       if (seen.has(row.reservation.id)) throw Error("OVERVIEW_PARTICIPANTS_UNAVAILABLE");
       seen.add(row.reservation.id);

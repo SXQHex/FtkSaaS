@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { readMergeDirectory } from "./merge-directory";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type {
   PersonView,
   Preview,
@@ -137,8 +137,12 @@ function approvalRead(
   }
   return { ...approval, versions: item.versions };
 }
-export async function readMergeApprovals(scope: ClientScope, cursor?: string) {
-  const backend = await scopedBackend(scope);
+export async function readMergeApprovals(
+  scope: ClientScope,
+  cursor?: string,
+  context?: AccountReadContext,
+) {
+  const backend = await scopedBackend(scope, undefined, context);
   const page = await backend.call("management_state_get_v1", {
     ...request(scope),
     operation: "person_merge_approve_v1",

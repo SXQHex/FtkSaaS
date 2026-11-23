@@ -75,10 +75,10 @@ export function LeadEditor({
       target?.id,
       target?.activityId,
     ],
-    queryFn: async () => {
-      const lead = await readLeadDetail(scope, target!.personId, target!.id);
+    queryFn: async (context) => {
+      const lead = await readLeadDetail(scope, target!.personId, target!.id, context);
       const page = target?.activityId
-        ? await readLeadActivities(scope, lead.id, undefined, target.activityId)
+        ? await readLeadActivities(scope, lead.id, undefined, target.activityId, context)
         : undefined;
       if (page && (page.items.length !== 1 || page.items[0]?.id !== target?.activityId))
         throw new Error("ACTIVITY_SOURCE_UNAVAILABLE");
@@ -218,7 +218,7 @@ function LeadEditorForm({
       before?.id,
       activityCursor,
     ],
-    queryFn: () => readLeadActivities(scope, before!.id, activityCursor),
+    queryFn: (context) => readLeadActivities(scope, before!.id, activityCursor, undefined, context),
     enabled: Boolean(before),
     retry: false,
   });

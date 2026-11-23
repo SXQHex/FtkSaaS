@@ -26,7 +26,7 @@ export function PlatformStudioQueue({ accountId }: { accountId: string }) {
   const query = useInfiniteQuery({
     queryKey: key,
     initialPageParam: undefined as string | undefined,
-    queryFn: ({ pageParam }) => readPlatformStudioQueue(accountId, pageParam),
+    queryFn: (context) => readPlatformStudioQueue(accountId, context.pageParam, context),
     getNextPageParam: (last) => last.next_cursor ?? undefined,
     retry: false,
     refetchOnMount: "always",

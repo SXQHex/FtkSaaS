@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type {
   BookingMode,
   EntitlementView,
@@ -16,10 +16,11 @@ export async function readBookingRights(
   personId: string,
   sessionId: string,
   mode: BookingMode,
+  readContext?: AccountReadContext,
 ) {
   z.uuid().parse(personId);
   z.uuid().parse(sessionId);
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, readContext);
   const rows = await backend.call("entitlements_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
@@ -45,8 +46,9 @@ export async function readCapacityOverride(
   personId: string,
   sessionId: string,
   saleId: string,
+  readContext?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, readContext);
   const key = {
     person_id: z.uuid().parse(personId),
     session_id: z.uuid().parse(sessionId),

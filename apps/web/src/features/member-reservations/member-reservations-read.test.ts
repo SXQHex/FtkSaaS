@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+import { QueryClient } from "@tanstack/react-query";
 import { BackendError } from "../../lib/backend";
 import { readOwnReservations } from "./member-reservations-read";
 const { reservations, discovery, header } = vi.hoisted(() => ({
@@ -70,6 +71,33 @@ it("hydrates only visible upcoming session intervals, retaining cursor and nativ
   });
   expect(result.items[0]!.lesson).not.toHaveProperty("own_waitlist");
   expect(header).not.toHaveBeenCalled();
+});
+it("shares the Query identity through the visible reservation, discovery and header readers", async () => {
+  const readContext = { client: new QueryClient(), signal: new AbortController().signal };
+  discovery.mockResolvedValueOnce([]);
+  const result = await readOwnReservations(
+    scope,
+    person,
+    "upcoming",
+    "current",
+    undefined,
+    readContext,
+  );
+  expect(reservations).toHaveBeenCalledExactlyOnceWith(
+    scope,
+    person,
+    "current",
+    "upcoming",
+    { sort: "starts_at_asc", includeSourceSummary: true },
+    readContext,
+  );
+  expect(discovery).toHaveBeenCalledExactlyOnceWith(
+    scope,
+    { starts_at: session.starts_at, ends_at: session.ends_at },
+    readContext,
+  );
+  expect(header).toHaveBeenCalledExactlyOnceWith(scope, session, readContext);
+  expect(result.items[0]!.title).toBe("Mevcut başlık");
 });
 it("never substitutes current policy for a mismatched own reservation or version", async () => {
   for (const own of [

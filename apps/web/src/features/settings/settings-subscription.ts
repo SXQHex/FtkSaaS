@@ -1,12 +1,15 @@
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
 import { queryOptions } from "@tanstack/react-query";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
 
-export async function readSettingsSubscription(scope: ClientScope) {
+export async function readSettingsSubscription(
+  scope: ClientScope,
+  readContext?: AccountReadContext,
+) {
   const subscription = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, readContext)
   ).call("subscription_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
@@ -57,7 +60,7 @@ export type SettingsSubscriptionSource = Awaited<ReturnType<typeof readSettingsS
 export function settingsSubscriptionQuery(scope: ClientScope) {
   return queryOptions({
     queryKey: ["settings-subscription", scope.accountId, scope.orgId],
-    queryFn: () => readSettingsSubscription(scope),
+    queryFn: (context) => readSettingsSubscription(scope, context),
     retry: false,
     // Plan, entitlement and role limits may change outside this SPA.
     // Revalidate stale subscription projections after focus/reconnect.

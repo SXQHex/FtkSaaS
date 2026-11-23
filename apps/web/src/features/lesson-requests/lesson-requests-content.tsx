@@ -43,8 +43,14 @@ export function LessonRequestsContent({
       : undefined;
   const query = useQuery({
     queryKey: [...prefix, filter, cursors[pageIndex], focusedRequest],
-    queryFn: async () => {
-      const result = await readLessonRequests(scope, cursors[pageIndex], filter, focusedRequest);
+    queryFn: async (readContext) => {
+      const result = await readLessonRequests(
+        scope,
+        cursors[pageIndex],
+        filter,
+        focusedRequest,
+        readContext,
+      );
       if (result.next_cursor && cursors.slice(0, pageIndex + 1).includes(result.next_cursor))
         throw new Error("LESSON_REQUEST_PAGE_UNAVAILABLE");
       return result;

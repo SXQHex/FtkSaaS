@@ -1,10 +1,19 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import { getTemporal } from "../../lib/temporal";
 import { readProfileRights } from "../member-profile/profile-read";
-export async function readOwnPackages(scope: ClientScope, personId: string) {
-  const rights = await readProfileRights(scope, personId, { includePurchaseSummary: true }),
+export async function readOwnPackages(
+  scope: ClientScope,
+  personId: string,
+  readContext?: AccountReadContext,
+) {
+  const rights = await readProfileRights(
+      scope,
+      personId,
+      { includePurchaseSummary: true },
+      readContext,
+    ),
     T = await getTemporal();
   return rights.map((row) => {
     const purchase = row.purchase_summary;
@@ -43,9 +52,13 @@ export async function readOwnPackages(scope: ClientScope, personId: string) {
     };
   });
 }
-export async function readOwnDebt(scope: ClientScope, personId: string) {
+export async function readOwnDebt(
+  scope: ClientScope,
+  personId: string,
+  readContext?: AccountReadContext,
+) {
   z.uuid().parse(personId);
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, readContext);
   const person = await backend.call("person_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
@@ -70,8 +83,12 @@ export async function readOwnDebt(scope: ClientScope, personId: string) {
   return debt;
 }
 
-export async function readOwnFinanceCurrencies(scope: ClientScope, personId: string) {
-  const backend = await scopedBackend(scope);
+export async function readOwnFinanceCurrencies(
+  scope: ClientScope,
+  personId: string,
+  readContext?: AccountReadContext,
+) {
+  const backend = await scopedBackend(scope, undefined, readContext);
   const result = await backend.call("member_finance_currencies_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),

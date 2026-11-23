@@ -70,7 +70,8 @@ export function RegisteredEventPayment({
   ];
   const source = useQuery({
     queryKey: key,
-    queryFn: () => readRegisteredPayment(scope, before.id, registrationId, expected!.person_id),
+    queryFn: (readContext) =>
+      readRegisteredPayment(scope, before.id, registrationId, expected!.person_id, readContext),
     enabled: !!expected,
     retry: false,
     refetchOnWindowFocus: false,

@@ -1,7 +1,7 @@
 import { BackendError } from "../../lib/backend";
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type {
   FollowupKind,
   ManagementSelectorPublicApplicationReviewV1,
@@ -21,8 +21,9 @@ export async function readLeadsPage(
   cursor?: string,
   filters: LeadFilters = {},
   includePipeline = true,
+  context?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, context);
   const read = (pipeline: boolean) =>
     backend.call("leads_list_v1", {
       ...base(scope),
@@ -77,9 +78,13 @@ export async function readLeadsPage(
   }
   return { ...page, pipelineAvailable };
 }
-export async function readLeadAssignees(scope: ClientScope, cursor?: string) {
+export async function readLeadAssignees(
+  scope: ClientScope,
+  cursor?: string,
+  context?: AccountReadContext,
+) {
   const page = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, context)
   ).call("management_state_get_v1", {
     ...base(scope),
     request_id: uuidv7(),
@@ -104,9 +109,10 @@ export async function readLeadFollowups(
   scope: ClientScope,
   cursor?: string,
   assignedTo?: string | null,
+  context?: AccountReadContext,
 ) {
   const page = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, context)
   ).call("management_state_get_v1", {
     ...base(scope),
     request_id: uuidv7(),
@@ -144,8 +150,13 @@ export async function readLeadFollowups(
   if (cursor && cursor === page.next_cursor) throw new Error("LEAD_CURSOR_REPEATED");
   return { ...page, items };
 }
-export async function readLeadDetail(scope: ClientScope, personId: string, leadId?: string) {
-  const backend = await scopedBackend(scope),
+export async function readLeadDetail(
+  scope: ClientScope,
+  personId: string,
+  leadId?: string,
+  context?: AccountReadContext,
+) {
+  const backend = await scopedBackend(scope, undefined, context),
     page = await backend.call("management_state_get_v1", {
       ...base(scope),
       request_id: uuidv7(),
@@ -191,11 +202,17 @@ export function readLeadActivities(
   leadId: string,
   cursor?: string,
   activityId?: string,
+  context?: AccountReadContext,
 ) {
-  return readActivities(scope, { lead_id: leadId }, cursor, activityId);
+  return readActivities(scope, { lead_id: leadId }, cursor, activityId, context);
 }
-export async function readPersonFollowup(scope: ClientScope, personId: string, activityId: string) {
-  const page = await readActivities(scope, { person_id: personId }, undefined, activityId);
+export async function readPersonFollowup(
+  scope: ClientScope,
+  personId: string,
+  activityId: string,
+  context?: AccountReadContext,
+) {
+  const page = await readActivities(scope, { person_id: personId }, undefined, activityId, context);
   const activity = page.items[0];
   if (page.items.length !== 1 || activity?.id !== activityId || activity.values.kind !== "followup")
     throw Error("LEAD_ACTIVITY_UNAVAILABLE");
@@ -206,8 +223,9 @@ async function readActivities(
   key: { lead_id: string } | { person_id: string },
   cursor?: string,
   activityId?: string,
+  context?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope),
+  const backend = await scopedBackend(scope, undefined, context),
     page = await backend.call("management_state_get_v1", {
       ...base(scope),
       request_id: uuidv7(),
@@ -251,8 +269,9 @@ export async function readApplicationsPage(
   cursor?: string,
   applicationId?: string,
   states?: ManagementSelectorPublicApplicationReviewV1["key"]["states"],
+  context?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope),
+  const backend = await scopedBackend(scope, undefined, context),
     page = await backend.call("management_state_get_v1", {
       client_api_version: 1,
       org_id: scope.orgId,
@@ -301,8 +320,13 @@ export async function readApplicationsPage(
   return { ...page, items };
 }
 
-export async function readSourceFollowups(scope: ClientScope, kind: FollowupKind, cursor?: string) {
-  const backend = await scopedBackend(scope),
+export async function readSourceFollowups(
+  scope: ClientScope,
+  kind: FollowupKind,
+  cursor?: string,
+  context?: AccountReadContext,
+) {
+  const backend = await scopedBackend(scope, undefined, context),
     page = await backend.call("crm_followup_list_v1", {
       ...base(scope),
       request_id: uuidv7(),

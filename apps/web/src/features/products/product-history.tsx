@@ -50,7 +50,7 @@ function HistoryPage({
       view,
       cursors[index],
     ],
-    queryFn: () => readProductHistory(scope, productId, view, cursors[index]),
+    queryFn: (context) => readProductHistory(scope, productId, view, cursors[index], context),
     retry: false,
   });
   useEffect(() => {

@@ -1,6 +1,6 @@
 import type { MemberLessonCancellation } from "@ftksaas/api-contracts";
 import { readMemberClasses } from "../member-classes/member-classes-read";
-import type { ClientScope } from "../../lib/scoped-backend";
+import type { ClientScope, AccountReadContext } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
 import { readMemberReservations } from "../member-profile/reservations";
 import { readSessionHeader } from "../session-detail/session-detail-read";
@@ -10,12 +10,20 @@ export async function readOwnReservations(
   filter: "upcoming" | "past",
   cursor?: string,
   sessionId?: string,
+  readContext?: AccountReadContext,
 ) {
-  const page = await readMemberReservations(scope, personId, cursor, filter, {
-    sort: filter === "upcoming" ? "starts_at_asc" : "created_at_desc",
-    includeSourceSummary: true,
-    sessionId,
-  });
+  const page = await readMemberReservations(
+    scope,
+    personId,
+    cursor,
+    filter,
+    {
+      sort: filter === "upcoming" ? "starts_at_asc" : "created_at_desc",
+      includeSourceSummary: true,
+      sessionId,
+    },
+    ...(readContext ? ([readContext] as const) : []),
+  );
   const sessions = [
     ...new Map(
       page.items.filter((row) => row.session).map((row) => [row.session!.id, row.session!]),
@@ -32,10 +40,14 @@ export async function readOwnReservations(
         try {
           if (filter === "upcoming" && session.state === "planned") {
             const native = (
-              await readMemberClasses(scope, {
-                starts_at: session.starts_at,
-                ends_at: session.ends_at,
-              })
+              await readMemberClasses(
+                scope,
+                {
+                  starts_at: session.starts_at,
+                  ends_at: session.ends_at,
+                },
+                ...(readContext ? ([readContext] as const) : []),
+              )
             ).find((row) => row.id === session.id);
             if (native) {
               titles.set(session.id, native.title);
@@ -58,7 +70,11 @@ export async function readOwnReservations(
               return;
             }
           }
-          const header = await readSessionHeader(scope, session);
+          const header = await readSessionHeader(
+            scope,
+            session,
+            ...(readContext ? ([readContext] as const) : []),
+          );
           titles.set(session.id, header.title);
         } catch (error) {
           if (

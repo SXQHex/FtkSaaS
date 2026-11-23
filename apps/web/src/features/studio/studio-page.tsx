@@ -8,7 +8,10 @@ import { useAccountProjection } from "../auth/use-account-projection";
 import { workspaceRoles } from "../workspace/workspace";
 import { WorkspaceLayout, type WorkspaceSelection } from "../workspace/workspace-layout";
 import { useAccountAppearance } from "../account/use-account-appearance";
-import { settingsSubscriptionQuery } from "../settings/settings-subscription";
+import {
+  readSettingsSubscription,
+  settingsSubscriptionQuery,
+} from "../settings/settings-subscription";
 import { StudioView, type StudioViewData } from "./studio-view";
 import { StudioSheets, type StudioSheetSelection } from "./studio-sheets";
 import { StudioInstructorEditor } from "./instructor-editor";
@@ -193,14 +196,16 @@ function StudioContent({
     !workspace.isError &&
     workspace.data?.selected?.id === scope.orgId &&
     workspaceRoles(workspace.data, scope.centerId).includes("owner");
+  const queryKey = ["studio", scope.accountId, scope.orgId, scope.centerId, canReadPlan];
   const query = useQuery({
-    queryKey: ["studio", scope.accountId, scope.orgId, scope.centerId, canReadPlan],
-    queryFn: () =>
+    queryKey,
+    queryFn: (readContext) =>
       readStudioSnapshot(
         scope,
         canReadPlan
           ? async () => (await queries.fetchQuery(settingsSubscriptionQuery(scope))).subscription
           : undefined,
+        readContext,
       ),
     retry: false,
   });
@@ -209,7 +214,21 @@ function StudioContent({
       ["studio", scope.accountId, scope.orgId, scope.centerId],
       ["schedule-sources", scope.accountId, scope.orgId, scope.centerId],
     ]);
-    return query.refetch({ throwOnError: true });
+    // Several native commands use this snapshot as their mandatory result.
+    // Keep both the snapshot and its plan read on the strict account path.
+    const data = await queries.fetchQuery({
+      queryKey,
+      queryFn: () =>
+        readStudioSnapshot(
+          scope,
+          canReadPlan
+            ? async () => (await readSettingsSubscription(scope)).subscription
+            : undefined,
+        ),
+      staleTime: 0,
+      retry: false,
+    });
+    return { data };
   }
   useEffect(() => {
     const error = query.error;

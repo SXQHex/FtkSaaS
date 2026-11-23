@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
 import { getTemporal } from "../../lib/temporal";
 import { readSettingsDocument } from "./settings-document";
@@ -52,10 +52,10 @@ export const workCalendarSchema = z
 export type WorkCalendarValue = CenterWorkCalendar | null;
 const same = (a: WorkCalendarValue, b: WorkCalendarValue) =>
   JSON.stringify(workCalendarSchema.parse(a)) === JSON.stringify(workCalendarSchema.parse(b));
-export async function readWorkCalendar(scope: ClientScope) {
+export async function readWorkCalendar(scope: ClientScope, readContext?: AccountReadContext) {
   const [source, context] = await Promise.all([
-    readSettingsDocument(scope, "center"),
-    readClosureContext(scope),
+    readSettingsDocument(scope, "center", readContext),
+    readClosureContext(scope, readContext),
   ]);
   if (
     !Object.hasOwn(source.document.values, "work_calendar") ||

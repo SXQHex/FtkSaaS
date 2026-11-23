@@ -50,7 +50,7 @@ export function WorkCalendarEditor({
   const key = ["work-calendar", scope.accountId, scope.orgId, scope.centerId];
   const query = useQuery({
     queryKey: key,
-    queryFn: () => readWorkCalendar(scope),
+    queryFn: (context) => readWorkCalendar(scope, context),
     retry: false,
     refetchOnMount: "always",
     refetchOnWindowFocus: false,

@@ -56,8 +56,16 @@ export function NavigationSearch({
   const searching = canSearchMembers && query === settled;
   const memberSearch = useQuery({
     queryKey: ["palette-members", memberScope, settled],
-    queryFn: async () => {
-      const page = await readPeoplePage(memberScope!, settled, undefined, "active");
+    queryFn: async (context) => {
+      const page = await readPeoplePage(
+        memberScope!,
+        settled,
+        undefined,
+        "active",
+        false,
+        undefined,
+        context,
+      );
       return page.items.slice(0, 6).map(({ id, display_name: name }) => ({ id, name }));
     },
     enabled: searching,

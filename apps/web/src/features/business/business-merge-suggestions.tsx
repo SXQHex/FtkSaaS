@@ -10,7 +10,7 @@ export function BusinessMergeSuggestions({ scope }: { scope: ClientScope }) {
   const { t } = useTranslation();
   const query = useQuery({
     queryKey: ["business-merge-suggestions", scope],
-    queryFn: () => readMergeDirectory(scope, "suggested", "", undefined, 3),
+    queryFn: (context) => readMergeDirectory(scope, "suggested", "", undefined, 3, context),
     retry: false,
     gcTime: 0,
   });

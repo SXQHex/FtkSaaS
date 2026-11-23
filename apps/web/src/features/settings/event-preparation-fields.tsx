@@ -24,7 +24,7 @@ export function EventPreparationFields({
   const { t } = useTranslation();
   const catalog = useInfiniteQuery({
     queryKey: ["event-choices", scope.accountId, scope.orgId, scope.centerId, "products"],
-    queryFn: ({ pageParam }) => readEventProducts(scope, pageParam),
+    queryFn: (context) => readEventProducts(scope, context.pageParam, context),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (page) => page.next_cursor ?? undefined,
     retry: false,

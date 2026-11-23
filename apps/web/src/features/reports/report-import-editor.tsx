@@ -201,7 +201,8 @@ export function ReportImportEditor({
     phase === "apply" && (currentJob?.state === "succeeded" || currentJob?.state === "failed");
   const rows = useQuery({
     queryKey: ["report-import-rows", scope, jobId, state, cursors[index], applyFinished],
-    queryFn: () => readImportRows(scope, jobId!, state, cursors[index], applyFinished),
+    queryFn: (context) =>
+      readImportRows(scope, jobId!, state, cursors[index], applyFinished, context),
     enabled: !!jobId && !unavailable,
     retry: false,
     refetchOnWindowFocus: false,

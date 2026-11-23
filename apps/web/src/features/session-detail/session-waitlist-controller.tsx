@@ -89,17 +89,28 @@ export function SessionWaitlistController({
   ];
   const entries = useQuery({
     queryKey: [...prefix, "entries", entriesCursors[entriesPage]],
-    queryFn: () => readSessionWaitlist(scope, session.id, "entries", entriesCursors[entriesPage]),
+    queryFn: (readContext) =>
+      readSessionWaitlist(scope, session.id, "entries", entriesCursors[entriesPage], readContext),
     retry: false,
   });
   const offers = useQuery({
     queryKey: [...prefix, "offers", offersCursors[offersPage]],
-    queryFn: () => readSessionWaitlist(scope, session.id, "offers", offersCursors[offersPage]),
+    queryFn: (readContext) =>
+      readSessionWaitlist(scope, session.id, "offers", offersCursors[offersPage], readContext),
     retry: false,
   });
   const people = useQuery({
     queryKey: [...prefix, "people", query, peopleCursors[peoplePage]],
-    queryFn: () => readPeoplePage(scope, query!, peopleCursors[peoplePage], "active"),
+    queryFn: (readContext) =>
+      readPeoplePage(
+        scope,
+        query!,
+        peopleCursors[peoplePage],
+        "active",
+        undefined,
+        undefined,
+        readContext,
+      ),
     enabled: query !== undefined && target?.action === "join",
     retry: false,
   });

@@ -1,7 +1,7 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { BackendError } from "../../lib/backend";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type {
   AcceptanceContext,
   DocumentView,
@@ -13,8 +13,12 @@ export interface DocumentContext {
   personId: string;
   context: AcceptanceContext;
 }
-export async function readRequiredDocuments(binding: DocumentContext, fileId?: string) {
-  const backend = await scopedBackend(binding.scope);
+export async function readRequiredDocuments(
+  binding: DocumentContext,
+  fileId?: string,
+  readContext?: AccountReadContext,
+) {
+  const backend = await scopedBackend(binding.scope, undefined, readContext);
   if (binding.context.on_behalf_of_person_id) throw Error("DOCUMENT_SELF_REQUIRED");
   const rows = await backend.call("document_requirements_get_v1", {
     client_api_version: 1,

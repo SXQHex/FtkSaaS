@@ -104,24 +104,25 @@ export function SessionDetailContent({
     : undefined;
   const session = useQuery({
     queryKey: [...prefix, "session"],
-    queryFn: () => guardedRead(() => readScheduleSession(scope, sessionId)),
+    queryFn: (readContext) =>
+      guardedRead(() => readScheduleSession(scope, sessionId, undefined, readContext)),
     enabled: Boolean(center && !invalid),
     retry: false,
   });
   const native = !session.isError ? session.data : undefined;
   const header = useQuery({
     queryKey: [...prefix, "header", native?.version],
-    queryFn: () => guardedRead(() => readSessionHeader(scope, native!)),
+    queryFn: (readContext) => guardedRead(() => readSessionHeader(scope, native!, readContext)),
     enabled: Boolean(native && !invalid && center),
     retry: false,
   });
   const rooms = useQuery({
     queryKey: [...prefix, "rooms", native?.version],
-    queryFn: () =>
+    queryFn: (readContext) =>
       guardedRead(() =>
         Promise.all(
           (header.data?.resources?.filter((row) => row.kind === "room") ?? []).map((row) =>
-            readStudioResource(scope, "room", row.id),
+            readStudioResource(scope, "room", row.id, readContext),
           ),
         ),
       ),
@@ -130,26 +131,41 @@ export function SessionDetailContent({
   });
   const instructors = useQuery({
     queryKey: [...prefix, "instructors", native?.version],
-    queryFn: () => guardedRead(() => readSessionInstructors(scope, sessionId)),
+    queryFn: (readContext) =>
+      guardedRead(() => readSessionInstructors(scope, sessionId, undefined, readContext)),
     enabled: Boolean(native && center && !invalid),
     retry: false,
   });
   const reservations = useQuery({
     queryKey: sessionDetailKeys.participants(scope, sessionId, person?.id, cursors[page]),
-    queryFn: () =>
-      guardedRead(() => readSessionParticipants(scope, sessionId, person?.id, cursors[page])),
+    queryFn: (readContext) =>
+      guardedRead(() =>
+        readSessionParticipants(scope, sessionId, person?.id, cursors[page], readContext),
+      ),
     enabled: Boolean(native && center && !invalid),
     retry: false,
   });
   const attendance = useQuery({
     queryKey: [...prefix, "attendance", native?.version],
-    queryFn: () => guardedRead(() => readSessionAttendance(scope, sessionId)),
+    queryFn: (readContext) =>
+      guardedRead(() => readSessionAttendance(scope, sessionId, readContext)),
     enabled: Boolean(native && center && !invalid),
     retry: false,
   });
   const people = useQuery({
     queryKey: [...prefix, "search", query, peopleCursors[peoplePage]],
-    queryFn: () => guardedRead(() => readPeoplePage(scope, query!, peopleCursors[peoplePage])),
+    queryFn: (readContext) =>
+      guardedRead(() =>
+        readPeoplePage(
+          scope,
+          query!,
+          peopleCursors[peoplePage],
+          undefined,
+          undefined,
+          undefined,
+          readContext,
+        ),
+      ),
     enabled: query !== undefined && Boolean(center && !invalid),
     retry: false,
   });

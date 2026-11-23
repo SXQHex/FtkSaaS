@@ -127,7 +127,8 @@ function PersonPicker({
       query,
       cursors[page],
     ],
-    queryFn: () => readPeoplePage(scope, query, cursors[page]),
+    queryFn: (context) =>
+      readPeoplePage(scope, query, cursors[page], undefined, undefined, undefined, context),
     retry: false,
   });
   const items = people.isError ? [] : (people.data?.items ?? []);

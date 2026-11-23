@@ -32,7 +32,7 @@ export function useSettingsPolicies({
   const { t } = useTranslation();
   const query = useQuery({
     queryKey: ["settings-policies", scope.accountId, scope.orgId, scope.centerId, level],
-    queryFn: () => readSettingsPolicies(scope, level),
+    queryFn: (context) => readSettingsPolicies(scope, level, context),
     enabled,
     retry: false,
     refetchOnWindowFocus: false,

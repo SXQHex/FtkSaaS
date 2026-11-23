@@ -2,7 +2,7 @@ import { z } from "zod";
 import { queryOptions } from "@tanstack/react-query";
 import { v7 as uuidv7 } from "uuid";
 import { BackendError } from "../../lib/backend";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { Page_NotificationView, RequestNotificationsList } from "@ftksaas/api-contracts";
 export type InboxVisibility = NonNullable<RequestNotificationsList["visibility"]>;
 export type InboxFilter = "all" | "unread" | "todo" | "archived" | "deleted";
@@ -18,12 +18,18 @@ export function inboxListQuery(
 ) {
   return queryOptions({
     queryKey: [...inboxKey(scope), "list", query, filter, cursor],
-    queryFn: async () => {
-      const page = await readInbox(scope, filter === "unread", cursor, {
-        query,
-        workState: filter === "todo" ? "pending" : "all",
-        visibility: filter === "archived" || filter === "deleted" ? filter : undefined,
-      });
+    queryFn: async (context) => {
+      const page = await readInbox(
+        scope,
+        filter === "unread",
+        cursor,
+        {
+          query,
+          workState: filter === "todo" ? "pending" : "all",
+          visibility: filter === "archived" || filter === "deleted" ? filter : undefined,
+        },
+        context,
+      );
       if (page.next_cursor && (page.next_cursor === cursor || visited.includes(page.next_cursor)))
         throw new Error("INBOX_CURSOR_UNAVAILABLE");
       return page;
@@ -45,9 +51,10 @@ export async function readInbox(
   unreadOnly: boolean,
   cursor?: string,
   options?: { query: string; workState: "all" | "pending"; visibility?: InboxVisibility },
+  context?: AccountReadContext,
 ): Promise<Page_NotificationView> {
   const page = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, context)
   ).call("notifications_list_v1", {
     ...common(scope),
     request_id: uuidv7(),
@@ -120,10 +127,14 @@ export async function readInbox(
   }
   return page;
 }
-export async function readNotificationState(scope: ClientScope, id: string) {
+export async function readNotificationState(
+  scope: ClientScope,
+  id: string,
+  context?: AccountReadContext,
+) {
   z.uuid().parse(id);
   const page = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, context)
   ).call("management_state_get_v1", {
     ...common(scope),
     request_id: uuidv7(),

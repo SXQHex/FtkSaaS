@@ -1,7 +1,7 @@
 import { queryBackendRead } from "../../lib/backend";
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { EventView, EventState, Interval } from "@ftksaas/api-contracts";
 import { getTemporal } from "../../lib/temporal";
 import { studioPages } from "../studio/studio";
@@ -111,8 +111,9 @@ export async function readEventsPage(
   cursor?: string,
   filters: { query?: string; status?: "all" | EventState; includeSummary?: boolean } = {},
   signal?: AbortSignal,
+  readContext?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope, signal);
+  const backend = await scopedBackend(scope, signal, readContext);
   const page = await queryBackendRead(
     backend,
     "event_list_v1",
@@ -146,9 +147,14 @@ export async function readEventsPage(
   signal?.throwIfAborted();
   return { ...page, items };
 }
-export async function readEvent(scope: ClientScope, id: string, includePaymentSummary = false) {
+export async function readEvent(
+  scope: ClientScope,
+  id: string,
+  includePaymentSummary = false,
+  readContext?: AccountReadContext,
+) {
   z.uuid().parse(id);
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, readContext);
   return validateEvent(
     await backend.call("event_get_v1", {
       ...common(scope),
@@ -160,8 +166,8 @@ export async function readEvent(scope: ClientScope, id: string, includePaymentSu
     id,
   );
 }
-export async function readEventRooms(scope: ClientScope) {
-  const backend = await scopedBackend(scope);
+export async function readEventRooms(scope: ClientScope, readContext?: AccountReadContext) {
+  const backend = await scopedBackend(scope, undefined, readContext);
   const rows = await studioPages((cursor) =>
     backend.call("management_state_get_v1", {
       ...common(scope),
@@ -185,8 +191,8 @@ export async function readEventRooms(scope: ClientScope) {
       return { id: z.uuid().parse(row.entity.id), name: values.name, capacity: values.capacity };
     });
 }
-export async function readEventDisciplines(scope: ClientScope) {
-  const backend = await scopedBackend(scope);
+export async function readEventDisciplines(scope: ClientScope, readContext?: AccountReadContext) {
+  const backend = await scopedBackend(scope, undefined, readContext);
   return studioPages((cursor) =>
     backend.call("disciplines_list_v1", {
       ...common(scope),
@@ -196,8 +202,8 @@ export async function readEventDisciplines(scope: ClientScope) {
     }),
   );
 }
-export async function readEventPeople(scope: ClientScope) {
-  const rows = await readStudioInstructors(scope);
+export async function readEventPeople(scope: ClientScope, readContext?: AccountReadContext) {
+  const rows = await readStudioInstructors(scope, undefined, readContext);
   return [
     ...new Map(
       rows

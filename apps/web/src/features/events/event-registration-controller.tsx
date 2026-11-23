@@ -105,7 +105,7 @@ function NewEventRegistrationController({
     name = person?.display_name ?? t(($) => $.events.unknown);
   const rights = useQuery({
     queryKey: ["event-registration-rights", scope.accountId, scope.orgId, scope.centerId, personId],
-    queryFn: () => readProfileRights(scope, personId!),
+    queryFn: (readContext) => readProfileRights(scope, personId!, undefined, readContext),
     enabled: !!personId,
     retry: false,
   });
@@ -118,7 +118,8 @@ function NewEventRegistrationController({
       before.id,
       personId,
     ],
-    queryFn: () => readRegistrationPayment(scope, before.id, personId!),
+    queryFn: (readContext) =>
+      readRegistrationPayment(scope, before.id, personId!, undefined, readContext),
     enabled: !!personId,
     retry: false,
     refetchOnWindowFocus: false,

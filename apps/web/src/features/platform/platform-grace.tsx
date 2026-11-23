@@ -42,7 +42,7 @@ export function PlatformGrace({
   const key = ["platform-grace", accountId, orgId];
   const query = useQuery({
     queryKey: key,
-    queryFn: () => readGraceDetail(accountId, orgId),
+    queryFn: (context) => readGraceDetail(accountId, orgId, context),
     retry: false,
     refetchOnMount: "always",
     gcTime: 0,

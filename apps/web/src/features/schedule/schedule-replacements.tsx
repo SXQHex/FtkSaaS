@@ -27,7 +27,7 @@ export function ScheduleReplacements({
   const { t } = useTranslation();
   const query = useQuery({
     queryKey: ["schedule-replacements", scope.accountId, scope.orgId, scope.centerId, sessionId],
-    queryFn: () => readScheduleReplacements(scope, sessionId),
+    queryFn: (readContext) => readScheduleReplacements(scope, sessionId, readContext),
     retry: false,
   });
   useEffect(() => {

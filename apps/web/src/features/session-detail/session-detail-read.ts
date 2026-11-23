@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
 import type {
   AttendanceView,
@@ -13,8 +13,9 @@ import { readScheduleSession } from "../schedule/schedule-read";
 export async function readSessionHeader(
   scope: ClientScope,
   session: Pick<SessionView, "id" | "starts_at" | "ends_at">,
+  readContext?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope),
+  const backend = await scopedBackend(scope, undefined, readContext),
     cursors = new Set<string>();
   let cursor: string | undefined;
   do {
@@ -78,10 +79,11 @@ export async function readSessionParticipants(
   sessionId: string,
   personId?: string,
   cursor?: string,
+  readContext?: AccountReadContext,
 ) {
   z.uuid().parse(sessionId);
   if (personId) z.uuid().parse(personId);
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, readContext);
   const page = await backend.call("reservation_list_v1", {
     ...common(scope),
     request_id: uuidv7(),
@@ -162,9 +164,13 @@ export function validateSessionAttendance(view: AttendanceView, sessionId: strin
   }
   return view;
 }
-export async function readSessionAttendance(scope: ClientScope, sessionId: string) {
+export async function readSessionAttendance(
+  scope: ClientScope,
+  sessionId: string,
+  readContext?: AccountReadContext,
+) {
   z.uuid().parse(sessionId);
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, readContext);
   return validateSessionAttendance(
     await backend.call("attendance_get_v1", {
       ...common(scope),
@@ -179,9 +185,10 @@ export async function readSessionInstructors(
   scope: ClientScope,
   sessionId: string,
   includeRoomLabels = false,
+  readContext?: AccountReadContext,
 ) {
-  const session = await readScheduleSession(scope, sessionId, includeRoomLabels),
-    backend = await scopedBackend(scope);
+  const session = await readScheduleSession(scope, sessionId, includeRoomLabels, readContext),
+    backend = await scopedBackend(scope, undefined, readContext);
   const ids = [
     ...new Set(
       session.assignments.filter((row) => row.duty === "instructor").map((row) => row.person_id),
@@ -273,9 +280,10 @@ export async function readSessionWaitlist(
   sessionId: string,
   view: "entries" | "offers",
   cursor?: string,
+  readContext?: AccountReadContext,
 ) {
   z.uuid().parse(sessionId);
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, readContext);
   const page = await backend.call("management_state_get_v1", {
     ...common(scope),
     request_id: uuidv7(),

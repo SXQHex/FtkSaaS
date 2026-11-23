@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { AutomationJobView, JobState, Interval } from "@ftksaas/api-contracts";
 import { getTemporal } from "../../lib/temporal";
 const count = z.number().int().nonnegative().safe(),
@@ -26,10 +26,11 @@ export async function readSegmentDiscovery(
   segmentId: string,
   mode: "matches" | "automations",
   cursor?: string,
+  context?: AccountReadContext,
 ) {
   z.uuid().parse(segmentId);
   const page = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, context)
   ).call("management_state_get_v1", {
     ...common(scope),
     operation: "segment_save_v1",
@@ -128,9 +129,10 @@ export async function readAutomationQueue(
   scope: ClientScope,
   filter: { automationId?: string; state: JobState | "all"; interval?: Interval },
   cursor?: string,
+  context?: AccountReadContext,
 ) {
   const page = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, context)
   ).call("management_state_get_v1", {
     ...common(scope),
     operation: "automation_save_v1",

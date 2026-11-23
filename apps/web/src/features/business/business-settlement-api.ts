@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import type { SettlementProposal, SettlementRequestView } from "@ftksaas/api-contracts";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 
 export const settlementRequest = (scope: ClientScope) => ({
   client_api_version: 1 as const,
@@ -14,8 +14,12 @@ export const settlementKey = (scope: ClientScope) => [
   scope.orgId,
   scope.centerId,
 ];
-export async function settlementAuthority(scope: ClientScope, person: string) {
-  const backend = await scopedBackend(scope);
+export async function settlementAuthority(
+  scope: ClientScope,
+  person: string,
+  readContext?: AccountReadContext,
+) {
+  const backend = await scopedBackend(scope, undefined, readContext);
   const result = await backend.call("settlement_authority_get_v1", {
     ...settlementRequest(scope),
     person_id: person,
@@ -28,8 +32,13 @@ export async function settlementAuthority(scope: ClientScope, person: string) {
     throw Error("SETTLEMENT_SCOPE_INVALID");
   return result;
 }
-export async function settlementMovements(scope: ClientScope, currency: string, cursor?: string) {
-  const backend = await scopedBackend(scope);
+export async function settlementMovements(
+  scope: ClientScope,
+  currency: string,
+  cursor?: string,
+  readContext?: AccountReadContext,
+) {
+  const backend = await scopedBackend(scope, undefined, readContext);
   const result = await backend.call("settlement_movements_list_v1", {
     ...settlementRequest(scope),
     currency,
@@ -46,8 +55,12 @@ export async function settlementMovements(scope: ClientScope, currency: string, 
     throw Error("SETTLEMENT_SCOPE_INVALID");
   return result;
 }
-export async function settlementRequests(scope: ClientScope, cursor?: string) {
-  const backend = await scopedBackend(scope);
+export async function settlementRequests(
+  scope: ClientScope,
+  cursor?: string,
+  readContext?: AccountReadContext,
+) {
+  const backend = await scopedBackend(scope, undefined, readContext);
   const result = await backend.call("settlement_requests_list_v1", {
     ...settlementRequest(scope),
     page: { limit: 30, ...(cursor ? { cursor } : {}) },

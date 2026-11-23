@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import { getTemporal } from "../../lib/temporal";
 import { instructorPeriod } from "../instructor/instructor-read";
 import type {
@@ -106,8 +106,12 @@ export async function memberClassWeek(
   });
   return { ...base, days, range: `${days[0]!.label} – ${days[6]!.label}` };
 }
-export async function readMemberClasses(scope: ClientScope, interval: Interval) {
-  const backend = await scopedBackend(scope),
+export async function readMemberClasses(
+  scope: ClientScope,
+  interval: Interval,
+  readContext?: AccountReadContext,
+) {
+  const backend = await scopedBackend(scope, undefined, readContext),
     items: MemberClass[] = [],
     ids = new Set<string>(),
     cursors = new Set<string>();

@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { AcceptanceContext } from "@ftksaas/api-contracts";
 export function documentContextKey(context: AcceptanceContext) {
   return JSON.stringify([
@@ -12,8 +12,12 @@ export function documentContextKey(context: AcceptanceContext) {
     context.event_registration_preview_id ?? null,
   ]);
 }
-export async function readMemberDocumentContexts(scope: ClientScope, cursor?: string) {
-  const backend = await scopedBackend(scope);
+export async function readMemberDocumentContexts(
+  scope: ClientScope,
+  cursor?: string,
+  readContext?: AccountReadContext,
+) {
+  const backend = await scopedBackend(scope, undefined, readContext);
   const page = await backend.call("member_document_contexts_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),

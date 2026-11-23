@@ -84,14 +84,15 @@ export function InboxContent({
   );
   const nativeSource = useQuery({
     queryKey: [...prefix, "work", memberPersonId, selected?.id, selected?.work],
-    queryFn: async () =>
+    queryFn: async (context) =>
       memberPersonId && memberSessionTarget
         ? readMemberSessionNotice(
             { ...scope, centerId: memberSessionTarget.center_id },
             memberPersonId,
             memberSessionTarget.key.session_id,
+            context,
           )
-        : readInboxSource(scope, selected!.work!, memberPersonId),
+        : readInboxSource(scope, selected!.work!, memberPersonId, context),
     enabled: canReadSource && openedSource === selected?.id,
     staleTime: 0,
     retry: false,
@@ -102,7 +103,7 @@ export function InboxContent({
   const stateKey = [...prefix, "state", selected?.id];
   const source = useQuery({
     queryKey: stateKey,
-    queryFn: () => readNotificationState(scope, selected!.id),
+    queryFn: (context) => readNotificationState(scope, selected!.id, context),
     enabled: !!selected,
     retry: false,
     refetchOnWindowFocus: false,
@@ -144,6 +145,7 @@ export function InboxContent({
     if (query || filter !== "all") {
       await queries.fetchQuery({
         ...inboxListQuery(scope),
+        queryFn: () => readInbox(scope, false, undefined, { query: "", workState: "all" }),
         staleTime: 0,
         retry: false,
       });

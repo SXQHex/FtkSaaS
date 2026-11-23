@@ -30,7 +30,7 @@ export function useSettingsRooms({
   const [selection, setSelection] = useState<{ id?: string }>();
   const query = useQuery({
     queryKey: ["settings-rooms", scope.accountId, scope.orgId, scope.centerId],
-    queryFn: () => readStudioResources(scope),
+    queryFn: (context) => readStudioResources(scope, context),
     enabled,
     retry: false,
     refetchOnWindowFocus: false,

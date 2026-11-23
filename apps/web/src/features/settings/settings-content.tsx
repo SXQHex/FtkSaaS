@@ -64,7 +64,7 @@ export function SettingsContent({
   const subscriptionSetup = organization?.access_mode === "bootstrap";
   const catalog = useQuery({
     queryKey: ["settings-organization-catalog", scope.accountId, scope.orgId],
-    queryFn: () => readOrganizationSettingsCatalog(scope),
+    queryFn: (context) => readOrganizationSettingsCatalog(scope, context),
     enabled: Boolean(organization && center && !subscriptionSetup && !workspace.isError),
     retry: false,
   });
@@ -281,12 +281,17 @@ function SettingsManagement({
       level,
       canOrganization,
     ],
-    queryFn: async () => {
+    queryFn: async (context) => {
       if (level === "organization")
-        return { items: await readDisciplineCatalog(scope, "organization"), centerItems: null };
+        return {
+          items: await readDisciplineCatalog(scope, "organization", context),
+          centerItems: null,
+        };
       const [local, global] = await Promise.all([
-        readDisciplineCatalog(scope, "center"),
-        canOrganization ? readDisciplineCatalog(scope, "organization") : Promise.resolve(null),
+        readDisciplineCatalog(scope, "center", context),
+        canOrganization
+          ? readDisciplineCatalog(scope, "organization", context)
+          : Promise.resolve(null),
       ]);
       return { items: global ?? local, centerItems: local };
     },
@@ -309,7 +314,7 @@ function SettingsManagement({
   const publicValues = document.source?.document.values;
   const organizationSource = useQuery({
     queryKey: ["settings-document", scope.accountId, scope.orgId, scope.centerId, "organization"],
-    queryFn: () => readSettingsDocument(scope, "organization"),
+    queryFn: (context) => readSettingsDocument(scope, "organization", context),
     enabled: section === "yayin" && level === "center" && canOrganization && !readOnly,
     retry: false,
     refetchOnReconnect: false,

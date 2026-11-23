@@ -1,12 +1,16 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { BackendError } from "../../lib/backend";
-import { scopedBackend } from "../../lib/scoped-backend";
+import { scopedBackend, type AccountReadContext } from "../../lib/scoped-backend";
 import type { StarterRetainedScope } from "@ftksaas/api-contracts";
 import { readSettingsSubscription, type SettingsSubscriptionSource } from "./settings-subscription";
 export type RetainedKind = "rooms" | "disciplines" | "instructors" | "students";
-export async function readDowngradeCenters(before: SettingsSubscriptionSource, cursor?: string) {
-  return (await scopedBackend(before.scope)).call("centers_list_v1", {
+export async function readDowngradeCenters(
+  before: SettingsSubscriptionSource,
+  cursor?: string,
+  readContext?: AccountReadContext,
+) {
+  return (await scopedBackend(before.scope, undefined, readContext)).call("centers_list_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
     org_id: before.scope.orgId,
@@ -19,6 +23,7 @@ export async function readDowngradeSource(
   centerId?: string,
   resources?: RetainedKind,
   cursor?: string,
+  readContext?: AccountReadContext,
 ) {
   const version = z
     .number()
@@ -28,7 +33,7 @@ export async function readDowngradeSource(
     .parse(before.subscription.subscription_version);
   const operation = "subscription_downgrade_request_v1" as const;
   const data = await (
-    await scopedBackend(before.scope)
+    await scopedBackend(before.scope, undefined, readContext)
   ).call("management_state_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),

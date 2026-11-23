@@ -31,7 +31,7 @@ export function OverviewContent({
       : undefined;
   const program = useQuery({
     queryKey: ["overview", scope.accountId, scope.orgId, scope.centerId, center?.timezone],
-    queryFn: () => readOverviewDay(scope, center!.timezone),
+    queryFn: (context) => readOverviewDay(scope, center!.timezone, undefined, context),
     enabled: !!center,
     retry: false,
     refetchInterval: 60_000,
@@ -48,7 +48,7 @@ export function OverviewContent({
       scope.centerId,
       entries?.map((r) => [r.session.id, r.session.version]),
     ],
-    queryFn: () => readOverviewLabels(scope, entries!),
+    queryFn: (context) => readOverviewLabels(scope, entries!, context),
     enabled: !!entries,
     retry: false,
   });
@@ -62,7 +62,7 @@ export function OverviewContent({
       selected?.session.version,
       selected?.session.capacity,
     ],
-    queryFn: () => readOverviewParticipants(scope, selected!.session.id),
+    queryFn: (context) => readOverviewParticipants(scope, selected!.session.id, context),
     enabled: !!selected,
     retry: false,
   });

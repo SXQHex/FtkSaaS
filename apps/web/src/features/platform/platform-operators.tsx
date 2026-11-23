@@ -63,7 +63,7 @@ export function PlatformOperators({
   const key = platformOperatorKey(accountId);
   const roster = useQuery({
     queryKey: key,
-    queryFn: () => readPlatformOperators(accountId),
+    queryFn: (context) => readPlatformOperators(accountId, context),
     retry: false,
     gcTime: 0,
     refetchOnMount: "always",
@@ -71,8 +71,8 @@ export function PlatformOperators({
   const rows = roster.isError ? [] : (roster.data ?? []);
   const account = useQuery({
     queryKey: ["platform-operator-target", accountId, lookup],
-    queryFn: async () =>
-      lookup ? ((await readVerifiedPlatformAccount(accountId, lookup)) ?? null) : null,
+    queryFn: async (context) =>
+      lookup ? ((await readVerifiedPlatformAccount(accountId, lookup, context)) ?? null) : null,
     enabled: Boolean(lookup),
     retry: false,
     gcTime: 0,

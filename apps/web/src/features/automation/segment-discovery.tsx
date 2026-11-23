@@ -30,8 +30,14 @@ export function SegmentDiscovery({
       target.mode,
       cursors[index],
     ],
-    queryFn: async () => {
-      const page = await readSegmentDiscovery(scope, target.id, target.mode, cursors[index]);
+    queryFn: async (context) => {
+      const page = await readSegmentDiscovery(
+        scope,
+        target.id,
+        target.mode,
+        cursors[index],
+        context,
+      );
       if (page.nextCursor && cursors.includes(page.nextCursor))
         throw Error("AUTOMATION_CURSOR_UNAVAILABLE");
       return page;

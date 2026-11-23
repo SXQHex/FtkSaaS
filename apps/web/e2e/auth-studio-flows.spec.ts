@@ -56,8 +56,32 @@ test("Studio flow: acknowledged room never writes again after a failed summary r
   expect(state.effects).toEqual(["room_save_v1"]);
   expect((await scanAccessibility(page, "studio-room-ack-read-failure")).violations).toEqual([]);
   state.failedReads.clear();
+  const accountReadsBeforeRetry = state.native.account;
+  const retryReads: string[] = [];
+  const observeReadback = (request: import("@playwright/test").Request) => {
+    if (request.method() !== "POST") return;
+    const path = new URL(request.url()).pathname;
+    if (path === "/functions/v1/backend-v1/account_get_v1") retryReads.push("account_get_v1");
+    if (path !== "/functions/v1/backend-v1/management_state_get_v1") return;
+    const payload: unknown = request.postDataJSON();
+    if (
+      typeof payload === "object" &&
+      payload !== null &&
+      "operation" in payload &&
+      payload.operation === "room_save_v1"
+    )
+      retryReads.push("room_save_v1");
+  };
+  page.on("request", observeReadback);
   await dialog.getByRole("button", { name: "Listeyi yeniden yükle", exact: true }).click();
   await expect(dialog).toHaveCount(0);
+  page.off("request", observeReadback);
+  expect(state.native.account).toBeGreaterThan(accountReadsBeforeRetry);
+  // The plan callback runs after these snapshot sources. Its strict account
+  // read alone must not satisfy the mandatory room readback's identity check.
+  const firstRoomRead = retryReads.indexOf("room_save_v1");
+  expect(firstRoomRead).toBeGreaterThan(-1);
+  expect(retryReads.slice(0, firstRoomRead)).toContain("account_get_v1");
   expect(state.writes).toHaveLength(1);
   await expect(
     page.getByRole("button", { name: "Okuma yeniden deneme salonu", exact: true }),

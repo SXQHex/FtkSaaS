@@ -49,7 +49,7 @@ export function BusinessReport({
       anchor,
     ],
     initialPageParam: undefined as string | undefined,
-    queryFn: async ({ pageParam }) => {
+    queryFn: async (context) => {
       const interval = await reportInterval(timezone, days, "", "", anchor);
       return readScopedReport(
         scope,
@@ -58,8 +58,9 @@ export function BusinessReport({
         {
           aggregate,
           limit: 25,
-          cursor: pageParam,
+          cursor: context.pageParam,
         },
+        context,
       );
     },
     getNextPageParam: (last) => last.rows.next_cursor ?? undefined,

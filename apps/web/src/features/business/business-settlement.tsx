@@ -57,7 +57,7 @@ export function BusinessSettlement({
   const { t } = useTranslation();
   const authority = useQuery({
     queryKey: [...settlementKey(scope), "authority", personId],
-    queryFn: () => settlementAuthority(scope, personId!),
+    queryFn: (context) => settlementAuthority(scope, personId!, context),
     enabled: Boolean(personId),
     retry: false,
     gcTime: 0,
@@ -119,7 +119,7 @@ function Ledger({
   const movements = useInfiniteQuery({
     queryKey: [...key, "movements", currency],
     initialPageParam: undefined as string | undefined,
-    queryFn: ({ pageParam }) => settlementMovements(scope, currency, pageParam),
+    queryFn: (context) => settlementMovements(scope, currency, context.pageParam, context),
     getNextPageParam: (last) => last.next_cursor ?? undefined,
     gcTime: 0,
     retry: false,
@@ -127,7 +127,7 @@ function Ledger({
   const requests = useInfiniteQuery({
     queryKey: [...key, "requests"],
     initialPageParam: undefined as string | undefined,
-    queryFn: ({ pageParam }) => settlementRequests(scope, pageParam),
+    queryFn: (context) => settlementRequests(scope, context.pageParam, context),
     getNextPageParam: (last) => last.next_cursor ?? undefined,
     gcTime: 0,
     retry: false,

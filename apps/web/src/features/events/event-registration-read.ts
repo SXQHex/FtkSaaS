@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
 import { BackendError } from "../../lib/backend";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type {
   EventPaymentPreparationView,
   EventView,
@@ -17,8 +17,12 @@ const common = (scope: ClientScope) => ({
   org_id: scope.orgId,
   center_id: scope.centerId,
 });
-export async function readDetailedEvent(scope: ClientScope, id: string): Promise<EventView> {
-  const event = await readEvent(scope, id, true);
+export async function readDetailedEvent(
+  scope: ClientScope,
+  id: string,
+  readContext?: AccountReadContext,
+): Promise<EventView> {
+  const event = await readEvent(scope, id, true, readContext);
   if (event.actual_started_at != null)
     z.iso.datetime({ offset: true }).parse(event.actual_started_at);
   if (event.registrations !== undefined) {
@@ -196,8 +200,9 @@ export async function readRegistrationPayment(
   eventId: string,
   personId: string,
   registrationId?: string,
+  readContext?: AccountReadContext,
 ): Promise<RegistrationPayment> {
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, readContext);
   try {
     const page = await backend.call("management_state_get_v1", {
       ...common(scope),

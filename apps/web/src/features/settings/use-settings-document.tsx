@@ -127,9 +127,9 @@ export function useSettingsDocument({
   const key = ["settings-document", scope.accountId, scope.orgId, scope.centerId, level];
   const query = useQuery({
     queryKey: key,
-    queryFn: async () => {
+    queryFn: async (context) => {
       try {
-        return await readSettingsDocument(scope, level);
+        return await readSettingsDocument(scope, level, context);
       } catch (cause) {
         loseAccess(cause);
         throw cause;
@@ -186,9 +186,9 @@ export function useSettingsDocument({
     source?.document.scope === "organization" ? source.document.logo : undefined;
   const logoRead = useQuery({
     queryKey: ["settings-logo", scope.accountId, scope.orgId, asset?.id],
-    queryFn: async () => {
+    queryFn: async (context) => {
       try {
-        return await readPhoto(asset!, scope);
+        return await readPhoto(asset!, scope, context);
       } catch (cause) {
         loseAccess(cause);
         throw cause;

@@ -80,7 +80,8 @@ export function ProductsContent({
       searchQuery,
       cursors[pageIndex],
     ],
-    queryFn: () => readProductsManagementPage(scope, filter, searchQuery, cursors[pageIndex]),
+    queryFn: (context) =>
+      readProductsManagementPage(scope, filter, searchQuery, cursors[pageIndex], context),
     enabled: Boolean(current),
     retry: false,
   });
@@ -290,7 +291,7 @@ function ProductEditorController({
   const [historyRevision, setHistoryRevision] = useState(0);
   const disciplines = useQuery({
     queryKey: ["product-disciplines", scope.accountId, scope.orgId, scope.centerId],
-    queryFn: () => readDisciplineCatalog(scope, "center"),
+    queryFn: (context) => readDisciplineCatalog(scope, "center", context),
     enabled: !base,
     retry: false,
   });

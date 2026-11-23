@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { EntitlementView, ProductView, DisciplineView } from "@ftksaas/api-contracts";
 import { getTemporal } from "../../lib/temporal";
 import { readProductsPage } from "../products/products";
@@ -9,9 +9,10 @@ export async function readProfileRights(
   scope: ClientScope,
   personId: string,
   options: { includePurchaseSummary?: boolean } = {},
+  readContext?: AccountReadContext,
 ): Promise<EntitlementView[]> {
   z.uuid().parse(personId);
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, undefined, readContext);
   const rows = await backend.call("entitlements_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
@@ -57,13 +58,16 @@ export async function readProfileRights(
   }
   return rows;
 }
-export async function readProfileCatalog(scope: ClientScope): Promise<ProductView[]> {
+export async function readProfileCatalog(
+  scope: ClientScope,
+  readContext?: AccountReadContext,
+): Promise<ProductView[]> {
   const rows: ProductView[] = [],
     cursors = new Set<string>(),
     ids = new Set<string>();
   let cursor: string | undefined;
   do {
-    const page = await readProductsPage(scope, cursor);
+    const page = await readProductsPage(scope, cursor, readContext);
     for (const row of page.items) {
       if (ids.has(row.id)) throw new Error("PROFILE_PRODUCT_SOURCE_UNAVAILABLE");
       ids.add(row.id);
@@ -76,8 +80,11 @@ export async function readProfileCatalog(scope: ClientScope): Promise<ProductVie
   return rows;
 }
 
-export async function readProfileDisciplines(scope: ClientScope): Promise<DisciplineView[]> {
-  const backend = await scopedBackend(scope),
+export async function readProfileDisciplines(
+  scope: ClientScope,
+  readContext?: AccountReadContext,
+): Promise<DisciplineView[]> {
+  const backend = await scopedBackend(scope, undefined, readContext),
     rows: DisciplineView[] = [],
     ids = new Set<string>(),
     cursors = new Set<string>();

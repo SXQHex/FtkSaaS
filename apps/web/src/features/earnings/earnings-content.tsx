@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import type { ClientScope } from "../../lib/scoped-backend";
+import type { ClientScope, AccountReadContext } from "../../lib/scoped-backend";
 import type { InstructorFinancePayment, Interval } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
 
@@ -28,6 +28,7 @@ async function readVisibleCounts(
   scope: ClientScope,
   interval: Interval | undefined,
   items: Awaited<ReturnType<typeof readEarningsDirectory>>["items"],
+  readContext?: AccountReadContext,
 ) {
   const visible = items.filter((row) => row.kind === "instructor"),
     result: Record<string, number> = {};
@@ -35,7 +36,12 @@ async function readVisibleCounts(
     const batch = visible.slice(at, at + 4);
     const responses = await Promise.all(
       batch.map((row) =>
-        readEarningsDirectory(scope, "instructors", { personId: row.person_id, interval }),
+        readEarningsDirectory(
+          scope,
+          "instructors",
+          { personId: row.person_id, interval },
+          readContext,
+        ),
       ),
     );
     responses.forEach((response, offset) => {
@@ -89,12 +95,17 @@ export function EarningsContent({
   const view = tab === "lines" ? "earnings" : tab;
   const page = useQuery({
     queryKey: [...earningsKeys.directory(scope), view, personId, interval, cursors[index]],
-    queryFn: () =>
-      readEarningsDirectory(scope, view, {
-        personId: personId || undefined,
-        interval,
-        cursor: cursors[index],
-      }),
+    queryFn: (readContext) =>
+      readEarningsDirectory(
+        scope,
+        view,
+        {
+          personId: personId || undefined,
+          interval,
+          cursor: cursors[index],
+        },
+        readContext,
+      ),
     enabled: active,
     retry: false,
     refetchOnWindowFocus: false,
@@ -102,7 +113,8 @@ export function EarningsContent({
   const catalog = useInfiniteQuery({
     queryKey: earningsKeys.instructorCatalog(scope),
     initialPageParam: undefined as string | undefined,
-    queryFn: ({ pageParam }) => readEarningsDirectory(scope, "instructors", { cursor: pageParam }),
+    queryFn: ({ pageParam, client, signal }) =>
+      readEarningsDirectory(scope, "instructors", { cursor: pageParam }, { client, signal }),
     getNextPageParam: (page) => page.next_cursor ?? undefined,
     enabled: active,
     retry: false,
@@ -130,13 +142,13 @@ export function EarningsContent({
   const counts = useQuery({
     queryKey: [...earningsKeys.visibleCounts(scope), interval, page.data],
     enabled: active && !!page.data && view === "instructors" && !page.isError,
-    queryFn: () => readVisibleCounts(scope, interval, page.data!.items),
+    queryFn: (readContext) => readVisibleCounts(scope, interval, page.data!.items, readContext),
     retry: false,
     refetchOnWindowFocus: false,
   });
   const disciplines = useQuery({
     queryKey: ["earnings-agreement-disciplines", scope],
-    queryFn: () => readDisciplineCatalog(scope, "center"),
+    queryFn: (readContext) => readDisciplineCatalog(scope, "center", readContext),
     enabled: active && editor?.kind === "agreement",
     retry: false,
   });

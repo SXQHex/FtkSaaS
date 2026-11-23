@@ -51,7 +51,7 @@ export function MemberDocumentsPanel({
       binding.personId,
       binding.context,
     ],
-    queryFn: () => readRequiredDocuments(binding),
+    queryFn: (readContext) => readRequiredDocuments(binding, undefined, readContext),
     retry: false,
     staleTime: 0,
     refetchOnWindowFocus: false,
@@ -169,8 +169,8 @@ export function MemberDocumentEditor({
       before.id,
       before.version_id,
     ],
-    queryFn: async () => {
-      const row = (await readRequiredDocuments(binding, before.file.id)).find(
+    queryFn: async (readContext) => {
+      const row = (await readRequiredDocuments(binding, before.file.id, readContext)).find(
         (r) =>
           r.id === before.id && r.version_id === before.version_id && r.file.id === before.file.id,
       );

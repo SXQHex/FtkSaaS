@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import { getTemporal } from "../../lib/temporal";
 import type { RequestAuditCenterExport, TrackingDirectory } from "@ftksaas/api-contracts";
 export const auditModules = [
@@ -82,10 +82,14 @@ async function auditRequest(
   if (input.result) request.result = z.literal("recorded").parse(input.result);
   return request;
 }
-export async function readAudit(scope: ClientScope, input: AuditInput) {
+export async function readAudit(
+  scope: ClientScope,
+  input: AuditInput,
+  context?: AccountReadContext,
+) {
   const request = await auditRequest(scope, input);
   const data = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, context)
   ).call("audit_list_v1", {
     ...request,
     page: pageFor(input.cursor),
@@ -114,10 +118,11 @@ export async function readAuditCsv(scope: ClientScope, input: AuditInput) {
 export async function readTracking(
   scope: ClientScope,
   input: AuditInput & { kind?: "all" | "operation" | "preview" | "job"; state?: string },
+  context?: AccountReadContext,
 ): Promise<TrackingDirectory> {
   const range = await interval(input);
   const data = await (
-    await scopedBackend(scope)
+    await scopedBackend(scope, undefined, context)
   ).call("tracking_directory_get_v1", {
     ...auditScope(scope),
     page: pageFor(input.cursor),

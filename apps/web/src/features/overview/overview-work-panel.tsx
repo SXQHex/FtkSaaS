@@ -67,7 +67,7 @@ export function OverviewWorkPanel({
       task.id,
       task.version,
     ],
-    queryFn: () => readOverviewWorkSource(scope, task),
+    queryFn: (context) => readOverviewWorkSource(scope, task, context),
     retry: false,
     refetchOnMount: "always",
     refetchOnWindowFocus: false,

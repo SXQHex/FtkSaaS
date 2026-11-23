@@ -43,7 +43,7 @@ export function MemberClassesContent({
   });
   const lessons = useQuery({
     queryKey: [...prefix, "lessons", period.data?.interval],
-    queryFn: () => readMemberClasses(scope, period.data!.interval),
+    queryFn: (readContext) => readMemberClasses(scope, period.data!.interval, readContext),
     enabled: !!period.data,
     retry: false,
   });
