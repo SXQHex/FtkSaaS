@@ -71,6 +71,7 @@ Bu dosya alanlar arası talep ve teslim kabulünün tek kaydıdır. Sohbet devri
 
 | XREQ-071 | Backend; kullanıcının ödeme onayı gecikmesi itirazı | Frontend | [WF17](workflows.md#wf17), [WF13](workflows.md#wf13); [talep ve kabul](#xreq-071) | Son onay → komut ACK → doğrulanmış görünür sonuç ayrı ölçülür; gereksiz ağ beklemeleri azaltılırken hesap/oturum, güncel kaynak, aynı-key ve readback garantileri korunur. | Değerlendirmede | Backend kaynak incelemesi tamamlandı; frontend teknik değerlendirmesi ve gerçek ekran kabulü bekleniyor. |
 | XREQ-072 | Backend; native CI boş 503 kanıtı | Yönetim | [WF00](workflows.md#wf00); [runtime kusuru ve kabul](#xreq-072) | Normal worker tamamlanması geçerli dış yanıtı iptal etmez; oneshot, kaynak/bellek sınırları ve eksiksiz native kabul korunarak kaynak bağlı runtime düzeltmesi kurulur. | Açık; runtime düzeltmesi gerekli | PR395 API8 base/server iptali kaydedildi; aynı native binary ile yaşam döngüsü kusuru üretildi. Per_worker aynı 3 GiB korumayı aşar; tekrar veya kalite istisnası çözüm değildir. |
+| XREQ-073 | Frontend · M09 okuma maliyeti | Backend değerlendirmesi | [Frontend M09](../apps/web/docs/remaining-work.md#router-query-birlesik) · [İstek ve kabul](#xreq-073) | Mevcut kaynak ve alan yetkileriyle sınırlı typed sayfa projeksiyonları, toplamlar ve kesin seçiciler. | Değerlendirme bekliyor | Mevcut istemci native doğrulamaları kullanmaya devam ediyor. Backend sözleşme ve teslim kararı bekleniyor. |
 
 Alanların kendi planlarındaki bağımlılık gözlemleri otomatik olarak talep, onay veya işe başlama yetkisi sayılmaz; somut talep bu tabloya kaydedildiğinde `XREQ-001` biçiminde sabit bir kimlik alır.
 
@@ -1013,3 +1014,19 @@ On denemenin tamamı dışarıda boş 503/base/server verdi; native user kapanı
 4. Aday kurulum yetkisi, PR birleşmesi ve development teslimi ayrı doğrulanır. Bu yerel runtime bulgusu hosted ödeme gecikmesinin veya hosted Edge sürümünün çözüldüğünü göstermez.
 
 Backend alanı mevcut fixture düzeltmesini ve güvenli hata kaydını teslim eder; ortak runtime kararı/kurulumu ve 503 kapanışı açık kalır.
+
+## XREQ-073
+
+Frontend [M09 taraması](../apps/web/docs/remaining-work.md#router-query-birlesik) aynı sonuç ve yetkiyle tekil native doğrulama gerektiren okumaları belirledi. Aşağıdaki ihtiyaçlar mevcut istemciyle karşılanamayan kısmı kapsar. Teknik biçimi ve uygulanabilirliği backend değerlendirir.
+
+| Tüketici | Native okumadan gereken çıktı |
+|---|---|
+| [WF02](workflows.md#wf02) merkez ve Ekip | Erişilebilir tek merkezin saat dilimi ve sürümü. Seçili ekip üyesinin canonical kimliğine ve merkeze bağlı, izin başına etkin değer ve sürüm. |
+| [WF03](workflows.md#wf03) Takvim, Genel Bakış, Eğitmen, CRM deneme dersi ve ders talebi | Takvim sorgusunun kendi merkezi, aralığı, kaynağı ve cursor'ı içinde seans durumu, yoklama durumu, sürüm ve görünür görev/etiketler. Yeni seanslı onay için sonuç rezervasyonuna bağlanmış seans kimliği. |
+| [WF04](workflows.md#wf04) üye rezervasyonu, seans katılımcıları, CRM kişileri ve Ekip | Üyenin kendi rezervasyon sürümüne bağlı seans başlığı, kendi yoklaması ve geçerli iptal kaynakları. Yönetim sayfalarında mevcut bağımsız kişi okuma yetkisinin izin verdiği canonical ad alanları. |
+| [WF02](workflows.md#wf02), [WF03](workflows.md#wf03) ve [WF14](workflows.md#wf14) Stüdyo | Görünen kaynaklar için program, kapanış, müsaitlik, sınıf ataması ve anlaşma özetleri. Aktif sınıflar ve yalnız seçilen eğitmenle sınırlı atama durumu ve yazma sürümleri. |
+| [WF08](workflows.md#wf08), [WF10](workflows.md#wf10) ve [WF14](workflows.md#wf14) finans | Kişi ve para birimi başına borç özeti, görünür eğitmen başına kapalı seans sayısı, self aylık hakediş toplamı ve Business raporlarında yetkili merkez toplamları ile birleşik toplam. Dönem, düzeltmeler, sıfır tutar ve para birimi semantiği tekil okumalarla eşleşir. |
+| [WF09](workflows.md#wf09) public keşif | Anonim durum/form bağını takvim satırı ayrıntısından bağımsız alabilme. Slug ve center altında kesin yayın kimliğiyle güncel, ziyaretçiye açık etkinliği ve bağlı onay/form sürümünü okuyabilme. |
+| [WF15](workflows.md#wf15) Etkinlik ve [WF17](workflows.md#wf17) Platform | Etkinlikte görünür mekân/görevli etiketi ve seçilen kişi/etkinlik/kayıt için geçerli ödeme hazırlığı; Platform'da başvuru kimliğiyle mevcut yetki kapsamındaki kesin kuyruk kaydı ve sürümü. |
+
+**Kabul.** Aynı aktör, native oturum, organizasyon, merkez, plan, canonical veri sahibi ve alan görünürlüğü korunur. Sonuç kümesi görünür kayıt ve seçili dönemle sınırlanır. İzin reddi, kaynak yokluğu, boş sonuç ve sıfır ayrı kalır. Cursor tüm seçicilere bağlanır. İlgili pozitif ve negatif native testler, önce/sonra istek ve satır sayısı, aynı fixture'da gecikme ve ayrı hosted ölçümle doğrulanır. Komut hazırlığı, idempotent yazma ve taze sonuç okuması kendi native kontrolünde kalır.

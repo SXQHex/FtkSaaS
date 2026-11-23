@@ -3,6 +3,7 @@ import { v7 as uuidv7 } from "uuid";
 import type { SettingsImageUpload, OrganizationSettingsValues } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
 import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
+import { readOrganizationSettingsCatalogQuery } from "./settings-reader";
 export type SettingsLevel = "organization" | "center";
 export const settingsDocumentKey = (scope: ClientScope, level: SettingsLevel) =>
   [
@@ -240,7 +241,14 @@ export async function readSettingsDocument(
 ) {
   const backend = await scopedBackend(scope, undefined, readContext);
   const [catalog, document] = await Promise.all([
-    backend.call("settings_catalog_get_v1", { ...common(scope, level), request_id: uuidv7() }),
+    level === "organization" && readContext
+      ? readContext.client
+          .fetchQuery(readOrganizationSettingsCatalogQuery(scope))
+          .then((catalog) => {
+            readContext.signal.throwIfAborted();
+            return catalog;
+          })
+      : backend.call("settings_catalog_get_v1", { ...common(scope, level), request_id: uuidv7() }),
     backend.call("settings_get_v1", { ...common(scope, level), request_id: uuidv7() }),
   ]);
   if (

@@ -1,5 +1,5 @@
 import { v7 as uuidv7 } from "uuid";
-import { getBackend } from "../../lib/backend";
+import { getBackend, queryBackendRead } from "../../lib/backend";
 import type { UserSettingsValues } from "@ftksaas/api-contracts";
 
 export type ThemeChoice = NonNullable<UserSettingsValues["theme"]>;
@@ -25,15 +25,29 @@ export interface AppearanceIntent {
   version: number;
   key: string;
 }
-export async function readAppearance(): Promise<AppearanceSnapshot> {
+export async function readAppearance(signal?: AbortSignal): Promise<AppearanceSnapshot> {
   const backend = getBackend();
   const [catalog, settings] = await Promise.all([
-    backend.call("settings_catalog_get_v1", {
-      client_api_version: 1,
-      request_id: uuidv7(),
-      scope: "user",
-    }),
-    backend.call("settings_get_v1", { client_api_version: 1, request_id: uuidv7(), scope: "user" }),
+    queryBackendRead(
+      backend,
+      "settings_catalog_get_v1",
+      {
+        client_api_version: 1,
+        request_id: uuidv7(),
+        scope: "user",
+      },
+      signal,
+    ),
+    queryBackendRead(
+      backend,
+      "settings_get_v1",
+      {
+        client_api_version: 1,
+        request_id: uuidv7(),
+        scope: "user",
+      },
+      signal,
+    ),
   ]);
   if (
     catalog.scope !== "user" ||

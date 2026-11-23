@@ -3,7 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { readAppearance } from "./appearance";
 
 export function useAccountAppearance(accountId: string) {
-  const query = useQuery({ queryKey: ["account-appearance", accountId], queryFn: readAppearance });
+  const query = useQuery({
+    queryKey: ["account-appearance", accountId],
+    queryFn: ({ signal }) => readAppearance(signal),
+  });
   const theme = query.data?.values.theme;
   const scale = query.data?.values.font_scale;
   const contrast = query.data?.values.contrast;

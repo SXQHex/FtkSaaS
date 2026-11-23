@@ -28,9 +28,10 @@ export type AccessWriteIntent =
 export async function readAccessAction(
   scope: ClientScope,
   selection: AccessAction,
+  signal?: AbortSignal,
 ): Promise<AccessActionBase> {
   const source = "invitation" in selection ? selection.invitation : selection.account;
-  const person = await readPerson(scope, source.personId);
+  const person = await readPerson(scope, source.personId, undefined, undefined, signal);
   if (selection.kind === "resend" || selection.kind === "invite")
     return {
       scope: { ...scope },
@@ -44,7 +45,7 @@ export async function readAccessAction(
       version: null,
       targetId: null,
     };
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, signal);
   const targetId = selection.kind === "cancel" ? selection.invitation.id : selection.account.linkId;
   if (!targetId) throw new Error("ACCESS_TARGET_UNAVAILABLE");
   // By-ID compatibility reads do not contain field/action metadata. The

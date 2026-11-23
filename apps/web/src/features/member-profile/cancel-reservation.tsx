@@ -123,16 +123,22 @@ export function CancelReservation({
   ]);
   useEffect(() => {
     if (recoveryOnly || intent.current) return;
-    let active = true;
-    void readCancellation({ accountId, orgId, centerId }, personId, reservationId, sessionId)
+    const controller = new AbortController();
+    void readCancellation(
+      { accountId, orgId, centerId },
+      personId,
+      reservationId,
+      sessionId,
+      controller.signal,
+    )
       .then((next) => {
-        if (active) {
+        if (!controller.signal.aborted) {
           setBase(next);
           setState("ready");
         }
       })
       .catch((failure) => {
-        if (!active) return;
+        if (controller.signal.aborted) return;
         if (failure instanceof BackendError && failure.code === "FORBIDDEN")
           setError(t(($) => $.memberProfile.cancelUnavailable));
         else if (onAccessLost(failure)) {
@@ -142,7 +148,7 @@ export function CancelReservation({
         setState("rejected");
       });
     return () => {
-      active = false;
+      controller.abort();
     };
   }, [
     accountId,

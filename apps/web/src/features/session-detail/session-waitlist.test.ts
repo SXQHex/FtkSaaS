@@ -8,6 +8,7 @@ import {
   readWaitlistReceipt,
   readWaitlistResult,
 } from "./session-waitlist";
+import { readOverviewParticipants } from "../overview/overview-read";
 import { readSessionWaitlist, readSessionParticipants } from "./session-detail-read";
 const id = (n: number) => `019a7b00-0000-7000-8000-${String(n).padStart(12, "0")}`;
 const scope = { accountId: id(1), orgId: id(2), centerId: id(3) },
@@ -173,4 +174,32 @@ it("the participant page opts into its assigned source without querying unrelate
     "reservation_list_v1",
     expect.objectContaining({ session_id: sid, include_source_summary: true }),
   );
+});
+
+it("hydrates people only for the first three eligible overview reservations", async () => {
+  const rows = ["cancelled", "active", "completed", "active", "active"].map((state, index) => ({
+    id: id(20 + index),
+    session_id: sid,
+    person_id: id(40 + index),
+    mode: "flexible",
+    state,
+    version: 1,
+  }));
+  call.mockImplementation((operation: string, request: { person_id: string }) =>
+    Promise.resolve(
+      operation === "reservation_list_v1"
+        ? { items: rows, next_cursor: "unneeded", as_of: entry.created_at }
+        : { id: request.person_id, display_name: "Sentetik üye" },
+    ),
+  );
+  const preview = await readOverviewParticipants(scope, sid);
+  expect(preview.map(({ reservation }) => reservation.id)).toEqual(
+    rows.slice(1, 4).map((row) => row.id),
+  );
+  expect(
+    call.mock.calls
+      .filter(([operation]) => operation === "person_get_v1")
+      .map(([, request]) => request.person_id),
+  ).toEqual(rows.slice(1, 4).map((row) => row.person_id));
+  expect(call).toHaveBeenCalledTimes(4);
 });

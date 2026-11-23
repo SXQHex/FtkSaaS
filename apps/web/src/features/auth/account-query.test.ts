@@ -7,7 +7,16 @@ const { native, reader } = vi.hoisted(() => ({
   reader: vi.fn(),
 }));
 vi.mock("../../lib/supabase", () => ({ getSupabaseClient: () => ({ auth: native }) }));
-vi.mock("../../lib/account", () => ({ readAccount: reader }));
+vi.mock("../../lib/account", () => ({
+  readAccount: (
+    ...[includePlatformScope, bearer, signal]: Parameters<
+      typeof import("../../lib/account").readAccount
+    >
+  ) => {
+    signal?.throwIfAborted();
+    return reader(includePlatformScope, bearer);
+  },
+}));
 
 import {
   accountQuery,

@@ -18,7 +18,9 @@ test("unavailable route reads only anonymous source and retains center scope acr
     slug: "test-studio",
     center_id: publicCalendarId,
     include_details: true,
+    page: { limit: 1 },
   });
+  expect(f.calls[0]).not.toHaveProperty("include_disciplines");
   await expect(
     page
       .getByRole("navigation", { name: "Sayfa menüsü", exact: true })

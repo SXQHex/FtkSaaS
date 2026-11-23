@@ -109,6 +109,7 @@ test("daily overview reads the center day and safe native member/package preview
     center_id: I.center,
     interval: { starts_at: "2026-11-15T21:00:00Z", ends_at: "2026-11-16T21:00:00Z" },
   });
+  expect(state.reads.filter((operation) => operation === "session_get_v1")).toHaveLength(2);
   expect(state.reads).not.toContain("finance_get_v1");
   expect(state.writes).toHaveLength(0);
   await expect(page.getByRole("heading", { name: "Bekleyen işler", exact: true })).toBeVisible();

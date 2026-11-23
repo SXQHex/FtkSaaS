@@ -132,8 +132,9 @@ export async function readTrialSessions(
       ends_at: date.add({ days: 1 }).toZonedDateTime(timezone).toInstant().toString(),
     },
     undefined,
-    undefined,
+    context?.signal,
     context,
+    { sessionsStartingAfter: Date.now() },
   );
   return {
     day: date.toString(),

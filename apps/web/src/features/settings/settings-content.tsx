@@ -47,7 +47,7 @@ import { useSettingsPolicies } from "./use-settings-policies";
 import { useSettingsDocument } from "./use-settings-document";
 import { useSettingsTeam } from "./use-settings-team";
 import { useSettingsNotifications } from "./use-settings-notifications";
-import { readOrganizationSettingsCatalog } from "./settings-reader";
+import { readOrganizationSettingsCatalogQuery } from "./settings-reader";
 import { SettingsTaxProfile } from "./settings-tax-profile";
 import { SettingsInvoiceHistory } from "./settings-invoice-history";
 
@@ -80,8 +80,7 @@ export function SettingsContent({
       roles.includes("org_manager")),
   );
   const catalog = useQuery({
-    queryKey: ["settings-organization-catalog", scope.accountId, scope.orgId],
-    queryFn: (context) => readOrganizationSettingsCatalog(scope, context),
+    ...readOrganizationSettingsCatalogQuery(scope),
     enabled: canReadOrganizationCatalog,
     retry: false,
   });
@@ -101,9 +100,7 @@ export function SettingsContent({
       </div>
     );
   const organizationCatalog =
-    canReadOrganizationCatalog && !catalog.isError && catalog.data?.state === "known"
-      ? catalog.data.catalog
-      : undefined;
+    canReadOrganizationCatalog && !catalog.isError ? catalog.data : undefined;
   const canOrganization = Boolean(organizationCatalog);
   const canWriteOrganization =
     organizationCatalog?.fields.some((field) => field.key === "address" && field.writable) === true;
@@ -338,6 +335,7 @@ function SettingsManagement({
           slug: scope.orgId,
           centerId: scope.centerId,
           interval: await publicCalendarInterval(),
+          discoveryOnly: true,
         },
         signal,
       ),
@@ -558,6 +556,7 @@ function SettingsManagement({
         <WorkCalendarEditor
           key={`${scope.accountId}:${scope.orgId}:${scope.centerId}`}
           scope={scope}
+          timezone={timezone}
           onClose={() => {
             if (!locked) setWorkCalendarOpen(false);
           }}

@@ -345,6 +345,64 @@ describe("Query-owned scoped account validation", () => {
     expect(queries.getQueryData(key)).toBeUndefined();
   });
 
+  it("aborts a shared account projection in flight without caching a late response", async () => {
+    const queries = client();
+    const requestStarted = Promise.withResolvers<AbortSignal>();
+    server.use(
+      http.post(`${host}/functions/v1/backend-v1/account_get_v1`, async ({ request: incoming }) => {
+        requestStarted.resolve(incoming.signal);
+        await new Promise<void>((resolve) =>
+          incoming.signal.addEventListener("abort", () => resolve(), { once: true }),
+        );
+        return envelope({ id: scope.accountId });
+      }),
+    );
+    const source = accountQuery(nativeId);
+    const pending = queries.fetchQuery(source).catch((failure: unknown) => failure);
+    const transport = await requestStarted.promise;
+    await queries.cancelQueries({ queryKey: source.queryKey, exact: true });
+    expect(isCancelledError(await pending)).toBe(true);
+    expect(transport.aborted).toBe(true);
+    expect(queries.getQueryData(source.queryKey)).toBeUndefined();
+  });
+
+  it.each(["call", "read"] as const)(
+    "uses a fresh account and aborts a standalone editor %s on close",
+    async (method) => {
+      const requestStarted = Promise.withResolvers<AbortSignal>();
+      server.use(
+        http.post(
+          `${host}/functions/v1/backend-v1/people_list_v1`,
+          async ({ request: incoming }) => {
+            requestStarted.resolve(incoming.signal);
+            await new Promise<void>((resolve) =>
+              incoming.signal.addEventListener("abort", () => resolve(), { once: true }),
+            );
+            return envelope(page);
+          },
+        ),
+      );
+      const controller = new AbortController();
+      const backend = await scopedBackend(scope, controller.signal);
+      const body = {
+        ...request,
+        org_id: scope.orgId,
+        center_id: scope.centerId,
+        page: { limit: 20 },
+      };
+      const result =
+        method === "read"
+          ? backend.read("people_list_v1", body, new AbortController().signal)
+          : backend.call("people_list_v1", body);
+      const pending = result.catch((failure: unknown) => failure);
+      const transport = await requestStarted.promise;
+      controller.abort(new Error("EDITOR_CLOSED"));
+      expect(await pending).toMatchObject({ message: "EDITOR_CLOSED" });
+      expect(transport.aborted).toBe(true);
+      expect(accountCount()).toBe(1);
+    },
+  );
+
   it("retains independent fresh checks for native write, receipt and mandatory readback", async () => {
     const queries = client();
     await queries.query(accountQuery(nativeId));

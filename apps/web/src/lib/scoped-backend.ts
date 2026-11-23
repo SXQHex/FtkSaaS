@@ -34,7 +34,7 @@ export async function scopedBackend(
     getAccessToken: async () => bearer,
   });
   const request = { client_api_version: 1 as const, request_id: uuidv7() };
-  // Query reads may be cancelled, but writers never pass a signal.
+  // Callers opt in to cancellation only for reads.
   const account = context
     ? await verifiedAccountForId(context.client, scope.accountId)
     : signal
@@ -42,13 +42,14 @@ export async function scopedBackend(
       : await backend.call("account_get_v1", request);
   signal?.throwIfAborted();
   if (account.id !== scope.accountId) throw new Error("ACCOUNT_CHANGED");
-  if (context) {
+  const readSignal = context?.signal ?? signal;
+  if (readSignal) {
     const session = data.session;
     const currentSession = async () => {
-      context.signal.throwIfAborted();
+      readSignal.throwIfAborted();
       const latest = await getSupabaseClient().auth.getSession();
       if (latest.error) throw latest.error;
-      context.signal.throwIfAborted();
+      readSignal.throwIfAborted();
       if (!latest.data.session || !sameNativeSession(session, latest.data.session))
         throw new Error("ACCOUNT_CHANGED");
     };
@@ -56,16 +57,20 @@ export async function scopedBackend(
     const call: typeof backend.call = async (operation, body) => {
       await currentSession();
       try {
-        return await backend.read(operation, body, context.signal);
+        return await backend.read(operation, body, readSignal);
       } finally {
         // A late denial from an old bearer must not revoke the new session.
         await currentSession();
       }
     };
-    const read: typeof backend.read = async (operation, body, readSignal) => {
+    const read: typeof backend.read = async (operation, body, requestSignal) => {
       await currentSession();
+      const requestLifetime =
+        requestSignal && requestSignal !== readSignal
+          ? AbortSignal.any([readSignal, requestSignal])
+          : readSignal;
       try {
-        return await backend.read(operation, body, readSignal ?? context.signal);
+        return await backend.read(operation, body, requestLifetime);
       } finally {
         await currentSession();
       }

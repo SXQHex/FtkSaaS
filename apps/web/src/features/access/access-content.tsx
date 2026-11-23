@@ -3,7 +3,7 @@ import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { BackendError } from "../../lib/backend";
 import type { ClientScope, AccountReadContext } from "../../lib/scoped-backend";
-import { readPeopleCenter } from "../people/people";
+import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { PersonEntry } from "../people/person-entry";
 import { AccessActionController } from "./access-controller";
 import { accessKeys, invalidateAccessDirectories } from "./access-query";
@@ -43,12 +43,12 @@ export function AccessContent({
   const [locked, setLocked] = useState(false);
   const [entryOpen, setEntryOpen] = useState(false);
   const [entryGeneration, setEntryGeneration] = useState(0);
-  const center = useQuery({
-    queryKey: ["access-center", scope.accountId, scope.orgId, scope.centerId],
-    queryFn: (context) => readPeopleCenter(scope, context),
-    retry: false,
-  });
-  const timezone = center.data?.timezone;
+  const workspace = useWorkspaceQuery(scope.accountId, scope.orgId, false);
+  const center =
+    !workspace.isError && workspace.data?.selected?.id === scope.orgId
+      ? workspace.data.centers.find((row) => row.id === scope.centerId && row.accessible)
+      : undefined;
+  const timezone = center?.timezone;
   const invitationKey = (cursor?: string) => [
     ...accessKeys.invitations(scope),
     invitationFilter,
@@ -72,7 +72,7 @@ export function AccessContent({
   const invitations = useQuery({
     queryKey: invitationKey(invitationCursors[invitationIndex]),
     queryFn: (context) => readInvitations(invitationCursors[invitationIndex], context),
-    enabled: !center.isPending,
+    enabled: !!center,
     retry: false,
   });
   const accounts = useQuery({
@@ -93,7 +93,7 @@ export function AccessContent({
     queries.clear();
     void navigate({ to: "/account", replace: true }).then(() => router.invalidate());
   }, [queries, navigate, router]);
-  const nativeAccessLost = [center.error, invitations.error, accounts.error].some((error) => {
+  const nativeAccessLost = [workspace.error, invitations.error, accounts.error].some((error) => {
     const code =
       error instanceof BackendError
         ? error.code
@@ -207,7 +207,7 @@ export function AccessContent({
         onRetry={() => {
           // Query errors remain visible if this manual retry fails. Do not
           // refetch a stale cursor or let one FORBIDDEN block the other reader.
-          void Promise.allSettled([refresh(), center.refetch()]);
+          void Promise.allSettled([refresh(), workspace.refetch()]);
         }}
         onAction={setSelection}
         onInvite={() => {

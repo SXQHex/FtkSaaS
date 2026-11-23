@@ -63,6 +63,7 @@ export async function readPublicCalendar(
     disciplineId?: string;
     interval: Interval;
     cursor?: string | null;
+    discoveryOnly?: boolean;
   },
   signal?: AbortSignal,
 ) {
@@ -73,9 +74,13 @@ export async function readPublicCalendar(
     request_id: uuidv7(),
     slug: input.slug,
     interval: input.interval,
-    page: { limit: 50, sort: "starts_at_asc", ...(input.cursor ? { cursor: input.cursor } : {}) },
+    page: {
+      limit: input.discoveryOnly ? 1 : 50,
+      sort: "starts_at_asc",
+      ...(input.cursor ? { cursor: input.cursor } : {}),
+    },
     ...(input.centerId ? { center_id: input.centerId } : {}),
-    include_disciplines: true,
+    ...(!input.discoveryOnly ? { include_disciplines: true } : {}),
     include_details: true,
     ...(input.disciplineId ? { discipline_id: z.uuid().parse(input.disciplineId) } : {}),
   };
@@ -87,7 +92,7 @@ export async function readPublicCalendar(
     headers: { "content-type": "application/json" },
     body: JSON.stringify(request),
   });
-  const data = calendar.parse(await readEnvelope<SuccessPublicCalendarGet>(response));
+  const data = calendar.parse(await readEnvelope<SuccessPublicCalendarGet>(response, signal));
   const ids = new Set<string>();
   const T = await getTemporal();
   let previous: string | undefined;

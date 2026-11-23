@@ -38,8 +38,12 @@ export async function createInstructorPerson(intent: NewInstructorIntent) {
   return result.primary_id;
 }
 
-export async function readInstructorEnrollment(scope: StudioScope, personId: string) {
-  const backend = await studioBackend(scope);
+export async function readInstructorEnrollment(
+  scope: StudioScope,
+  personId: string,
+  signal?: AbortSignal,
+) {
+  const backend = await studioBackend(scope, signal);
   const management = (selector: ManagementSelector) =>
     studioPages((cursor) =>
       backend.call("management_state_get_v1", {
@@ -53,7 +57,7 @@ export async function readInstructorEnrollment(scope: StudioScope, personId: str
       }),
     );
   const [roles, links, invitations] = await Promise.all([
-    readStudioInstructors(scope, personId),
+    readStudioInstructors(scope, personId, undefined, signal),
     management({ operation: "account_link_remove_v1", key: { person_id: personId } }).catch(
       (error: unknown) => {
         // Discovery needs a role/relationship/invitation scope; a newly created

@@ -12,7 +12,16 @@ const { native, account } = vi.hoisted(() => ({
 }));
 
 vi.mock("../../lib/supabase", () => ({ getSupabaseClient: () => ({ auth: native }) }));
-vi.mock("../../lib/account", () => ({ readAccount: account }));
+vi.mock("../../lib/account", () => ({
+  readAccount: (
+    ...[includePlatformScope, bearer, signal]: Parameters<
+      typeof import("../../lib/account").readAccount
+    >
+  ) => {
+    signal?.throwIfAborted();
+    return account(includePlatformScope, bearer);
+  },
+}));
 
 import { loginWithPassword } from "./auth";
 

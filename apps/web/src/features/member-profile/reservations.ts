@@ -215,8 +215,9 @@ export async function readProfileReservation(
   personId: string,
   id: string,
   sessionId: string,
+  signal?: AbortSignal,
 ) {
-  const backend = await scopedBackend(scope),
+  const backend = await scopedBackend(scope, signal),
     cursors = new Set<string>();
   let cursor: string | undefined;
   do {

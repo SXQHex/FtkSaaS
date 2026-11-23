@@ -6,6 +6,7 @@ import { BackendError } from "../../lib/backend";
 import type {
   AttendanceView,
   PersonView,
+  ReservationView,
   WaitlistEntryView,
   SessionView,
 } from "@ftksaas/api-contracts";
@@ -80,6 +81,7 @@ export async function readSessionParticipants(
   personId?: string,
   cursor?: string,
   readContext?: AccountReadContext,
+  select?: (reservations: ReservationView[]) => ReservationView[],
 ) {
   z.uuid().parse(sessionId);
   if (personId) z.uuid().parse(personId);
@@ -107,7 +109,8 @@ export async function readSessionParticipants(
     ids.add(row.id);
   }
   const people = new Map<string, PersonView | undefined>();
-  const personIds = [...new Set(page.items.map((row) => row.person_id))];
+  const reservations = select ? select(page.items) : page.items;
+  const personIds = [...new Set(reservations.map((row) => row.person_id))];
   for (let i = 0; i < personIds.length; i += 4)
     await Promise.all(
       personIds
@@ -115,7 +118,7 @@ export async function readSessionParticipants(
         .map(async (id) => people.set(id, await visiblePerson(backend, scope, id))),
     );
   return {
-    items: page.items.map((reservation) => ({
+    items: reservations.map((reservation) => ({
       reservation,
       person: people.get(reservation.person_id),
     })),

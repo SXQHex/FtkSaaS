@@ -84,8 +84,9 @@ export async function readDisciplineCatalog(
   scope: ClientScope,
   level: DisciplineLevel,
   readContext?: AccountReadContext,
+  signal = readContext?.signal,
 ) {
-  const backend = await scopedBackend(scope, undefined, readContext),
+  const backend = await scopedBackend(scope, signal, readContext),
     items: PresentedDiscipline[] = [],
     cursors = new Set<string>(),
     ids = new Set<string>();
@@ -119,9 +120,10 @@ export async function readDisciplineBase(
   level: DisciplineLevel,
   id: string,
   includeEffects = false,
+  signal?: AbortSignal,
 ): Promise<DisciplineBase> {
   z.uuid().parse(id);
-  const backend = await scopedBackend(scope);
+  const backend = await scopedBackend(scope, signal);
   const operation = level === "organization" ? "discipline_save_v1" : "center_discipline_set_v1";
   const selector =
     level === "organization"
@@ -150,6 +152,8 @@ export async function readDisciplineBase(
   const catalog = await readDisciplineCatalog(
       scope,
       level === "center" && !current.exists ? "organization" : level,
+      undefined,
+      signal,
     ),
     discipline = catalog.find((item) => item.id === id);
   if (!discipline) throw new Error("DISCIPLINE_SOURCE_UNAVAILABLE");

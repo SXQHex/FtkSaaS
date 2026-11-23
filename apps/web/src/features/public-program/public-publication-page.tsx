@@ -30,7 +30,7 @@ function PublicPublicationPage({ slug, centerId }: { slug: string; centerId?: st
     queryKey: ["public-publication-state", slug, centerId, openedAt],
     queryFn: async ({ signal }) =>
       readPublicCalendar(
-        { slug, centerId, interval: await publicCalendarInterval(openedAt) },
+        { slug, centerId, interval: await publicCalendarInterval(openedAt), discoveryOnly: true },
         signal,
       ),
     retry: false,

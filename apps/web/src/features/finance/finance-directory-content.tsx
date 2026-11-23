@@ -116,7 +116,7 @@ export function FinanceDirectoryContent({
   const creditRows = source && tab === "credits" && !personal ? source.items : [];
   const creditDebts = useQueries({
     queries: creditRows.map((row) => ({
-      queryKey: [...financeKeys.person(scope, row.person_id, row.currency), undefined],
+      queryKey: [...financeKeys.person(scope, row.person_id, row.currency), "debts"],
       queryFn: ({ signal, client }: AccountReadContext) =>
         guard(() =>
           readFinancePage(
@@ -125,6 +125,7 @@ export function FinanceDirectoryContent({
             undefined,
             signal,
             { client, signal },
+            1,
           ),
         ),
       select: (finance: Awaited<ReturnType<typeof readFinancePage>>) =>

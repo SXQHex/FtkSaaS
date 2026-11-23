@@ -2,12 +2,25 @@ import { queryOptions, type QueryClient } from "@tanstack/react-query";
 import { invalidateAndReadFirstPage } from "../../lib/cache-invalidation";
 import { scheduleCacheKeys } from "../schedule/schedule-cache";
 import { sessionDetailKeys } from "../session-detail/session-detail-query";
-import { readStudioRooms, type StudioScope } from "./studio";
+import { readStudioResource, readStudioRooms, type StudioScope } from "./studio";
 
 export function studioRoomsQuery(scope: StudioScope) {
   return queryOptions({
     queryKey: ["studio-rooms", scope.accountId, scope.orgId, scope.centerId],
     queryFn: (context) => readStudioRooms(scope, context),
+    retry: false,
+  });
+}
+
+export function studioRoomQuery(queries: QueryClient, scope: StudioScope, roomId?: string) {
+  const directory = studioRoomsQuery(scope);
+  const source = queries.getQueryState(directory.queryKey);
+  const initial = source?.status === "success" && !source.isInvalidated ? source : undefined;
+  return queryOptions({
+    queryKey: [...directory.queryKey, roomId],
+    queryFn: (context) => readStudioResource(scope, "room", roomId!, context),
+    initialData: initial?.data?.find((room) => room.id === roomId),
+    initialDataUpdatedAt: initial?.dataUpdatedAt,
     retry: false,
   });
 }
