@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useBlocker, useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { PersonSummary } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
 import { readPerson } from "../people/people";
+import { invalidatePeoplePages } from "../people/people-query";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { readApplicationsPage } from "./leads-read";
 import {
@@ -44,6 +45,7 @@ export function ApplicationEditor({
 }) {
   const { t } = useTranslation(),
     router = useRouter(),
+    queries = useQueryClient(),
     [action, setAction] = useState<"match_existing" | "create_candidate" | "close">(
       "match_existing",
     ),
@@ -63,7 +65,9 @@ export function ApplicationEditor({
     write: writeLeadIntent,
     readReceipt: readLeadReceipt,
     readResult: readLeadResult,
-    onRefresh: async () => {
+    onRefresh: async (result) => {
+      if (result.kind === "application" && result.createdCandidate)
+        await invalidatePeoplePages(queries, scope);
       await query.refetch({ throwOnError: true });
       await onSaved();
     },

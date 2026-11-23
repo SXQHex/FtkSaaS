@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
@@ -62,7 +62,6 @@ export function AutomationEditor(props: AutomationEditorProps) {
     [nameError, setNameError] = useState<string>(),
     [preset, setPreset] = useState(""),
     [prepared, setPrepared] = useState<Awaited<ReturnType<typeof resolveAutomationPreparation>>>();
-  const queries = useQueryClient();
   const running = useRef(false),
     mounted = useRef(true);
   useEffect(() => {
@@ -87,23 +86,10 @@ export function AutomationEditor(props: AutomationEditorProps) {
   }, [locked, onLockChange]);
   const choices = useInfiniteQuery({
     queryKey: ["automation-segment-choices", scope.accountId, scope.orgId, scope.centerId],
-    queryFn: async (context) => {
-      const page = await readSegments(scope, undefined, context.pageParam, context);
-      const prior = queries.getQueryData<{ pageParams: (string | undefined)[] }>([
-        "automation-segment-choices",
-        scope.accountId,
-        scope.orgId,
-        scope.centerId,
-      ]);
-      if (
-        page.next_cursor &&
-        (page.next_cursor === context.pageParam || prior?.pageParams.includes(page.next_cursor))
-      )
-        throw Error("AUTOMATION_CURSOR_UNAVAILABLE");
-      return page;
-    },
+    queryFn: (context) => readSegments(scope, undefined, context.pageParam, context),
     initialPageParam: undefined as string | undefined,
-    getNextPageParam: (page) => page.next_cursor ?? undefined,
+    getNextPageParam: (page, _pages, _last, pageParams) =>
+      page.next_cursor && !pageParams.includes(page.next_cursor) ? page.next_cursor : undefined,
     enabled: selection.kind === "automation",
     retry: false,
   });
@@ -245,6 +231,9 @@ export function AutomationEditor(props: AutomationEditorProps) {
     );
   const workAlert = ["pending_request", "unclosed_attendance"].includes(auto.trigger);
   const segments = choices.data?.pages.flatMap((page) => page.items) ?? [];
+  const nextSegmentCursor = choices.data?.pages.at(-1)?.next_cursor;
+  const segmentCursorLoop =
+    nextSegmentCursor && choices.data?.pageParams.includes(nextSegmentCursor);
   const options = segments
     .filter((row) => row.state === "active")
     .map((row) => ({ id: row.id, name: row.name, disabled: workAlert }));
@@ -355,7 +344,7 @@ export function AutomationEditor(props: AutomationEditorProps) {
               {t(($) => $.automation.moreSegments)}
             </Button>
           )}
-          {choices.isError && (
+          {(choices.isError || segmentCursorLoop) && (
             <Button
               variant="outline"
               isDisabled={locked}

@@ -1,5 +1,5 @@
-import { useEffect, useId, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useContext, useEffect, useId, useRef, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import {
   Sheet,
@@ -12,6 +12,8 @@ import { Field, FieldGroup, FieldLabel, FieldError } from "@ftksaas/ui/component
 import { Checkbox } from "@ftksaas/ui/components/checkbox";
 import { Button } from "@ftksaas/ui/components/button";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
+import { readIntoCurrentQuery } from "../../lib/cache-invalidation";
+import { PrivateSessionRevision } from "../auth/private-session-revision";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { EventCommandNotice } from "../events/event-command-notice";
 import {
@@ -23,7 +25,6 @@ import {
   readAgreementAcceptanceResult,
   type AgreementDocumentBinding,
 } from "./agreement-document";
-import type { DigitalAgreementView } from "@ftksaas/api-contracts";
 
 export function AgreementDocumentSheet({
   binding,
@@ -38,20 +39,23 @@ export function AgreementDocumentSheet({
 }) {
   const { t } = useTranslation(),
     id = useId();
+  const queries = useQueryClient();
+  const sessionRevision = useContext(PrivateSessionRevision);
   const checkbox = useRef<HTMLInputElement>(null);
-  const [reviewed, setReviewed] = useState(false),
+  const [reviewedDocument, setReviewedDocument] = useState<{ revision: number; id: string }>(),
     [preparing, setPreparing] = useState(false),
-    [error, setError] = useState<"review" | "source">(),
-    [confirmed, setConfirmed] = useState<DigitalAgreementView>();
+    [error, setError] = useState<"review" | "source">();
+  const queryKey = [
+    "instructor-agreement-document",
+    binding.scope.accountId,
+    binding.scope.orgId,
+    binding.scope.centerId,
+    binding.agreement.id,
+    binding.agreement.version,
+    sessionRevision,
+  ];
   const query = useQuery({
-    queryKey: [
-      "instructor-agreement-document",
-      binding.scope.accountId,
-      binding.scope.orgId,
-      binding.scope.centerId,
-      binding.agreement.id,
-      binding.agreement.version,
-    ],
+    queryKey,
     queryFn: (readContext) => readAgreementDocument(binding, readContext),
     retry: false,
     staleTime: 0,
@@ -64,19 +68,23 @@ export function AgreementDocumentSheet({
   const command = useMemberCommand({
     write: acceptAgreementDocument,
     readReceipt: readAgreementAcceptanceReceipt,
-    readResult: readAgreementAcceptanceResult,
+    readResult: (intent, receiptId) =>
+      readIntoCurrentQuery(queries, queryKey, () =>
+        readAgreementAcceptanceResult(intent, receiptId),
+      ),
     onAccessLost,
-    onRefresh: async (view) => {
-      setConfirmed(view);
-    },
   });
   const locked = preparing || command.locked;
   useEffect(() => {
     onLockChange(locked);
     return () => onLockChange(false);
   }, [locked, onLockChange]);
-  const view = confirmed ?? (!query.isError && !query.isFetching ? query.data : undefined);
+  const view = query.isSuccess && query.fetchStatus === "idle" ? query.data : undefined;
   const document = view?.rendered_document;
+  const reviewed =
+    !!document &&
+    reviewedDocument?.revision === sessionRevision &&
+    reviewedDocument.id === document.id;
   const accepted = view ? ownServerAcceptance(view, binding.scope.accountId) : false;
   const disabled = locked || command.state !== "ready" || !document || accepted;
   async function accept() {
@@ -93,7 +101,7 @@ export function AgreementDocumentSheet({
     } catch (cause) {
       if (!onAccessLost(cause)) {
         setError("source");
-        setReviewed(false);
+        setReviewedDocument(undefined);
       }
     } finally {
       setPreparing(false);
@@ -101,8 +109,7 @@ export function AgreementDocumentSheet({
   }
   async function reload() {
     if (locked) return;
-    setConfirmed(undefined);
-    setReviewed(false);
+    setReviewedDocument(undefined);
     setError(undefined);
     command.reset();
     await query.refetch();
@@ -133,10 +140,8 @@ export function AgreementDocumentSheet({
         }}
       >
         <FieldGroup>
-          {query.isFetching && !confirmed && (
-            <p role="status">{t(($) => $.memberDocuments.loading)}</p>
-          )}
-          {query.isError && !confirmed && (
+          {!view && !query.isError && <p role="status">{t(($) => $.memberDocuments.loading)}</p>}
+          {query.isError && (
             <Alert role="alert" variant="destructive">
               <AlertDescription>{t(($) => $.agreementDocument.unavailable)}</AlertDescription>
             </Alert>
@@ -172,7 +177,9 @@ export function AgreementDocumentSheet({
                 isInvalid={error === "review"}
                 validationBehavior="aria"
                 onChange={(value) => {
-                  setReviewed(value);
+                  setReviewedDocument(
+                    value ? { revision: sessionRevision, id: document.id } : undefined,
+                  );
                   setError(undefined);
                 }}
               />
@@ -188,12 +195,14 @@ export function AgreementDocumentSheet({
                 : t(($) => $.agreementDocument.changed)}
             </FieldError>
           )}
-          <EventCommandNotice
-            command={command}
-            onReload={() => {
-              void reload();
-            }}
-          />
+          {(command.state !== "saved" || accepted) && (
+            <EventCommandNotice
+              command={command}
+              onReload={() => {
+                void reload();
+              }}
+            />
+          )}
         </FieldGroup>
       </form>
       <SheetFooter>

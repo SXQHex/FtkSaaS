@@ -120,6 +120,67 @@ test("event detail shows native unknown payment and requires reviewed actual sta
   await close.getByRole("button", { name: "Vazgeç", exact: true }).click();
   expect(state.event.attendance_state).toBe("closed");
 });
+
+test("event details never pair a new revision with the previous times while duty names load", async ({
+  page,
+}) => {
+  const state = await mockEventDetail(page);
+  await page.getByRole("tab", { name: "Yoklama", exact: true }).click();
+  const planned = page.getByLabel("Planlanan başlangıç", { exact: true });
+  const actual = page.getByLabel("Fiilî başlangıç", { exact: true });
+  await expect(planned).toHaveValue(/18:00/);
+  await actual.fill("2026-11-15T18:05");
+  await page.getByLabel("Gerekçe", { exact: true }).fill("Sentetik fiilî başlangıç");
+
+  let release!: () => void;
+  const waitForDuty = new Promise<void>((resolve) => (release = resolve));
+  const dutyPath = "**/functions/v1/backend-v1/person_get_v1";
+  await page.route(dutyPath, async (route) => {
+    if (route.request().postDataJSON().person_id === I.instructor) await waitForDuty;
+    await route.fallback();
+  });
+  const dutyRead = page.waitForRequest(
+    (request) =>
+      request.url().endsWith("/person_get_v1") && request.postDataJSON().person_id === I.instructor,
+  );
+  await page.route("**/functions/v1/backend-v1/event_get_v1", async (route) => {
+    if (state.effects && !state.event.duties?.length) {
+      state.event.name = "Güncellenen sentetik etkinlik";
+      state.event.interval = {
+        starts_at: "2026-11-15T14:30:00Z",
+        ends_at: "2026-11-15T16:30:00Z",
+      };
+      state.event.duties = [
+        {
+          id: D.debt,
+          person_id: I.instructor,
+          duty: "instructor",
+          fee_minor: "12000",
+          currency: "TRY",
+          performed: null,
+          verified_at: null,
+          version: 1,
+        },
+      ];
+    }
+    await route.fallback();
+  });
+
+  try {
+    await page.getByRole("button", { name: "Fiilî başlangıcı kaydet", exact: true }).click();
+    const dialog = await accept(page, "Fiilî başlangıcı kaydet");
+    await dutyRead;
+    await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
+    await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+    await expect(planned.and(page.locator('input[value$="18:00"]'))).toHaveCount(0);
+  } finally {
+    release();
+  }
+  await expect(page.getByRole("heading", { name: "Güncellenen sentetik etkinlik" })).toBeVisible();
+  await expect(planned).toHaveValue(/17:30/);
+  await expect(actual).toHaveValue("2026-11-15T18:05");
+});
+
 test("package practice uses the selected right for eligibility and closes without a payment command", async ({
   page,
 }) => {
@@ -435,6 +496,46 @@ async function paidRegistration(page: Page) {
   await sheet.getByRole("button", { name: "Kaydı onayla", exact: true }).click();
   return sheet;
 }
+test("reopening an event payment never offers a warm balance after a failed read", async ({
+  page,
+}) => {
+  const state = await mockEventDetail(page);
+  async function selectPerson() {
+    await page.getByRole("button", { name: "Katılımcı ekle", exact: true }).click();
+    const sheet = page.getByRole("dialog");
+    await sheet.getByLabel("Kişi", { exact: true }).selectOption(I.instructor);
+    return sheet;
+  }
+  let sheet = await selectPerson();
+  await sheet.getByRole("button", { name: "Devam", exact: true }).click();
+  await sheet.getByRole("button", { name: "Ödeme hazırlığını oluştur", exact: true }).click();
+  const preparation = await accept(page, "Ödeme hazırlığını oluştur");
+  await expect(preparation.getByText(saved, { exact: true })).toBeVisible();
+  await preparation.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await sheet.getByRole("button", { name: "Close", exact: true }).click();
+  await expect(sheet).toHaveCount(0);
+
+  let rejectedReads = 0;
+  let denyPayment = true;
+  await page.route("**/functions/v1/backend-v1/event_payment_get_v1", async (route) => {
+    if (!denyPayment) return route.fallback();
+    rejectedReads++;
+    return route.abort("failed");
+  });
+  sheet = await selectPerson();
+  await expect(
+    sheet.getByRole("alert").filter({ hasText: "Ödeme kaynağı paylaşılmıyor" }),
+  ).toBeVisible();
+  await expect(sheet.getByRole("button", { name: "Devam", exact: true })).toBeDisabled();
+  await expect(sheet.getByText("Kalan borç", { exact: true })).toHaveCount(0);
+  expect(rejectedReads).toBe(1);
+
+  denyPayment = false;
+  await sheet.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await sheet.getByRole("button", { name: "Devam", exact: true }).click();
+  await expect(sheet.getByText("Kalan borç", { exact: true })).toBeVisible();
+  expect(state.writes.map(({ op }) => op)).toEqual(["event_payment_prepare_v1"]);
+});
 test("event paid registration separates reviewed debt preparation, targeted bank collection and final native registration", async ({
   page,
 }) => {

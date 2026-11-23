@@ -14,18 +14,21 @@ for (const colorScheme of ["light", "dark"] as const) {
       await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
       await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
       await expect(page).toHaveURL(`${origin}/mfa`);
+      // The URL can change before the MFA form replaces the login form.
+      const code = page.getByLabel("Doğrulama kodu");
+      const mfa = page.getByRole("main").filter({ has: code });
+      await expect(code).toBeVisible();
       expect(calls.account).toBe(0);
       await page.addStyleTag({
         content: `html { zoom: ${scale}; }
         * { line-height: 1.5 !important; letter-spacing: .12em !important; word-spacing: .16em !important; }
         p { margin-bottom: 2em !important; }`,
       });
-      const code = page.getByLabel("Doğrulama kodu");
       const controls = [
-        page.getByRole("link", { name: "F FtkSaaS" }),
+        mfa.getByRole("link", { name: "F FtkSaaS" }),
         code,
-        page.getByRole("button", { name: "Doğrula", exact: true }),
-        page.getByRole("link", { name: "Girişe dön" }),
+        mfa.getByRole("button", { name: "Doğrula", exact: true }),
+        mfa.getByRole("link", { name: "Girişe dön" }),
       ];
       await controls[0]!.focus();
       for (const [index, control] of controls.entries()) {

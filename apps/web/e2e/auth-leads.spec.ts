@@ -496,6 +496,12 @@ test("explicit application candidate creation rereads the same native person wit
   const state = await mockLeads(page);
   state.app.phone_matches = [];
   state.people.get(leadIds.person)!.contacts = [];
+  const directory = page.getByRole("grid", { name: "Üyeler", exact: true });
+  const candidate = directory.getByRole("row").filter({ hasText: "Başvuran Örnek" });
+  await clickWorkspaceLink(page, "Üyeler");
+  await expect(directory.getByRole("row").filter({ hasText: "Aday A" })).toBeVisible();
+  await expect(candidate).toHaveCount(0);
+  await clickWorkspaceLink(page, "Adaylar");
   await page.getByRole("tab", { name: "Başvurular", exact: true }).click();
   await page.getByRole("button", { name: "Başvuran Örnek", exact: true }).click();
   const dialog = page.getByRole("dialog");
@@ -509,6 +515,8 @@ test("explicit application candidate creation rereads the same native person wit
   expect(state.people.get(state.app.person_id!)?.display_name).toBe("Başvuran Örnek");
   expect(state.leads.some((lead) => lead.person_id === state.app.person_id)).toBe(true);
   await closeLead(page);
+  await clickWorkspaceLink(page, "Üyeler");
+  await expect(candidate).toBeVisible();
 });
 test("an explicitly unbound manager role does not enable application review", async ({ page }) => {
   const state = await mockLeads(page, { unboundManager: true });

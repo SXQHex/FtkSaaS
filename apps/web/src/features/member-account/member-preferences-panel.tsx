@@ -4,6 +4,7 @@ import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { v7 as uuidv7 } from "uuid";
 import { BackendError } from "../../lib/backend";
+import { readIntoCurrentQuery } from "../../lib/cache-invalidation";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { AccountPreferencesView, type PreferenceId } from "./member-account-view";
@@ -36,21 +37,19 @@ export function MemberPreferencesPanel({
   const command = useMemberCommand({
     write: writeMemberPreference,
     readReceipt: readMemberPreferenceReceipt,
-    readResult: async (intent: PreferenceIntent) => {
-      const next = await readMemberPreferences(intent.scope),
-        row = next.rows.find((row) => row.id === intent.id);
-      if (
-        !row ||
-        row.selected !== intent.enabled ||
-        row.version === undefined ||
-        row.version <= intent.version
-      )
-        throw new Error("PREFERENCE_RESULT_UNREAD");
-      return next;
-    },
-    onRefresh: async (next) => {
-      queries.setQueryData(key, next);
-    },
+    readResult: (intent: PreferenceIntent) =>
+      readIntoCurrentQuery(queries, key, async () => {
+        const next = await readMemberPreferences(intent.scope),
+          row = next.rows.find((row) => row.id === intent.id);
+        if (
+          !row ||
+          row.selected !== intent.enabled ||
+          row.version === undefined ||
+          row.version <= intent.version
+        )
+          throw new Error("PREFERENCE_RESULT_UNREAD");
+        return next;
+      }),
     onAccessLost: (error) => {
       const lost =
         (error instanceof Error && ["ACCOUNT_CHANGED", "AUTH_REQUIRED"].includes(error.message)) ||

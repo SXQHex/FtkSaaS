@@ -5,6 +5,7 @@ import { z } from "zod";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { LessonRequestView } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
+import { readIntoCurrentQuery } from "../../lib/cache-invalidation";
 import { getTemporal } from "../../lib/temporal";
 import { LessonRequestSheet, type RequestDraft, type RequestStage } from "./lesson-requests-view";
 import {
@@ -73,14 +74,15 @@ export function LessonRequestEditor({
     scope.centerId,
     initial.id,
   ];
+  const sourceKey = [...prefix, "source"];
   const source = useQuery({
-    queryKey: [...prefix, "source"],
+    queryKey: sourceKey,
     queryFn: (readContext) => readLessonRequest(scope, initial.id, readContext),
     retry: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
-  const current = source.isError ? undefined : (saved?.request ?? source.data);
+  const current = source.isError ? undefined : source.data;
   const instructors = useQuery({
     queryKey: [...prefix, "instructors", current?.person_id],
     queryFn: (readContext) => readRequestInstructors(scope, current!.person_id, readContext),
@@ -104,10 +106,15 @@ export function LessonRequestEditor({
   const command = useMemberCommand({
     write: writeRequest,
     readReceipt: readRequestReceipt,
-    readResult: readRequestResult,
+    readResult: (intent, id) =>
+      readIntoCurrentQuery(
+        queries,
+        sourceKey,
+        () => readRequestResult(intent, id),
+        (result) => result.request,
+      ),
     onAccessLost,
     onRefresh: async (result) => {
-      queries.setQueryData([...prefix, "source"], result.request);
       setSaved(result);
       await onRefresh();
     },

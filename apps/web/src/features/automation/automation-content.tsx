@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { AutomationJobView, JobState } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
+import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
 
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { EventActionDialog } from "../events/event-action-dialog";
@@ -150,14 +151,13 @@ export function AutomationContent({
     },
     [onLockChange],
   );
-  async function refresh() {
-    await Promise.all([
-      queries.invalidateQueries({ queryKey: prefix, refetchType: "none" }),
-      queries.invalidateQueries({
-        queryKey: ["automation-segment-choices", scope.accountId, scope.orgId, scope.centerId],
-        refetchType: "none",
-      }),
-    ]);
+  async function refresh(segmentWritten = false) {
+    const choicesKey = ["automation-segment-choices", scope.accountId, scope.orgId, scope.centerId];
+    await invalidateCachedFamilies(
+      queries,
+      [prefix, choicesKey],
+      segmentWritten ? [choicesKey] : [],
+    );
     // Every cursor family is stale; validate only the visible tab's first page.
     if (tab === "automations") {
       await queries.fetchQuery({
@@ -550,7 +550,7 @@ export function AutomationContent({
           selection={selection}
           ownPersonId={workspace.data?.selected?.self_context?.person_id}
           centerName={center.name}
-          onSaved={refresh}
+          onSaved={() => refresh(selection.kind === "segment")}
           onClose={() => {
             if (!locked) {
               setSelection(undefined);

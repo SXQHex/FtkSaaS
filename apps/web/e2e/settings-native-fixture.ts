@@ -16,6 +16,7 @@ export async function mockSettingsCompletion(
   page: Page,
   options: {
     permissionUnknown?: boolean;
+    roleDetailReadbackFailure?: boolean;
     billingOwner?: boolean;
     businessDowngrade?: boolean;
     bootstrapBilling?: "owner" | "member";
@@ -85,6 +86,7 @@ export async function mockSettingsCompletion(
     keptCenterId: undefined as string | null | undefined,
     failed: false,
   };
+  let assignedRoleReads = 0;
   const target = {
     plan: "starter",
     target: { id: uid(101), period: "monthly", amount_minor: "50000", currency: "TRY" },
@@ -227,6 +229,17 @@ export async function mockSettingsCompletion(
       await send(nativePage([center, { ...center, id: uid(141), name: "İkinci merkez" }]));
     }
     if (op === "roles_list_v1") {
+      if (
+        options.roleDetailReadbackFailure &&
+        r.person_id === I.instructor &&
+        r.page?.limit === 100 &&
+        writes.some((entry) => entry.op === "role_assign_v1")
+      ) {
+        // The first scoped list authenticates the write result. The second is
+        // the editor's independent readback and can fail after acknowledgment.
+        assignedRoleReads++;
+        if (assignedRoleReads === 2) return abort();
+      }
       const self = {
         id: uid(103),
         person_id: I.self,

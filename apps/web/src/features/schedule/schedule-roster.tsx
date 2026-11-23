@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { GroupStudentReservation, Interval, SessionView } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
+import { invalidateAndReadFirstPage } from "../../lib/cache-invalidation";
 import { Button } from "@ftksaas/ui/components/button";
 import { Input } from "@ftksaas/ui/components/input";
 import { NativeSelect, NativeSelectOption } from "@ftksaas/ui/components/native-select";
@@ -53,6 +54,7 @@ export function ScheduleRoster({
   onRefresh: () => Promise<void>;
 }) {
   const { t } = useTranslation();
+  const queries = useQueryClient();
   const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]),
     [page, setPage] = useState(0);
   const [search, setSearch] = useState(""),
@@ -77,21 +79,24 @@ export function ScheduleRoster({
     reservation: GroupStudentReservation;
   }>();
   const [cancelLocked, setCancelLocked] = useState(false);
+  const groupFamily = ["schedule-group", scope.accountId, scope.orgId, scope.centerId, classId];
+  const groupPeriod = [...groupFamily, interval.starts_at, interval.ends_at];
   const group = useQuery({
-    queryKey: [
-      "schedule-group",
-      scope.accountId,
-      scope.orgId,
-      scope.centerId,
-      classId,
-      interval.starts_at,
-      interval.ends_at,
-      cursors[page],
-    ],
+    queryKey: [...groupPeriod, cursors[page]],
     queryFn: (readContext) =>
       readGroupStudents(scope, classId, interval, "", cursors[page], readContext),
     retry: false,
   });
+  async function refreshRoster() {
+    await invalidateAndReadFirstPage({
+      queries,
+      families: [groupFamily],
+      firstPageKey: [...groupPeriod, undefined],
+      readFirstPage: () => readGroupStudents(scope, classId, interval, ""),
+    });
+    setCursors([undefined]);
+    setPage(0);
+  }
   const people = useQuery({
     queryKey: [
       "schedule-group-people",
@@ -147,11 +152,7 @@ export function ScheduleRoster({
     readResult: readPriorityResult,
     onAccessLost,
     onRefresh: async () => {
-      await Promise.all([
-        group.refetch({ throwOnError: true }),
-        rights.refetch({ throwOnError: true }),
-        onRefresh(),
-      ]);
+      await Promise.all([refreshRoster(), rights.refetch({ throwOnError: true }), onRefresh()]);
     },
   });
   const locked = busy || command.locked || cancelLocked;
@@ -570,7 +571,7 @@ export function ScheduleRoster({
           onAccessLost={onAccessLost}
           onLockChange={setCancelLocked}
           onRefresh={async () => {
-            await Promise.all([group.refetch({ throwOnError: true }), onRefresh()]);
+            await Promise.all([refreshRoster(), onRefresh()]);
           }}
         />
       )}

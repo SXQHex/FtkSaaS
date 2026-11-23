@@ -11,10 +11,19 @@ import { at, nativePage } from "./pro-completion-fixture.js";
 const autoId = "019ab7b0-0000-7000-8000-000000000201",
   segmentId = "019ab7b0-0000-7000-8000-000000000202",
   jobId = "019ab7b0-0000-7000-8000-000000000203",
-  createdId = "019ab7b0-0000-7000-8000-000000000204";
+  createdId = "019ab7b0-0000-7000-8000-000000000204",
+  secondSegmentId = "019ab7b0-0000-7000-8000-000000000206";
 async function fixture(
   page: Page,
-  mode: "normal" | "unknown" | "stale" | "segment" | "paged" | "older" | "starter" = "normal",
+  mode:
+    | "normal"
+    | "unknown"
+    | "stale"
+    | "segment"
+    | "paged"
+    | "older"
+    | "starter"
+    | "choices" = "normal",
 ) {
   await mockStudio(page);
   const state = {
@@ -43,12 +52,13 @@ async function fixture(
     ] as AutomationJobView[],
     writes: [] as Record<string, unknown>[],
     segment: undefined as { name: string; definition: SegmentDefinition } | undefined,
+    segmentVersion: 4,
     created: false,
     reads: 0,
     discoveries: [] as Record<string, unknown>[],
     denied: false,
   };
-  if (mode === "segment")
+  if (mode === "segment" || mode === "choices")
     state.segment = {
       name: "Hakkı azalanlar",
       definition: {
@@ -183,7 +193,15 @@ async function fixture(
       expect(r.page.limit).toBe(20);
       const automation = r.operation === "automation_save_v1",
         type = automation ? "automations" : "segments",
-        target = automation ? (state.created ? createdId : autoId) : segmentId;
+        choicePage = mode === "choices" && !automation && !r.selector.key.segment_id,
+        second = choicePage && r.page.cursor === "choices-next",
+        target = automation
+          ? state.created
+            ? createdId
+            : autoId
+          : second
+            ? secondSegmentId
+            : segmentId;
       if (automation && mode === "stale" && r.selector.key.automation_id && !state.writes.length)
         state.version = 8;
       if (automation) state.reads++;
@@ -197,7 +215,10 @@ async function fixture(
                 entity: { type, id: target },
                 state: "active",
                 versions: [
-                  { entity: { type, id: target }, version: automation ? state.version : 4 },
+                  {
+                    entity: { type, id: target },
+                    version: automation ? state.version : second ? 4 : state.segmentVersion,
+                  },
                 ],
                 current: {
                   operation: r.operation,
@@ -211,13 +232,17 @@ async function fixture(
                     : {
                         segment_id: target,
                         scope: r.selector.key.scope,
-                        name: state.segment!.name,
+                        name: second ? "İkinci sentetik segment" : state.segment!.name,
                         definition: state.segment!.definition,
                       },
                 },
               },
             ];
-      return send({ items: rows, next_cursor: null, as_of: "2026-11-16T12:00:00Z" });
+      return send({
+        items: rows,
+        next_cursor: choicePage && !r.page.cursor ? "choices-next" : null,
+        as_of: "2026-11-16T12:00:00Z",
+      });
     }
     if (op === "automation_save_v1" || op === "segment_save_v1") {
       state.writes.push(r);
@@ -240,12 +265,18 @@ async function fixture(
           state.version++;
           if (!r.automation_id) state.created = true;
         }
-      } else state.segment = { name: r.name, definition: r.definition };
+      } else {
+        if (r.segment_id) {
+          expect(r.expected_version).toBe(state.segmentVersion);
+          state.segmentVersion++;
+        }
+        state.segment = { name: r.name, definition: r.definition };
+      }
       if (mode === "unknown") return route.abort("failed");
       return send({
         operation_id: I.role,
         primary_id: op === "segment_save_v1" ? segmentId : state.created ? createdId : autoId,
-        version: op === "segment_save_v1" ? 4 : state.version,
+        version: op === "segment_save_v1" ? state.segmentVersion : state.version,
         replayed: false,
         related: [],
       });
@@ -366,6 +397,44 @@ test("automation saves a native member followup with explicit threshold and leav
   });
   expect(state.writes[0]).not.toHaveProperty("expected_version");
   await expect(d.getByRole("button", { name: "Vazgeç", exact: true })).toBeEnabled();
+});
+
+test("automation segment chooser reads a valid continuation again after a segment edit", async ({
+  page,
+}) => {
+  const state = await fixture(page, "choices");
+  const dialog = page.getByRole("dialog");
+  const create = page.getByRole("button", { name: "Otomasyon ekle", exact: true });
+  const close = dialog.getByRole("button", { name: "Vazgeç", exact: true });
+  const more = dialog.getByRole("button", { name: "Daha fazla segment göster", exact: true });
+  const segment = dialog.getByLabel("Segment", { exact: true });
+  const second = segment.locator(`option[value="${secondSegmentId}"]`);
+
+  await create.click();
+  await expect(segment).toContainText("Hakkı azalanlar");
+  await more.click();
+  await expect(second).toHaveText("İkinci sentetik segment");
+  await close.click();
+
+  await page.getByRole("tab", { name: "Segmentler", exact: true }).click();
+  await page
+    .getByRole("row")
+    .filter({ hasText: "Hakkı azalanlar" })
+    .getByRole("button", { name: "Düzenle", exact: true })
+    .click();
+  await dialog.getByLabel("Segment adı", { exact: true }).fill("Güncel sentetik segment");
+  await dialog.getByRole("checkbox", { name: review, exact: true }).press("Space");
+  await dialog.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await expect(saved(page)).toBeVisible();
+  await close.click();
+  await page.getByRole("tab", { name: "Otomasyonlar", exact: true }).click();
+
+  await create.click();
+  await expect(segment).toContainText("Güncel sentetik segment");
+  if (await more.isVisible()) await more.click();
+  await expect(second).toHaveText("İkinci sentetik segment");
+  await expect(more).toHaveCount(0);
+  expect(state.writes).toHaveLength(1);
 });
 test("automation reviewed disable preserves definition and uses the actual version", async ({
   page,

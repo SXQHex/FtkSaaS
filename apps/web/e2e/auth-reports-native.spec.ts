@@ -346,6 +346,13 @@ test("student CSV maps opening rights and currency debts explicitly, previews in
   page,
 }) => {
   const f = await mockReports(page);
+  await page.clock.setFixedTime(new Date());
+  const directory = page.getByRole("grid", { name: "Üyeler", exact: true });
+  const firstStudent = directory.getByRole("row").filter({ hasText: "Birinci sentetik" });
+  await clickWorkspaceLink(page, "Üyeler");
+  await expect(directory.getByRole("row").filter({ hasText: "Örnek Eğitmen" })).toBeVisible();
+  await expect(firstStudent).toHaveCount(0);
+  await clickWorkspaceLink(page, "Raporlar");
   await page.getByRole("tab", { name: "Dosyalar", exact: true }).click();
   await page.getByRole("button", { name: "CSV içe aktar", exact: true }).click();
   const dialog = page.getByRole("dialog");
@@ -405,6 +412,7 @@ test("student CSV maps opening rights and currency debts explicitly, previews in
     .press("Space");
   await dialog.getByRole("button", { name: "Seçilen satırları içe aktar", exact: true }).click();
   await expect(dialog.getByText(/İş: pending/)).toBeVisible();
+  await expect(dialog.getByText("İşlem kaydedildi; güncel kayıt okundu.")).toHaveCount(0);
   expect(f.writes.find((row) => row.op === "import_apply_v1")!.r).not.toHaveProperty(
     "selected_row_numbers",
   );
@@ -426,4 +434,7 @@ test("student CSV maps opening rights and currency debts explicitly, previews in
       ].includes(row.op),
     ),
   ).toBe(false);
+  await dialog.getByRole("button", { name: "Kapat", exact: true }).click();
+  await clickWorkspaceLink(page, "Üyeler");
+  await expect(firstStudent).toBeVisible();
 });

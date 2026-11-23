@@ -14,7 +14,7 @@ export function useMemberCommand<Intent, Result>({
   write: (intent: Intent) => Promise<Pick<Mutation, "primary_id">>;
   readReceipt?: (intent: Intent) => Promise<OperationStatusView>;
   readResult: (intent: Intent, id?: string) => Promise<Result>;
-  onRefresh: (result: Result) => Promise<void>;
+  onRefresh?: (result: Result) => Promise<void>;
   onAccessLost: (error: unknown) => boolean;
 }) {
   const [state, setState] = useState<
@@ -55,7 +55,7 @@ export function useMemberCommand<Intent, Result>({
     if (!intent.current || !acknowledged.current) return;
     const result = await readResult(intent.current, primary.current);
     if (!mounted.current || terminal.current) return;
-    await onRefresh(result);
+    await onRefresh?.(result);
     if (mounted.current && !terminal.current) setState("saved");
   }
   function failed(error: unknown) {

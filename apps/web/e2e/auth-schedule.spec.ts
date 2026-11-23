@@ -51,6 +51,8 @@ async function scheduleFixture(
     creates: [] as Record<string, unknown>[],
     cancels: [] as Record<string, unknown>[],
     effects: 0,
+    paged: false,
+    rosterReads: [] as { cursor?: string; active: boolean }[],
   };
   const saleId = "019a7b00-0000-7000-8000-000000000086",
     reservationId = "019a7b00-0000-7000-8000-000000000087";
@@ -257,6 +259,7 @@ async function scheduleFixture(
       request.selector.key.directory === "class"
     ) {
       expect(request.selector.key.class_id).toBe(I.lesson);
+      group.rosterReads.push({ cursor: request.page.cursor, active: group.active });
       return send({
         items: group.active
           ? [
@@ -288,7 +291,7 @@ async function scheduleFixture(
               },
             ]
           : [],
-        next_cursor: null,
+        next_cursor: group.paged && !request.page.cursor ? "group-students-next" : null,
         as_of: new Date().toISOString(),
       });
     }
@@ -661,10 +664,21 @@ test("fixed group uses explicit priority sale and lesson, recovers its ACK, and 
   page,
 }) => {
   const state = await scheduleFixture(page, true, false, true);
+  state.group.paged = true;
   await page.getByText("Sentetik program seansı", { exact: true }).click();
   const panel = page.getByRole("dialog");
   await expect(panel.getByRole("button", { name: "Seansı düzenle", exact: true })).toBeEnabled();
   await panel.getByRole("button", { name: "Üyeleri düzenle", exact: true }).click();
+  const nextRosterPage = panel.getByRole("button", { name: "Sonraki", exact: true }).first();
+  const previousRosterPage = panel.getByRole("button", { name: "Önceki", exact: true }).first();
+  await nextRosterPage.click();
+  await expect
+    .poll(() => state.group.rosterReads.at(-1))
+    .toEqual({
+      cursor: "group-students-next",
+      active: false,
+    });
+  await previousRosterPage.click();
   await panel.getByRole("button", { name: "Kişileri ara", exact: true }).click();
   await panel.locator("#group-person").selectOption(I.self);
   await panel.locator("#group-sale").selectOption(state.saleId);
@@ -689,6 +703,15 @@ test("fixed group uses explicit priority sale and lesson, recovers its ACK, and 
   ).toBeVisible();
   expect(state.group.creates).toHaveLength(1);
   expect(state.group.effects).toBe(1);
+  await panel.getByRole("button", { name: "Yeni açık işlem", exact: true }).click();
+  await nextRosterPage.click();
+  await expect
+    .poll(() => state.group.rosterReads.at(-1))
+    .toEqual({
+      cursor: "group-students-next",
+      active: true,
+    });
+  await previousRosterPage.click();
   expect(state.session?.capacity).toMatchObject({
     held: beforeCapacity.held + 1,
     remaining: beforeCapacity.remaining - 1,

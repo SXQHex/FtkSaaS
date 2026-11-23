@@ -1,16 +1,13 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import type {
-  EventView,
-  PersonSummary,
-  Preview,
-  EventPaymentPreparationView,
-} from "@ftksaas/api-contracts";
+import type { EventView, PersonSummary, Preview } from "@ftksaas/api-contracts";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
+import { readIntoCurrentQuery } from "../../lib/cache-invalidation";
 import { formatMinorAmount } from "../../lib/money";
 import { useMemberCommand } from "../member-profile/use-member-command";
+import { PrivateSessionRevision } from "../auth/private-session-revision";
 import { readProfileRights } from "../member-profile/profile-read";
 import { MemberDocumentsPanel } from "../member-documents/member-documents-panel";
 import { LeadPersonPicker } from "../leads/lead-person-picker";
@@ -20,7 +17,11 @@ import { EventPaymentPanel } from "./event-payment-panel";
 import { EventActionDialog } from "./event-action-dialog";
 import { EventCommandNotice } from "./event-command-notice";
 import { EventPreviewEffects } from "./event-preview-effects";
-import { readDetailedEvent, readRegistrationPayment } from "./event-registration-read";
+import {
+  readDetailedEvent,
+  readRegistrationPayment,
+  type RegistrationPayment,
+} from "./event-registration-read";
 import {
   previewEventRegistration,
   eventRegistrationIntent,
@@ -79,11 +80,12 @@ function NewEventRegistrationController({
   onAccessLost: (error: unknown) => boolean;
 }) {
   const { t } = useTranslation();
+  const queries = useQueryClient();
+  const sessionRevision = useContext(PrivateSessionRevision);
   const [person, setPerson] = useState<PersonSummary | null>(null),
     [sale, setSale] = useState(""),
     [step, setStep] = useState<1 | 2 | 3>(1),
     [preview, setPreview] = useState<{ target: RegistrationTarget; value: Preview }>(),
-    [preparation, setPreparation] = useState<EventPaymentPreparationView>(),
     [draft, setDraft] = useState({ ...emptyEventCollection }),
     [reviewed, setReviewed] = useState(false),
     [confirmation, setConfirmation] = useState<"prepare" | "collect">(),
@@ -109,23 +111,28 @@ function NewEventRegistrationController({
     enabled: !!personId,
     retry: false,
   });
+  const paymentKey = [
+    "event-registration-payment",
+    scope.accountId,
+    scope.orgId,
+    scope.centerId,
+    before.id,
+    personId,
+    sessionRevision,
+  ];
   const existing = useQuery({
-    queryKey: [
-      "event-registration-payment",
-      scope.accountId,
-      scope.orgId,
-      scope.centerId,
-      before.id,
-      personId,
-    ],
+    queryKey: paymentKey,
     queryFn: (readContext) =>
       readRegistrationPayment(scope, before.id, personId!, undefined, readContext),
     enabled: !!personId,
     retry: false,
+    staleTime: 0,
+    refetchOnMount: "always",
     refetchOnWindowFocus: false,
   });
-  const payment =
-    preparation ?? (existing.data?.kind === "available" ? existing.data.value : undefined);
+  const paymentSource =
+    existing.isSuccess && existing.fetchStatus === "idle" ? existing.data : undefined;
+  const payment = paymentSource?.kind === "available" ? paymentSource.value : undefined;
   const registerCommand = useMemberCommand({
     write: async (intent: Parameters<typeof writeEventRegistration>[0]) => {
       try {
@@ -141,23 +148,34 @@ function NewEventRegistrationController({
       }
     },
     readReceipt: readRegistrationReceipt,
-    readResult: readRegistrationResult,
+    readResult: (intent, id) =>
+      readIntoCurrentQuery(
+        queries,
+        paymentKey,
+        () => readRegistrationResult(intent, id),
+        (result): RegistrationPayment =>
+          result.outcome === "capacity_closed"
+            ? { kind: "available", value: result.payment }
+            : { kind: "unavailable" },
+      ),
     onAccessLost,
     onRefresh: async (result) => {
-      if (result.outcome === "capacity_closed") {
-        setCapacityClosed(true);
-        setPreparation(result.payment);
-      }
+      if (result.outcome === "capacity_closed") setCapacityClosed(true);
       await onSaved();
     },
   });
   const prepareCommand = useMemberCommand({
     write: writeEventPreparation,
     readReceipt: readRegistrationReceipt,
-    readResult: readPreparationResult,
+    readResult: (intent, id) =>
+      readIntoCurrentQuery(
+        queries,
+        paymentKey,
+        () => readPreparationResult(intent, id),
+        (value): RegistrationPayment => ({ kind: "available", value }),
+      ),
     onAccessLost,
-    onRefresh: async (value) => {
-      setPreparation(value);
+    onRefresh: async () => {
       setPreview(undefined);
       await onSaved();
     },
@@ -165,10 +183,15 @@ function NewEventRegistrationController({
   const collectionCommand = useMemberCommand({
     write: writeCollection,
     readReceipt: readCollectionReceipt,
-    readResult: readEventCollectionResult,
+    readResult: (intent: Parameters<typeof readEventCollectionResult>[0], id) =>
+      readIntoCurrentQuery(
+        queries,
+        paymentKey,
+        () => readEventCollectionResult(intent, id),
+        (value): RegistrationPayment => ({ kind: "available", value }),
+      ),
     onAccessLost,
-    onRefresh: async (value) => {
-      setPreparation(value);
+    onRefresh: async () => {
       setPreview(undefined);
       await onSaved();
     },
@@ -206,7 +229,7 @@ function NewEventRegistrationController({
     );
   }
   async function next() {
-    if (running.current || locked || !personId) return;
+    if (running.current || locked || !personId || !paymentSource) return;
     running.current = true;
     setWorking(true);
     setError(undefined);
@@ -234,7 +257,9 @@ function NewEventRegistrationController({
     }
   }
   async function confirm() {
-    if (running.current || locked || !confirmed || !personId || !confirmation) return;
+    if (running.current || locked || !confirmed || !personId || !confirmation || !paymentSource)
+      return;
+    if (confirmation === "prepare" && paymentSource.kind !== "unavailable") return;
     running.current = true;
     setWorking(true);
     setError(undefined);
@@ -270,6 +295,16 @@ function NewEventRegistrationController({
   }
   const nativeNotices = (
     <>
+      {existing.isError && (
+        <Alert variant="destructive">
+          <AlertDescription>
+            {t(($) => $.eventDetail.paymentUnread)}
+            <Button variant="outline" isDisabled={locked} onPress={() => void existing.refetch()}>
+              {t(($) => $.studio.retry)}
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
       {capacityClosed && (
         <Alert>
           <AlertDescription>{t(($) => $.eventDetail.capacityClosed)}</AlertDescription>
@@ -341,8 +376,7 @@ function NewEventRegistrationController({
           before.state === "published" &&
           before.terms.full_payment_required &&
           BigInt(before.terms.fee_minor) > 0n &&
-          !existing.isFetching &&
-          !existing.isError &&
+          paymentSource?.kind === "unavailable" &&
           prepareCommand.state === "ready"
         }
         canCollect={
@@ -353,22 +387,6 @@ function NewEventRegistrationController({
         }
         locked={locked}
       />
-      {existing.isError && (
-        <Alert variant="destructive">
-          <AlertDescription>
-            {t(($) => $.eventDetail.paymentUnread)}
-            <Button
-              variant="outline"
-              isDisabled={locked}
-              onPress={() => {
-                void existing.refetch();
-              }}
-            >
-              {t(($) => $.studio.retry)}
-            </Button>
-          </AlertDescription>
-        </Alert>
-      )}
     </>
   );
   return (
@@ -395,7 +413,7 @@ function NewEventRegistrationController({
         backDisabled={!!payment && step === 2}
         nextDisabled={
           !personId ||
-          existing.isFetching ||
+          !paymentSource ||
           registerCommand.state !== "ready" ||
           (step === 2 &&
             draft.choice === "now" &&
@@ -539,8 +557,9 @@ function NewEventRegistrationController({
           }}
           locked={locked}
           disabled={
+            (confirmation === "prepare" ? paymentSource?.kind !== "unavailable" : !payment) ||
             (confirmation === "prepare" ? prepareCommand.state : collectionCommand.state) !==
-            "ready"
+              "ready"
           }
           error={error}
           notice={nativeNotices}

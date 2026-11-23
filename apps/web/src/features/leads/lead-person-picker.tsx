@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
 import type { PersonSummary } from "@ftksaas/api-contracts";
 import { readPeoplePage } from "../people/people";
+import { peopleKeys } from "../people/people-query";
 import { Field, FieldLabel } from "@ftksaas/ui/components/field";
 import { Input } from "@ftksaas/ui/components/input";
 import { NativeSelect, NativeSelectOption } from "@ftksaas/ui/components/native-select";
@@ -34,7 +35,7 @@ export function LeadPersonPicker({
     return () => clearTimeout(timer);
   }, [search]);
   const people = useQuery({
-    queryKey: ["lead-people", scope.accountId, scope.orgId, scope.centerId, query, cursors[index]],
+    queryKey: [...peopleKeys.picker(scope), query, cursors[index]],
     queryFn: (context) =>
       readPeoplePage(scope, query, cursors[index], undefined, undefined, undefined, context),
     retry: false,

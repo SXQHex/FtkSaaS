@@ -58,6 +58,10 @@ async function setup(
   const writes: RequestInstructorAgreementAccept[] = [],
     receiptKeys: string[] = [],
     effects = new Set<string>();
+  const documentRead = {
+    gate: undefined as Promise<void> | undefined,
+    waiting: false,
+  };
   let unread = false;
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
     const op = new URL(route.request().url()).pathname.split("/").at(-1)!,
@@ -82,6 +86,11 @@ async function setup(
         center_id: I.center,
         agreement_id: view.agreement.id,
       });
+      if (documentRead.gate) {
+        documentRead.waiting = true;
+        await documentRead.gate;
+        return route.abort("failed");
+      }
       if (effects.size && options.unread && !unread) {
         unread = true;
         return route.abort("failed");
@@ -141,7 +150,7 @@ async function setup(
     await expect(
       panel.getByRole("article", { name: view.rendered_document!.content.name }),
     ).toBeVisible();
-  return { native, view, panel, writes, receiptKeys, effects };
+  return { native, view, panel, writes, receiptKeys, effects, documentRead };
 }
 async function accept(panel: import("@playwright/test").Locator) {
   await panel.getByRole("checkbox", { name: text.review, exact: true }).press("Space");
@@ -258,4 +267,48 @@ test("native permission loss removes private agreement and financial contents wi
   await expect(page.getByRole("button", { name: text.open, exact: true })).toHaveCount(0);
   expect(f.effects.size).toBe(0);
   expect(f.view.acceptance).toBeNull();
+});
+
+test("an open accepted agreement waits for current evidence after native reauthentication", async ({
+  page,
+  context,
+}) => {
+  const f = await setup(page);
+  await accept(f.panel);
+  const accepted = f.panel.getByText(text.accepted, { exact: true });
+  await expect(accepted).toBeVisible();
+
+  const otherTab = await context.newPage();
+  let release!: () => void;
+  f.documentRead.gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  try {
+    await otherTab.goto(`${origin}/account`);
+    await otherTab.getByRole("tab", { name: "Oturumlar", exact: true }).click();
+    await otherTab.getByRole("button", { name: "Diğerlerini kapat", exact: true }).click();
+    const reauth = otherTab.getByRole("dialog");
+    await reauth.getByLabel("Parola", { exact: true }).fill("fixture-password");
+    await reauth.getByRole("button", { name: "Devam et", exact: true }).click();
+    await expect.poll(() => f.documentRead.waiting).toBe(true);
+    await expect(f.panel).toBeVisible();
+    await expect(f.panel.getByText(common.memberDocuments.loading, { exact: true })).toBeVisible();
+    await expect(f.panel.getByRole("article")).toHaveCount(0);
+    await expect(accepted).toHaveCount(0);
+  } finally {
+    release();
+    await otherTab.close();
+  }
+
+  await expect(f.panel.getByText(text.unavailable, { exact: true })).toBeVisible();
+  await expect(f.panel.getByRole("article")).toHaveCount(0);
+  await expect(accepted).toHaveCount(0);
+  await expect(f.panel.getByText(common.events.commandStates.saved, { exact: true })).toHaveCount(
+    0,
+  );
+  f.documentRead.gate = undefined;
+  await f.panel.getByRole("button", { name: common.memberDocuments.retry, exact: true }).click();
+  await expect(accepted).toBeVisible();
+  expect(f.writes).toHaveLength(1);
+  await f.panel.getByRole("button", { name: common.memberDocuments.close, exact: true }).click();
 });

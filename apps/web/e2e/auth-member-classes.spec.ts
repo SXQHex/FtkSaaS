@@ -19,6 +19,7 @@ type MemberClass = CalendarItem & {
 };
 const review = "Hak kaynağını ve iptal koşullarını inceledim, işlemi onaylıyorum.";
 const saved = "İşlem kaydedildi; güncel kayıt okundu.";
+const initialDocumentText = "Sentetik belge metni <script>window.documentExecuted=true</script>";
 async function fixture(
   page: Page,
   options: {
@@ -116,6 +117,8 @@ async function fixture(
     documentAccepted: false,
     documentUnread: false,
     documentContentFailed: false,
+    documentContentGate: undefined as Promise<void> | undefined,
+    documentText: initialDocumentText,
   };
   if (options.offer) {
     state.entry = {
@@ -211,6 +214,7 @@ async function fixture(
       };
       if (r.content_file_id) {
         expect(r.content_file_id).toBe(id(22));
+        await state.documentContentGate;
         doc.rendered_document = {
           id: id(23),
           language: "tr",
@@ -223,7 +227,7 @@ async function fixture(
             language: "tr",
             template_id: "document.synthetic",
             template_version: "1",
-            text: "Sentetik belge metni <script>window.documentExecuted=true</script>",
+            text: state.documentText,
           },
         };
         if (state.documentAccepted)
@@ -759,6 +763,43 @@ test("member document content failure exposes explicit retry and never offers ac
   expect(state.writes).toHaveLength(0);
   await d.getByRole("button", { name: "Belgeleri yeniden yükle", exact: true }).click();
   await expect(d.getByRole("button", { name: "Belgeyi kabul et", exact: true })).toBeVisible();
+});
+
+test("reopening a member document waits for a fresh body before offering acceptance", async ({
+  page,
+}) => {
+  const { state, d } = await openDocument(page);
+  const original = d.getByText(initialDocumentText, { exact: true });
+  const acceptDocument = d.getByRole("button", { name: "Belgeyi kabul et", exact: true });
+  const reviewDocument = d.getByRole("checkbox", { name: documentReview, exact: true });
+  const contentReads = () =>
+    state.reads.filter(
+      ({ op, request }) => op === "document_requirements_get_v1" && request.content_file_id,
+    ).length;
+  await expect(original).toBeVisible();
+  await reviewDocument.press("Space");
+  await d.getByRole("button", { name: "Belgeyi kapat", exact: true }).click();
+  await expect(original).toHaveCount(0);
+  const previousReads = contentReads();
+  state.documentText = "Yeniden açılan belge için güncel sentetik metin.";
+  let release!: () => void;
+  state.documentContentGate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  try {
+    await d.getByRole("button", { name: "Ders koşulları belgesini oku", exact: true }).click();
+    await expect.poll(contentReads).toBeGreaterThan(previousReads);
+    await expect(d.getByText("Belgeler yükleniyor…", { exact: true })).toBeVisible();
+    await expect(original).toHaveCount(0);
+    await expect(acceptDocument).toHaveCount(0);
+    await expect(reviewDocument).toHaveCount(0);
+  } finally {
+    release();
+  }
+  await expect(d.getByText(state.documentText, { exact: true })).toBeVisible();
+  await expect(acceptDocument).toBeEnabled();
+  await expect(reviewDocument).not.toBeChecked();
+  expect(state.writes).toHaveLength(0);
 });
 
 test("member offer exposes actual flexible-right document contexts without changing the native offer payload", async ({

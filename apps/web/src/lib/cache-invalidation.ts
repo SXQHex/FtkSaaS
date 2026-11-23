@@ -28,6 +28,23 @@ export async function cacheVerifiedReadback<T>(queries: QueryClient, queryKey: Q
   await cancelling;
 }
 
+export async function readIntoCurrentQuery<T>(
+  queries: QueryClient,
+  queryKey: QueryKey,
+  read: () => Promise<T>,
+  select: (result: T) => unknown = (result) => result,
+): Promise<T> {
+  const filters = { queryKey, exact: true };
+  const source = queries.getQueryCache().find(filters);
+  const result = await read();
+  // Session handoff removes private queries and can recreate the same key.
+  // A read begun against the previous query must never populate the new one.
+  if (!source || queries.getQueryCache().find(filters) !== source)
+    throw new Error("PRIVATE_QUERY_CHANGED");
+  await cacheVerifiedReadback(queries, queryKey, select(result));
+  return result;
+}
+
 export async function invalidateAndReadFirstPage<T>({
   queries,
   families,
