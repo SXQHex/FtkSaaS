@@ -43,11 +43,17 @@ async function prepareAccountAndWorkspace(
   organizationId?: string,
 ) {
   const account = await loadAccountProjection(context, includePlatformScope);
-  // Non-blocking: the workspace is the same Query consumed by both shells.
-  // Its failure remains visible in the shell, rather than failing the account route.
-  void context.queryClient
-    .query(workspaceQuery(context.queryClient, account.id, organizationId))
-    .catch(() => {});
+  const query = workspaceQuery(context.queryClient, account.id, organizationId);
+  if (organizationId) {
+    // Every scoped navigation (including history and deep links) checks native
+    // authority before exposing a previously cached privileged screen.
+    // Keep one canonical workspace queryFn for Router and its live observers.
+    await context.queryClient.fetchQuery({ ...query, staleTime: 0 });
+  } else {
+    // The personal account has no privileged organization selection to protect.
+    // Workspace discovery remains non-blocking for the account shell.
+    void context.queryClient.query(query).catch(() => {});
+  }
   // Return no account DTO: Router coordinates; Query is the sole account cache.
 }
 
