@@ -24,20 +24,29 @@ export function RootLayout() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const anonymousProgram = pathname.startsWith("/public/");
   const authReady = useAuthSession(!anonymousProgram, setSameActorHandoff);
-  const publicRoute =
+  // These screens have no domain account Query; MFA/recovery still enforce
+  // native session and assurance in their own Router beforeLoad guards.
+  const unscopedRoute =
     anonymousProgram ||
-    ["/", "/login", "/signup", "/verify-email", "/forgot-password", "/auth/callback"].includes(
-      pathname,
-    );
+    [
+      "/",
+      "/login",
+      "/signup",
+      "/verify-email",
+      "/forgot-password",
+      "/auth/callback",
+      "/mfa",
+      "/reset-password",
+    ].includes(pathname);
   useEffect(() => {
-    if (publicRoute) return;
+    if (unscopedRoute) return;
     return observeQueryAccessFailures(queries, {
       onChecking: setCheckingAccess,
       invalidateRoute: () => router.invalidate({ sync: true }),
       showLogin: () => router.navigate({ to: "/login", replace: true }),
     });
-  }, [publicRoute, queries, router]);
-  const privateAuthPending = !authReady && !publicRoute;
+  }, [unscopedRoute, queries, router]);
+  const privateAuthPending = !authReady && !unscopedRoute;
   // Preserve in-flight native commands without exposing any old private UI.
   // Queries were already evicted and Router guards must finish before reveal.
   const preserveCommandTree = privateAuthPending && sameActorHandoff;
@@ -57,8 +66,8 @@ export function RootLayout() {
         <div
           className="contents"
           style={{ display: preserveCommandTree ? "none" : undefined }}
-          inert={(checkingAccess || privateAuthPending) && !publicRoute}
-          aria-hidden={(checkingAccess || privateAuthPending) && !publicRoute}
+          inert={(checkingAccess || privateAuthPending) && !unscopedRoute}
+          aria-hidden={(checkingAccess || privateAuthPending) && !unscopedRoute}
         >
           <Suspense fallback={<RoutePendingPage />}>
             {privateAuthPending && !preserveCommandTree ? (
@@ -72,7 +81,7 @@ export function RootLayout() {
             )}
           </Suspense>
         </div>
-        {(checkingAccess || preserveCommandTree) && !publicRoute && (
+        {(checkingAccess || preserveCommandTree) && !unscopedRoute && (
           <div className="fixed inset-0 z-50 bg-background">
             <StateView kind="loading" />
           </div>

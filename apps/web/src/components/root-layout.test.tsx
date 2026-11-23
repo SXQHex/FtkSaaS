@@ -21,7 +21,9 @@ vi.mock("@tanstack/react-router", () => ({
   useRouter: () => ({ navigate: vi.fn() }),
   useRouterState: () => state.pathname,
   Outlet: () =>
-    state.pathname === "/login" ? (
+    state.pathname === "/mfa" || state.pathname === "/reset-password" ? (
+      <p>native-auth-gate</p>
+    ) : state.pathname === "/login" ? (
       <LoginForm
         onPassword={state.password}
         onGoogle={async () => {
@@ -98,3 +100,15 @@ it("keeps same-user native commands mounted but entirely hidden and inert until 
   rerender(<RootLayout />);
   expect(privateContent).toBeVisible();
 });
+
+it.each(["/mfa", "/reset-password"])(
+  "keeps the guarded native Auth screen visible during a same-user session handoff: %s",
+  (pathname) => {
+    state.pathname = pathname;
+    state.ready = false;
+    const { container } = renderRoot();
+    const authGate = screen.getByText("native-auth-gate");
+    expect(authGate).toBeVisible();
+    expect(container.querySelector('[aria-hidden="true"]')).toBeNull();
+  },
+);

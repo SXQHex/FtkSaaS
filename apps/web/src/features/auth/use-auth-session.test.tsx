@@ -106,6 +106,13 @@ it("does not purge private Query or the recovery marker for focus, token rotatio
 });
 
 it("evicts all private cache on a same-user new native session and revalidates routes", async () => {
+  let finish!: () => void;
+  invalidate.mockImplementation(
+    () =>
+      new Promise<void>((resolve) => {
+        finish = resolve;
+      }),
+  );
   const { result } = renderHook(useAuthSession);
   const callback = changed.mock.calls[0][0];
   await act(() => callback("INITIAL_SESSION", session()));
@@ -115,7 +122,10 @@ it("evicts all private cache on a same-user new native session and revalidates r
   expect(queryClear).toHaveBeenCalledOnce();
   expect(sessionStorage.getItem("ftk-recovery-account")).toBeNull();
   await waitFor(() => expect(invalidate).toHaveBeenCalledExactlyOnceWith({ sync: true }));
-  await waitFor(() => expect(result.current).toBe(true));
+  await act(async () => {
+    finish();
+  });
+  expect(result.current).toBe(true);
   await act(() => callback("TOKEN_REFRESHED", session(actor, secondSession, "new-token")));
   expect(queryClear).toHaveBeenCalledTimes(1);
 });
