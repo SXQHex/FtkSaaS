@@ -6,6 +6,10 @@ import type {
   InstructorFinanceEarning,
   InstructorFinancePayment,
   InstructorFinancePerson,
+  RequestInstructorFinanceDirectoryGet,
+  RequestInstructorPaymentRecord,
+  RequestInstructorPaymentCorrect,
+  RequestOperationStatusGet,
 } from "@ftksaas/api-contracts";
 const id = (n: number) => `019a7b00-0000-7000-8000-${String(n).padStart(12, "0")}`;
 export const earningsIds = {
@@ -29,9 +33,12 @@ export async function mockEarnings(
   } = {},
 ) {
   const studio = await mockStudio(page);
-  const reads: Record<string, any>[] = [],
-    writes: Record<string, any>[] = [],
-    receipts: Record<string, any>[] = [];
+  const reads: RequestInstructorFinanceDirectoryGet[] = [],
+    writes: (
+      | RequestInstructorPaymentCorrect
+      | (RequestInstructorPaymentRecord & { expected_version?: never })
+    )[] = [],
+    receipts: RequestOperationStatusGet[] = [];
   const agreementReads: string[] = [];
   const earning: InstructorFinanceEarning = {
     kind: "earning",

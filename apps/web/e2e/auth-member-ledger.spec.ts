@@ -1,10 +1,18 @@
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
-import type { EntitlementView, EntitlementLedgerItem } from "@ftksaas/api-contracts";
+import type {
+  EntitlementView,
+  EntitlementLedgerItem,
+  RequestEntitlementsGet,
+  RequestPersonGet,
+} from "@ftksaas/api-contracts";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
 import common from "../src/locales/tr/common.json" with { type: "json" };
+type LedgerRead = RequestEntitlementsGet & {
+  ledger_page: NonNullable<RequestEntitlementsGet["ledger_page"]>;
+};
 const sale = "019a7b00-0000-7000-8000-000000000070",
   secondSale = "019a7b00-0000-7000-8000-000000000071";
 async function setup(
@@ -12,8 +20,8 @@ async function setup(
   options: { denied?: boolean; empty?: boolean; noMembership?: boolean; noRights?: boolean } = {},
 ) {
   const studio = await mockStudio(page),
-    reads: Record<string, any>[] = [],
-    personReads: Record<string, any>[] = [];
+    reads: LedgerRead[] = [],
+    personReads: RequestPersonGet[] = [];
   const entitlement: EntitlementView = {
     sale_id: sale,
     person_id: I.instructor,
@@ -55,6 +63,7 @@ async function setup(
       ];
       if (options.noRights) return send([]);
       if (req.ledger_sale_id) {
+        if (!req.ledger_page) throw Error("LEDGER_PAGE_UNAVAILABLE");
         reads.push(req);
         expect([sale, secondSale]).toContain(req.ledger_sale_id);
         expect(req.ledger_page.limit).toBe(20);

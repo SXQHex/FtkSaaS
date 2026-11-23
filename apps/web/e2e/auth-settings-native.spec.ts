@@ -2,7 +2,7 @@ import { test, expect } from "./test.js";
 import { scanAccessibility } from "./accessibility.js";
 import { mockSettingsCompletion } from "./settings-native-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
-import { uid } from "./pro-completion-fixture.js";
+import { uid, requestsFor } from "./pro-completion-fixture.js";
 import { openWorkspaceSearch, origin } from "./auth-fixture.js";
 import common from "../src/locales/tr/common.json" with { type: "json" };
 async function confirm(page: import("@playwright/test").Page) {
@@ -819,8 +819,8 @@ test("team permission unknown state blocks scope and retries exactly one frozen 
   await manage.press("Space");
   manageReview = await confirm(page);
   await expect(manageReview.getByRole("status")).toContainText(common.events.commandStates.saved);
-  const changes = f.writes.filter(
-    (row) => row.op === "permission_set_v1" && row.r.permission === "person.manage",
+  const changes = requestsFor(f.writes, "permission_set_v1").filter(
+    (row) => row.r.permission === "person.manage",
   );
   expect(changes.map((row) => row.r.enabled)).toEqual([true, false]);
   expect(changes.map((row) => row.r.expected_version)).toEqual([4, 5]);

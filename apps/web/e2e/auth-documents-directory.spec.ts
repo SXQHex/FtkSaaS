@@ -7,6 +7,7 @@ import {
   metadata,
   uid,
   at,
+  requestsFor,
 } from "./pro-completion-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 const version = {
@@ -144,8 +145,8 @@ test("document directory has native global summaries, cursor/search, actual read
   ).toBeVisible();
   await expect(page.getByText(/Önceki sürüm.*geçerli|Önceki.*geçerli/)).toBeVisible();
   expect(
-    f.requests
-      .filter((row) => row.op === "document_directory_get_v1" && row.r.view === "acceptances")
+    requestsFor(f.requests, "document_directory_get_v1")
+      .filter((row) => row.r.view === "acceptances")
       .every((row) => row.r.document_id === document.document_id),
   ).toBe(true);
 });
@@ -219,7 +220,9 @@ test("owned ready file reuses the native file and publishes only after explicit 
               file_id: ready.file_id,
               version_label: "Yeni sentetik sürüm",
               scope: { kind: "center", center_id: I.center },
-              requirements: r.selector.key.requirements ?? [
+              requirements: ("requirements" in r.selector.key
+                ? r.selector.key.requirements
+                : undefined) ?? [
                 { gate: "sale", scope: { center_ids: [I.center] }, renewed_acceptance: true },
               ],
             },

@@ -1,27 +1,57 @@
 import { expect, type Page, type Route } from "@playwright/test";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
+import type { Operations } from "@ftksaas/api-contracts";
 export const at = "2026-11-17T12:00:00Z";
 export const uid = (n: number) => `019ab7b0-0000-7000-8000-${String(n).padStart(12, "0")}`;
-export type NativeRequest = Record<string, any>;
-export interface CompletionRequest {
-  op: string;
-  r: NativeRequest;
+export type NativeRequest = Record<string, unknown>;
+interface CompletionActions {
   route: Route;
   send: (data: unknown) => Promise<void>;
   fail: (code: string) => Promise<void>;
   abort: () => Promise<void>;
 }
+
+// A mixed operation log can be inspected before its operation is narrowed.
+// Keep common optional projections contract-typed without suppressing type checks.
+type RequestInspectionFields = {
+  patch?: Operations["settings_update_v1"]["request"]["patch"];
+  report?: Operations["report_get_v1"]["request"]["report"];
+  kept_scope?: Operations["subscription_downgrade_request_v1"]["request"]["kept_scope"];
+};
+
+export type RecordedRequest = {
+  [Operation in keyof Operations]: {
+    op: Operation;
+    r: Operations[Operation]["request"] & RequestInspectionFields;
+  };
+}[keyof Operations];
+
+export function requestsFor<Operation extends keyof Operations>(
+  rows: readonly RecordedRequest[],
+  operation: Operation,
+): Extract<RecordedRequest, { op: Operation }>[] {
+  return rows.filter(
+    (row): row is Extract<RecordedRequest, { op: Operation }> => row.op === operation,
+  );
+}
+
+export type CompletionRequest = {
+  [Operation in keyof Operations]: CompletionActions & {
+    op: Operation;
+    r: Operations[Operation]["request"];
+  };
+}[keyof Operations];
 export async function mockCompletion(
   page: Page,
   handler: (request: CompletionRequest) => Promise<void>,
 ) {
   const studio = await mockStudio(page);
-  const requests: { op: string; r: NativeRequest }[] = [];
+  const requests: RecordedRequest[] = [];
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
     const op = new URL(route.request().url()).pathname.split("/").at(-1)!,
       r = route.request().postDataJSON();
-    requests.push({ op, r });
+    requests.push({ op, r } as RecordedRequest);
     let handled = false;
     const send = async (data: unknown) => {
       handled = true;
@@ -38,7 +68,7 @@ export async function mockCompletion(
       handled = true;
       await route.abort("failed");
     };
-    await handler({ op, r, route, send, fail, abort });
+    await handler({ op, r, route, send, fail, abort } as CompletionRequest);
     if (!handled) await route.fallback();
   });
   await page.goto(`${origin}/login`);

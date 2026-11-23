@@ -6,6 +6,7 @@ import {
 } from "./auth-fixture.js";
 import { test, expect } from "./test.js";
 import { mockReports } from "./reports-native-fixture.js";
+import { requestsFor } from "./pro-completion-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 async function exportForm(page: import("@playwright/test").Page) {
   await page.getByRole("button", { name: "Dışa aktar", exact: true }).click();
@@ -140,7 +141,9 @@ test("export unknown result replays the frozen key, survives summary refresh and
   await expect
     .poll(() => f.writes.filter((row) => row.op === "report_export_start_v1").length)
     .toBe(2);
-  const writes = f.writes.filter((row) => row.op === "report_export_start_v1");
+  const writes = requestsFor(f.writes, "report_export_start_v1");
+  const exportFilters = writes[0]?.r.filters;
+  if (!exportFilters) throw Error("EXPORT_FILTERS_UNAVAILABLE");
   expect(writes[0]!.r.operation_key).toBe(writes[1]!.r.operation_key);
   expect(writes[0]!.r.filters).toEqual(writes[1]!.r.filters);
   await expect(
@@ -168,9 +171,8 @@ test("export unknown result replays the frozen key, survives summary refresh and
       (row) =>
         row.op === "report_get_v1" &&
         row.r.report === "sales" &&
-        JSON.stringify(row.r.filters.interval) === JSON.stringify(writes[0]!.r.filters.interval) &&
-        JSON.stringify(row.r.filters.center_ids) ===
-          JSON.stringify(writes[0]!.r.filters.center_ids),
+        JSON.stringify(row.r.filters.interval) === JSON.stringify(exportFilters.interval) &&
+        JSON.stringify(row.r.filters.center_ids) === JSON.stringify(exportFilters.center_ids),
     ),
   ).toBe(true);
   expect(

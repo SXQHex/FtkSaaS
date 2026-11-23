@@ -9,6 +9,7 @@ import {
   at,
   completionUrl,
   type NativeRequest,
+  type RecordedRequest,
 } from "./pro-completion-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 export async function mockReports(
@@ -20,7 +21,7 @@ export async function mockReports(
     expiredPreview?: boolean;
   } = {},
 ) {
-  const writes: { op: string; r: NativeRequest }[] = [];
+  const writes: RecordedRequest[] = [];
   let importKind: "students" | "crm_applications" = "crm_applications";
   let failed = false,
     jobReadFailed = false,
@@ -429,6 +430,7 @@ export async function mockReports(
     if (op === "import_preview_v1") {
       writes.push({ op, r });
       imported = true;
+      if (!r.mapping.kind) throw Error("IMPORT_KIND_MISSING");
       importKind = r.mapping.kind;
       if (importKind === "students")
         Object.assign(preview.import_summary, {

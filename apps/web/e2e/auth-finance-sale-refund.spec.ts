@@ -5,14 +5,19 @@ import type { Page } from "@playwright/test";
 import { mockFinanceDirectory } from "./finance-directory-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
+import type {
+  RequestSaleRefundApply,
+  RequestSaleRefundPreview,
+  RequestOperationStatusGet,
+} from "@ftksaas/api-contracts";
 async function setup(
   page: Page,
   options: { denied?: boolean; unknown?: boolean; unread?: boolean; prefillPage2?: boolean } = {},
 ) {
   const state = await mockFinanceDirectory(page),
-    writes: Record<string, any>[] = [],
-    previews: Record<string, any>[] = [],
-    receipts: Record<string, any>[] = [];
+    writes: RequestSaleRefundApply[] = [],
+    previews: RequestSaleRefundPreview[] = [],
+    receipts: RequestOperationStatusGet[] = [];
   let refunded = false,
     financialReads = 0;
   const previewId = I.account,

@@ -4,6 +4,10 @@ import type {
   EntitlementView,
   TableFreezes,
   FreezeCancellationPreview,
+  RequestFreezeCancelApply,
+  RequestFreezeCancelPreview,
+  RequestFreezeEndApply,
+  RequestOperationStatusGet,
 } from "@ftksaas/api-contracts";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
@@ -18,10 +22,10 @@ async function setup(
   options: { denied?: boolean; unknown?: boolean; unread?: boolean; stale?: boolean } = {},
 ) {
   const studio = await mockStudio(page),
-    writes: Record<string, any>[] = [],
-    previews: Record<string, any>[] = [],
-    receipts: Record<string, any>[] = [],
-    shortening: Record<string, any>[] = [];
+    writes: RequestFreezeCancelApply[] = [],
+    previews: RequestFreezeCancelPreview[] = [],
+    receipts: RequestOperationStatusGet[] = [],
+    shortening: RequestFreezeEndApply[] = [];
   let saved = false,
     failedRead = false,
     reservationVersion = 2;
