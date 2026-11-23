@@ -32,14 +32,14 @@ function deltaFixture(){
   {name:'unmapped_v1',request:{$ref:'#/$defs/OtherInput'},success:{$ref:'#/$defs/Uuid'}}
  ],permissions:{read:true},tables:[],uuid_field_map:[],feature_delivery:{}}};
  const oldPackage={name:'synthetic',scripts:{'test:api':'node --test --test-concurrency=2 tests/api-acceptance.test.mjs'},dependencies:{pinned:'1.0.0'}};
- const base={[contractPath]:JSON.stringify(contract),'apps/backend/database/migrations.sha256.json':JSON.stringify({'old.sql':'old'}),'apps/backend/scripts/check-migrations.py':'# original\n','apps/backend/package.json':JSON.stringify(oldPackage),'apps/backend/supabase/functions/backend-v1/implemented.json':JSON.stringify({operations:['entitlements_get_v1']}),'apps/backend/supabase/functions/backend-v1/index.ts':'old generated'};
+ const base={[contractPath]:JSON.stringify(contract),'apps/backend/database/migrations.sha256.json':JSON.stringify({'old.sql':'old'}),'apps/backend/scripts/check-migrations.py':'# original\n','apps/backend/package.json':JSON.stringify(oldPackage),'apps/backend/supabase/functions/backend-v1/implemented.json':JSON.stringify({operations:['entitlements_get_v1']}),'apps/backend/supabase/functions/backend-v1/index.js':'old generated'};
  const head=structuredClone(base),c=structuredClone(contract);
  c.$defs.Input.properties.session_id={$ref:'#/$defs/Uuid'};head[contractPath]=JSON.stringify(c);
  head[source]='begin;\n-- mapped source\ncommit;\n';head[wrapper]='begin;\n-- wrappers\ncommit;\n';head[migration]=head[source]+head[wrapper];
  head['apps/backend/database/migrations.sha256.json']=JSON.stringify({'old.sql':'old',[migration.split('/').at(-1)]:'new'});
  head['apps/backend/scripts/check-migrations.py']=base['apps/backend/scripts/check-migrations.py']+"\nassert next(Path('supabase/migrations').glob('*_p01_catalog_entitlement_reads.sql')).read_text()==Path('database/p01-catalog-entitlement-reads.sql').read_text()+Path('database/p01-catalog-entitlement-reads-wrappers.sql').read_text(),'P01 reads source drift'\n";
  head['apps/backend/package.json']=JSON.stringify({...oldPackage,scripts:{...oldPackage.scripts,'test:api':oldPackage.scripts['test:api']+' '+p01Suite.replace('apps/backend/','')}});
- head['apps/backend/supabase/functions/backend-v1/index.ts']='new generated';head[p01Suite]='// new behavior test';
+ head['apps/backend/supabase/functions/backend-v1/index.js']='new generated';head[p01Suite]='// new behavior test';
  const changes=()=>[...new Set([...Object.keys(base),...Object.keys(head)])].filter(p=>base[p]!==head[p]).map(path=>({path,status:!(path in head)?'D':!(path in base)?'A':'M'}));
  return {base,head,changes,run(){const c=changes();const read=(side,path)=>(side==='base'?base:head)[path]??null;const evidence=analyzeDelta(c,read,[profile]);return select(c,{evidence});}};
 }
@@ -49,6 +49,12 @@ test('documentation only has no backend setup and retains link checks',()=>{cons
 test('module changes include explicitly declared shared economic consumers',()=>{const p=plan('apps/backend/database/instructor-earnings.sql');for(const n of ['instructor-earnings','cross-center-settlement','starter-attendance-protection','program-session-lifecycle','api-acceptance'])assert(p.api.includes('apps/backend/tests/'+n+'.test.mjs'));assert(!p.api.includes('apps/backend/tests/person-registry.test.mjs'));});
 
 test('shared auth tenant finance gateway migrations infrastructure and unknown files expand safely',()=>{for(const p of ['apps/backend/database/kernel.sql','apps/backend/database/dispatch.sql','apps/backend/supabase/migrations/next.sql','apps/backend/tests/api-client.mjs','apps/backend/scripts/new-unknown.mjs','docs/contracts/example.json','.github/workflows/ci-fast.yml'])assert.deepEqual(plan(p).api,apiSuites,p);});
+
+test('renaming the generated gateway retains full backend source and DB/API acceptance scope',()=>{
+ const changes=parseChanges('R100\0apps/backend/supabase/functions/backend-v1/index.ts\0apps/backend/supabase/functions/backend-v1/index.js\0');
+ assert.equal(classifyChanges(changes).kind,'full');
+ const selected=select(changes);assert(selected.structural);assert(selected.db);assert(selected.broad);assert.deepEqual(selected.api,apiSuites);
+});
 
 test('contract generator/shared types cannot silently omit structural coverage',()=>{for(const p of ['docs/contracts/08.json','docs/contracts/01-product.md','docs/decisions/example.md','apps/backend/scripts/generate.mjs','packages/api-contracts/index.ts'])assert(plan(p).structural);});
 
@@ -130,7 +136,7 @@ test('shared package dependency, changed runner flags, test removal or unknown s
 });
 
 test('standalone generated edit, unmapped registration or shared kernel edit cannot silently narrow',()=>{
- const f=deltaFixture();for(const p of Object.keys(f.head))delete f.head[p];Object.assign(f.head,f.base);f.head['apps/backend/supabase/functions/backend-v1/index.ts']='unexplained';
+ const f=deltaFixture();for(const p of Object.keys(f.head))delete f.head[p];Object.assign(f.head,f.base);f.head['apps/backend/supabase/functions/backend-v1/index.js']='unexplained';
  assert.deepEqual(f.run().api,apiSuites);
  for(const mutate of [
   x=>x.head['apps/backend/supabase/functions/backend-v1/handler.ts']='shared gateway',
@@ -158,8 +164,8 @@ test('actual P01-A branch delta selects two suites even with accumulated generat
  // This regression fixture is optional in shallow external test checkouts;
  // normal workflow uses full git history and the pure snapshot cases above always run.
  try{execFileSync('git',['cat-file','-e',head+'^{commit}'],{stdio:'pipe'});}catch{t.skip('Historical snapshot unavailable in shallow checkout; pure snapshot cases still run');return;}
- const frozenPath=p=>p.startsWith('packages/contracts/')?p.replace('packages/contracts/','packages/api-contracts/'):p==='contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json'?'packages/api-contracts/schema/contract.json':p==='package.json'||/^(database|supabase|scripts|tests)\//.test(p)?'apps/backend/'+p:p;
- const originalPath=p=>p==='packages/api-contracts/schema/contract.json'?'contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json':p.startsWith('packages/api-contracts/')?p.replace('packages/api-contracts/','packages/contracts/'):p.replace(/^apps\/backend\//,'');
+ const frozenPath=p=>(p.startsWith('packages/contracts/')?p.replace('packages/contracts/','packages/api-contracts/'):p==='contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json'?'packages/api-contracts/schema/contract.json':p==='package.json'||/^(database|supabase|scripts|tests)\//.test(p)?'apps/backend/'+p:p).replace(/^apps\/backend\/supabase\/functions\/backend-v1\/index\.ts$/,'apps/backend/supabase/functions/backend-v1/index.js');
+ const originalPath=p=>p==='apps/backend/supabase/functions/backend-v1/index.js'?'supabase/functions/backend-v1/index.ts':p==='packages/api-contracts/schema/contract.json'?'contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json':p.startsWith('packages/api-contracts/')?p.replace('packages/api-contracts/','packages/contracts/'):p.replace(/^apps\/backend\//,'');
  const changes=parseChanges(execFileSync('git',['diff','--name-status','-z',base,head],{encoding:'utf8'})).map(c=>({...c,path:frozenPath(c.path)}));
  const cache=new Map(),read=(side,path)=>{const k=side+':'+path;if(!cache.has(k)){try{cache.set(k,execFileSync('git',['show',(side==='base'?base:head)+':'+originalPath(path)],{encoding:'utf8',maxBuffer:20*1024*1024,stdio:'pipe'}));}catch{cache.set(k,null);}}return cache.get(k);};
  const p=select(changes,{evidence:analyzeDelta(changes,read,[profile])});

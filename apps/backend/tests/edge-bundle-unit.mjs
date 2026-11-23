@@ -7,8 +7,20 @@ import {optimizeStandaloneValidators} from '../scripts/optimize-standalone-valid
 import * as validators from '../supabase/functions/backend-v1/validators.js';
 
 test('Edge upload keeps JSON-encoded source within 4,999,999 bytes',()=>{
- const source=fs.readFileSync('supabase/functions/backend-v1/index.ts','utf8');
+ const source=fs.readFileSync('supabase/functions/backend-v1/index.js','utf8');
  assert(Buffer.byteLength(JSON.stringify(source))<=4_999_999,'Edge API source upload exceeds budget');
+});
+
+test('Generated JavaScript gateway loads and retains typed method rejection',async()=>{
+ const previous=globalThis.Deno;let handler;
+ globalThis.Deno={serve:value=>{handler=value;},env:{get:()=>undefined}};
+ try{
+  await import('../supabase/functions/backend-v1/index.js');
+  assert.equal(typeof handler,'function');
+  const response=await handler(new Request('http://localhost/functions/v1/backend-v1/account_get_v1'));
+  assert.equal(response.status,400);assert.equal(response.headers.get('content-type'),'application/json');
+  const body=await response.json();assert(validators.failure_envelope(body));assert.equal(body.error.code,'VALIDATION_FAILED');
+ }finally{if(previous===undefined)delete globalThis.Deno;else globalThis.Deno=previous;}
 });
 
 test('Standalone optimization preserves exact errors and live schema constants',()=>{

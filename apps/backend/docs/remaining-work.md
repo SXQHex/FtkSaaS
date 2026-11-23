@@ -2,6 +2,24 @@
 
 Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin tek sahibidir**. [Sıra ve kontrol noktaları](production-queue.md), [kaynak/test/hosted kabulü](00-FtkSaaS-yeni-sohbet-devir.md), [ürün kapsamı](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md), [domain davranışı](../../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md) ve [P08](../../../docs/decisions/P08-accepted-scope.md) kendi sahiplerinde tutulur. Buradaki ölçülebilir kabul senaryoları yeni ürün kuralı değildir. F01–F33/14 modül kapsamı korunur; mevcut sağlam kod yeniden yazılmaz.
 
+<a id="ci503-native-baslangic"></a>
+## CI503 — Native worker başlangıcı ve ödeme yanıtı teşhisi
+
+**Durum:** PR395 ilk aday CI başarısız; API11 fixture zamanlaması düzeltildi, API8 boş 503 ve native yaşam döngüsü kusuru açık. Güncel main senkronize edildi. Ortak runtime düzeltmesi [XREQ-072](../../../docs/requests.md#xreq-072), hosted ödeme gecikmesi ve frontend ölçümü XREQ-071 sahibindedir. Kullanıcının 23 Kasım görevi kapsamında kapsam daraltma veya yeni kalite istisnası yoktur. Kaynak/ölçüm/ortam kanıtının tek sahibi [devir kaydıdır](00-FtkSaaS-yeni-sohbet-devir.md#ci503-native-baslangic).
+
+- [x] Başarısız koşuyu kaynak ve test adımına bağla; test fixture hatası, uygulama JSON hatası ve runtime bağlantı iptalini ayır. Kanıtlanmayan son tetikleyiciyi açık bırak.
+- [x] Aynı backend baytlarıyla `.ts`/`.js` native worker başlangıcını karşılaştır; CPU süresi ile toplam süreyi ve hosted hazır ESZIP yolunu ayır.
+- [x] Saf JavaScript entrypoint üretimini ve deployment adayını hazırla; kaynak tip denetimi, bütün request/response validator'ları, hosted JWT ve mevcut kaynak bağlı kontroller aynı kalır. Aynı baytlı eski `.ts` dağıtımı yeni entrypoint teslimi sayılmaz; gerçek deploy ayrı açık kalır.
+- [x] Boş/geçersiz JSON yanıtında güvenli servis kaynağı ve yakın native kapanma olaylarını sakla; secret/payload/URI kaydetmeden orijinal başarısızlık korunur. PR395 API8 artifact'ında base/server ve CONNECTION_ABORTED yakalandı; eksik user shutdown nedeni ayrıca açık tutulur.
+- [x] Hızlı fixture'ın eski tarihli politikasını gerçek PostgreSQL seçimiyle yeniden üret; backend limit/hata beklentisini koruyarak DB saatine bağla ve etkin politika/sürüm assertion'larını ekle.
+- [x] Aynı native binary ile normal EarlyDrop sonrası dış yanıt iptalini kontrollü deneyde göster; per_worker seçeneğini aynı 3 GiB sınırında ölç ve başarısız bellek sonucuyla ele.
+- [ ] Son aday backend verify/kalite, etkilenen testler ve eksiksiz native CI geçer. Native DB'nin çalışmadığı yerel ortamda microbenchmark tam ödeme/SQL kabulü sayılmaz.
+- [ ] Özgün 503'ün nedenini gerçek runtime kaydı veya aynı kaynağa bağlı tekrar üretimle belirle; yalnız başarılı tekrar/uzantı değişikliğiyle kök neden kapatılmaz.
+- [ ] XREQ-072 kapsamında normal yanıtın tamamlanmasıyla worker ömrünü doğru eşleyen runtime adayı doğrulanır; mevcut oneshot, kaynak sınırları, bellek kapısı ve tam native kabul korunur. Desteklenmeyen politika, otomatik tekrar veya rastlantısal yeşil koşu kapanış değildir.
+- [ ] Hosted ödeme akışında Auth/RPC/başlangıç ve istemcinin ACK/readback sürelerini ayrı doğrula. İstemci seri çağrı talebi [XREQ-071](../../../docs/requests.md#xreq-071); frontend kabulü ayrı sahibindedir.
+
+Bu dar hata/gecikme incelemesi, ertelenmiş O10 yük/kapasite projesini veya ticari SLA'yı kendiliğinden etkinleştirmez. Merge, deployment ve canlı kabul ayrı kanıt ister.
+
 <a id="bt01"></a>
 ## BT01 — Backend TypeScript ve Edge tip güvenliği
 

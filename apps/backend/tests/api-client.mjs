@@ -1,6 +1,7 @@
 import {measured,timedFetch} from './request-diagnostics.mjs';
+import {invalidJsonResponseError} from '../scripts/native-runtime-diagnostics.mjs';
 import {stackStatus,connect} from '../scripts/db.mjs';import {newUuidV7} from '../scripts/uuid.mjs';import {randomBytes} from 'node:crypto';import fs from 'node:fs';
-async function responseJson(response,label){const body=await measured('http_body',label,()=>response.text());try{return JSON.parse(body);}catch{throw new Error(label+' returned invalid JSON (HTTP '+response.status+', content-type '+response.headers.get('content-type')+', bytes '+Buffer.byteLength(body)+')');}}
+async function responseJson(response,label){const body=await measured('http_body',label,()=>response.text());try{return JSON.parse(body);}catch{throw invalidJsonResponseError(response,label,Buffer.byteLength(body));}}
 let cachedContext;export function context(){if(!cachedContext){const s=stackStatus();cachedContext={s,env:s.env};}return cachedContext;}
 async function createAuthUser(label){const {env}=context();const email='dev+'+label+'-'+newUuidV7()+'@ftksaas.invalid',password=randomBytes(30).toString('base64url');
  const a=await timedFetch('auth.create',env.API_URL+'/auth/v1/admin/users',{method:'POST',headers:{apikey:env.SERVICE_ROLE_KEY,authorization:'Bearer '+env.SERVICE_ROLE_KEY,'content-type':'application/json'},body:JSON.stringify({email,password,email_confirm:true,user_metadata:{display_name:label}})});

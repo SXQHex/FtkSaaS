@@ -69,6 +69,9 @@ Bu dosya alanlar arası talep ve teslim kabulünün tek kaydıdır. Sohbet devri
 
 | XREQ-070 | Backend değerlendirmesi; W1-BE-36 recovery kabul callback kaynağı | Backend; tüketici frontend | [WF01](workflows.md#wf01) | Zorunlu bağımsız callback pini ve mevcut development runner CLI girişi; gerçek sağlayıcı kanıtı ayrı. | [Backend kaynak/ortam](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-recovery-callback-acceptance) | Frontend veya hosted kabulü verilmedi. [Değerlendirme](#xreq-070). |
 
+| XREQ-071 | Backend; kullanıcının ödeme onayı gecikmesi itirazı | Frontend | [WF17](workflows.md#wf17), [WF13](workflows.md#wf13); [talep ve kabul](#xreq-071) | Son onay → komut ACK → doğrulanmış görünür sonuç ayrı ölçülür; gereksiz ağ beklemeleri azaltılırken hesap/oturum, güncel kaynak, aynı-key ve readback garantileri korunur. | Değerlendirmede | Backend kaynak incelemesi tamamlandı; frontend teknik değerlendirmesi ve gerçek ekran kabulü bekleniyor. |
+| XREQ-072 | Backend; native CI boş 503 kanıtı | Yönetim | [WF00](workflows.md#wf00); [runtime kusuru ve kabul](#xreq-072) | Normal worker tamamlanması geçerli dış yanıtı iptal etmez; oneshot, kaynak/bellek sınırları ve eksiksiz native kabul korunarak kaynak bağlı runtime düzeltmesi kurulur. | Açık; runtime düzeltmesi gerekli | PR395 API8 base/server iptali kaydedildi; aynı native binary ile yaşam döngüsü kusuru üretildi. Per_worker aynı 3 GiB korumayı aşar; tekrar veya kalite istisnası çözüm değildir. |
+
 Alanların kendi planlarındaki bağımlılık gözlemleri otomatik olarak talep, onay veya işe başlama yetkisi sayılmaz; somut talep bu tabloya kaydedildiğinde `XREQ-001` biçiminde sabit bir kimlik alır.
 
 ## XREQ-001 kayıtta mevcut hesap bildirimi
@@ -955,3 +958,58 @@ Mevcut native çekirdek ve kaynak komutları korunur; eksik kapsam keşfi/filtre
 ## XREQ-070 Web1 native recovery kabul aracının callback kaynağı
 
 **Backend değerlendirmesi — 17 Kasım2026:** W1-BE-36 bulgusu mevcut recovery helper’ında doğrulandı. Eski hedef varsayımı kaldırılır; native/expired kabulü güvenilir private girdiden zorunlu origin/path/next pini alır, link/provider cevabından hedef türetmez. Mevcut development runner’ına native|expired stdin JSON CLI girişi eklenir; yeni Auth/RPC, proof üretimi, TTL/saat değişikliği veya hosted reset/seed yoktur. Yan callback reddi ve özgün parola/oturum temizliği korunur. Kesin native akış [WF01](workflows.md#wf01), operatör girişleri [backend çalışma rehberi](../apps/backend/docs/remote-backend-setup.md#pinlenmiş-callback-ile-native-recovery-kabulü), güncel kaynak/run/ortam ve eski kanıt ayrımı [backend devri](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#web1-recovery-callback-acceptance) sahibindedir. Unit fixture yeni app/loopback gerçek sağlayıcı kabulü değildir; P01/G-PRO alt kontrolü yeni gerçek kanıt olmadan kapatılmaz. Frontend sayfa kabulü yeniden açılmadı ve karşı alan adına kabul verilmedi.
+
+<a id="xreq-071"></a>
+## XREQ-071 Platform ödeme onayının uçtan uca gecikmesi
+
+### Backend talebi — 23 Kasım 2026
+
+**İhtiyaç:** Kullanıcı, ödeme onayında 2–3 saniyelik rutin beklemeye itiraz etti. [Backend incelemesi](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#ci503-native-baslangic) yerel native başlangıç maliyeti ile hosted gecikmeyi ayırır; birinin düzelmesi diğerinin kabulü değildir. Bu talep frontend komut akışındaki seri beklemelerin ölçülmesini ve aynı güvenlik/doğruluk garantileriyle azaltılmasını ister. Yeni ürün/API kuralı veya onaylanmış sayısal SLA tanımlamaz.
+
+**Kaynak bulgusu:** İncelenen `main b79d25f129700d20b2eeb16676b72e344c1bd727` üzerinde `platform-payment.ts`, `scoped-backend.ts` ve komut yaşam döngüsü, son onaydan doğrulanmış sonuca kadar yedi Edge çağrısını altı seri aşamada çalıştırır: hesap → ödeme kaynağı → hesap → `saas_payment_verify_v1` → hesap → paralel ödeme/organizasyon okuması. Her `scopedBackend` mevcut native bearer'ı sabitleyip domain hesabını doğrular. Başlangıç detay yükleme, token yenileme, kurtarma ve aktif query invalidation beklemeleri bu sayıya dahil değildir. Bu statik çağrı sayısı ölçülmüş ekran süresi değildir; tek başına kontrollerin silinmesini haklı çıkarmaz. Mevcut M08 salt Query okuma iyileştirmesi, komut/receipt güvenliğini değiştirme kabulü sayılmaz.
+
+**Beklenen davranış ve kabul:**
+
+1. Aynı sentetik fixture, cihaz/ağ ve soğuk/ılık koşullarında önce/sonra örnek sayısı, medyan/p95, endpoint sayısı ve ağ zaman çizelgesi kaydedilir. Son onay → ACK ile son onay → typed readback/görünür başarı ayrı ölçülür; tek RPC veya önbellek başarısı bütün akışın süresi diye sunulmaz.
+2. Daha az seri ağ işi, mevcut hesabın domain kimliği ve sabitlenmiş native oturum/bearer bağıyla eşdeğer doğrulama sağlar. Farklı hesaba geçiş, aynı kullanıcıda yeni oturum, normal token yenileme, iptal edilmiş oturum, platform yetkisi kaybı ve geç dönen yanıt olumsuzları korunur.
+3. İlk yazıdan önce incelenen ödeme sürümü/pending durumu doğrulanır. Tek atomik backend komutu, dondurulmuş payload/operation key ve kayıp ACK sonrası aynı-key kurtarma korunur; ACK sonrasında ikinci yazı yapılmaz. Finans/abonelik yan etkileri istemcide ayrı adımlara bölünmez.
+4. Ödeme/organizasyon typed readback'i, tam ID/org eşleşmesi, ilerleyen sürüm ve seçilen kabul/ret durumu korunur. Okuma başarısızsa `saved-unread`, ACK bilinmiyorsa mevcut belirsiz sonuç/kurtarma durumu kalır; iyimser başarı veya otomatik yeni-key/503 retry eklenmez.
+5. Çift tıklama/yön değiştirme kilitleri, hesap/org kapsamlı invalidation ve geç yanıt kontrolü korunur. Var olan negatif assertion'lar ve frontend kontrolleri eksiksiz geçer. Backend sözleşmesi ihtiyacı ortaya çıkarsa bu kayıt üzerinden backend değerlendirmesine döner.
+
+Frontend uygulama, onay ve gerçek ekran kabulü bu backend talebiyle verilmiş değildir.
+
+<a id="xreq-072"></a>
+## XREQ-072 Native Edge yanıt ömrü ve boş 503
+
+### Backend → Yönetim — 23 Kasım 2026
+
+**İstenen karar/teslim:** Ortak native runtime kurulumunda normal worker tamamlanmasının dış HTTP yanıtını iptal etmesini gideren, kaynağı ve binary hash'i doğrulanmış bir düzeltme adayı değerlendirilip mevcut kurulum yetkisiyle kabul edilmelidir. Backend burada yeni runtime fork'u, desteklenmeyen politika, ortak workflow değişikliği veya sınır istisnası uygulamadı. Adayın tam kaynak incelemesi ve native kabulü gerekir; sürüm numarasını yükseltmek tek başına çözüm kanıtı değildir.
+
+**Gerçek hata:** [PR395 / run45161230234 / api-8](https://github.com/SXQHex/FtkSaaS/actions/runs/45161230234/job/137647048862), head `51a01473c99003681137f57f392d08bfb6b48ad8`, tested merge `f9091e8f58e9298605c284d10c439ccc4cb2fcb4`. `calendar_get_v1` yaklaşık 232 ms'de `HTTP503 / content-type:null / 0 byte / x-served-by:base/server` aldı. Güvenli artifact aynı anda `CONNECTION_ABORTED` kaydetti; CPU/bellek/wall-clock uyarısı yok, host bellek koruması geçti. CLI logs penceresi eksiksiz alındı fakat CLI bu akışa user worker Shutdown olayını yazmıyor. Bu yüzden bu CI çağrısının kesin kapanma nedeni kanıtlanmış sayılmaz. İlk ödeme 503'ü de yalnız başarılı bir sonraki koşuyla kapatılmaz. Ayrıntı ve ayrı API11 fixture düzeltmesinin sahibi [backend devridir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#ci503-native-baslangic).
+
+**Bağımsız yeniden üretim:** CLI 3.0.0'ın resmi Edge Runtime 1.77.9 binary'si; kaynak `0dd15ef2281b60ea03413ef5d2a60ebb25b0e21d`, native ELF SHA256 `76954e8efdda8262238f75fe91d9436c9f2df4905f0105669d8bb1175050dbf7`. DB'siz user handler POST gövdesini okuyup `Response.json({ok:true,value:42})` döndürür. Native main, `forceCreate:true`, 256 MB, CPU soft 1000/hard 2000 ms, wall 400000 ms, `noModuleCache:false` ile worker oluşturur. `oneshot` ve gerçek event worker altında şu aktarım sırası yarış penceresini deterministik büyütür:
+
+```js
+const response = await worker.fetch(request); // Gerçek user yanıtı 200.
+const bytes = await response.arrayBuffer();
+await new Promise(resolve => setTimeout(resolve, 15)); // Yalnız teşhis deneyi.
+return new Response(bytes, {
+  status: response.status,
+  headers: response.headers,
+});
+```
+
+On denemenin tamamı dışarıda boş 503/base/server verdi; native user kapanışları `EarlyDrop`, CPU 7–31 ms. Doğrudan yanıt geçişinde 130 ve ek 500 deneme 200 verdi; doğal CI interleaving'i bu deneyde yakalanmadı. Bu karşılaştırma normal iş tamamlandıktan sonra yanıtın kaybedilebildiğini kanıtlar; 15 ms gecikme bir uygulama çözümü olarak önerilmez. Native `per_request` kontrolü aynı pencerede 10/10 yanıtı korudu; CLI config bu politikayı desteklemediğinden repoya alınmadı.
+
+**Kaynak bulgusu ve onarılacak sınır:** [Response resource close](https://github.com/supabase/edge-runtime/blob/0dd15ef2281b60ea03413ef5d2a60ebb25b0e21d/ext/workers/lib.rs#L463-L475), mevcut dış bağlantı token'ını beklemeden request-end sinyali gönderir. Oneshot supervisor normal `EarlyDrop` ile worker'ı sonlandırır; runtime drop aynı bağlantı token'ını iptal eder. [Dış sunucu](https://github.com/supabase/edge-runtime/blob/0dd15ef2281b60ea03413ef5d2a60ebb25b0e21d/crates/base/src/server.rs#L238-L247) henüz yanıtı aktarmadıysa geçerli yanıtı 503'e çevirir. Onarım yönü, normal request-end/worker ömrünü dış yanıtın tamamlanması veya gerçek istemci iptaliyle doğru eşlemektir. Bu öneri derlenmiş veya doğrulanmış bir runtime yaması değildir.
+
+**Elenen seçenekler:** Mevcut gerçek backend.js, `per_worker`, concurrency 2 ve aynı sınırlarla 148 başarılı GET doğrulamasından sonra 11,36 saniyede RSS 3.164.792 KiB'ye çıktı; mevcut 3 GiB koruması deneyi durdurdu. JS başlangıç düzeltmesi bu worker birikimini çözmüyor. CLI 3.3.0/Edge 1.79.3 ve incelenen upstream main'de kusurun giderildiğine dair kanıt bulunmadı; yeni CLI'nin Kong bağlantı kapasitesi düzeltmesi bu oneshot yaşam döngüsü kusurunun kabulü sayılamaz.
+
+**Kabul ölçütleri:**
+
+1. Düzeltme adayı yukarıdaki deterministik başarılı yanıt senaryosunu, küçük/boş/stream yanıtları ve gerçek istemci iptalini doğru yönetir; worker veya bağlantı sızıntısı oluşturmaz. CPU/bellek/wall-clock ihlalleri başarısız kalır.
+2. Desteklenen native kurulum, sabit sürüm ve binary kaynağı doğrulanır. `oneshot`, worker sınırları, mevcut 3 GiB host koruması, concurrency ve test gövdeleri korunur. Farklı bir resmi çalışma modeli önerilirse bellek ve davranış eşdeğerliği ayrıca kanıtlanır.
+3. Güncel main üzerinde tam backend core/API/quality kabulü ve kaynak/run/attempt bağları geçer. HTTP 503 veya bozuk JSON için otomatik tekrar, beklenen hata kodunu değiştirme, test atlama veya rastlantısal yeşil koşu kapanış olamaz.
+4. Aday kurulum yetkisi, PR birleşmesi ve development teslimi ayrı doğrulanır. Bu yerel runtime bulgusu hosted ödeme gecikmesinin veya hosted Edge sürümünün çözüldüğünü göstermez.
+
+Backend alanı mevcut fixture düzeltmesini ve güvenli hata kaydını teslim eder; ortak runtime kararı/kurulumu ve 503 kapanışı açık kalır.

@@ -4,7 +4,7 @@ const contractPath='packages/api-contracts/schema/contract.json';
 const generatedPaths=new Set([
  'packages/api-contracts/src/generated.ts','packages/api-contracts/src/operations.ts',
  'packages/api-contracts/src/index.ts','packages/api-contracts/src/runtime.ts',
- 'apps/backend/supabase/functions/backend-v1/contract.json','apps/backend/supabase/functions/backend-v1/index.ts',
+ 'apps/backend/supabase/functions/backend-v1/contract.json','apps/backend/supabase/functions/backend-v1/index.js',
  'apps/backend/supabase/functions/backend-v1/validators.js','apps/backend/database/runtime-wrappers-current.sql'
 ]);
 const omit=(o,keys)=>Object.fromEntries(Object.entries(o).filter(([k])=>!keys.includes(k)));

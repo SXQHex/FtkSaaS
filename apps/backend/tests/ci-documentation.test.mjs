@@ -5,7 +5,7 @@ import {join,resolve} from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {documentScope,rendererOnlyProse} from '../scripts/ci/document-scope.mjs';
 import {markdownAnchors,checkDocuments,historicalSnapshot} from '../scripts/ci/docs-check.mjs';
-import {workflowPath,validateWorkflows,renderReferences} from '../scripts/update-docs.mjs';
+import {workflowPath,validateWorkflows,renderReferences,contextFiles} from '../scripts/update-docs.mjs';
 import {structure,validateCapture} from '../scripts/capture-docs.mjs';
 import {project} from '../scripts/ci/deploy-development.mjs';
 import {classifyChanges,ownerOf} from '../scripts/ci/scope.mjs';
@@ -62,6 +62,7 @@ test('only exact source-manifest snapshots retain historical link context',()=>{
 
 test('workflow map rejects missing duplicate unknown APIs and worker promotion to UI',()=>{
  const root=resolve('.'),manifest=JSON.parse(fs.readFileSync(workflowPath)),contract=JSON.parse(fs.readFileSync('packages/api-contracts/schema/contract.json'));
+ assert(contextFiles(root).some(file=>file.path==='apps/backend/supabase/functions/backend-v1/index.js'));
  assert.equal(validateWorkflows(manifest,contract,root).size,contract['x-contract'].operations.length);
  for(const mutate of [
   m=>m.flows[0].operations.pop(),

@@ -9,6 +9,7 @@ import {v7 as uuid} from 'uuid';
 import {revalidateDeployment} from './deployment-source.mjs';
 
 export const project='gwyprhenabtpkbojephw';
+export const backendEntrypoint='supabase/functions/backend-v1/index.js';
 export const sha256=s=>createHash('sha256').update(s).digest('hex');
 // Only fixed labels and bounded process metadata leave this boundary. Provider
 // output can contain credentials, SQL, paths or customer data, even on failure.
@@ -46,7 +47,13 @@ export async function managementRequest(route,{method='GET',body}={},send=fetch)
  }
  return response.status===204?null:response.json();
 }
-export function unchangedEdge(previous,edge,hash){return previous?.success===true&&previous.project===project&&previous.edge_source_sha256===hash&&previous.edge_version===edge?.version&&edge.status==='ACTIVE'&&edge.verify_jwt===true;}
+export function backendEntrypointMatches(value){
+ if(value===backendEntrypoint)return true;
+ if(typeof value!=='string')return false;
+ // Hosted metadata prepends a per-version file URL to the API upload's relative path.
+ try{const url=new URL(value);return url.protocol==='file:'&&url.hostname===''&&url.search===''&&url.hash===''&&url.pathname.endsWith('/source/'+backendEntrypoint);}catch{return false;}
+}
+export function unchangedEdge(previous,edge,hash){return previous?.success===true&&previous.project===project&&previous.edge_source_sha256===hash&&previous.edge_entrypoint_path===backendEntrypoint&&previous.edge_version===edge?.version&&edge.status==='ACTIVE'&&edge.verify_jwt===true&&backendEntrypointMatches(edge.entrypoint_path);}
 export function unchangedResendWebhook(previous,edge,hash){return previous?.success===true&&previous.project===project&&previous.resend_webhook_source_sha256===hash&&previous.resend_webhook_version===edge?.version&&edge?.status==='ACTIVE'&&edge.verify_jwt===false;}
 export function unchangedCalendarGateway(previous,edge,hash){return previous?.success===true&&previous.project===project&&previous.calendar_gateway_source_sha256===hash&&previous.calendar_gateway_version===edge?.version&&edge?.status==='ACTIVE'&&edge.verify_jwt===false;}
 export async function resendWebhookSmoke(record,send=fetch){
@@ -221,14 +228,15 @@ export async function deliver(){
   // Isolate hosted settings from the intentionally different local JWT config.
   temp=fs.mkdtempSync(path.join(os.tmpdir(),'ftk-hosted-'));
   const fn=path.join(temp,'supabase/functions/backend-v1');fs.mkdirSync(fn,{recursive:true});
-  const bundle=fs.readFileSync('supabase/functions/backend-v1/index.ts');receipt.edge_source_sha256=sha256(bundle);
-  fs.writeFileSync(path.join(fn,'index.ts'),bundle);
-  fs.writeFileSync(path.join(temp,'supabase/config.toml'),'project_id = "ftksaas-hosted-development"\n[functions.backend-v1]\nverify_jwt = true\n[functions.resend-webhook]\nverify_jwt = false\n[functions.personal-calendar]\nverify_jwt = false\n');
+  const bundle=fs.readFileSync(backendEntrypoint);receipt.edge_source_sha256=sha256(bundle);receipt.edge_entrypoint_path=backendEntrypoint;
+  fs.writeFileSync(path.join(temp,backendEntrypoint),bundle);
+  fs.writeFileSync(path.join(temp,'supabase/config.toml'),'project_id = "ftksaas-hosted-development"\n[functions.backend-v1]\nverify_jwt = true\nentrypoint = "./functions/backend-v1/index.js"\n[functions.resend-webhook]\nverify_jwt = false\n[functions.personal-calendar]\nverify_jwt = false\n');
   const previous=fs.existsSync(ciFile('previous-development-delivery.json'))?JSON.parse(fs.readFileSync(ciFile('previous-development-delivery.json'))):null;
   const before=await api('/functions/backend-v1');
   receipt.edge_unchanged=unchangedEdge(previous,before,receipt.edge_source_sha256);
   if(!receipt.edge_unchanged)cli(['functions','deploy','backend-v1','--use-api','--workdir',temp,'--output-format','json','--yes','--remote='+project]);
   const edge=await api('/functions/backend-v1');
+  record('edge_javascript_entrypoint',backendEntrypointMatches(edge.entrypoint_path));receipt.edge_deployed_entrypoint_path=edge.entrypoint_path;
   record('edge_active_jwt_required',edge.status==='ACTIVE'&&edge.verify_jwt===true);receipt.edge_version=edge.version;receipt.edge_bundle_sha256=edge.ezbr_sha256??null;
   await current();stage='Resend webhook deployment';
   const webhook=path.join(temp,'supabase/functions/resend-webhook');fs.mkdirSync(webhook,{recursive:true});

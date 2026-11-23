@@ -413,6 +413,7 @@ enabled = true
 
 [functions.backend-v1]
 verify_jwt = false
+entrypoint = "./functions/backend-v1/index.js"
 
 [functions.resend-webhook]
 verify_jwt = false

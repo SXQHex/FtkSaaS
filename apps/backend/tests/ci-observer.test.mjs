@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {memorySnapshot,signalEvent,dockerEvent,observe,edgeMemoryBudget,EDGE_MEMORY_LIMIT_KIB} from '../scripts/ci/observe-api.mjs';
+import {nativeRuntimeEvent,collectNativeRuntimeDiagnostics,invalidJsonResponseError,nativeLogLimits} from '../scripts/native-runtime-diagnostics.mjs';
 test('signal tracing distinguishes sender thread, sender process and target without command arguments',()=>{
  const line=' Runner.Worker-1959  [002] d..2. 1234.567: signal_generate: sig=15 errno=0 code=0 comm=node pid=2355 grp=1 res=0';
  assert.deepEqual(signalEvent(line,tid=> `Name:\tprocess\nTgid:\t${tid==='1959'?1900:2350}\n`),{sender_comm:'Runner.Worker',sender_tid:1959,sender_pid:1900,kernel_s:1234.567,signal:15,code:0,target_comm:'node',target_tid:2355,target_pid:2350,group:1,result:0});
@@ -94,4 +95,76 @@ test('passing memory evidence cannot override the observed command failure',asyn
   const rows=fs.readFileSync(path.join(dir,'events.jsonl'),'utf8').trim().split('\n').map(JSON.parse);
   assert(rows.some(r=>r.kind==='memory.acceptance'&&r.passed===true));
  } finally {fs.rmSync(dir,{recursive:true,force:true});}
+});
+
+const nativeTimestamp='2026-11-23T09:45:26.052Z',isolate='bba6d0ab-99dd-4c8f-997d-4731bf6b0a10';
+const nativeLine=line=>({type:'log-entry',service:'functions',stream:'stderr',timestamp:nativeTimestamp,instance_id:'SECRET_INSTANCE_SENTINEL',line});
+test('native runtime diagnostics retain fixed limit reasons and reject private payloads',()=>{
+ for(const [line,reason] of [
+  ['CPU time limit reached','CPU_LIMIT'],['CPU time hard limit reached','CPU_HARD_LIMIT'],
+  ['CPU time soft limit reached','CPU_SOFT_LIMIT'],['memory limit reached for the worker','MEMORY_LIMIT'],
+  ['wall clock duraiton reached','WALL_CLOCK_LIMIT'],['wall clock duration reached','WALL_CLOCK_LIMIT'],
+  ['wall clock duration warning','WALL_CLOCK_WARNING'],
+ ])assert.deepEqual(nativeRuntimeEvent(nativeLine(line+': isolate: '+isolate)),{at:nativeTimestamp,kind:'native.runtime',reason,isolate_id:isolate});
+ const aborted=nativeRuntimeEvent(nativeLine('connection aborted (uri: "/functions/v1/backend-v1/op?token=SECRET_URI_SENTINEL")'));
+ assert.deepEqual(aborted,{at:nativeTimestamp,kind:'native.runtime',reason:'CONNECTION_ABORTED'});
+ assert.equal(nativeRuntimeEvent(nativeLine('[functions] worker error WorkerRequestCancelled: request has been cancelled by supervisor')).reason,'REQUEST_CANCELLED');
+ assert.equal(nativeRuntimeEvent(nativeLine('main worker has been destroyed')).reason,'MAIN_WORKER_DESTROYED');
+ for(const line of ['authorization: Bearer SECRET_TOKEN_SENTINEL','CPU time limit reached: isolate: SECRET_ID_SENTINEL','CPU time limit reached: isolate: '+isolate+' SECRET_SUFFIX_SENTINEL','unhandled error {"password":"SECRET_BODY_SENTINEL"}'])assert.equal(nativeRuntimeEvent(nativeLine(line)),null);
+ assert.equal(nativeRuntimeEvent({...nativeLine('main worker has been destroyed'),service:'gateway'}),null);
+ assert.equal(nativeRuntimeEvent({...nativeLine('main worker has been destroyed'),timestamp:'SECRET_TIME_SENTINEL'}),null);
+ assert(!JSON.stringify(aborted).includes('SECRET'));
+});
+
+test('native log collection reads one bounded local history window with telemetry disabled',()=>{
+ let calls=0;
+ const rows=collectNativeRuntimeDiagnostics({since:nativeTimestamp,cwd:'/isolated/backend',run:(command,args,options)=>{
+  calls++;
+  assert.equal(command,'/isolated/backend/node_modules/.bin/supabase');
+  assert.deepEqual(args,['stack','logs','--service','functions','--since',nativeTimestamp,'--tail',String(nativeLogLimits.tail),'--output-format','stream-json']);
+  assert.equal(options.timeout,5000);assert.equal(options.maxBuffer,2*1024*1024);assert.equal(options.killSignal,'SIGKILL');
+  assert.deepEqual(options.stdio,['ignore','pipe','ignore']);
+  assert.equal(options.env.SUPABASE_TELEMETRY_DISABLED,'1');assert.equal(options.env.DO_NOT_TRACK,'1');
+  return {status:0,stdout:[nativeLine('CPU time limit reached: isolate: '+isolate),nativeLine('SECRET_BODY_SENTINEL')].map(JSON.stringify).join('\n')+'\n',stderr:'SECRET_STDERR_SENTINEL'};
+ }});
+ assert.equal(calls,1);assert.equal(rows[0].reason,'CPU_LIMIT');
+ assert.equal(rows.at(-1).complete,true);assert.equal(rows.at(-1).retained_lines,2);assert.equal(rows.at(-1).matched_events,1);
+ assert(!JSON.stringify(rows).includes('SECRET'));
+});
+
+test('native diagnostics expose timeout, buffer, retention, and tail gaps without losing complete events',()=>{
+ for(const [code,reason] of [['ETIMEDOUT','CLI_TIMEOUT'],['ENOBUFS','BUFFER_LIMIT'],['ENOENT','CLI_UNAVAILABLE']]){
+  const rows=collectNativeRuntimeDiagnostics({since:nativeTimestamp,run:()=>({error:Object.assign(Error('SECRET_EXCEPTION_SENTINEL'),{code}),status:null,stdout:JSON.stringify(nativeLine('CPU time limit reached: isolate: '+isolate))+'\n{"private":"SECRET_PARTIAL_SENTINEL',stderr:'SECRET_STDERR_SENTINEL'})});
+  assert.equal(rows[0].reason,'CPU_LIMIT');assert(rows.some(row=>row.reason===reason));assert(rows.some(row=>row.reason==='INVALID_EVENT'));assert.equal(rows.at(-1).complete,false);assert(!JSON.stringify(rows).includes('SECRET'));
+ }
+ const rows=collectNativeRuntimeDiagnostics({since:nativeTimestamp,run:()=>({status:0,stdout:[{type:'log-marker',service:'functions',kind:'lost'},...Array.from({length:nativeLogLimits.tail},()=>nativeLine('private application output'))].map(JSON.stringify).join('\n')})});
+ assert(rows.some(row=>row.reason==='RETENTION_LOSS'));assert(rows.some(row=>row.reason==='TAIL_LIMIT'));assert.equal(rows.at(-1).complete,false);
+ const unavailable=collectNativeRuntimeDiagnostics({run:()=>{throw Error('SECRET_SPAWN_SENTINEL');}});
+ assert(unavailable.some(row=>row.reason==='COLLECTION_FAILED'));assert(unavailable.some(row=>row.reason==='NO_RETAINED_LOGS'));assert(!JSON.stringify(unavailable).includes('SECRET'));
+});
+
+test('invalid JSON response remains a failure while native metadata is captured without raw headers',()=>{
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'ci-native-response-')),output=path.join(dir,'events.jsonl');
+ try{
+  const response=new Response(null,{status:503,headers:{'x-served-by':'base/server','content-type':'text/html; secret=SECRET_HEADER_SENTINEL','set-cookie':'SECRET_COOKIE_SENTINEL'}});
+  const error=invalidJsonResponseError(response,'saas_payment_verify_v1',0,{enabled:true,output,since:nativeTimestamp,run:()=>({status:0,stdout:JSON.stringify(nativeLine('CPU time limit reached: isolate: '+isolate))+'\n'})});
+  assert.match(error.message,/invalid JSON \(HTTP 503, content-type text\/html, bytes 0, x-served-by base\/server\)/);
+  assert.throws(()=>{throw error;},value=>value===error);
+  const text=fs.readFileSync(output,'utf8'),rows=text.trim().split('\n').map(JSON.parse);
+  assert.equal(rows[0].kind,'http.invalid_json');assert.equal(rows[0].status,503);assert.equal(rows[0].served_by,'base/server');assert.equal(rows[1].reason,'CPU_LIMIT');assert(!text.includes('SECRET'));assert(!error.message.includes('SECRET'));
+  const unknown=invalidJsonResponseError(new Response(null,{status:503,headers:{'x-served-by':'SECRET_HEADER_SENTINEL','content-type':'SECRET_TYPE_SENTINEL'}}),'operation',0,{enabled:false});
+  assert.match(unknown.message,/content-type unrecognized.*x-served-by unrecognized/);assert(!unknown.message.includes('SECRET'));
+ }finally{fs.rmSync(dir,{recursive:true,force:true});}
+});
+
+test('failed native collection and evidence writes cannot mask the invalid JSON failure or failing exit',async()=>{
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'ci-native-failure-')),output=path.join(dir,'events.jsonl');
+ try{
+  const error=invalidJsonResponseError(new Response(null,{status:503}),'saas_payment_verify_v1',0,{enabled:true,output,run:()=>{throw Error('SECRET_FAILURE_SENTINEL');}});
+  assert.match(error.message,/invalid JSON \(HTTP 503.*x-served-by missing/);
+  assert(fs.readFileSync(output,'utf8').includes('COLLECTION_FAILED'));
+  const helper=new URL('../scripts/native-runtime-diagnostics.mjs',import.meta.url).href;
+  const code=await observe(process.execPath,['--input-type=module','-e',`import {invalidJsonResponseError} from ${JSON.stringify(helper)};const error=invalidJsonResponseError(new Response(null,{status:503}),'saas_payment_verify_v1',0,{enabled:true,output:${JSON.stringify(output)},write(){throw Error('SECRET_WRITE_SENTINEL');}});if(!error.message.includes('invalid JSON (HTTP 503')||error.message.includes('SECRET'))process.exit(9);process.exit(7);`],{trace:false,docker:false,output:path.join(dir,'observer.jsonl')});
+  assert.equal(code,7);
+ }finally{fs.rmSync(dir,{recursive:true,force:true});}
 });

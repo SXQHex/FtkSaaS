@@ -1,7 +1,7 @@
 import {missingCalendarConfiguration} from '../scripts/calendar-configuration-plan.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {project,unchangedEdge,unchangedResendWebhook,unchangedCalendarGateway,resendWebhookSmoke,hostedSmoke,sameMigration,migrationPlan,migrationBody,migrationBatch} from '../scripts/ci/deploy-development.mjs';
+import {project,backendEntrypoint,backendEntrypointMatches,unchangedEdge,unchangedResendWebhook,unchangedCalendarGateway,resendWebhookSmoke,hostedSmoke,sameMigration,migrationPlan,migrationBody,migrationBatch} from '../scripts/ci/deploy-development.mjs';
 import {deploymentSource,resolveAcceptedSource,revalidateDeployment,trustedDeliveryRun,filterSupabaseDelivery,resolveDeployment,previousReceipt} from '../scripts/ci/deployment-source.mjs';
 import fs,{mkdtempSync,rmSync} from 'node:fs';
 import {backendUnchanged} from '../scripts/ci/source.mjs';
@@ -13,10 +13,16 @@ import {execFileSync} from 'node:child_process';
 
 process.chdir(repositoryRoot);
 
-test('unchanged Edge requires both trusted source receipt and live version/JWT match',()=>{
- const previous={success:true,project,edge_version:3,edge_source_sha256:'hash'},edge={version:3,status:'ACTIVE',verify_jwt:true};
+test('unchanged Edge requires trusted source/entrypoint receipt and live version/JWT/entrypoint match',()=>{
+ const previous={success:true,project,edge_version:3,edge_source_sha256:'hash',edge_entrypoint_path:backendEntrypoint},edge={version:3,status:'ACTIVE',verify_jwt:true,entrypoint_path:backendEntrypoint};
  assert(unchangedEdge(previous,edge,'hash'));
  for(const [p,e,h] of [[null,edge,'hash'],[{...previous,success:false},edge,'hash'],[{...previous,project:'other'},edge,'hash'],[previous,{...edge,version:4},'hash'],[previous,{...edge,verify_jwt:false},'hash'],[previous,edge,'changed']])assert(!unchangedEdge(p,e,h));
+ for(const [p,e] of [[previous,{...edge,status:'FAILED'}],[{...previous,edge_entrypoint_path:undefined},edge],[{...previous,edge_entrypoint_path:'supabase/functions/backend-v1/index.ts'},edge],[previous,{...edge,entrypoint_path:'supabase/functions/backend-v1/index.ts'}]])assert(!unchangedEdge(p,e,'hash'));
+ const deployed='file:///tmp/user_fn_project_function_109/source/'+backendEntrypoint;
+ assert(unchangedEdge(previous,{...edge,entrypoint_path:deployed},'hash'));
+ for(const value of [undefined,null,3,{},'invalid',backendEntrypoint+'.map',backendEntrypoint.replace('backend-v1','other'),deployed.replace('index.js','index.ts'),deployed.replace('file:','https:'),deployed.replace('file:///','file://remote/'),deployed+'?version=1',deployed+'#index.js']){
+  assert(!backendEntrypointMatches(value));assert(!unchangedEdge(previous,{...edge,entrypoint_path:value},'hash'));
+ }
 });
 
 test('Resend deployment reuse requires its own source/version receipt and dedicated non-JWT configuration',()=>{
@@ -257,12 +263,13 @@ test('Historical retired V2 marker never deploys or searches historical runtime 
 test('Supabase delivery compares last successful delivery with accepted main, including deletions, renames and modes',async()=>{
  const base='a'.repeat(40),head='b'.repeat(40),repo={owner:'SXQHex',repo:'FtkSaaS'};
  const proof={deploy:true,sha:head,expected_main:head},previous={source:base};
- const edge={path:'apps/backend/supabase/functions/backend-v1/index.ts',type:'blob',mode:'100644',sha:'edge'};
+ const edge={path:'apps/backend/supabase/functions/backend-v1/index.js',type:'blob',mode:'100644',sha:'edge'};
  const outside={path:'.github/workflows/backend.yml',type:'blob',mode:'100644',sha:'old'};
  const cases=[
   {before:[edge,outside],after:[{...outside,sha:'new'},edge],deploy:false},
   {before:[edge],after:[edge,{...outside,path:'docs/ci-policy.md'}],deploy:false},
   {before:[edge],after:[{...edge,sha:'new'}],deploy:true},
+  {before:[{...edge,path:'apps/backend/supabase/functions/backend-v1/index.ts'}],after:[edge],deploy:true},
   {before:[edge],after:[],deploy:true},
   {before:[],after:[edge],deploy:true},
   {before:[edge],after:[{...edge,path:'docs/moved.ts'}],deploy:true},
