@@ -1,4 +1,5 @@
 import { v7 as uuidv7 } from "uuid";
+import { z } from "zod";
 import { nativeSessionId } from "../auth/native-session-id";
 import type { Session } from "@supabase/supabase-js";
 import { getSupabaseClient } from "../../lib/supabase";
