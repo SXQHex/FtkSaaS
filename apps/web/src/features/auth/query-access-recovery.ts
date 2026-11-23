@@ -267,10 +267,7 @@ export function observeQueryAccessFailures(queries: QueryClient, actions: Access
     run(`query:${query.queryHash}`, () => {
       // Another concurrent revocation may already have purged this feature.
       // Still process terminal session/actor errors after their Query vanishes.
-      if (
-        kind === "permission" &&
-        (terminated || !cache.find({ queryKey: key, exact: true }))
-      )
+      if (kind === "permission" && (terminated || !cache.find({ queryKey: key, exact: true })))
         return Promise.resolve();
       return reconcileQueryAccessFailure(queries, key, error, safeActions);
     });
