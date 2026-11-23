@@ -9,7 +9,7 @@ const actorB = { ...scope, accountId: "actor-b" };
 const key = (s: typeof scope, cursor?: string) =>
   ["merge-directory", s.accountId, s.orgId, s.centerId, "pending", "", cursor] as const;
 
-it("marks old merge cursors and same-org aliases stale without refetching or crossing tenants", async () => {
+it("M01 merge invalidation stays scoped without cursor refetch", async () => {
   const queries = new QueryClient();
   const first = key(scope);
   const old = key(scope, "cursor-2");
