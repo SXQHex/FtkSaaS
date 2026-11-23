@@ -7,6 +7,7 @@ test("M06: revoked center access clears live CRM, history and deep-link permissi
   page,
 }) => {
   const state = await mockLeads(page);
+  await page.getByRole("tab", { name: "Liste", exact: true }).click();
   const privateRow = page.getByRole("button", { name: "Aday A", exact: true });
   await expect(privateRow).toBeVisible();
 
@@ -57,6 +58,7 @@ test("M06: an independent CRM FORBIDDEN is not a global logout or old-session ca
   page,
 }) => {
   const state = await mockLeads(page);
+  await page.getByRole("tab", { name: "Liste", exact: true }).click();
   await expect(page.getByRole("button", { name: "Aday A", exact: true })).toBeVisible();
 
   state.setDenied(true);
