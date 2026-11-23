@@ -18,3 +18,15 @@ test('P07 deletion reauth trusts native verification, binds the same user/sessio
  assert.deepEqual(await lifecycleReauth('x','k',proof,id,async()=>Response.json({message:'private detail'}, {status:500})),{error:'TEMPORARY_FAILURE'});
  assert.deepEqual(await lifecycleReauth('x','k','x'.repeat(16385),id,()=>{throw Error('must not call provider');}),{error:'AUTH_REQUIRED'});
 });
+
+test('malformed native Auth factors and session claims never create reauth context',async()=>{
+ const id='01900000-0000-7000-8000-000000000001',session='01900000-0000-7000-8000-000000000002';
+ const token=claims=>'header.'+Buffer.from(JSON.stringify(claims)).toString('base64url')+'.signature';
+ const claims={sub:id,session_id:session,aal:'aal2'};
+ for(const user of [null,[],{id,factors:'verified'},{id,factors:[null]},{id,factors:[{status:7}]}]){
+  assert.deepEqual(await lifecycleReauth('x','k',token(claims),id,async()=>Response.json(user)),{error:'AUTH_REQUIRED'});
+ }
+ for(const invalid of [{sub:id,session_id:17,aal:'aal2'},{sub:id,session_id:session,aal:7},{sub:session,session_id:session,aal:'aal2'}]){
+  assert.deepEqual(await lifecycleReauth('x','k',token(invalid),id,async()=>Response.json({id})),{error:'AUTH_REQUIRED'});
+ }
+});

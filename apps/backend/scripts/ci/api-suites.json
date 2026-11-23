@@ -109,11 +109,11 @@
     },
     {
       "path": "apps/backend/tests/cross-center-settlement.test.mjs",
-      "sha256": "c60f25c9bbeab0490cc291828fa7823e76dc2f72bea0e633b2166be9b31f80e5",
+      "sha256": "d1dd15203803655443e5af84d3afdd98c13715f43866972f8e404912f0ddf6fd",
       "shared": [
         [
           1,
-          104
+          112
         ]
       ],
       "parts": [
@@ -121,8 +121,8 @@
           "id": "cross-center-payments",
           "ranges": [
             [
-              105,
-              228
+              113,
+              236
             ]
           ]
         },
@@ -130,8 +130,8 @@
           "id": "cross-center-deficit-sources",
           "ranges": [
             [
-              229,
-              249
+              237,
+              257
             ]
           ]
         },
@@ -139,8 +139,8 @@
           "id": "cross-center-no-transfer",
           "ranges": [
             [
-              250,
-              271
+              258,
+              279
             ]
           ]
         },
@@ -148,8 +148,8 @@
           "id": "cross-center-rounding",
           "ranges": [
             [
-              272,
-              288
+              280,
+              296
             ]
           ]
         },
@@ -157,8 +157,8 @@
           "id": "cross-center-source-scope",
           "ranges": [
             [
-              289,
-              347
+              297,
+              356
             ]
           ]
         },
@@ -166,8 +166,8 @@
           "id": "cross-center-authority",
           "ranges": [
             [
-              348,
-              428
+              357,
+              436
             ]
           ]
         },
@@ -175,8 +175,8 @@
           "id": "cross-center-atomic",
           "ranges": [
             [
-              429,
-              480
+              437,
+              496
             ]
           ]
         }

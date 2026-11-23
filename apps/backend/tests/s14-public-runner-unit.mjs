@@ -7,6 +7,18 @@ import {signPublicApplication} from '../scripts/p04-public-ingress.mjs';
 const id=n=>'019a4c1d-7000-7000-8000-'+String(n).padStart(12,'0');
 const config={org:id(1),center:id(2),session:id(3),publication:id(4),email:'owner@example.invalid',password:'synthetic-password',apikey:'header.'+Buffer.from(JSON.stringify({role:'anon',ref:'gwyprhenabtpkbojephw'})).toString('base64url')+'.signature',ingressSecret:randomBytes(32).toString('hex'),clientIp:'192.0.2.17',botProof:'synthetic-unit-proof'};
 let nativeSequence=100;
+
+// Verify the timestamp actually received on the wire. Re-signing with an
+// independent Date.now() crosses second boundaries and rejects valid HMACs.
+function assertSignedIngress(headers,raw,now=Date.now()){
+ const signedAt=headers['x-ftk-ingress-time'];
+ assert.match(signedAt,/^\d{10}$/);
+ assert(Math.abs(now/1000-Number(signedAt))<=60,'signed ingress must stay within the native 60s freshness window');
+ assert.equal(headers['x-ftk-client-ip'],config.clientIp);
+ const expected=signPublicApplication(raw,config.clientIp,config.ingressSecret,Number(signedAt)*1000);
+ assert.equal(headers['x-ftk-ingress-time'],expected['x-ftk-ingress-time']);
+ assert.equal(headers['x-ftk-ingress-signature'],expected['x-ftk-ingress-signature']);
+}
 function fixture(fault={}){
  const data={calls:[],states:[],submitted:0,reviewed:0,logout:0,revoked:false,application:null,sessions:new Map(),loginCount:0,current:null,revokedIds:[]};
  const row=()=>({entity:{type:'public_applications',id:id(5)},state:data.application,versions:[{entity:{type:'public_applications',id:id(5)},version:1}],current:{values:{publication_id:config.publication,contact:data.contact,person_id:null}}});
@@ -28,7 +40,8 @@ function fixture(fault={}){
   if(op==='public_application_submit_v1'){
    assert.equal(options.headers.authorization,'Bearer '+config.apikey);
    assert.equal(body.bot_proof,config.botProof);
-   const expected=signPublicApplication(options.body,config.clientIp,config.ingressSecret);
+   assertSignedIngress(options.headers,options.body);
+   const expected=signPublicApplication(options.body,config.clientIp,config.ingressSecret,Number(options.headers['x-ftk-ingress-time'])*1000);
    assert.equal(options.headers['x-ftk-ingress-signature'],expected['x-ftk-ingress-signature']);
    if(fault.submit)return Response.json({ok:false,error:{code:'BOT_VERIFICATION_FAILED'}});
    if(!data.application){data.submitted++;data.contact=body.contact;data.application='pending';}
@@ -100,4 +113,34 @@ test('S14 runner cannot pass while a prior recorded session remains active after
  await assert.rejects(acceptPublicApplication(config,{...options,state}),/RECORDED_SESSION_RECOVERY/);
  assert(data.sessions.has(old));assert.equal(data.states.at(-1).sessions.find(s=>s.id===old).cleanupConfirmed,false);
  assert.equal(data.submitted,1);assert.equal(data.reviewed,1);
+});
+
+test('S14 signed transport survives a legitimate one-second clock boundary without weakening freshness',async()=>{
+ const {data,options}=fixture(),clock=Date.now,second=Date.parse('2026-11-23T07:07:59.999Z');
+ try{
+  Date.now=()=>second;
+  const result=await acceptPublicApplication(config,{...options,request:async(url,init)=>{
+   if(new URL(url).pathname.endsWith('/public_application_submit_v1'))Date.now=()=>second+2;
+   return options.request(url,init);
+  }});
+  assert.equal(result.status,'passed');
+  assert.equal(data.submitted,1);
+  assert.equal(data.reviewed,1);
+ }finally{Date.now=clock;}
+});
+
+
+test('S14 transport double rejects altered signatures, changed payload, forged IP and stale timestamps',()=>{
+ const at=Date.parse('2026-11-23T07:07:59.999Z'),raw=JSON.stringify({synthetic:'signed'});
+ const headers=signPublicApplication(raw,config.clientIp,config.ingressSecret,at);
+ assert.doesNotThrow(()=>assertSignedIngress(headers,raw,at+2));
+ const tampered=[
+  [{...headers,'x-ftk-ingress-signature':'0'.repeat(64)},raw,at+2],
+  [headers,raw+' ',at+2],
+  [{...headers,'x-ftk-client-ip':'192.0.2.99'},raw,at+2],
+  [headers,raw,at+61000],
+  [headers,raw,at-61000],
+  [{...headers,'x-ftk-ingress-time':'not a timestamp'},raw,at]
+ ];
+ for(const [metadata,body,time] of tampered)assert.throws(()=>assertSignedIngress(metadata,body,time));
 });

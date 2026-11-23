@@ -4,6 +4,14 @@ import assert from 'node:assert/strict';
 import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';
 import {connect} from '../scripts/db.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
+
+// The linked center-wide source and subsequent settlement lessons share one
+// instructor; choose non-overlapping slots even around a UTC hour boundary.
+function settlementFixtureSlot(slot,clock=Date.now()){
+ const start=new Date(clock+86400000+slot*3600000);
+ start.setUTCMinutes(10,0,0);
+ return start;
+}
 async function settlementFixture(t){
  const {platform,plan}=await fixturePlatform(),owner=await authUser('settlement-owner'),outside=await authUser('settlement-outsider');
  const db=await connect();t.after(()=>db.end());const rows=async(q,a=[])=>(await db.query(q,a)).rows;
@@ -69,7 +77,7 @@ async function settlementFixture(t){
  }
  let seq=0;
  async function lesson(sale,performed=true,result='attended',p=student.p,c=B,cancel=false){
-  seq++;const start=new Date(Date.now()+seq*3600000+86400000);start.setUTCMinutes(10,0,0);
+  seq++;const start=settlementFixtureSlot(seq);
   const ss=await mut('session_create_v1',{discipline_id:D,format:'group',interval:{starts_at:start.toISOString(),ends_at:new Date(+start+1800000).toISOString()},resources:[],assignments:[{person_id:teacher.p,duty:'instructor'}],capacity:{total:10}},c);
   const rid=(await mut('reservation_create_v1',{session_id:ss.primary_id,person_id:p,mode:'flexible',...(sale?{source_sale_id:sale}:{})},c)).primary_id;
   // Preserve all30 minutes and legacy actual_started_at=null without crossing Istanbul midnight.
@@ -290,7 +298,7 @@ test("Cross-center source scope and independent earning override",async t=>{
  const {platform,plan,owner,outside,db,rows,account,org,A,B,C,person,body,mut,read,fail,D,linked,manager,student,teacher,om,authority,grant,movements,requests,get,line,proposal,submit,decide,product,sell,lesson,correct,baseProduct}=await provenanceFixture(t);
  await t.test('W1-BE-66 selected sale respects the session scope and source-less borrowing still works',async()=>{
   const local=await sell(await product(A,'credits','100',2,[{scope_kind:'center_all_disciplines',center_id:A,discipline_id:null,usage_targets:['lesson']}]));
-  const starts=new Date(Date.now()+86400000);
+  const starts=settlementFixtureSlot(0);
   const session=await mut('session_create_v1',{discipline_id:D,format:'group',
    interval:{starts_at:starts.toISOString(),ends_at:new Date(+starts+1800000).toISOString()},resources:[],
    assignments:[{person_id:teacher.p,duty:'instructor'}],capacity:{total:10}},B);
@@ -477,4 +485,12 @@ test('Cross-center multi-line settlement and atomic ledger failures',async t=>{
    await decide(q);assert.equal((await get(q.id)).record.allocations.length,2);
   }
  });
+});
+
+// The fixture invariant runs in the final API unit, never in the shared prelude.
+test('settlement fixture source and follow-up lessons never overlap at hour boundaries',()=>{
+ for(const clock of ['2026-11-23T01:00:00Z','2026-11-23T01:41:00Z','2026-11-23T01:55:00Z','2026-11-23T01:59:59Z'].map(Date.parse)){
+  const source=settlementFixtureSlot(0,clock),next=settlementFixtureSlot(1,clock);
+  assert(+source+1800000<=+next,'source session must end before later instructor lesson');
+ }
 });

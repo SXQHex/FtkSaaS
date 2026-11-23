@@ -1,5 +1,25 @@
 # Güncel kaynak ve kabul
 
+<a id="bt01-edge-tip-kabul-adayi"></a>
+## BT01 — Edge TypeScript ve dış veri sınırı aday kabulü
+
+**PR #391 güncel core tanısı (23 Kasım):** [CI #45128603038](https://github.com/SXQHex/FtkSaaS/actions/runs/45128603038) içindeki `clean/core`, 464 testin 463'ünü geçirip S14 public acceptance runner'ın önceden kaydedilmiş oturumunu geri kazanma senaryosunda `PUBLIC_ACCEPTANCE_FAILED_AT_REAL_SIGNED_SUBMIT` ile durdu. Kök neden test transport çiftinin gerçek istekteki `x-ftk-ingress-time` başlığı yerine HMAC'i yeni `Date.now()` ile hesaplamasıdır; saniye değişiminde doğru imzayı yanlış reddeder. Geçiş anı deterministik yeni olumsuz testte aynı hata ile yeniden üretildi, ardından test doğrulayıcısı gelen zamanı temel alacak şekilde düzeltildi. Mevcut imza assertion'ı, IP/payload HMAC eşitliği ve 60 saniyelik native tazelik kapısı korundu; sahte imza, farklı payload/IP ve eski/gelecek zaman olumsuz testleri eklendi. Backend runtime/SQL/API sözleşmesi değişmedi. Node 24.22.1 ile güncel aday yerelde `verify` **466/466 + 144/144 + 10/10**, ayrıca `check:quality` **10/10, sıfır bulgu**; GitHub'da yeni aday CI, merge ve development kabulü ayrı ayrı açık.
+
+
+
+**PR #391 ilk aday sonucu:** [45095988123](https://github.com/SXQHex/FtkSaaS/actions/runs/45095988123) koşusunda quality, clean/core ve sekiz API shard geçti; api-1/api-7/api-10 belge yükleme (pending dosyada `checksum:null` iken erken bütünlük reddi), api-6 ise sentetik seans saatleri (aynı eğitmen üzerinde çakışan zamanlar) nedeniyle başarısız oldu. Ortak `file_upload_complete_v1` sınırında gerçek Storage dosyası doğrulanmadan kalıcı checksum beklenmesi yanlıştı. Düzeltme pending durumda özel Storage'dan bayt/gerçek SHA-256 okuyarak doğrulamayı sürdürür; ready dosya ve fatura checksum kontrolünü korur. Negatif test önce hatayı yeniden üretti; ardından pending başarı yolu ve eksik ready checksum reddi geçti. Api-6 fixture aynı UTC saat slotu üzerinden bağlandı; çakışma regresyonu önce başarısız, sonra başarılı oldu, native kaynak çatışması kuralı değişmedi. Değişen bölünmüş test dosyası için `api-suites.json` kaynak SHA ve yedi parçanın tam satır kapsamı yeniden denetlendi; assertion/test kapısı daraltılmadı.
+
+**Düzeltme yerel kontrolü:** Node 24.22.1 / pnpm 12.15.0 ile backend `verify` 144/144, etkilenen Edge unit 45/45, `check:quality` 10/10 (0 bulgu), `typecheck`, Edge bundle/validator `--check` ve workflow `docs:check` başarılı. Bunlar **yeni aday CI sonucu değildir**; ikinci PR aday full clean, merge ve development kaynağa bağlı kabulü açık kalır.
+
+Kaynak tabanı: \`e23c9daa5002bfe5510a919d752c9033a6a1edf9\` (\`main\`, BT01/1 PR #390 sonrası). BT01/1'in [kaynak envanteri](#bt01-edge-kaynak-taramasi) korunur; aşağıdaki sonuçlar **bu adayın yerel kaynak/test aşamasıdır**, henüz PR CI/merge/development/hosted kabulü değildir.
+
+- Backend \`tsconfig.json\` statik denetimi: \`backend-v1\` (generated \`index.ts\` hariç), \`resend-webhook\`, \`personal-calendar\` girişleri, native Deno tipleri, \`.ts\` importları ve \`.mjs\` transport tip bildirimleri. \`tests/types.test.ts\` içindeki iki kasıtlı \`@ts-expect-error\` korunur. Kaynak tipleri tek backend \`pnpm typecheck\`/\`verify\` üzerinden denetlenir; tip kontrolünü aşan \`any\` veya yeni susturma yok.
+- \`generate-validators.mjs\` aynı \`contract.json\` operasyon envanterinden \`validators.d.ts\` üretir; \`--check\` kaynak eşitliğini doğrular. AJV \`validators.js\` ve üç Edge bundle için mevcut drift/boyut denetimi aynen yürür.
+- \`handler.ts\`, native Auth/MFA ve JWT claim, JSON, RPC iç zarfı, takvim feed, dosya/CSV/fatura ve public preflight; e-posta/tick/Resend/Turnstile/Storage dış veri sınırları \`unknown\`/runtime alan kontrolleriyle daraltıldı. Hatalı şema \`INTEGRITY_VIOLATION\` veya mevcut kapalı provider ret yolu üzerinden reddedilir; yetkili SQL, tenant sınırı, operasyon anahtarı, normal sözleşme yanıtı ve frontend kaynakları değiştirilmedi.
+- Node 24.22.1, pnpm 12.15.0: backend \`verify\` **144/144**, etkilenen \`node --test\` **44/44**, \`pnpm check:quality\` **10/10 ve sıfır bulgu**. Backend ve contracts statik tip kontrolleri, \`docs:check\`, validator/bundle \`--check\` geçerli. Bunlar izole DB full clean veya gerçek provider/development kabulünün yerine geçmez.
+
+Zorunlu aday full clean/core+API, policy kurulumu ve tam kaynak/merge/main/development doğrulaması **açık**. CI çalışmadan BT01 bütünsel olarak kapatılamaz.
+
 <a id="bt01-edge-kaynak-taramasi"></a>
 ## BT01/1 — Edge kaynak ve dış veri sınırı envanteri
 
