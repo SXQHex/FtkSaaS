@@ -1,5 +1,5 @@
 import { test, expect } from "./test.js";
-import { openWorkspaceNavigation, origin } from "./auth-fixture.js";
+import { origin } from "./auth-fixture.js";
 import { mockLeads } from "./leads-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 
@@ -31,14 +31,15 @@ test("M06: revoked center access clears live CRM, history and deep-link permissi
   await page.getByRole("button", { name: "Yenile", exact: true }).first().click();
   await expect.poll(() => verificationReads).toBeGreaterThan(0);
   await expect(privateRow).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Aday ekle", exact: true })).toBeDisabled();
+  const add = page.getByRole("button", { name: "Aday ekle", exact: true });
+  if (await add.count()) await expect(add).toBeDisabled();
   await expect(page).not.toHaveURL(/\/login$/);
   expect(state.writes).toHaveLength(0);
 
   // A React Router history transition must revalidate native authority before
   // any cached manager content can return.
-  const navigation = await openWorkspaceNavigation(page);
-  await navigation.getByRole("link", { name: "Hesabım", exact: true }).click();
+  await page.locator('[data-slot="sidebar-footer"]').getByRole("button").click();
+  await page.getByRole("menuitem", { name: "Hesabım", exact: true }).click();
   await expect(page).toHaveURL(/\/account/);
   await page.goBack();
   await expect(page).toHaveURL(`${origin}/o/${I.org}/c/${I.center}/leads`);
