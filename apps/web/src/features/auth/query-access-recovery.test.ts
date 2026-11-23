@@ -191,8 +191,8 @@ describe("M06: cross-feature access reconciliation", () => {
     const original = view();
     const same = structuredClone(original);
     expect(workspaceAuthority(original)).toBe(workspaceAuthority(same));
-    expect(workspaceAuthority(original)).not.toBe(workspaceAuthority(view({ manager: false }));
-    expect(workspaceAuthority(original)).not.toBe(workspaceAuthority(view({ accessible: false }));
+    expect(workspaceAuthority(original)).not.toBe(workspaceAuthority(view({ manager: false })));
+    expect(workspaceAuthority(original)).not.toBe(workspaceAuthority(view({ accessible: false })));
   });
 
   it("observes a remote workspace role loss and never treats a manual Query projection as a remote revocation", async () => {
