@@ -1,5 +1,6 @@
 import type { QueryClient } from "@tanstack/react-query";
 import type { ClientScope } from "../../lib/scoped-backend";
+import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
 
 export const memberPrivateLessonKeys = {
   person: (scope: ClientScope, personId: string) =>
@@ -11,8 +12,7 @@ export function invalidateMemberPrivateLessonLists(
   scope: ClientScope,
   personId: string,
 ) {
-  return queries.invalidateQueries({
-    queryKey: [...memberPrivateLessonKeys.person(scope, personId), "list"],
-    refetchType: "none",
-  });
+  return invalidateCachedFamilies(queries, [
+    [...memberPrivateLessonKeys.person(scope, personId), "list"],
+  ]);
 }
