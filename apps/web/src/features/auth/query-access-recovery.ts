@@ -33,9 +33,7 @@ export function workspaceAuthority(view: Workspace | undefined): string | undefi
       selected?.self_context?.centers
         .map((row) => JSON.stringify([row.center_id, row.student, row.instructor, row.assistant]))
         .sort() ?? [],
-    centers: view.centers
-      .map((row) => JSON.stringify([row.id, row.accessible, row.state]))
-      .sort(),
+    centers: view.centers.map((row) => JSON.stringify([row.id, row.accessible, row.state])).sort(),
     roles: view.roles
       .map((row) =>
         JSON.stringify([
@@ -66,10 +64,7 @@ function keyHasOrganization(key: QueryKey, orgId: string): boolean {
   return key.some(
     (part) =>
       part === orgId ||
-      (part !== null &&
-        typeof part === "object" &&
-        "orgId" in part &&
-        part.orgId === orgId),
+      (part !== null && typeof part === "object" && "orgId" in part && part.orgId === orgId),
   );
 }
 
@@ -231,8 +226,6 @@ export function observeQueryAccessFailures(queries: QueryClient, actions: Access
     if (!classifyAccessFailure(query.state.error)) return;
     if (handled.has(query.queryHash)) return;
     handled.add(query.queryHash);
-    run(() =>
-      reconcileQueryAccessFailure(queries, query.queryKey, query.state.error, actions),
-    );
+    run(() => reconcileQueryAccessFailure(queries, query.queryKey, query.state.error, actions));
   });
 }
