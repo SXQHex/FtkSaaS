@@ -2,17 +2,16 @@
 
 **Tek sıra sahibi:** Bu dosya _neye önce başlanacağını ve hangi noktada durulacağını_ belirler. İşlerin ve testlerin tam ölçütleri [remaining-work.md](remaining-work.md), güncel repo/PR/CI/ortam kanıtı [handover.md](handover.md) sahibindedir. Teknik gerekçe [development.md](development.md#router--query-birleşik-veri-yaşam-döngüsü) altındadır. Burada ayrı backlog ya da tarihsel kabul defteri oluşturulmaz.
 
-**Aktif kullanıcı görevi.** Tüm frontend cache taramasının [düzeltme adayı ve açık kabulü](remaining-work.md#final-cache-audit). [Güncel kaynak ve doğrulama](handover.md#kaynak-ve-kontrol-noktası).
+Cache doğruluğu ve oturum kapsamı [kabul edildi](remaining-work.md#final-cache-audit). Güncel kaynak ve ortam kanıtı [devir kaydında](handover.md#kaynak-ve-kontrol-noktası).
 
 ## Aktif sıra
 
-| Öncelik | Teslim dilimi                                                  | Kontrol noktası                                                                                                       |
-| ------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| 1       | [Son cache taraması](remaining-work.md#final-cache-audit)      | Önce yetki ve oturum, ardından native yazma etkileri ve ilk sayfa. Sonra aynı kaynak için frontend CI ve main kanıtı. |
-| 2       | [M09, M13 ve C-ortak](remaining-work.md#router-query-birlesik) | Kalan alt okumalar, hashing/bellek ve aynı fixture'da ağ karşılaştırması.                                             |
-| 3       | [M14 ve D01–D05](remaining-work.md#router-query-birlesik)      | Dört tarayıcı profili ve ilgili gerçek ortam kabulü.                                                                  |
+| Öncelik | Teslim dilimi                                                      | Kontrol noktası                                                                          |
+| ------- | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
+| 1       | [M08–M10, M13 ve C-ortak](remaining-work.md#router-query-birlesik) | Kalan alt okumalar, taşıma iptali, hashing/bellek ve aynı fixture'da ağ karşılaştırması. |
+| 2       | [M14 ve D01–D05](remaining-work.md#router-query-birlesik)          | Kalan değişikliklerin birleşik regresyonu, dört tarayıcı ve gerekli gerçek ortam kabulü. |
 
-**PR sınırı:** M01 PR #375, M02 PR #378, M03 PR #380, M04 PR #382 ve M05 PR #384 ile bağımsız, A-ortak PR #387 ile birleşik doğrulandı. Kalan işlerde tercihen iki mantıksal büyük PR: (1) alan kabulleri + oturum/scope doğruluğu, (2) ağ maliyeti + AbortSignal. Aynı sınıra bağlı birkaç iş bir PR'da kapanabilir; tam CI gereksiz sık çalıştırılmaz. Her PR ayrı branch ve Draft ile başlar; kod, test ve kabul aynı kaynak SHA'sına bağlıdır. Yeni kullanıcı yetkisi olmadan merge veya production değişikliği yapılmaz.
+Her teslim ayrı branch ve Draft PR ile başlar. Kod, test ve kabul aynı kaynak SHA'sına bağlıdır. Merge ve production değişikliği açık yetkiye bağlıdır.
 
 <a id="tip-guvenligi-sirasi"></a>
 
