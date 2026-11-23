@@ -911,9 +911,9 @@ export function MemberProfileContent({
               queries.setQueryData(negativeKey, result.limit);
               queries.setQueryData(rightsKey, result.rights);
               await person.refetch({ throwOnError: true });
-              void queries.invalidateQueries({
-                queryKey: ["people", scope.accountId, scope.orgId, scope.centerId],
-              });
+              await invalidateCachedFamilies(queries, [
+                ["people", scope.accountId, scope.orgId, scope.centerId],
+              ]);
             }}
           />
         )}
