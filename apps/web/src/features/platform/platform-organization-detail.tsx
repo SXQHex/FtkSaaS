@@ -1,6 +1,7 @@
 import { useId, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { readIntoCurrentQuery } from "../../lib/cache-invalidation";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { Badge } from "@ftksaas/ui/components/badge";
 import { Button, LinkButton } from "@ftksaas/ui/components/button";
@@ -55,7 +56,8 @@ export function PlatformOrganizationDetail({
   });
   const command = useMemberCommand({
     write: writeSuspension,
-    readResult: readSuspensionResult,
+    readResult: (intent, id) =>
+      readIntoCurrentQuery(queries, key, () => readSuspensionResult(intent, id)),
     onAccessLost: (error) => {
       if (!platformAccessDenied(error)) return false;
       onDenied();
@@ -68,7 +70,6 @@ export function PlatformOrganizationDetail({
           kind: data.organization.platform_suspended ? "suspended" : "resumed",
           subject: data.organization.name,
         });
-      queries.setQueryData(key, data);
       await queries.invalidateQueries({ queryKey: platformOrganizationsKey(accountId) });
       await queries.invalidateQueries({ queryKey: ["platform-grace", accountId, organizationId] });
       setReason("");

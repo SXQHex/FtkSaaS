@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { EventView } from "@ftksaas/api-contracts";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
+import { readIntoCurrentQuery } from "../../lib/cache-invalidation";
+import { PrivateSessionRevision } from "../auth/private-session-revision";
 import { formatMinorAmount } from "../../lib/money";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { writeCollection, readCollectionReceipt } from "../finance/finance";
@@ -45,6 +47,7 @@ export function RegisteredEventPayment({
 }) {
   const { t } = useTranslation(),
     queries = useQueryClient();
+  const sessionRevision = useContext(PrivateSessionRevision);
   const expected = before.registrations?.find((row) => row.id === registrationId);
   const [draft, setDraft] = useState({ ...emptyEventCollection }),
     [confirmation, setConfirmation] = useState(false),
@@ -67,6 +70,7 @@ export function RegisteredEventPayment({
     before.id,
     registrationId,
     expected?.person_id,
+    sessionRevision,
   ];
   const source = useQuery({
     queryKey: key,
@@ -74,21 +78,20 @@ export function RegisteredEventPayment({
       readRegisteredPayment(scope, before.id, registrationId, expected!.person_id, readContext),
     enabled: !!expected,
     retry: false,
+    refetchOnMount: "always",
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
   const command = useMemberCommand({
     write: writeCollection,
     readReceipt: readCollectionReceipt,
-    readResult: readRegisteredCollectionResult,
+    readResult: (intent: Parameters<typeof readRegisteredCollectionResult>[0], id) =>
+      readIntoCurrentQuery(queries, key, () => readRegisteredCollectionResult(intent, id)),
     onAccessLost,
-    onRefresh: async (row) => {
-      queries.setQueryData(key, row);
-      await onSaved();
-    },
+    onRefresh: onSaved,
   });
   const locked = preparing || command.locked;
-  const row = !source.isError ? source.data : undefined;
+  const row = source.isSuccess && source.fetchStatus === "idle" ? source.data : undefined;
   const payment = row?.payment_summary;
   const readOnly = locked || command.state !== "ready";
   useEffect(() => {
@@ -167,7 +170,7 @@ export function RegisteredEventPayment({
         </SheetHeader>
         <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-5">
           {notice}
-          {source.isPending && <p role="status">{t(($) => $.eventDetail.paymentUnread)}</p>}
+          {expected && !row && !source.isError && <p role="status">{t(($) => $.studio.loading)}</p>}
           {(source.isError || !expected) && (
             <Alert variant="destructive">
               <AlertDescription>{t(($) => $.eventDetail.paymentUnread)}</AlertDescription>

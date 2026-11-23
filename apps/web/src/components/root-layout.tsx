@@ -7,10 +7,11 @@ import {
 } from "react-aria-components";
 import { UNSAFE_PortalProvider } from "react-aria/PortalProvider";
 import { useTranslation } from "react-i18next";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Outlet, useRouter, useRouterState } from "@tanstack/react-router";
 import { useAuthSession } from "../features/auth/use-auth-session";
+import { PrivateSessionRevision } from "../features/auth/private-session-revision";
 import { observeQueryAccessFailures } from "../features/auth/query-access-recovery";
 import { RoutePendingPage } from "../features/states/route-state-pages";
 import { StateView } from "../features/states/state-view";
@@ -28,10 +29,15 @@ export function RootLayout() {
   const queries = useQueryClient();
   const [checkingAccess, setCheckingAccess] = useState(false);
   const [sameActorHandoff, setSameActorHandoff] = useState(false);
+  const [sessionRevision, setSessionRevision] = useState(0);
   const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(null);
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const anonymousProgram = pathname.startsWith("/public/");
-  const authReady = useAuthSession(!anonymousProgram, setSameActorHandoff);
+  const onSessionHandoff = useCallback((pending: boolean) => {
+    setSameActorHandoff(pending);
+    if (pending) setSessionRevision((value) => value + 1);
+  }, []);
+  const authReady = useAuthSession(!anonymousProgram, onSessionHandoff);
   // These screens have no domain account Query; MFA/recovery still enforce
   // native session and assurance in their own Router beforeLoad guards.
   const unscopedRoute =
@@ -88,7 +94,9 @@ export function RootLayout() {
                 ) : showExample ? (
                   <FormPreview />
                 ) : (
-                  <Outlet />
+                  <PrivateSessionRevision value={sessionRevision}>
+                    <Outlet />
+                  </PrivateSessionRevision>
                 )}
               </Suspense>
             )}

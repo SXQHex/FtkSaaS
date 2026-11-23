@@ -526,6 +526,17 @@ export async function mockReports(
       exportState = state;
     },
     releaseApply: () => {
+      if (applied && !applyReleased && importKind === "students") {
+        for (const row of rows.slice(0, 2))
+          f.studio.people.push({
+            ...structuredClone(f.studio.people[0]!),
+            id: uid(200 + row.row_number),
+            display_name: row.student_preview.display_name,
+            version: 1,
+            relationships: [{ center_id: I.center, kind: "student", state: "active" }],
+            discipline_relationships: [],
+          });
+      }
       applyReleased = true;
     },
   };

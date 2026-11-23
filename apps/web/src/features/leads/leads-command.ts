@@ -329,7 +329,11 @@ export async function readLeadResult(intent: LeadIntent, id?: string) {
       )
         throw new Error("APPLICATION_PERSON_UNREAD");
     }
-    return { kind: "application" as const, application };
+    return {
+      kind: "application" as const,
+      application,
+      createdCandidate: intent.request.action === "create_candidate",
+    };
   }
   if (intent.operation === "crm_activity_save_v1") {
     const page = await readLeadActivities(intent.scope, intent.lead.id, undefined, id),

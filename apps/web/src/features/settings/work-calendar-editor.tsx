@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
+import { readIntoCurrentQuery } from "../../lib/cache-invalidation";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { EventCommandNotice } from "../events/event-command-notice";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
@@ -66,10 +67,10 @@ export function WorkCalendarEditor({
   const command = useMemberCommand({
     write: writeWorkCalendar,
     readReceipt: readWorkCalendarReceipt,
-    readResult: readWorkCalendarResult,
+    readResult: (intent, id) =>
+      readIntoCurrentQuery(queries, key, () => readWorkCalendarResult(intent, id)),
     onAccessLost,
-    onRefresh: async (source) => {
-      queries.setQueryData(key, source);
+    onRefresh: async () => {
       await Promise.all(
         ["settings-document", "settings-history", "schedule-sources", "studio"].map((group) =>
           queries.invalidateQueries({

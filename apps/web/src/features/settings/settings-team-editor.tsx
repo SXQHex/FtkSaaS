@@ -83,7 +83,7 @@ export function SettingsTeamEditor({
     onAccessLost,
     onRefresh: async () => {
       await onSaved();
-      await roles.refetch();
+      await roles.refetch({ throwOnError: true });
     },
   });
   const locked = preparing || command.locked;

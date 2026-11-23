@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useId, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { DocumentView } from "@ftksaas/api-contracts";
@@ -15,6 +15,7 @@ import { Field, FieldGroup, FieldLabel } from "@ftksaas/ui/components/field";
 import { Checkbox } from "@ftksaas/ui/components/checkbox";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { EventCommandNotice } from "../events/event-command-notice";
+import { PrivateSessionRevision } from "../auth/private-session-revision";
 import {
   documentBody,
   documentAcceptanceIntent,
@@ -155,9 +156,12 @@ export function MemberDocumentEditor({
 }) {
   const { t } = useTranslation();
   const reviewId = useId();
-  const [reviewed, setReviewed] = useState(false),
+  const sessionRevision = useContext(PrivateSessionRevision);
+  const documentKey = `${sessionRevision}:${before.id}:${before.version_id}:${before.file.id}`;
+  const [reviewedDocument, setReviewedDocument] = useState<string>(),
     [preparing, setPreparing] = useState(false),
     [error, setError] = useState(false);
+  const reviewed = reviewedDocument === documentKey;
   const query = useQuery({
     queryKey: [
       "member-document-content",
@@ -168,6 +172,8 @@ export function MemberDocumentEditor({
       binding.context,
       before.id,
       before.version_id,
+      before.file.id,
+      sessionRevision,
     ],
     queryFn: async (readContext) => {
       const row = (await readRequiredDocuments(binding, before.file.id, readContext)).find(
@@ -178,6 +184,7 @@ export function MemberDocumentEditor({
       return { row, body: documentBody(row) };
     },
     retry: false,
+    refetchOnMount: "always",
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
@@ -190,6 +197,10 @@ export function MemberDocumentEditor({
   });
   const locked = preparing || command.locked;
   const readOnly = disabled || locked || command.state !== "ready";
+  const content =
+    query.isSuccess && query.fetchStatus === "idle" && query.isFetchedAfterMount
+      ? query.data
+      : undefined;
   useEffect(() => {
     onLockChange(locked);
     return () => onLockChange(false);
@@ -198,7 +209,7 @@ export function MemberDocumentEditor({
     if (query.error) onAccessLost(query.error);
   }, [query.error, onAccessLost]);
   async function accept() {
-    if (readOnly || !query.data) return;
+    if (readOnly || !content) return;
     if (!reviewed) {
       setError(true);
       return;
@@ -206,7 +217,7 @@ export function MemberDocumentEditor({
     setPreparing(true);
     setError(false);
     try {
-      await command.start(await documentAcceptanceIntent(binding, query.data.row, reviewed));
+      await command.start(await documentAcceptanceIntent(binding, content.row, reviewed));
     } catch (cause) {
       if (!onAccessLost(cause)) setError(true);
     } finally {
@@ -216,7 +227,7 @@ export function MemberDocumentEditor({
   return (
     <FieldGroup>
       <h3 className="font-semibold">{before.name}</h3>
-      {query.isPending && <p role="status">{t(($) => $.memberDocuments.loading)}</p>}
+      {!content && !query.isError && <p role="status">{t(($) => $.memberDocuments.loading)}</p>}
       {query.isError && (
         <Alert variant="destructive">
           <AlertDescription>
@@ -233,25 +244,25 @@ export function MemberDocumentEditor({
           </AlertDescription>
         </Alert>
       )}
-      {query.data && !query.isError && (
+      {content && (
         <>
-          <DocumentBody body={query.data.body} />
+          <DocumentBody body={content.body} />
           <Field orientation="horizontal" data-invalid={error || undefined}>
             <Checkbox
               id={reviewId}
               isSelected={reviewed}
-              isDisabled={readOnly || query.data.row.accepted}
+              isDisabled={readOnly || content.row.accepted}
               isInvalid={error}
               validationBehavior="aria"
               onChange={(value) => {
-                setReviewed(value);
+                setReviewedDocument(value ? documentKey : undefined);
                 setError(false);
               }}
             />
             <FieldLabel htmlFor={reviewId}>{t(($) => $.memberDocuments.review)}</FieldLabel>
           </Field>
           <Button
-            isDisabled={readOnly || query.data.row.accepted}
+            isDisabled={readOnly || content.row.accepted}
             onPress={() => {
               void accept();
             }}

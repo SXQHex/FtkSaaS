@@ -4,6 +4,7 @@ import {
   cacheVerifiedReadback,
   invalidateAndReadFirstPage,
   invalidateCachedFamilies,
+  readIntoCurrentQuery,
   retainFirstInfinitePage,
 } from "./cache-invalidation";
 
@@ -149,6 +150,23 @@ it("keeps a verified readback when the previous exact reader finishes late", asy
   await cancelled;
   expect(queries.getQueryData(key)).toBe("verified rights");
   expect(queries.getQueryData(other)).toBe("other rights");
+});
+
+it("discards an imperative result when the private query was replaced during the read", async () => {
+  const queries = new QueryClient();
+  const key = ["work-calendar", "actor", "org", "center"];
+  queries.setQueryData(key, "old session");
+  let finish!: (value: string) => void;
+  const readback = readIntoCurrentQuery(
+    queries,
+    key,
+    () => new Promise<string>((resolve) => (finish = resolve)),
+  );
+  queries.removeQueries({ queryKey: key, exact: true });
+  queries.setQueryData(key, "new session");
+  finish("late old session result");
+  await expect(readback).rejects.toThrow("PRIVATE_QUERY_CHANGED");
+  expect(queries.getQueryData(key)).toBe("new session");
 });
 
 it("cancels and trims affected infinite catalogs before marking them stale", async () => {

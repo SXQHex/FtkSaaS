@@ -875,6 +875,32 @@ test("operational team role is a separate reviewed command and native channel/te
   expect(f.writes.some((row) => row.op === "content_catalog_save_v1")).toBe(false);
 });
 
+test("failed role detail readback stays unread and recovers with one acknowledged write", async ({
+  page,
+}) => {
+  const f = await mockSettingsCompletion(page, { roleDetailReadbackFailure: true });
+  await page.getByRole("tab", { name: "Ekip", exact: true }).click();
+  await page.getByRole("button", { name: "Görevi düzenle", exact: true }).click();
+  const editor = page.getByRole("dialog");
+  await editor.getByRole("checkbox", { name: /Asistan/ }).press("Space");
+  await editor.getByRole("button", { name: "Değişiklikleri önizle", exact: true }).click();
+  const review = await confirm(page);
+  await expect(
+    review.getByText(common.events.commandStates["saved-unread"], { exact: true }),
+  ).toBeVisible();
+  expect(requestsFor(f.writes, "role_assign_v1")).toHaveLength(1);
+
+  await review.getByRole("button", { name: common.finance.readResult, exact: true }).click();
+  await expect(review.getByText(common.events.commandStates.saved, { exact: true })).toBeVisible();
+  expect(requestsFor(f.writes, "role_assign_v1")).toHaveLength(1);
+  expect(
+    requestsFor(f.requests, "operation_status_get_v1").filter(
+      ({ r }) => r.operation === "role_assign_v1",
+    ),
+  ).toHaveLength(0);
+  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+});
+
 test("manager directory binds role and state to scope and revokes through the dedicated org command", async ({
   page,
 }) => {

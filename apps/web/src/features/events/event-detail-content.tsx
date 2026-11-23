@@ -1,6 +1,6 @@
 import { useWorkspaceQuery } from "../workspace/workspace-query";
 import { useCallback, useEffect, useState } from "react";
-import { useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
 import { invalidateEarningsViews } from "../earnings/earnings-query";
 import { useRouter } from "@tanstack/react-router";
@@ -37,8 +37,11 @@ export function EventDetailContent({
     router = useRouter(),
     queries = useQueryClient();
   const [tab, setTab] = useState<"participants" | "attendance">("participants"),
-    [actual, setActual] = useState<string>(),
-    [reason, setReason] = useState(""),
+    [attendanceDraft, setAttendanceDraft] = useState<{
+      version: EventView["version"];
+      actual?: string;
+      reason?: string;
+    }>(),
     [locked, setLocked] = useState(false),
     [edit, setEdit] = useState(false),
     [registration, setRegistration] = useState<{ event: EventView; id?: string }>(),
@@ -66,7 +69,6 @@ export function EventDetailContent({
   });
   const presentation = useQuery({
     queryKey: [...prefix, "presentation", event],
-    placeholderData: keepPreviousData,
     enabled: !!event,
     retry: false,
     queryFn: async (readContext) => {
@@ -114,6 +116,8 @@ export function EventDetailContent({
       };
     },
   });
+  const info = presentation.isError ? undefined : presentation.data;
+  const draft = attendanceDraft?.version === event?.version ? attendanceDraft : undefined;
   const accessLost = useCallback(
     (cause: unknown) => {
       if (
@@ -143,7 +147,12 @@ export function EventDetailContent({
   async function refresh(afterWrite?: { finance?: boolean; earnings?: boolean }) {
     const scopeIds = [scope.accountId, scope.orgId, scope.centerId];
     const affected: (readonly unknown[])[] = [["events", ...scopeIds]];
-    if (afterWrite) affected.push(["schedule-range", ...scopeIds]);
+    if (afterWrite)
+      affected.push(
+        ["schedule-range", ...scopeIds],
+        ["event-registration-payment", ...scopeIds, eventId],
+        ["registered-event-payment", ...scopeIds, eventId],
+      );
     if (afterWrite?.finance) {
       for (const name of [
         "finance-directory",
@@ -160,8 +169,7 @@ export function EventDetailContent({
       invalidateCachedFamilies(queries, affected),
       ...(afterWrite?.earnings ? [invalidateEarningsViews(queries, scope)] : []),
     ]);
-    setActual(undefined);
-    setReason("");
+    setAttendanceDraft(undefined);
   }
   function choose(selection: EventActionSelection) {
     if (event && !locked) setAction({ before: structuredClone(event), selection });
@@ -177,12 +185,13 @@ export function EventDetailContent({
     else if (value === "verify_duty" && id) choose({ action: value, id, reason: "" });
   }
   function attendanceAction(value: EventAttendanceAction) {
+    if (!info) return;
     if (value === "record_start" || value === "correct_start" || value === "clear_start")
       choose({
         action: value,
-        actual: actual ?? presentation.data?.actual ?? "",
+        actual: draft?.actual ?? info.actual,
         offset: "",
-        reason,
+        reason: draft?.reason ?? "",
       });
     else if (value === "close_attendance") choose({ action: value });
     else
@@ -210,7 +219,7 @@ export function EventDetailContent({
         ...(allowed && event.attendance_state === "open" ? (["close_attendance"] as const) : []),
         ...(event.attendance_state === "closed" ? (["correct_attendance"] as const) : []),
       ];
-  if (!event || !presentation.data || presentation.isError)
+  if (!event)
     return (
       <div className="flex flex-col gap-4">
         <h1 className="text-2xl font-semibold">{t(($) => $.eventDetail.title)}</h1>
@@ -224,14 +233,13 @@ export function EventDetailContent({
         <Button
           onPress={() => {
             void source.refetch();
-            void presentation.refetch();
           }}
         >
           {t(($) => $.events.reload)}
         </Button>
       </div>
     );
-  const info = presentation.data;
+  const pendingTime = presentation.isError ? unknown : t(($) => $.studio.loading);
   const enabledActions: EventDetailAction[] = [
     "edit",
     ...(event.state === "draft" ? (["publish"] as const) : []),
@@ -251,8 +259,8 @@ export function EventDetailContent({
             : t(($) => $.events.editor.workshop)
         }
         facts={[
-          { label: t(($) => $.eventDetail.planned), value: info.planned },
-          { label: t(($) => $.events.editor.ends), value: info.end },
+          { label: t(($) => $.eventDetail.planned), value: info?.planned ?? pendingTime },
+          { label: t(($) => $.events.editor.ends), value: info?.end ?? pendingTime },
           {
             label: t(($) => $.events.editor.venue),
             value:
@@ -298,7 +306,7 @@ export function EventDetailContent({
         duties={
           event.duties?.map((row) => ({
             id: row.id,
-            name: info.names.get(row.person_id) ?? unknown,
+            name: info?.names.get(row.person_id) ?? unknown,
             duty:
               row.duty === "instructor"
                 ? t(($) => $.events.editor.instructor)
@@ -364,11 +372,15 @@ export function EventDetailContent({
         }
         attendance={
           <EventAttendanceView
-            planned={info.planned}
-            actual={actual ?? info.actual}
-            onActual={setActual}
-            reason={reason}
-            onReason={setReason}
+            planned={info?.planned ?? pendingTime}
+            actual={draft?.actual ?? info?.actual ?? ""}
+            onActual={(value) =>
+              setAttendanceDraft({ ...draft, version: event.version, actual: value })
+            }
+            reason={draft?.reason ?? ""}
+            onReason={(value) =>
+              setAttendanceDraft({ ...draft, version: event.version, reason: value })
+            }
             rows={
               event.registrations?.map((row) => ({
                 id: row.id,
@@ -384,7 +396,7 @@ export function EventDetailContent({
             }
             onAction={attendanceAction}
             enabledActions={attendanceActions}
-            locked={locked}
+            locked={locked || !info}
           />
         }
         backHref={`/o/${scope.orgId}/c/${scope.centerId}/events`}
@@ -395,6 +407,16 @@ export function EventDetailContent({
         locked={locked}
         notice={
           <>
+            {presentation.isError && (
+              <Alert variant="destructive">
+                <AlertDescription>
+                  {t(($) => $.events.sourceError)}
+                  <Button variant="outline" onPress={() => void presentation.refetch()}>
+                    {t(($) => $.events.reload)}
+                  </Button>
+                </AlertDescription>
+              </Alert>
+            )}
             <Alert>
               <AlertDescription>{t(($) => $.eventDetail.sourceLimit)}</AlertDescription>
             </Alert>

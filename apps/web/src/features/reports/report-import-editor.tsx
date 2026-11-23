@@ -13,6 +13,8 @@ import type {
 } from "@ftksaas/api-contracts";
 import { formatMinorAmount } from "../../lib/money";
 import { useMemberCommand } from "../member-profile/use-member-command";
+import { invalidatePeoplePages } from "../people/people-query";
+import { invalidateLeadPages } from "../leads/leads-query";
 import { EventCommandNotice } from "../events/event-command-notice";
 import {
   writeComplete,
@@ -111,7 +113,8 @@ export function ReportImportEditor({
     executing = useRef(false),
     mounted = useRef(true),
     previewIntent = useRef<ReportJobIntent | undefined>(undefined),
-    applyIntent = useRef<ReportJobIntent | undefined>(undefined);
+    applyIntent = useRef<ReportJobIntent | undefined>(undefined),
+    refreshedImport = useRef<string>(undefined);
   const targets = kind === "students" ? studentTargets : crmTargets;
   const [sources, setSources] = useState<Partial<Record<ImportTarget, string>>>({
     source_key: "source_key",
@@ -217,6 +220,21 @@ export function ReportImportEditor({
   }, [currentRows]);
   const summary = currentPreview?.import_summary;
   const applySummary = applyFinished ? currentRows?.apply_summary : undefined;
+  useEffect(() => {
+    if (
+      !jobId ||
+      refreshedImport.current === jobId ||
+      job.fetchStatus !== "idle" ||
+      rows.fetchStatus !== "idle" ||
+      !applySummary ||
+      applySummary.applied_rows + applySummary.replayed_rows === 0
+    )
+      return;
+    refreshedImport.current = jobId;
+    void (kind === "students"
+      ? invalidatePeoplePages(queries, scope)
+      : invalidateLeadPages(queries, scope));
+  }, [applySummary, job.fetchStatus, jobId, kind, queries, rows.fetchStatus, scope]);
   useEffect(() => {
     if (!currentPreview) return;
     const timer = window.setTimeout(
@@ -358,13 +376,16 @@ export function ReportImportEditor({
   }
   async function refresh() {
     setError(false);
-    const reads = await Promise.all([
-      job.refetch(),
-      rows.refetch(),
-      ...(previewId ? [preview.refetch()] : []),
-    ]);
-    if (reads.some((row) => row.isError)) setError(true);
-    await onSaved();
+    try {
+      await Promise.all([
+        job.refetch({ throwOnError: true }),
+        rows.refetch({ throwOnError: true }),
+        ...(previewId ? [preview.refetch({ throwOnError: true })] : []),
+      ]);
+      await onSaved();
+    } catch (cause) {
+      if (mounted.current && !lost(cause)) setError(true);
+    }
   }
   const count = (value: number) => value.toLocaleString("tr-TR");
   async function downloadSkipped() {
@@ -686,27 +707,31 @@ export function ReportImportEditor({
               </AlertDescription>
             </Alert>
           )}
-          <EventCommandNotice
-            command={completion}
-            onReload={() => {
-              if (!locked) completion.reset();
-            }}
-          />
-          <EventCommandNotice
-            command={command}
-            onReload={() => {
-              if (command.state === "stale" || command.state === "rejected") {
-                command.reset();
-                previewIntent.current = undefined;
-                applyIntent.current = undefined;
-                setJob(undefined);
-                setPhase("preview");
-                setReviewed(false);
-                setSelected(new Set());
-                knownValid.current.clear();
-              } else if (jobId) void refresh();
-            }}
-          />
+          {phase === "preview" && (
+            <EventCommandNotice
+              command={completion}
+              onReload={() => {
+                if (!locked) completion.reset();
+              }}
+            />
+          )}
+          {(phase !== "apply" || command.state !== "saved") && (
+            <EventCommandNotice
+              command={command}
+              onReload={() => {
+                if (command.state === "stale" || command.state === "rejected") {
+                  command.reset();
+                  previewIntent.current = undefined;
+                  applyIntent.current = undefined;
+                  setJob(undefined);
+                  setPhase("preview");
+                  setReviewed(false);
+                  setSelected(new Set());
+                  knownValid.current.clear();
+                } else if (jobId) void refresh();
+              }}
+            />
+          )}
         </div>
       }
     />
