@@ -4,6 +4,7 @@ import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { BackendError } from "../../lib/backend";
 import { workspaceRoles, type readWorkspace } from "./workspace";
+import { invalidateWorkspace } from "./workspace-query";
 import type { ClientScope } from "../../lib/scoped-backend";
 import { eligibleDisciplines, readStudioRooms } from "../studio/studio";
 import { readDisciplineCatalog } from "../settings/discipline-reader";
@@ -180,8 +181,9 @@ export function FirstCenterSetup({
     readResult: readCreatedCenter,
     onRefresh: async (result) => {
       setCreated(result.center);
-      queries.setQueryData(["workspace", accountId, organizationId], result.workspace);
-      await queries.invalidateQueries({ queryKey: ["workspace", accountId] });
+      // Keep the owned command result, but never publish its old-session
+      // workspace snapshot over the current session's shared Query data.
+      await invalidateWorkspace(queries, accountId);
     },
     onAccessLost: (error) => {
       const code =
