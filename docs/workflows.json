@@ -133,6 +133,8 @@
         "apps/backend/scripts/ci/summarize-timings.mjs",
         "apps/backend/scripts/ci/timing-reporter.mjs",
         "apps/backend/scripts/ci/timings.mjs",
+        "apps/backend/scripts/acceptance/edge-response-lifecycle.mjs",
+        "apps/backend/scripts/acceptance/xreq-072-edge-runtime.patch",
         "apps/backend/scripts/db.mjs",
         "apps/backend/scripts/deliver-dev-invitations.mjs",
         "apps/backend/scripts/dev-info.mjs",
@@ -315,8 +317,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "39601b56bca314f4f30ee74f09ece2b46393860f89be23cd4bbc173eb2000da7",
-        "reason": "Ortak istemci ve Edge aynı sözleşme doğrulayıcılarını kullanır. İstek ve geçerli yanıt biçimleri aynı kaldı."
+        "fingerprint": "6b28a5c7683fb702526a7d2aebf4b11134fb0f18ae0ad587261b62a63d2d2a44",
+        "reason": "Ortak istemci ve Edge sözleşme doğrulayıcıları ile native Edge yanıt ömrü yaması ve binary kabulü incelendi. İstek ve geçerli yanıt biçimleri aynı."
       }
     },
     {

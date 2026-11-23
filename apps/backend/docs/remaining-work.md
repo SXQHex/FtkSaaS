@@ -11,7 +11,7 @@ Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin te
 <a id="ci503-native-baslangic"></a>
 ## CI503 — Native worker başlangıcı ve ödeme yanıtı teşhisi
 
-**Durum:** PR395 ilk aday CI başarısız; API11 fixture zamanlaması düzeltildi, API8 boş 503 ve native yaşam döngüsü kusuru açık. Güncel main senkronize edildi. Ortak runtime düzeltmesi [XREQ-072](../../../docs/requests.md#xreq-072), hosted ödeme gecikmesi ve frontend ölçümü XREQ-071 sahibindedir. Kullanıcının 23 Kasım görevi kapsamında kapsam daraltma veya yeni kalite istisnası yoktur. Kaynak/ölçüm/ortam kanıtının tek sahibi [devir kaydıdır](00-FtkSaaS-yeni-sohbet-devir.md#ci503-native-baslangic).
+**Durum:** API11 fixture zamanlaması düzeltildi. Boş 503'e yol açan native yaşam döngüsü kusuru için [yerel binary adayı doğrulandı](00-FtkSaaS-yeni-sohbet-devir.md#xreq-072-runtime-adayi). Ortak runtime kurulumu ve tam kabul [XREQ-072](../../../docs/requests.md#xreq-072), hosted ödeme gecikmesi ve frontend ölçümü XREQ-071 sahibindedir.
 
 - [x] Başarısız koşuyu kaynak ve test adımına bağla; test fixture hatası, uygulama JSON hatası ve runtime bağlantı iptalini ayır. Kanıtlanmayan son tetikleyiciyi açık bırak.
 - [x] Aynı backend baytlarıyla `.ts`/`.js` native worker başlangıcını karşılaştır; CPU süresi ile toplam süreyi ve hosted hazır ESZIP yolunu ayır.
@@ -21,7 +21,8 @@ Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin te
 - [x] Aynı native binary ile normal EarlyDrop sonrası dış yanıt iptalini kontrollü deneyde göster; per_worker seçeneğini aynı 3 GiB sınırında ölç ve başarısız bellek sonucuyla ele.
 - [ ] Son aday backend verify/kalite, etkilenen testler ve eksiksiz native CI geçer. Native DB'nin çalışmadığı yerel ortamda microbenchmark tam ödeme/SQL kabulü sayılmaz.
 - [ ] Özgün 503'ün nedenini gerçek runtime kaydı veya aynı kaynağa bağlı tekrar üretimle belirle; yalnız başarılı tekrar/uzantı değişikliğiyle kök neden kapatılmaz.
-- [ ] XREQ-072 kapsamında normal yanıtın tamamlanmasıyla worker ömrünü doğru eşleyen runtime adayı doğrulanır; mevcut oneshot, kaynak sınırları, bellek kapısı ve tam native kabul korunur. Desteklenmeyen politika, otomatik tekrar veya rastlantısal yeşil koşu kapanış değildir.
+- [x] XREQ-072 native adayında normal yanıtın aktarımı, iki istemci iptali, worker kapanışları ve kaynak limitleri gerçek binary ile doğrulandı.
+- [ ] Aday, kaynak ve binary özeti doğrulanarak mevcut native kurulum hattına alınır. Aynı binary tam core/API/quality kabulünü, kaynak/koşu/deneme bağlarını ve gereken development doğrulamasını geçer.
 - [ ] Hosted ödeme akışında Auth/RPC/başlangıç ve istemcinin ACK/readback sürelerini ayrı doğrula. İstemci seri çağrı talebi [XREQ-071](../../../docs/requests.md#xreq-071); frontend kabulü ayrı sahibindedir.
 
 Bu dar hata/gecikme incelemesi, ertelenmiş O10 yük/kapasite projesini veya ticari SLA'yı kendiliğinden etkinleştirmez. Merge, deployment ve canlı kabul ayrı kanıt ister.
