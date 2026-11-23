@@ -29,7 +29,7 @@ test("M06: revoked center access clears live CRM, history and deep-link permissi
   // After remote revocation the next native feature read must not preserve it.
   revoked = true;
   state.setDenied(true);
-  await page.getByRole("button", { name: "Yenile", exact: true }).first().click();
+  await page.getByRole("button", { name: "Güncel durumu oku", exact: true }).first().click();
   await expect.poll(() => verificationReads).toBeGreaterThan(0);
   await expect(privateRow).toHaveCount(0);
   const add = page.getByRole("button", { name: "Aday ekle", exact: true });
@@ -62,7 +62,7 @@ test("M06: an independent CRM FORBIDDEN is not a global logout or old-session ca
   await expect(page.getByRole("button", { name: "Aday A", exact: true })).toBeVisible();
 
   state.setDenied(true);
-  await page.getByRole("button", { name: "Yenile", exact: true }).first().click();
+  await page.getByRole("button", { name: "Güncel durumu oku", exact: true }).first().click();
   await expect(page.getByText("Aday kaydı okunamadı.", { exact: false })).toBeVisible();
   await expect(page).toHaveURL(`${origin}/o/${I.org}/c/${I.center}/leads`);
   await expect(page.getByRole("button", { name: "Aday ekle", exact: true })).toBeDisabled();
