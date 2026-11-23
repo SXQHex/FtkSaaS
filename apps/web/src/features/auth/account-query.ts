@@ -157,10 +157,19 @@ export async function verifiedAccountForId(
 }
 
 export async function invalidateAccountProjections(queries: QueryClient) {
-  await queries.cancelQueries({ queryKey: accountQueryKeys.all() });
-  // Router reloads the projection; do not refetch before its guard runs.
-  return queries.invalidateQueries({
-    queryKey: accountQueryKeys.all(),
-    refetchType: "none",
-  });
+  const filters = { queryKey: accountQueryKeys.all() };
+  const cache = queries.getQueryCache();
+  const inFlight = cache.findAll(filters).filter((query) => query.state.fetchStatus !== "idle");
+  const cancelling = queries.cancelQueries(filters, { silent: true });
+  const invalidating = queries.invalidateQueries({ ...filters, refetchType: "none" });
+  // Replace already-owned reads before awaiting cancellation. Query then hands
+  // existing Router/Suspense waiters the replacement promise, instead of a
+  // CancelledError (cold) or reverted old account data (warm).
+  const replacements: Promise<unknown>[] = [];
+  for (const query of inFlight) {
+    // A synchronous cache subscriber may have evicted this projection.
+    if (cache.get(query.queryHash) === query) replacements.push(query.fetch());
+  }
+  // Idle projections remain stale; their next guarded reader owns the fetch.
+  await Promise.all([cancelling, invalidating, ...replacements]);
 }
