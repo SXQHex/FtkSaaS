@@ -1,5 +1,23 @@
 # Güncel kaynak ve kabul
 
+<a id="bt01-edge-kaynak-taramasi"></a>
+## BT01/1 — Edge kaynak ve dış veri sınırı envanteri
+
+**Kaynak:** 23 Kasım 2026 `main` tabanı `0e14ba3cc5e8e1897bfa1d7c059cd650fdf8d18f`; aynı SHA'nın [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/45089277586) sonucu başarılıdır. Bu kayıt yalnız [BT01'in ilk tarama maddesini](remaining-work.md#bt01) kapatır; tip denetimi entegrasyonu, kod düzeltmeleri, regresyonlar ve aday CI kabulü açıktır.
+
+**Graf:** `backend-v1` altında 14 el yazımı `.ts` kaynak ve `resend-webhook`/`personal-calendar` altında birer `handler.ts` olmak üzere 16 modül incelendi. Doğrudan `.mjs` sınırları `transports/browser-cors.mjs` (transitif `scripts/uuid.mjs`) ve `transports/calendar-gateway.mjs` dosyalarıdır. Deno `env`/`serve`, `uuid` ve `standardwebhooks` dış çalışma ortamı/bağımlılıklarıdır. `packages/api-contracts/src/{index,generated,operations,client,read-transport,runtime}.ts` ile `schema/contract.json` eşlemesi incelendi. Edge `index.ts` dosyaları bundle çıktısı, `validators.js` ise sözleşmeden üretilmiş AJV çıktısıdır; el yazımı kaynak borcu olarak sayılmadı. `tests/types.test.ts` içindeki iki `@ts-expect-error`, kasıtlı negatif sözleşme testidir ve korunur. Üretilmiş `generated.ts` içindeki `any` özellik *adı* TypeScript `any` türü değildir.
+
+| Sınır | Doğrulanmış kaynak bulgusu / sonraki alt maddelerde giderilecek risk |
+|---|---|
+| Açık ve örtük `any` | El yazımı Edge TypeScript'te 14 açık `any` kullanımı: `handler.ts` altı `as any` validator erişimi ve üç callback, `account-signup.ts`/`transactional-email.ts` içinde iki `Promise<any>`, `transactional-email.ts`/`lifecycle-auth.ts`/`invitation-delivery.ts` içinde üç parametre. Ek örtük yayılım `handler.ts` üzerinden `request`, `result`, `context`, `meta`, `claims`; `invitation-delivery.ts` üzerinde RPC sonucu; diğer JSON cevaplarında görülüyor. El yazımı Edge'de `@ts-ignore` veya `@ts-nocheck` yok. |
+| JSON gövdeleri | TS kaynaklarında yedi `JSON.parse()` ve 15 `Response.json()` çağrısı (ağ yanıtı okuma); ayrıca `calendar-gateway.mjs` içinde iki `JSON.parse()`. `handler.ts` isteği runtime AJV ile doğruluyor fakat TS türünü daraltmıyor. `invitation-delivery.ts` imzalı tick, mühürlü token; `lifecycle-auth.ts` JWT claim; `email-events.ts` imzalı webhook; `import-file.ts` CSV consent JSON ayrı sınırlarda kısmi/manual kontroller içeriyor. JSON kaynaklarından doğan `any` tüketim öncesi kanıtlı `unknown` daraltmasına dönüştürülmeli. |
+| RPC ve dahili zarf | `handler.ts` içinde public/auth/RPC dönüşleri, `_internal_storage`, `_internal_import`, `_internal_invoice`, `_internal_download`, `_internal_retry` ve `data` alanlarına kapsamlı şema doğrulaması olmadan erişim var; bazı `success_*` AJV kontrolleri dönüşüm *sonrası*. `invitation-delivery.ts` ve `transactional-email.ts` claim/authorize/finish yanıtlarını `any` üzerinden okuyor. `ops-errors.ts` denetim RPC kabul alanını kısmi kontrol ediyor. |
+| Auth, MFA ve sağlayıcı | `handler.ts`/`lifecycle-auth.ts`: Supabase Auth `/user` JSON ve JWT claim/factors şekilleri statik ve kapsamlı runtime tip güvencesinden yoksun; MFA kontrolünde `(f:any)` var. Resend `email-provider.ts` JSON sonucu, imzalı `email-events.ts` webhook olayı; Turnstile `public-ingress.ts` yanıtı; Storage signed URL `document-storage.ts`/`import-file.ts` kısmi alan denetimleri kullanıyor. Mevcut imza, IP, zaman, alan ve yanıt kontrolleri korunmalı; eksik alanlar doğrulanmalı. |
+| `.mjs` ve sözleşme sınırı | `browser-cors.mjs` ile `calendar-gateway.mjs` Edge tarafından tip bildirimi olmadan çağrılıyor; gateway JSON cevabı çalışma anında yalnız seçili alanlarla doğrulanıyor. `packages/api-contracts` kapalı `Operations[K]` request/response tiplerini üretir; `client.ts` JSON için yalnız `ok` zarfını kontrol edip response union'a cast ediyor. Bu cast runtime şema doğrulaması değildir. Handler'ın dinamik `validators["request_"+operation]`/`validators["success_"+operation]` erişimleri hiçbir tipli köprüye bağlanmamış. |
+
+**Tanı:** Mevcut `pnpm --filter @ftksaas/backend typecheck` başarılı, fakat `tsconfig.json` yalnız `tests/types.test.ts` dosyasını içeriyor. Tüm 16 el yazımı Edge kaynağı ve doğrudan `.mjs` bağımlılıkları geçici ayrı TS7 konfigürasyonunda `allowImportingTsExtensions` ve `allowJs` ile denendi: Deno ambient tipi yokken `Deno` tanımsızlığı ve `handler.ts` servis callback'inde örtük `any` görüldü. Yalnız tanı amaçlı geçici Deno bildirimi eklendiğinde `document-storage.ts:3` üzerinde `Uint8Array<ArrayBufferLike>` → `BufferSource` TS2345 hatası kaldı. Bu *başarısız* Edge tanısı CI başarısı veya kod düzeltmesi olarak kabul edilmedi; geçici dosyalar kaynağa dahil edilmedi.
+
+
 <a id="account-display-label"></a>
 ## W1-BE-67 · Ortak hesap etiketi
 
