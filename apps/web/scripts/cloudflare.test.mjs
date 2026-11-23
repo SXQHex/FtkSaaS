@@ -127,6 +127,71 @@ async function buildFixture(t) {
   return directory;
 }
 
+const apiResponse = (result) => Response.json({ success: true, result });
+const versionResponse = () =>
+  apiResponse({ id: version, annotations: { "workers/tag": "web-" + source.sha } });
+const apiFailure = (status, codes) =>
+  Response.json(
+    {
+      success: false,
+      errors: codes.map((code) => ({ code, message: "private provider details" })),
+    },
+    { status },
+  );
+
+async function deliveryFixture(t, { intercept, revalidate, pause } = {}) {
+  const directory = await buildFixture(t);
+  const requests = [];
+  const waits = [];
+  let manifest;
+  return {
+    waits,
+    count: (method, suffix) =>
+      requests.filter((request) => request.method === method && request.path.endsWith(suffix))
+        .length,
+    deliver: () =>
+      deliverCloudflare({
+        source,
+        archiveHash: "b".repeat(64),
+        token: "test",
+        directory,
+        revalidate: revalidate ?? (() => {}),
+        pause: async (milliseconds) => {
+          waits.push(milliseconds);
+          await pause?.();
+        },
+        fetcher: async (address, options) => {
+          const url = new URL(address);
+          requests.push({ method: options.method ?? "GET", path: url.pathname });
+          const overridden = await intercept?.(url.pathname, options);
+          if (overridden !== undefined) return overridden;
+          if (url.hostname === "app.fethiyetango.com")
+            return new Response(url.pathname === entry ? javascript : html);
+          if (url.pathname.endsWith("/settings"))
+            return apiResponse({
+              compatibility_date: "2026-11-17",
+              compatibility_flags: [],
+              bindings: [],
+            });
+          if (url.pathname.endsWith("/assets-upload-session")) {
+            manifest = JSON.parse(options.body).manifest;
+            return apiResponse({ jwt: "upload", buckets: [[manifest[entry].hash]] });
+          }
+          if (url.pathname.endsWith("/assets/upload")) return apiResponse({ jwt: "complete" });
+          if (url.pathname.endsWith("/versions") && options.method === "POST")
+            return apiResponse({ id: version });
+          if (url.pathname.endsWith("/versions/" + version)) return versionResponse();
+          assert(url.pathname.endsWith("/deployments"));
+          return apiResponse(
+            options.method === "POST"
+              ? { id: deployment }
+              : { deployments: [{ id: deployment, versions }] },
+          );
+        },
+      }),
+  };
+}
+
 test("uploads exact static bytes and promotes only the verified 100% deployment", async (t) => {
   const directory = await buildFixture(t);
   const urls = [];
@@ -186,6 +251,144 @@ test("uploads exact static bytes and promotes only the verified 100% deployment"
   assert.equal(receipt.version, version);
   assert.equal(receipt.deployment, deployment);
   assert.deepEqual(urls.slice(-4), ["/", "/login", "/auth/callback", entry]);
+});
+
+test("waits for the exact uploaded version without repeating any write", async (t) => {
+  let reads = 0;
+  const fixture = await deliveryFixture(t, {
+    intercept: (path) => {
+      if (path.endsWith("/versions/" + version) && ++reads === 1) return apiFailure(404, [100146]);
+    },
+  });
+  const receipt = await fixture.deliver();
+  assert.equal(receipt.version, version);
+  assert.equal(receipt.deployment, deployment);
+  assert.equal(fixture.count("GET", "/versions/" + version), 2);
+  assert.deepEqual(fixture.waits, [500]);
+  assert.equal(fixture.count("POST", "/assets-upload-session"), 1);
+  assert.equal(fixture.count("POST", "/assets/upload"), 1);
+  assert.equal(fixture.count("POST", "/versions"), 1);
+  assert.equal(fixture.count("POST", "/deployments"), 1);
+});
+
+test("fails after five unavailable-version reads and logs only numeric provider codes", async (t) => {
+  const fixture = await deliveryFixture(t, {
+    intercept: (path) => {
+      if (path.endsWith("/versions/" + version)) return apiFailure(404, [100146]);
+    },
+  });
+  await assert.rejects(fixture.deliver(), (error) => {
+    assert.match(error.message, /HTTP 404/);
+    assert.match(error.message, /100146/);
+    assert(!error.message.includes("private provider details"));
+    return true;
+  });
+  assert.equal(fixture.count("GET", "/versions/" + version), 5);
+  assert.deepEqual(fixture.waits, [500, 500, 500, 500]);
+  assert.equal(fixture.count("POST", "/versions"), 1);
+  assert.equal(fixture.count("POST", "/deployments"), 0);
+});
+
+test("rejects other version read failures immediately", async (t) => {
+  for (const [name, failure] of [
+    ["another 404 code", () => apiFailure(404, [10007])],
+    ["uncoded 404", () => apiFailure(404, [])],
+    ["non-JSON 404", () => new Response("private provider details", { status: 404 })],
+    [
+      "malformed errors",
+      () => Response.json({ success: false, errors: { code: 100146 } }, { status: 404 }),
+    ],
+    ["string code", () => apiFailure(404, ["100146"])],
+    ["mixed codes", () => apiFailure(404, [100146, 10007])],
+    ["mixed malformed codes", () => apiFailure(404, [100146, null])],
+    ["forbidden", () => apiFailure(403, [100146])],
+    ["server error", () => apiFailure(500, [100146])],
+    [
+      "network failure",
+      () => {
+        throw new Error("synthetic network failure");
+      },
+    ],
+  ]) {
+    await t.test(name, async (t) => {
+      const fixture = await deliveryFixture(t, {
+        intercept: (path) => {
+          if (path.endsWith("/versions/" + version)) return failure();
+        },
+      });
+      await assert.rejects(fixture.deliver(), (error) => {
+        assert(!error.message.includes("private provider details"));
+        return true;
+      });
+      assert.equal(fixture.count("GET", "/versions/" + version), 1);
+      assert.deepEqual(fixture.waits, []);
+      assert.equal(fixture.count("POST", "/deployments"), 0);
+    });
+  }
+});
+
+test("rejects a version with the wrong identity or source tag before promotion", async (t) => {
+  for (const [name, result, expected] of [
+    [
+      "wrong version",
+      { id: deployment, annotations: { "workers/tag": "web-" + source.sha } },
+      /different version/,
+    ],
+    [
+      "wrong source",
+      { id: version, annotations: { "workers/tag": "web-wrong" } },
+      /bound to the source/,
+    ],
+  ]) {
+    await t.test(name, async (t) => {
+      const fixture = await deliveryFixture(t, {
+        intercept: (path) => {
+          if (path.endsWith("/versions/" + version)) return apiResponse(result);
+        },
+      });
+      await assert.rejects(fixture.deliver(), expected);
+      assert.equal(fixture.count("GET", "/versions/" + version), 1);
+      assert.deepEqual(fixture.waits, []);
+      assert.equal(fixture.count("POST", "/deployments"), 0);
+    });
+  }
+});
+
+test("does not retry a write even when Cloudflare reports version-not-found", async (t) => {
+  for (const suffix of ["/assets/upload", "/versions", "/deployments"]) {
+    await t.test(suffix, async (t) => {
+      const fixture = await deliveryFixture(t, {
+        intercept: (path, options) => {
+          if (options.method === "POST" && path.endsWith(suffix)) return apiFailure(404, [100146]);
+        },
+      });
+      await assert.rejects(fixture.deliver(), /HTTP 404/);
+      assert.equal(fixture.count("POST", suffix), 1);
+      assert.deepEqual(fixture.waits, []);
+      if (suffix !== "/deployments") assert.equal(fixture.count("POST", "/deployments"), 0);
+    });
+  }
+});
+
+test("revalidates source before promotion when main moves while the version becomes visible", async (t) => {
+  let reads = 0;
+  let moved = false;
+  const fixture = await deliveryFixture(t, {
+    intercept: (path) => {
+      if (path.endsWith("/versions/" + version) && ++reads === 1) return apiFailure(404, [100146]);
+    },
+    pause: () => {
+      moved = true;
+    },
+    revalidate: () => {
+      if (moved) throw new Error("Accepted Cloudflare source is no longer current main");
+    },
+  });
+  await assert.rejects(fixture.deliver(), /no longer current main/);
+  assert.equal(fixture.count("GET", "/versions/" + version), 2);
+  assert.deepEqual(fixture.waits, [500]);
+  assert.equal(fixture.count("POST", "/versions"), 1);
+  assert.equal(fixture.count("POST", "/deployments"), 0);
 });
 
 test("rejects an incomplete build or symlink before connecting to Cloudflare", async (t) => {

@@ -74,21 +74,43 @@ export async function deliverCloudflare({
 }) {
   assert(token, "Configure CLOUDFLARE_API_TOKEN in the cloudflare-production environment");
   const assets = await readAssets(directory);
-  async function request(path, { body, authorization = token } = {}) {
-    const response = await fetcher(api + path, {
-      method: body ? "POST" : "GET",
-      headers: {
-        Authorization: `Bearer ${authorization}`,
-        ...(body && !(body instanceof FormData) ? { "Content-Type": "application/json" } : {}),
-      },
-      body: body instanceof FormData ? body : JSON.stringify(body),
-      redirect: "error",
-      signal: AbortSignal.timeout(60_000),
-    });
-    if (!response.ok) throw Error(`Cloudflare API HTTP ${response.status}`);
-    const result = await response.json();
-    if (result.success !== true) throw Error("Cloudflare API rejected the request");
-    return result.result;
+  async function request(path, { body, authorization = token, versionReadback = false } = {}) {
+    for (let attempt = 1; ; attempt++) {
+      const response = await fetcher(api + path, {
+        method: body ? "POST" : "GET",
+        headers: {
+          Authorization: `Bearer ${authorization}`,
+          ...(body && !(body instanceof FormData) ? { "Content-Type": "application/json" } : {}),
+        },
+        body: body instanceof FormData ? body : JSON.stringify(body),
+        redirect: "error",
+        signal: AbortSignal.timeout(60_000),
+      });
+      if (!response.ok) {
+        const failure = await response.json().catch(() => null);
+        const errors = Array.isArray(failure?.errors) ? failure.errors : [];
+        // Match Wrangler's bounded readback for a just-uploaded version, never a write.
+        if (
+          versionReadback &&
+          body === undefined &&
+          response.status === 404 &&
+          failure?.success === false &&
+          errors.length === 1 &&
+          errors[0]?.code === 100146 &&
+          attempt < 5
+        ) {
+          await pause(500);
+          continue;
+        }
+        const codes = errors.map((error) => error?.code).filter(Number.isSafeInteger);
+        throw Error(
+          `Cloudflare API HTTP ${response.status}${codes.length ? ` (codes: ${codes.join(", ")})` : ""}`,
+        );
+      }
+      const result = await response.json();
+      if (result.success !== true) throw Error("Cloudflare API rejected the request");
+      return result.result;
+    }
   }
   const settings = await request(script + "/settings");
   assert(
@@ -138,7 +160,7 @@ export async function deliverCloudflare({
   await revalidate();
   const version = await request(script + "/versions", { body: form });
   assert.match(version.id ?? "", uuid, "Cloudflare version ID is missing");
-  const confirmed = await request(script + "/versions/" + version.id);
+  const confirmed = await request(script + "/versions/" + version.id, { versionReadback: true });
   assert.equal(confirmed.id, version.id, "Cloudflare returned a different version");
   assert.equal(
     confirmed.annotations?.["workers/tag"],
