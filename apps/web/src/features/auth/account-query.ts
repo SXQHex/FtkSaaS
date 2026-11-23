@@ -32,8 +32,7 @@ export function accountQuery(nativeUserId: string, includePlatformScope = false)
       // Reject a late result from the old session without treating a normal
       // bearer refresh (same session_id) as a new login.
       const latest = await verifiedSession(nativeUserId);
-      if (nativeSessionId(session) !== nativeSessionId(latest))
-        throw new Error("ACCOUNT_CHANGED");
+      if (nativeSessionId(session) !== nativeSessionId(latest)) throw new Error("ACCOUNT_CHANGED");
       return account;
     },
     staleTime: accountStaleTime,

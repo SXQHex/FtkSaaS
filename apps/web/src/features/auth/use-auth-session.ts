@@ -11,10 +11,7 @@ function sessionIdentity(session: Session | null): NativeIdentity | null {
   return session ? { userId: session.user.id, sessionId: nativeSessionId(session) } : null;
 }
 
-function sameSession(
-  previous: NativeIdentity | null | undefined,
-  current: NativeIdentity | null,
-) {
+function sameSession(previous: NativeIdentity | null | undefined, current: NativeIdentity | null) {
   if (previous === undefined) return false;
   if (previous === null || current === null) return previous === current;
   // If either token lacks a trustworthy session identifier, fail closed:
@@ -48,8 +45,7 @@ export function useAuthSession(enabled = true) {
       previous.current = current;
       // SIGNED_IN is re-emitted on focus; TOKEN_REFRESHED and MFA keep the
       // original session_id. An actual same-user reauthentication does not.
-      if (event === "SIGNED_OUT" || changed)
-        sessionStorage.removeItem("ftk-recovery-account");
+      if (event === "SIGNED_OUT" || changed) sessionStorage.removeItem("ftk-recovery-account");
       if (!changed && event !== "SIGNED_OUT" && event !== "PASSWORD_RECOVERY") return;
       const next = ++revision;
       setReady(false);

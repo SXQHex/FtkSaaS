@@ -151,7 +151,10 @@ describe("shared account projections", () => {
         sub: "native-a",
         session_id: "019a7b00-0000-7000-8000-000000000103",
       }),
-    ).replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/, "");
+    )
+      .replaceAll("+", "-")
+      .replaceAll("/", "_")
+      .replace(/=+$/, "");
     const original = {
       data: {
         session: { user: { id: "native-a" }, access_token: `fixture.${encoded}.old` },

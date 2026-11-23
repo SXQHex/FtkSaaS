@@ -82,9 +82,7 @@ it("does not purge private Query or the recovery marker for focus, token rotatio
   expect(clear).not.toHaveBeenCalled();
   expect(invalidate).not.toHaveBeenCalled();
   expect(result.current).toBe(true);
-  expect(sessionStorage.getItem("ftk-recovery-account")).toBe(
-    `${actor}:${firstSession}`,
-  );
+  expect(sessionStorage.getItem("ftk-recovery-account")).toBe(`${actor}:${firstSession}`);
 });
 
 it("evicts all private cache on a same-user new native session and revalidates routes", async () => {
@@ -109,9 +107,7 @@ it("keeps a verified recovery marker for PASSWORD_RECOVERY in the same native se
   sessionStorage.setItem("ftk-recovery-account", `${actor}:${firstSession}`);
   await act(() => callback("PASSWORD_RECOVERY", session(actor, firstSession)));
   expect(clear).toHaveBeenCalledOnce();
-  expect(sessionStorage.getItem("ftk-recovery-account")).toBe(
-    `${actor}:${firstSession}`,
-  );
+  expect(sessionStorage.getItem("ftk-recovery-account")).toBe(`${actor}:${firstSession}`);
   await waitFor(() => expect(result.current).toBe(true));
 });
 

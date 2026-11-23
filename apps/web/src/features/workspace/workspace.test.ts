@@ -305,9 +305,9 @@ it("refuses a previous session's late workspace authority even for the same user
       data: { session: { user: { id: userId }, access_token: current } },
       error: null,
     });
-  await expect(
-    readWorkspace(accountId, orgId, async () => ({ id: accountId })),
-  ).rejects.toThrow("ACCOUNT_CHANGED");
+  await expect(readWorkspace(accountId, orgId, async () => ({ id: accountId }))).rejects.toThrow(
+    "ACCOUNT_CHANGED",
+  );
   expect(requests.some((row) => row.operation === "organizations_list_v1")).toBe(true);
   expect(requests.every((row) => row.bearer === `Bearer ${previous}`)).toBe(true);
 });
