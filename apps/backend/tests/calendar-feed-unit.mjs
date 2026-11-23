@@ -64,7 +64,10 @@ test('calendar diagnostic mode classifies failures without publishing upstream b
   [async()=>new Response('private upstream detail '+token,{status:503}),'upstream-http'],
   [async()=>{throw new DOMException('private '+token,'TimeoutError');},'upstream-fetch-timeout'],
   [async()=>new Response('not-json private '+token),'upstream-json'],
+  [async()=>Response.json(null),'upstream-json'],
+  [async()=>Response.json({error:{code:'NOT_FOUND'}}),'upstream-application'],
   [async()=>Response.json({ok:false,error:{code:'INTERNAL_ERROR',message:token}}),'upstream-application'],
+  [async()=>Response.json({ok:true,data:[]}),'ics-base64'],
   [async()=>Response.json({ok:true,data:{ics_base64:'invalid'}}),'ics-base64'],
  ]){
   for(const diagnostics of [false,true]){

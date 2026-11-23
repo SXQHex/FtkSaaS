@@ -39,6 +39,48 @@ import './calendar-feed-unit.mjs';
 import './p06-parser.mjs';
 import './settings-media-unit.mjs';
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import Ajv from 'ajv/dist/2020.js';import addFormats from 'ajv-formats';import {validate,version} from 'uuid';import {newUuidV7,newOperation} from '../scripts/uuid.mjs';
+test('shared API client returns only canonical success and failure envelopes',async t=>{
+ const {build}=await import('esbuild');
+ const clientBundle=await build({entryPoints:['../../packages/api-contracts/src/client.ts'],bundle:true,platform:'browser',format:'esm',minify:true,write:false});
+ const {BackendTransportError,createBackendClient}=await import('data:text/javascript;base64,'+Buffer.from(clientBundle.outputFiles[0].text).toString('base64'));
+ const id=newUuidV7(),functionsUrl='https://studio.example.invalid/functions/v1/backend-v1';
+ const request={client_api_version:1,request_id:id,org_id:id,page:{limit:2}};
+ const success={ok:true,data:{items:[],as_of:'2026-11-24T00:00:00Z'},trace_id:id};
+ const failure={ok:false,error:{code:'FORBIDDEN',retryable:false,trace_id:id}};
+ const client=createBackendClient({functionsUrl,publishableKey:'synthetic',getAccessToken:async()=>'synthetic'});
+ const calls=[];
+ let replies=[];
+ t.mock.method(globalThis,'fetch',async url=>{
+  calls.push(url);
+  assert(replies.length>0,'unexpected transport retry');
+  return replies.shift();
+ });
+ replies=[Response.json(success)];
+ assert.deepEqual(await client.call('centers_list_v1',request),success);
+ assert.deepEqual(calls.splice(0),['https://studio.example.invalid/rest/v1/rpc/centers_list_v1']);
+
+ replies=[Response.json(failure,{status:403}),Response.json(failure)];
+ assert.deepEqual(await client.call('centers_list_v1',request),failure);
+ assert.deepEqual(calls.splice(0),['https://studio.example.invalid/rest/v1/rpc/centers_list_v1',functionsUrl+'/centers_list_v1']);
+
+ replies=[new Response('Not JSON',{status:502}),Response.json(success)];
+ assert.deepEqual(await client.call('centers_list_v1',request),success);
+ assert.deepEqual(calls.splice(0),['https://studio.example.invalid/rest/v1/rpc/centers_list_v1',functionsUrl+'/centers_list_v1']);
+
+ replies=[Response.json(failure,{status:409})];
+ assert.deepEqual(await client.call('centers_list_v1',request),failure);
+ assert.deepEqual(calls.splice(0),['https://studio.example.invalid/rest/v1/rpc/centers_list_v1']);
+
+ for(const body of [{ok:true},{ok:false},{...success,data:{...success.data,items:'invalid'}},
+  {...failure,error:{...failure.error,retryable:'false'}}]){
+  replies=[Response.json(body)];
+  await assert.rejects(client.call('centers_list_v1',request),error=>error instanceof BackendTransportError&&error.status===200);
+  assert.deepEqual(calls.splice(0),['https://studio.example.invalid/rest/v1/rpc/centers_list_v1']);
+ }
+ replies=[Response.json(success)];
+ await assert.rejects(client.call('account_get_v1',{client_api_version:1,request_id:id}),BackendTransportError);
+ assert.deepEqual(calls,[functionsUrl+'/account_get_v1']);
+});
 test('P05 Storage adapter checks actual bytes/hash/mime/size and returns no internal origin',async()=>{
  const {build}=await import('esbuild');const built=await build({entryPoints:['supabase/functions/backend-v1/document-storage.ts'],bundle:true,platform:'browser',format:'esm',write:false});
  const {documentStorage,contentHash}=await import('data:text/javascript;base64,'+Buffer.from(built.outputFiles[0].text).toString('base64'));

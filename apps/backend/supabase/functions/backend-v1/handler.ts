@@ -1,6 +1,6 @@
 import {calendarFeed,type CalendarFeedItem} from './calendar-feed.ts';
 import {nativeUser,sessionClaims} from './auth-payload.ts';
-import {isRecord,parseJson,requireInteger,requireRecord,requireString,responseJson} from './edge-json.ts';
+import {isRecord,isUnknownArray,parseJson,requireInteger,requireRecord,requireString,responseJson} from './edge-json.ts';
 import {calendarToken,calendarTokenHash,calendarOrigin,calendarSubscriptionUrl,calendarAppUrl} from './calendar-token.ts';
 import {lifecycleReauth} from './lifecycle-auth.ts';
 import {accountSignupCheck} from './account-signup.ts';
@@ -18,7 +18,7 @@ const implemented=new Set(implementation.operations);
 const validatorRegistry: ReadonlyMap<string,(value:unknown)=>boolean>=new Map(Object.entries(validators));
 const validate=(kind:'request'|'success',operation:string,data:unknown)=>validatorRegistry.get(kind+'_'+operation)?.(data)===true;
 const validFailure=(value:unknown)=>validators.failure_envelope(value);
-const arrayLength=(value:unknown)=>Array.isArray(value)?value.length:0;
+const arrayLength=(value:unknown)=>isUnknownArray(value)?value.length:0;
 function isCalendarItem(value:unknown):value is Omit<CalendarFeedItem,'app_url'>{
  return isRecord(value)&&typeof value.id==='string'&&typeof value.org_id==='string'&&
   typeof value.version==='number'&&typeof value.title==='string'&&typeof value.location==='string'&&
@@ -44,7 +44,7 @@ function isImportMeta(value:unknown):value is {object_key:string;bytes:number;ch
   typeof value.max_rows==='number'&&Number.isSafeInteger(value.max_rows)&&value.max_rows>0&&value.max_rows<=5000;
 }
 function isImportMapping(value:unknown):value is Parameters<typeof parseImportCsv>[1]{
- return isRecord(value)&&Array.isArray(value.columns)&&value.columns.every((entry:unknown)=>
+ return isRecord(value)&&isUnknownArray(value.columns)&&value.columns.every((entry:unknown)=>
   isRecord(entry)&&typeof entry.source_column==='string'&&typeof entry.target==='string')&&
   (value.delimiter===undefined||value.delimiter===','||value.delimiter===';')&&
   (value.kind===undefined||value.kind==='students'||value.kind==='crm_applications');
@@ -57,10 +57,10 @@ const failure=(code:string,status=400,unexpected=false)=>{const payload={ok:fals
 const handleRequest=async(req:Request):Promise<Response>=>{
  if(req.method!=="POST")return failure("VALIDATION_FAILED");
  try{
-  const operation=new URL(req.url).pathname.split("/").filter(Boolean).at(-1)!;
+  const operation=new URL(req.url).pathname.split("/").filter(Boolean).at(-1);
   if(operation==='invitation_delivery_tick')return invitationTick(req,n=>Deno.env.get(n));
   
-  if(!implemented.has(operation))return failure("NOT_FOUND",404);
+  if(!operation||!implemented.has(operation))return failure("NOT_FOUND",404);
   const body=await req.text();if(body.length>2097152)return failure("VALIDATION_FAILED");
   const request=parseJson(body);
   if(!isRecord(request))return failure('VALIDATION_FAILED');
@@ -88,7 +88,7 @@ const handleRequest=async(req:Request):Promise<Response>=>{
    if(!rpc.ok)return failure('TEMPORARY_FAILURE',503);const result=requireRecord(await responseJson(rpc));
    if(result.ok===true){
     const data=requireRecord(result.data);
-    if(!Array.isArray(data.items)||!data.items.every(isCalendarItem)||typeof data.as_of!=='string')return failure('INTEGRITY_VIOLATION',500);
+    if(!isUnknownArray(data.items)||!data.items.every(isCalendarItem)||typeof data.as_of!=='string')return failure('INTEGRITY_VIOLATION',500);
     let bytes:Uint8Array;
     try{
      const items=data.items.map(item=>({...item,starts_at:new Date(item.starts_at).toISOString(),ends_at:new Date(item.ends_at).toISOString(),app_url:calendarAppUrl(appTemplate,item.org_id,item.id)}));
@@ -300,9 +300,9 @@ const handleRequest=async(req:Request):Promise<Response>=>{
     data.upload_url=await storage.upload(requireString(data.upload_url));
    }
    if(operation==='document_requirements_get_v1'&&request.content_file_id){
-    if(!Array.isArray(result.data))return failure('INTEGRITY_VIOLATION',500);
+    if(!isUnknownArray(result.data))return failure('INTEGRITY_VIOLATION',500);
     const item=result.data.find((x:unknown)=>isRecord(x)&&isRecord(x.file)&&x.file.id===request.content_file_id);
-    if(!item)return failure('NOT_FOUND',404);
+    if(item===undefined)return failure('NOT_FOUND',404);
     if(!isRecord(item)||!isRecord(item.file))return failure('INTEGRITY_VIOLATION',500);
     if(!item.digital_content){
      const file=await storage.download(requireString(request.org_id)+'/'+requireString(item.file.id));

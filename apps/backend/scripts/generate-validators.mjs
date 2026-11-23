@@ -62,19 +62,20 @@ function writeValidators(selected,path,optimize=code=>code){
  if(process.argv.includes('--check'))assert.equal(fs.readFileSync(path,'utf8'),code,'Runtime validator drift: '+path);else fs.writeFileSync(path,code);
  console.log('Generated standalone request/response validators: '+Object.keys(selected).length+' ('+path+')');
 }
-writeValidators(exports,'supabase/functions/backend-v1/validators.js',optimizeStandaloneValidators);
+writeValidators(exports,'../../packages/api-contracts/src/validators.js',optimizeStandaloneValidators);
 // The declared types follow the *same* authoritative operation inventory as the
 // standalone validator JS. TypeScript never checks the generated 6 MB JS output.
 const typeDeclarations=[
  '// Generated from contract.json; do not hand-edit. Runtime implementations are in validators.js.',
- "import type {Operations,FailureEnvelope} from '@ftksaas/api-contracts';",
+ "import type {Operations} from './operations.js';",
+ "import type {FailureEnvelope} from './generated.js';",
  'export declare const failure_envelope: (value: unknown) => value is FailureEnvelope;',
  ...contract['x-contract'].operations.flatMap(({name})=>[
   'export declare const request_'+name+": (value: unknown) => value is Operations['"+name+"']['request'];",
   'export declare const success_'+name+": (value: unknown) => value is Operations['"+name+"']['response'];"
  ])
 ].join('\n')+'\n';
-const declarationPath='supabase/functions/backend-v1/validators.d.ts';
+const declarationPath='../../packages/api-contracts/src/validators.d.ts';
 if(process.argv.includes('--check'))assert.equal(fs.readFileSync(declarationPath,'utf8'),typeDeclarations,'Validator types drift');
 else fs.writeFileSync(declarationPath,typeDeclarations);
 

@@ -1,5 +1,5 @@
 import {sendEmail} from './email-provider.ts';
-import {isRecord,requireRecord} from './edge-json.ts';
+import {isRecord,isUnknownArray,requireRecord} from './edge-json.ts';
 type Rpc=(body:unknown,aux:unknown)=>Promise<unknown>;
 type EmailClaim={job_id:string;org_id:string;lease_token:string;api_key:string;payload:{from:string;to:string[];subject:string;text:string}};
 const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
@@ -7,7 +7,7 @@ const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
 function validEmailClaim(item:unknown):item is EmailClaim{
  if(!isRecord(item)||!['job_id','org_id'].every(k=>typeof item[k]==='string'&&uuid.test(item[k]))||typeof item.lease_token!=='string'||!item.lease_token||typeof item.api_key!=='string'||!item.api_key||!isRecord(item.payload))return false;
  const payload=item.payload;
- return typeof payload.from==='string'&&!/[\r\n]/.test(payload.from)&&Array.isArray(payload.to)&&payload.to.length===1&&typeof payload.to[0]==='string'&&!/[\r\n]/.test(payload.to[0])&&typeof payload.subject==='string'&&typeof payload.text==='string';
+ return typeof payload.from==='string'&&!/[\r\n]/.test(payload.from)&&isUnknownArray(payload.to)&&payload.to.length===1&&typeof payload.to[0]==='string'&&!/[\r\n]/.test(payload.to[0])&&typeof payload.subject==='string'&&typeof payload.text==='string';
 }
 export async function deliverTransactionalEmail(item:unknown,requestId:string,rpc:Rpc,send:typeof fetch=fetch){
  if(!validEmailClaim(item))throw Error('INVALID_EMAIL_CLAIM');

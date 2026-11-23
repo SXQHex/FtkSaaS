@@ -1,5 +1,6 @@
 // Generated from contract.json; do not hand-edit. Runtime implementations are in validators.js.
-import type {Operations,FailureEnvelope} from '@ftksaas/api-contracts';
+import type {Operations} from './operations.js';
+import type {FailureEnvelope} from './generated.js';
 export declare const failure_envelope: (value: unknown) => value is FailureEnvelope;
 export declare const request_account_get_v1: (value: unknown) => value is Operations['account_get_v1']['request'];
 export declare const success_account_get_v1: (value: unknown) => value is Operations['account_get_v1']['response'];

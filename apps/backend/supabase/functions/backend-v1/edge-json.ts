@@ -4,6 +4,9 @@ export type JsonRecord = Record<string, unknown>;
 export function isRecord(value: unknown): value is JsonRecord {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
+export function isUnknownArray(value: unknown): value is unknown[] {
+  return Array.isArray(value);
+}
 export function requireRecord(value: unknown): JsonRecord {
   if (!isRecord(value)) throw Error('INVALID_EXTERNAL_RESPONSE');
   return value;
