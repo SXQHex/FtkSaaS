@@ -345,85 +345,74 @@ test("keyboard kanban movement opens review before any native writer", async ({ 
   expect(state.leads[0]!.pipeline?.stage.key).toBe("talk");
   await closeLead(page);
 });
-test.describe("touch input", () => {
-  test.use({ hasTouch: true, viewport: { width: 1100, height: 900 } });
-  test("touch kanban movement proposes a stage without committing a native writer", async ({
-    page,
-    browserName,
-  }) => {
-    const state = await mockLeads(page),
-      handle = page.getByRole("button", {
-        name: "Aday A için aşamayı sürükleyerek seç",
-        exact: true,
-      });
+test("native kanban stage selection opens review without committing a writer", async ({
+  page,
+  browserName,
+}) => {
+  const state = await mockLeads(page);
+  const touch = hasTouchInput(page);
+  if (touch && browserName === "webkit") {
+    // Playwright WebKit cannot send a trusted drag. Use the board's native
+    // stage selector, which is available to iPhone users on the same card.
+    await page.getByRole("combobox", { name: /Aday A/ }).selectOption("talk");
+  } else {
+    const handle = page.getByRole("button", {
+      name: "Aday A için aşamayı sürükleyerek seç",
+      exact: true,
+    });
     await handle.scrollIntoViewIfNeeded();
-    const from = await handle.boundingBox(),
-      to = await page.locator('[data-slot="kanban-column"]').nth(1).boundingBox();
+    const from = await handle.boundingBox();
+    const to = await page.locator('[data-slot="kanban-column"]').nth(1).boundingBox();
     expect(from).not.toBeNull();
     expect(to).not.toBeNull();
+    const viewport = page.viewportSize();
+    if (!from || !to || !viewport) throw new Error("Kanban drag points are unavailable");
+    const left = Math.max(0, to.x);
+    const right = Math.min(viewport.width, to.x + to.width);
+    const top = Math.max(0, to.y);
+    const bottom = Math.min(viewport.height, to.y + to.height);
+    if (left >= right || top >= bottom)
+      throw new Error("The next stage must intersect the active device viewport");
 
-    const cdp = browserName === "chromium" ? await page.context().newCDPSession(page) : undefined;
-    const touchTarget = cdp ? undefined : await handle.elementHandle();
-    const start = { x: from!.x + from!.width / 2, y: from!.y + from!.height / 2 };
-    const target = { x: to!.x + to!.width / 2, y: to!.y + 70 };
-    type TouchPhase = "touchStart" | "touchMove" | "touchEnd";
-    const dispatchWebKitTouch = cdp
-      ? undefined
-      : await page.evaluateHandle<
-          (element: unknown, type: TouchPhase, point: typeof start) => void
-        >(
-          `(element, type, point) => {
-            const doc = element.ownerDocument;
-            const view = doc.defaultView;
-            const contact = doc.createTouch(
-              view, element, 1, point.x + view.scrollX, point.y + view.scrollY,
-            );
-            const active = doc.createTouchList(...(type === "touchEnd" ? [] : [contact]));
-            element.dispatchEvent(new TouchEvent(type.toLowerCase(), {
-              bubbles: true,
-              cancelable: true,
-              touches: active,
-              targetTouches: active,
-              changedTouches: doc.createTouchList(contact),
-            }));
-          }`,
-        );
-    async function touch(type: TouchPhase, point: typeof start) {
+    const start = { x: from.x + from.width / 2, y: from.y + from.height / 2 };
+    const target = { x: (left + right) / 2, y: Math.min(bottom - 1, top + 70) };
+    const cdp = touch ? await page.context().newCDPSession(page) : undefined;
+    try {
       if (cdp) {
-        await cdp.send("Input.dispatchTouchEvent", {
-          type,
-          touchPoints: type === "touchEnd" ? [] : [point],
-        });
-        return;
+        await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [start] });
+      } else {
+        await page.mouse.move(start.x, start.y);
+        await page.mouse.down();
+        await page.mouse.move(start.x + 6, start.y);
       }
-      // A touch stays bound to its initial target, even if moving the card remounts its handle.
-      await dispatchWebKitTouch!.evaluate(
-        (dispatch, { element, type, point }) => dispatch(element, type, point),
-        { element: touchTarget!, type, point },
-      );
+      await expect(handle).toHaveAttribute("aria-pressed", "true");
+      if (cdp) {
+        for (let step = 1; step <= 5; step++)
+          await cdp.send("Input.dispatchTouchEvent", {
+            type: "touchMove",
+            touchPoints: [
+              {
+                x: start.x + ((target.x - start.x) * step) / 5,
+                y: start.y + ((target.y - start.y) * step) / 5,
+              },
+            ],
+          });
+      } else {
+        await page.mouse.move(target.x, target.y, { steps: 5 });
+      }
+      await expect(page.getByRole("status")).toContainText("hedef: Görüşülüyor");
+      if (cdp) await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+      else await page.mouse.up();
+    } finally {
+      await cdp?.detach();
     }
-    await touch("touchStart", start);
-    await expect(handle).toHaveAttribute("aria-pressed", "true");
-    for (let step = 1; step <= 5; step++)
-      await touch("touchMove", {
-        x: start.x + ((target.x - start.x) * step) / 5,
-        y: start.y + ((target.y - start.y) * step) / 5,
-      });
-    await expect(page.getByRole("status")).toContainText("hedef: Görüşülüyor");
-    await touch("touchEnd", target);
-    await expect(
-      page.getByRole("dialog").getByRole("heading", { name: "Aşamayı değiştir", exact: true }),
-    ).toBeVisible();
-    expect(state.writes).toHaveLength(0);
-    await closeLead(page);
-    expect(state.leads[0]!.pipeline?.stage.key).toBe("new");
-    await cdp?.detach();
-    await touchTarget?.dispose();
-    await dispatchWebKitTouch?.dispose();
-    await page.evaluate(
-      "document.documentElement.dataset.theme = 'dark'; document.documentElement.classList.add('dark')",
-    );
-  });
+  }
+  await expect(
+    page.getByRole("dialog").getByRole("heading", { name: "Aşamayı değiştir", exact: true }),
+  ).toBeVisible();
+  expect(state.writes).toHaveLength(0);
+  await closeLead(page);
+  expect(state.leads[0]!.pipeline?.stage.key).toBe("new");
 });
 test("an existing person becomes a candidate without a second person writer", async ({ page }) => {
   const state = await mockLeads(page);

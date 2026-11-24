@@ -1,4 +1,4 @@
-import { activate } from "./device-input.js";
+import { activate, newPageForCurrentDevice } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { mockNative } from "./auth-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
@@ -552,7 +552,7 @@ test("operator filters a native payment queue, rejects a report and replays one 
     activity.actions.paymentDeclined,
   );
 
-  const customer = await browser.newPage({ baseURL });
+  const customer = await newPageForCurrentDevice(browser, { baseURL });
   try {
     await mockSettingsCompletion(customer, { billingOwner: true, startUrl: null });
     await customer.route("**/functions/v1/backend-v1/subscription_get_v1", (route) =>

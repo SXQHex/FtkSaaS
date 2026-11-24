@@ -1,4 +1,4 @@
-import { activate, closeWithDevice } from "./device-input.js";
+import { activate, closeWithDevice, newPageForCurrentDevice } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { mockEventDetail, detailIds as D } from "./event-detail-fixture.js";
 import { mockSessionDetail } from "./session-detail-fixture.js";
@@ -881,7 +881,7 @@ test("event closed attendance correction and performed duty each require a separ
   await expect(page.getByRole("heading", { name: state.event.name, exact: true })).toBeVisible();
   expect(state.writes.filter(({ op }) => op === "event_duty_verify_v1")).toHaveLength(1);
 
-  const instructor = await browser.newPage({ locale: "tr-TR", serviceWorkers: "block" });
+  const instructor = await newPageForCurrentDevice(browser);
   try {
     const self = await mockSessionDetail(instructor, { existing: true, instructor: true });
     await instructor.clock.setFixedTime(new Date("2026-11-15T19:00:00Z"));

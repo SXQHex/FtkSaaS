@@ -22,9 +22,11 @@
 
 Refactoring tamamlanana dek otomatik frontend CI'si yalnız **Desktop Chromium** projesinin on iki Playwright shard'ını ve **tam Playwright test envanterini** çalıştırır. Diğer tarayıcı profilleri ve senaryoları korunur, fakat CI tarafından seçilmez. Lint, tip, build, birim/coverage, erişilebilirlik kontrolleri ve aynı profilin tam test envanteri geçerlidir. Dört tarayıcı kabulü bu dönemde iddia edilemez; refactoring kapanışında [CI politikasındaki](../../../docs/ci-policy.md) kaynak-özel güvenilir kurulum süreciyle dört tarayıcı profili × üç shard düzeni geri alınır.
 
-<a id="router--query-birleşik-veri-yaşam-döngüsü"></a>
+Yerel D04 doğrulaması için `FTK_BROWSER_PROJECT` değerleri `chromium`, `mobile-chromium` (Pixel 7), `webkit` (13,6 inç MacBook Air, DPR 2, 1280×832 CSS ekranı) ve `mobile-webkit` (iPhone 15) olarak seçilir. `test:e2e --workers=1` bütün senaryoları tek işçiyle çalıştırır. Harici kabul koşusu aynı profilleri kullanır. Ayrı kullanıcı sayfaları seçili cihazı devralır ve kimlikleri bağımsız context'lerde tutar. [Test girdisi](../e2e/device-input.ts)
 
-Yerel D04 doğrulaması için `FTK_BROWSER_PROJECT` değerleri `chromium`, `mobile-chromium` (Pixel 7), `webkit` (13,6 inç MacBook Air, DPR 2, 1280×832 CSS ekranı) ve `mobile-webkit` (iPhone 15) olarak seçilir. `test:e2e --workers=1` bütün senaryoları tek işçiyle çalıştırır. Harici kabul koşusu da aynı profil seçimini kullanır. Dokunma aktarımı [test girdisi yardımcısındaki](../e2e/device-input.ts) Playwright context ayarından alınır. Chromium’da bölge kaydırması dokunma girdisiyle, WebKit’te taşma ve konum yerel kaydırma API’siyle sınanır. WebKit’in gerçek parmak kaydırması, fiziksel cihaz veya iOS Simulator kanıtı ister. WCAG reflow testleri kontrollü 320 CSS piksel senaryolarını ayrıca korur.
+Chromium’da mobil kaydırma ve pano sürüklemesi dokunma girdisiyle sınanır. iPhone profilinde taşma ve konum yerel kaydırma API’siyle, pano aşaması görünür seçim kontrolüyle sınanır. WebKit’te gerçek parmak hareketi için fiziksel cihaz veya iOS Simulator kanıtı gerekir. WCAG reflow testleri kontrollü 320 CSS piksel senaryolarını ayrıca korur.
+
+<a id="router--query-birleşik-veri-yaşam-döngüsü"></a>
 
 ## Router + Query birleşik veri yaşam döngüsü
 

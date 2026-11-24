@@ -1,4 +1,4 @@
-import { activate, attemptOutsideDismissal } from "./device-input.js";
+import { activate, attemptOutsideDismissal, newPageForCurrentDevice } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import { Temporal } from "temporal-polyfill";
@@ -181,7 +181,7 @@ test("a closed lesson allows only its center manager to correct the native atten
     reservation: state.reservation!,
   };
   const browser = page.context().browser()!;
-  const owner = await browser.newPage();
+  const owner = await newPageForCurrentDevice(browser);
   try {
     const ownerState = await mockSessionDetail(owner, { existing: true, source });
     await activate(owner.getByRole("tab", { name: "Yoklama", exact: true }));
@@ -193,7 +193,7 @@ test("a closed lesson allows only its center manager to correct the native atten
   } finally {
     await owner.close();
   }
-  const manager = await browser.newPage();
+  const manager = await newPageForCurrentDevice(browser);
   try {
     const management = await mockSessionDetail(manager, {
       existing: true,
@@ -243,7 +243,7 @@ test("a closed lesson allows only its center manager to correct the native atten
   } finally {
     await manager.close();
   }
-  const member = await browser.newPage();
+  const member = await newPageForCurrentDevice(browser);
   try {
     const own = await mockOwnReservations(member, { closedLesson: source });
     const history = member.getByRole("grid", { name: "Geçmiş", exact: true });

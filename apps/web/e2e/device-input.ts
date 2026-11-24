@@ -1,4 +1,12 @@
-import { test, type BrowserContext, type Locator, type Page } from "@playwright/test";
+import {
+  test,
+  type Browser,
+  type BrowserContext,
+  type BrowserContextOptions,
+  type Locator,
+  type Page,
+} from "@playwright/test";
+import { activeBrowserProfile } from "../playwright-device.js";
 
 const touchContexts = new WeakMap<BrowserContext, boolean>();
 
@@ -8,6 +16,21 @@ export function registerTouchInput(context: BrowserContext, hasTouch: boolean) {
 
 export function hasTouchInput(page: Page) {
   return touchContexts.get(page.context()) ?? test.info().project.use.hasTouch === true;
+}
+
+export async function newPageForCurrentDevice(
+  browser: Browser,
+  options?: Pick<BrowserContextOptions, "baseURL">,
+) {
+  const { device } = activeBrowserProfile();
+  const page = await browser.newPage({
+    ...device,
+    locale: "tr-TR",
+    serviceWorkers: "block",
+    ...options,
+  });
+  registerTouchInput(page.context(), device.hasTouch === true);
+  return page;
 }
 
 export async function activate(control: Locator, desktopKey?: "Enter" | "Space") {

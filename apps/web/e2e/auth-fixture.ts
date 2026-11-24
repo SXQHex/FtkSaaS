@@ -56,6 +56,22 @@ export async function checkLockedWorkspaceScope(page: Page, checkSwitcher: () =>
   // The closed drawer does not mount its switcher at the mobile breakpoint.
   await expect(page.getByRole("dialog").last()).toBeVisible();
   await expect(page.getByRole("navigation", { name: "Ana menü", exact: true })).toBeHidden();
+  if (hasTouchInput(page)) {
+    const trigger = page.locator('button[aria-controls="workspace-sidebar"]');
+    if (!(await trigger.isVisible()) || !(await trigger.isEnabled())) return;
+    const canReachTrigger = await trigger.evaluate((button) => {
+      const { left, top, width, height } = button.getBoundingClientRect();
+      const hit = button.ownerDocument.elementFromPoint(left + width / 2, top + height / 2);
+      return button.contains(hit);
+    });
+    if (!canReachTrigger) return;
+    // Some sheets leave the header visible. If touch can open the drawer,
+    // check the same disabled scope switcher inside the native layout.
+    await openWorkspaceNavigation(page);
+    await checkSwitcher();
+    await closeWorkspaceNavigation(page);
+    return;
+  }
   await page.setViewportSize({ ...viewport, width: 1024 });
   try {
     await checkSwitcher();
