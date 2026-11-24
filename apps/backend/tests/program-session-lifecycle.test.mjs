@@ -134,6 +134,22 @@ test('Program lifecycle through real Auth -> Edge -> RPC',async t=>{
   const second=await management('program_preview_v1',{class_id:discoveredClass},{page:{limit:1,cursor:programs.next_cursor}});assert.equal(second.items.length,1);assert.equal(second.next_cursor,null);assert.notEqual(second.items[0].entity.id,programs.items[0].entity.id);assert.equal(second.as_of,programs.as_of);
   const legacy=key();await db.query("insert into core.program_versions(id,org_id,center_id,class_id,weekdays,local_start,duration_minutes,starts_on,ends_on,state) values($1,$2,$3,$4,array[1], '06:00:00',60,'2026-01-01','2026-02-01','active')",[legacy,org,c1,discoveredClass]);
   const old=(await management('program_preview_v1',{class_id:discoveredClass,program_id:legacy})).items[0];assert(old);assert.equal('schedule' in old.current.values,false);assert.equal('timezone' in old.current.values,false);
+  const programOperation='program_preview_v1',selected={class_ids:[class1,discoveredClass]};
+  const mainPrograms=await management(programOperation,{class_id:class1});
+  const discoveredPrograms=await management(programOperation,{class_id:discoveredClass});
+  const combined=await management(programOperation,selected,{page:{limit:1}});
+  assert.equal(combined.items.length,1);assert(combined.next_cursor);
+  const rest=await management(programOperation,selected,{page:{limit:200,cursor:combined.next_cursor}});
+  assert.equal(rest.next_cursor,null);assert.equal(rest.as_of,combined.as_of);
+  const entries=items=>items.map(({as_of,...item})=>[item.entity.id,item]).sort(([a],[b])=>a.localeCompare(b));
+  assert.deepEqual(entries([...combined.items,...rest.items]),entries([...mainPrograms.items,...discoveredPrograms.items]));
+  const combinedRequest=(selectedKey,extra={})=>({operation:programOperation,selector:{operation:programOperation,key:selectedKey},page:{},...extra});
+  await fail('management_state_get_v1',combinedRequest({class_id:discoveredClass},{page:{cursor:combined.next_cursor}}),'VALIDATION_FAILED');
+  await fail('management_state_get_v1',combinedRequest(selected,{page:{cursor:combined.next_cursor}}),'VALIDATION_FAILED',cm.u);
+  await fail('management_state_get_v1',combinedRequest(selected),'FORBIDDEN',i1.u);
+  await fail('management_state_get_v1',combinedRequest(selected,{center_id:c2}),'NOT_FOUND');
+  await fail('management_state_get_v1',combinedRequest({class_ids:[class1,key()]}),'NOT_FOUND');
+  await fail('management_state_get_v1',combinedRequest({class_id:class1,...selected}),'VALIDATION_FAILED');
   const originalFeatures=(await rows('select features from core.saas_plan_versions where id=$1',[plan]))[0].features;
   try{
    await db.query("update core.saas_plan_versions set features=array_remove(features,'F10') where id=$1",[plan]);

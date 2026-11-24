@@ -69,7 +69,8 @@ test('Availability and policies through real Auth -> Edge -> RPC',async t=>{
   await inspectFail('center_discipline_set_v1',{discipline_id:discipline},'FORBIDDEN',{},manager.u);
   const features=(await rows('select features from core.saas_plan_versions where id=$1',[plan]))[0].features;
   try{
-   for(const [feature,operation,k] of [['F01','center_discipline_set_v1',{discipline_id:discipline}],['F02','availability_exception_save_v1',{resource}]]){
+   for(const [feature,operation,k] of [['F01','center_discipline_set_v1',{discipline_id:discipline}],['F02','availability_exception_save_v1',{resource}],
+    ['F02','availability_exception_save_v1',{resources:[resource]}],['F02','availability_save_v1',{resources:[resource]}]]){
     await db.query('update core.saas_plan_versions set features=array_remove($2::text[],$3) where id=$1',[plan,features,feature]);
     await inspectFail(operation,k,'PLAN_FEATURE_UNAVAILABLE');
    }
@@ -137,6 +138,49 @@ test('Availability and policies through real Auth -> Edge -> RPC',async t=>{
   await mut('center_manager_assign_v1',{center_id:other,person_id:person});
   const otherResource=(await mut('room_save_v1',{center_id:other,name:'Foreign center room',capacity:5})).primary_id;
   await inspectFail(op,{resource:{kind:'room',id:otherResource}},'NOT_FOUND');
+  const selected={resources:[resource,personResource]};
+  const uppercase={...resource,id:resource.id.toUpperCase()};
+  assert.deepEqual((await inspect(op,{resource:uppercase})).items.map(row=>row.entity.id),
+   (await inspect(op,{resource})).items.map(row=>row.entity.id));
+  await inspectFail(op,{resources:[resource,uppercase]},'VALIDATION_FAILED');
+  const expectedPerson=(await inspect(op,{resource:personResource})).items;
+  const expected=[...(await inspect(op,k)).items,...expectedPerson];
+  const combined=await inspect(op,selected,{page:{limit:1}});
+  assert.equal(combined.items.length,1);assert(combined.next_cursor);
+  const remaining=await inspect(op,selected,{page:{limit:200,cursor:combined.next_cursor}});
+  assert.equal(remaining.next_cursor,null);assert.equal(remaining.as_of,combined.as_of);
+  const entries=page=>page.map(({as_of,...item})=>[item.entity.id,item]).sort(([a],[b])=>a.localeCompare(b));
+  assert.deepEqual(entries([...combined.items,...remaining.items]),entries(expected));
+  const exactSelection=await inspect(op,selected,{entity:personView.items[0].entity});
+  assert.deepEqual(entries(exactSelection.items),entries(expectedPerson));
+  await inspectFail(op,{resources:[resource,{kind:'room',id:secondRoom}]},'NOT_FOUND',{entity:personView.items[0].entity});
+  await inspectFail(op,k,'VALIDATION_FAILED',{page:{cursor:combined.next_cursor}});
+  await inspectFail(op,selected,'VALIDATION_FAILED',{page:{cursor:combined.next_cursor}},manager.u);
+  await inspectFail(op,{resources:[resource,{kind:'room',id:otherResource}]},'NOT_FOUND');
+  await inspectFail(op,{resources:[]},'VALIDATION_FAILED');
+  await inspectFail(op,{resources:[resource,resource]},'VALIDATION_FAILED');
+  await inspectFail(op,{...k,...selected},'VALIDATION_FAILED');
+  await inspectFail(op,selected,'FORBIDDEN',{},instructor.u);
+  const rulesOperation='availability_save_v1';
+  const personRule=await mut(rulesOperation,{resource:personResource,rule});
+  const expectedRules=[...(await inspect(rulesOperation,k)).items,
+   ...(await inspect(rulesOperation,{resource:personResource})).items];
+  const ruleFirst=await inspect(rulesOperation,selected,{page:{limit:1}});
+  assert.equal(ruleFirst.items.length,1);assert(ruleFirst.next_cursor);
+  const restRules=await inspect(rulesOperation,selected,{page:{limit:200,cursor:ruleFirst.next_cursor}});
+  assert.equal(restRules.next_cursor,null);assert.equal(restRules.as_of,ruleFirst.as_of);
+  assert.deepEqual(entries([...ruleFirst.items,...restRules.items]),entries(expectedRules));
+  const exactRule=await inspect(rulesOperation,{...selected,rule_id:personRule.primary_id});
+  assert.equal(exactRule.items.length,1);
+  assert.deepEqual(exactRule.items[0].current.values.resource,personResource);
+  assert.deepEqual(exactRule.items[0].versions,[{entity:{type:'availability_rules',id:personRule.primary_id},version:personRule.version}]);
+  await inspectFail(rulesOperation,k,'VALIDATION_FAILED',{page:{cursor:ruleFirst.next_cursor}});
+  await inspectFail(rulesOperation,selected,'VALIDATION_FAILED',{page:{cursor:ruleFirst.next_cursor}},manager.u);
+  await inspectFail(rulesOperation,{resources:[resource,{kind:'room',id:otherResource}]},'NOT_FOUND');
+  await inspectFail(rulesOperation,{resources:[]},'VALIDATION_FAILED');
+  await inspectFail(rulesOperation,{resources:[resource,resource]},'VALIDATION_FAILED');
+  await inspectFail(rulesOperation,{...k,...selected},'VALIDATION_FAILED');
+  await inspectFail(rulesOperation,selected,'FORBIDDEN',{},instructor.u);
   const v=(await inspect(op,k,{entity:one.entity})).items[0].versions[0].version;
   const appended=await mut(op,{resource,interval:{starts_at:'2032-01-01T00:00:00Z',ends_at:'2032-01-02T00:00:00Z'},reason:'Private maintenance',expected_version:v});
   const latest=await inspect(op,k,{entity:{type:'availability_exceptions',id:appended.primary_id}});assert.equal(latest.items[0].versions[0].version,v+1);
