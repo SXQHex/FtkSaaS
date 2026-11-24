@@ -317,8 +317,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "173445ad4f0933c5d52e8e626dada3d3dba91673e6074253e4dbc19940cd5235",
-        "reason": "XREQ-073 API kabul envanteri, güncel merkez okuyucusunun RLS ve SQL rol kontrollerini doğrular."
+        "fingerprint": "b3fad52409cb8bd5bacec789cc5ba4bd365bcaf1d34b23f3e1df2c78bb2c7f1c",
+        "reason": "XREQ-073 kabul envanterindeki hesap ve Platform testi kendi operatör satırına bağlı çalışır."
       }
     },
     {
@@ -411,8 +411,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "d28df6cb0d17b1627b03c99d46432bb4b3dd3654ee028549ea9c885fb57c2f8f",
-        "reason": "Native Auth faktörleri bilinmeyen dizi elemanları olarak alan kontrolünden geçer. AAL ve oturum bağlama kuralları korunur."
+        "fingerprint": "c6f03a3f77c1decd89366e56100400584f18c6efabba94db763c345705dcb5cd",
+        "reason": "Kimlik ve doğrulanmış ad fallback kabulü, hesap kaydı olmayan operatörü kendi üyelik zamanıyla doğrular."
       }
     },
     {
@@ -2020,8 +2020,8 @@
         "platform_operator_access_set_v1"
       ],
       "review": {
-        "fingerprint": "fb212985ebf2bae20571bcdd7131994ad3a3f6d94edf3b96338ac15b1d1b423a",
-        "reason": "XREQ-073 Platform kesin başvuru seçicisi kendi kayıt ve canlı kuyruk görünürlüğü, cursor ayrımı ve kabul testiyle incelendi."
+        "fingerprint": "1d0d6b2686e43344eb0215a7166e505e44abc5ac64dae3530fe86fb16624a998",
+        "reason": "Platform operatör dizini kabulü eşzamanlı test üyeliklerinden bağımsızdır. Etiket ve uygunluk doğrulamaları korunur."
       }
     },
     {
