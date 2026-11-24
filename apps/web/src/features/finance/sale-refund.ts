@@ -36,17 +36,18 @@ export async function readSaleRefundAuthority(scope: ClientScope, saleId: string
     selector: { operation: "sale_refund_preview_v1", key: { sale_id: saleId } },
     page: { limit: 1 },
   });
-  const item = page.items[0],
-    versions =
-      item?.versions.filter((row) => row.entity.type === "sales" && row.entity.id === saleId) ?? [];
+  const item = Array.isArray(page?.items) ? page.items[0] : undefined,
+    versions = Array.isArray(item?.versions)
+      ? item.versions.filter((row) => row?.entity?.type === "sales" && row.entity.id === saleId)
+      : [];
   if (
+    item?.exists !== true ||
     page.items.length !== 1 ||
     page.next_cursor ||
-    !item?.exists ||
     item.entity?.type !== "sales" ||
     item.entity.id !== saleId ||
     item.current?.operation !== "sale_refund_preview_v1" ||
-    item.current.values.sale_id !== saleId ||
+    item.current.values?.sale_id !== saleId ||
     versions.length !== 1
   )
     throw new Error("SALE_REFUND_AUTHORITY_UNAVAILABLE");

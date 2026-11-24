@@ -24,15 +24,15 @@ export async function readCreditRefundSource(scope: ClientScope, selection: Fina
     selector: { operation: "student_credit_refund_v1", key: { person_id: selection.personId } },
     page: { limit: 1 },
   });
-  const item = page.items[0];
+  const item = Array.isArray(page?.items) ? page.items[0] : undefined;
   if (
+    item?.exists !== true ||
     page.items.length !== 1 ||
     page.next_cursor ||
-    !item?.exists ||
     item.entity?.type !== "people" ||
     item.entity.id !== selection.personId ||
     item.current?.operation !== "student_credit_refund_v1" ||
-    item.current.values.person_id !== selection.personId
+    item.current.values?.person_id !== selection.personId
   )
     throw new Error("FINANCE_AUTHORITY_UNAVAILABLE");
   return readFinancePage(scope, selection);

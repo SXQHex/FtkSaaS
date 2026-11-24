@@ -12,10 +12,25 @@ const platformScope = z.object({
   operator_manage: z.boolean().optional(),
 });
 
+const identityText = z.string().nullable();
+const verifiedAt = z.iso.datetime({ offset: true }).nullable();
+const identity = z.object({
+  given_name: identityText,
+  family_name: identityText,
+  email: identityText,
+  phone: identityText,
+  pending_email: identityText,
+  pending_phone: identityText,
+  email_verified_at: verifiedAt,
+  phone_verified_at: verifiedAt,
+  unverified_phone: identityText,
+});
+
 const actor = z.object({
-  id: z.uuid(),
+  id: z.guid(),
   state: z.enum(["active", "pending", "deletion_pending", "deleted"]),
   display_name: z.string(),
+  identity: identity.optional(),
   platform_scope: platformScope.optional(),
 });
 

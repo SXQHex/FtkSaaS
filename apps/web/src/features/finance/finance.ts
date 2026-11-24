@@ -24,7 +24,7 @@ const financeView = z.looseObject({
       id: z.uuid(),
       due_at: instant,
       remaining_minor: money,
-      center_id: z.uuid().optional(),
+      center_id: z.guid().optional(),
       version,
       net_minor: money.optional(),
       paid_minor: money.optional(),
@@ -39,9 +39,9 @@ const financeView = z.looseObject({
         amount_minor: money,
         currency,
         occurred_at: instant,
-        center_id: z.uuid().optional(),
+        center_id: z.guid().optional(),
         version,
-        previous_id: z.uuid().nullish(),
+        previous_id: z.guid().nullish(),
         payment: z
           .looseObject({
             method: z.enum(["cash", "bank_transfer", "card_pos"]),
@@ -122,15 +122,15 @@ export async function readCollectionAuthority(
       selector: { operation: "collection_record_v1", key: { person_id: personId } },
       page: { limit: 1 },
     });
-    const item = page.items[0];
+    const item = Array.isArray(page?.items) ? page.items[0] : undefined;
     if (
+      item?.exists !== true ||
       page.items.length !== 1 ||
       page.next_cursor ||
-      !item?.exists ||
       item.entity?.type !== "people" ||
       item.entity.id !== personId ||
       item.current?.operation !== "collection_record_v1" ||
-      item.current.values.person_id !== personId
+      item.current.values?.person_id !== personId
     )
       throw new Error("FINANCE_AUTHORITY_UNAVAILABLE");
     return true;

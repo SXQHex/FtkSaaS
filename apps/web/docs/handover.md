@@ -19,6 +19,14 @@
 - **M09 PR #418 yerel ölçümleri.** [Ders talebi, kesin merkez ve Ekip izin paneli ölçümleri](https://github.com/SXQHex/FtkSaaS/pull/418) sabit PR kanıtında. [C-ortak kabulü](remaining-work.md#router-query-birlesik) canlı gecikme ve diğer akışların karşılaştırmasını izler.
 - **Önceki kabul kanıtı.** [M08'in kaynak ve trafik ölçümü](https://github.com/SXQHex/FtkSaaS/blob/db6615ef0a9e66a3513ce6ea25a8358ffaa12956/apps/web/docs/handover.md#kaynak-ve-kontrol-noktası) ve [PR #401 cache kabulü](https://github.com/SXQHex/FtkSaaS/blob/41775df365af408ec5a43b891579310bb78d10d7/apps/web/docs/handover.md#kaynak-ve-kontrol-noktası) sabit kaynakta.
 
+<a id="ts02-ts03-kaynak-ve-ortam-kabulu"></a>
+
+### TS02, TS03 ve TS05 kaynak ve ortam kabulü
+
+[PR #438](https://github.com/SXQHex/FtkSaaS/pull/438) head `e5ff56bda3011f6b99e90d03c3d1f0939a2211bf`, main `b1cdf3550aabbbff0f155d53eb5bc2a07d03c25f`. [Frontend Checks](https://github.com/SXQHex/FtkSaaS/actions/runs/45427691146) kontrolleri ve 12 Desktop Chromium shard, aynı main SHA'sındaki [Main acceptance](https://github.com/SXQHex/FtkSaaS/actions/runs/45429583483) ile [Cloudflare build ve dağıtımı](https://github.com/SXQHex/FtkSaaS/actions/runs/45429780907) başarılı.
+
+[PR #440](https://github.com/SXQHex/FtkSaaS/pull/440) head `4963c92a3ff91cdb3af1ce05b3346116ce5e978c`, main `c30e088695c3eee0df7979abe9a918c009fb8af7`. [Frontend Checks](https://github.com/SXQHex/FtkSaaS/actions/runs/45429678908) kontrolleri ve 12 Desktop Chromium shard, aynı main SHA'sındaki [Main acceptance](https://github.com/SXQHex/FtkSaaS/actions/runs/45432274535) ve [Cloudflare delivery](https://github.com/SXQHex/FtkSaaS/actions/runs/45432410312) başarılı.
+
 ### C-ortak ölçümü
 
 `48ad4019d3f9391c3afc0eba257329c2e1e0ee61` ve `1bbb5d61e3d0b0f13c6ad4d6d33e7e87d1eeffe2` aynı merkez yöneticisi fixture'ında, 1280×720 Desktop Chromium'da birer işçi ve beşer tekrarla ölçüldü. Rapor, API sözleşmesinde `R` olarak tanımlanan Edge ve doğrudan RPC okumalarını `reads` alanında toplar. Sayfa öğeleri, rapor satırları ve tekil DTO'lar bu alanda sayılır. Yazma işlemleri `commands` alanında kaydedilir. Yerel p50, kaydetme dahil her adımın başlamasından görünürlük ve sonuç kontrollerinin bitimine kadar geçen süredir. [Ölçüm senaryosu](../e2e/auth-c-common-read-cost.spec.ts)
