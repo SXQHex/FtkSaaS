@@ -50,10 +50,16 @@ const calendar = z.object({
 });
 export type PublicCalendarPage = z.infer<typeof calendar>;
 
-export async function publicCalendarInterval(now = Date.now()): Promise<Interval> {
-  const T = await getTemporal();
+type CalendarTemporal = Awaited<ReturnType<typeof getTemporal>>;
+type FormattedPublicRow = PublicProgramRow & { timezone: string };
+
+export function publicCalendarIntervalAt(T: CalendarTemporal, now: number): Interval {
   const start = T.Instant.fromEpochMilliseconds(now);
   return { starts_at: start.toString(), ends_at: start.add({ hours: 14 * 24 }).toString() };
+}
+
+export async function publicCalendarInterval(now = Date.now()): Promise<Interval> {
+  return publicCalendarIntervalAt(await getTemporal(), now);
 }
 
 export async function readPublicCalendar(
@@ -119,64 +125,102 @@ export async function readPublicCalendar(
   return data;
 }
 
-export async function publicProgramRows(
-  pages: PublicCalendarPage[],
-): Promise<{ rows: PublicProgramRow[]; timezone?: string }> {
-  const T = await getTemporal();
-  const first = pages[0];
-  const ids = new Set<string>();
-  const rows = pages
-    .flatMap((page) => page.items)
-    .map((item) => {
-      if (ids.has(item.publication_id)) throw new Error("Yinelenen public program kaydı.");
-      ids.add(item.publication_id);
-      const start = T.Instant.from(item.interval.starts_at).toZonedDateTimeISO(item.timezone);
-      const end = T.Instant.from(item.interval.ends_at).toZonedDateTimeISO(item.timezone);
-      const time: Intl.DateTimeFormatOptions = {
-        hour: "2-digit",
-        minute: "2-digit",
-        hourCycle: "h23",
-        ...(start.offset !== end.offset ? { timeZoneName: "shortOffset" as const } : {}),
-      };
-      return {
-        id: item.publication_id,
-        title: item.title,
-        day: start.toPlainDate().toString(),
-        dayLabel: start.toLocaleString("tr-TR", {
-          weekday: "long",
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-        }),
-        start: start.toLocaleString("tr-TR", time),
-        end: end.toLocaleString(
-          "tr-TR",
-          start.toPlainDate().equals(end.toPlainDate())
-            ? time
-            : { ...time, day: "numeric", month: "short", year: "numeric" },
-        ),
-        startsAt: item.interval.starts_at,
-        endsAt: item.interval.ends_at,
-        venue: item.venue_public_label,
-        conditions: item.public_conditions,
-        fee: formatMinorAmount(item.fee_minor, item.currency),
-        kind: item.kind,
-        timezone: item.timezone,
-        instructor: item.instructors?.join(" · ") || undefined,
-        occupancy: item.occupancy ?? undefined,
-      };
-    });
-  const zones = new Set(rows.map((row) => row.timezone));
-  const timezone =
-    zones.size === 1
-      ? rows[0]?.timezone
-      : rows.length
-        ? undefined
-        : (first?.center_profile?.timezone ?? first?.organization_profile?.timezone);
+function formatProgramRows(
+  T: CalendarTemporal,
+  items: PublicCalendarPage["items"],
+): FormattedPublicRow[] {
+  return items.map((item) => {
+    const start = T.Instant.from(item.interval.starts_at).toZonedDateTimeISO(item.timezone);
+    const end = T.Instant.from(item.interval.ends_at).toZonedDateTimeISO(item.timezone);
+    const day = start.toPlainDate();
+    const time: Intl.DateTimeFormatOptions = {
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23",
+      ...(start.offset !== end.offset ? { timeZoneName: "shortOffset" as const } : {}),
+    };
+    return {
+      id: item.publication_id,
+      title: item.title,
+      day: day.toString(),
+      dayLabel: start.toLocaleString("tr-TR", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }),
+      start: start.toLocaleString("tr-TR", time),
+      end: end.toLocaleString(
+        "tr-TR",
+        day.equals(end.toPlainDate())
+          ? time
+          : { ...time, day: "numeric", month: "short", year: "numeric" },
+      ),
+      startsAt: item.interval.starts_at,
+      endsAt: item.interval.ends_at,
+      venue: item.venue_public_label,
+      conditions: item.public_conditions,
+      fee: formatMinorAmount(item.fee_minor, item.currency),
+      kind: item.kind,
+      timezone: item.timezone,
+      instructor: item.instructors?.join(" · ") || undefined,
+      occupancy: item.occupancy ?? undefined,
+    };
+  });
+}
+
+export async function readPublicProgramPage(
+  T: CalendarTemporal,
+  input: Parameters<typeof readPublicCalendar>[0],
+  signal?: AbortSignal,
+) {
+  const source = await readPublicCalendar(input, signal);
+  const profile = source.center_profile ?? source.organization_profile;
   return {
-    rows: rows.toSorted(
+    rows: formatProgramRows(T, source.items),
+    timezone: source.center_profile?.timezone ?? source.organization_profile?.timezone,
+    nextCursor: source.next_cursor,
+    publicationState: source.publication_state,
+    applicationState: source.application.state,
+    profile: profile && {
+      name: profile.name,
+      description: profile.description,
+      address: profile.address,
+    },
+    disciplines:
+      source.center_profile?.disciplines ?? source.organization_profile?.disciplines ?? [],
+  };
+}
+
+export function combinePublicProgramRows(
+  T: CalendarTemporal,
+  pages: { rows: FormattedPublicRow[]; timezone?: string }[],
+): { rows: PublicProgramRow[]; timezone?: string } {
+  const rows = pages.flatMap((page) => page.rows);
+  const ids = new Set<string>();
+  const zones = new Set<string>();
+  for (const row of rows) {
+    if (ids.has(row.id)) throw new Error("Yinelenen public program kaydı.");
+    ids.add(row.id);
+    zones.add(row.timezone);
+  }
+  const timezone =
+    zones.size === 1 ? rows[0]?.timezone : rows.length ? undefined : pages[0]?.timezone;
+  return {
+    rows: rows.sort(
       (a, b) => a.day.localeCompare(b.day) || T.Instant.compare(a.startsAt, b.startsAt),
     ),
     timezone,
   };
+}
+
+export async function publicProgramRows(pages: PublicCalendarPage[]) {
+  const T = await getTemporal();
+  return combinePublicProgramRows(
+    T,
+    pages.map((page) => ({
+      rows: formatProgramRows(T, page.items),
+      timezone: page.center_profile?.timezone ?? page.organization_profile?.timezone,
+    })),
+  );
 }
