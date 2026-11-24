@@ -152,14 +152,16 @@ function PeopleContent({
   const [entryStarted, setEntryStarted] = useState(false);
   const [entryGeneration, setEntryGeneration] = useState(0);
   useEffect(() => {
+    const nextQuery = search.trim();
+    if (nextQuery === queryText) return;
     const timer = setTimeout(() => {
-      setQueryText(search.trim());
+      setQueryText(nextQuery);
       setCursors([undefined]);
       setIndex(0);
       setSelectedId(undefined);
     }, 300);
     return () => clearTimeout(timer);
-  }, [search]);
+  }, [search, queryText]);
   const query = useQuery({
     queryKey: [
       "people",

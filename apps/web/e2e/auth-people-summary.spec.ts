@@ -217,6 +217,10 @@ test("Members: server status/cursor reset and exact scoped summaries, responsive
   expect((await scanAccessibility(page, "members-summary-desktop")).violations).toEqual([]);
   await page.getByRole("button", { name: "Sonraki", exact: true }).click();
   await expect(table.getByText("Fixture Page Two", { exact: true })).toBeVisible();
+  await page.clock.install();
+  await page.getByRole("textbox", { name: "Üye ara", exact: true }).fill(" ");
+  await page.clock.runFor(350);
+  await expect(table.getByText("Fixture Page Two", { exact: true })).toBeVisible();
   const filter = page.getByRole("radiogroup", { name: "Durum", exact: true });
   await filter.getByRole("radio", { name: "Aktif", exact: true }).click();
   await expect(table.getByText("Fixture Active", { exact: true })).toBeVisible();

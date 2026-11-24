@@ -19,7 +19,7 @@
 
 ### C-ortak ölçümü
 
-`48ad4019d3f9391c3afc0eba257329c2e1e0ee61` ve `1bbb5d61e3d0b0f13c6ad4d6d33e7e87d1eeffe2` aynı merkez yöneticisi fixture'ında, 1280×720 Desktop Chromium'da birer işçi ve beşer tekrarla ölçüldü. Sayaçlar Edge ve doğrudan RPC okumalarını içerir. Satırlar sayfa öğeleri, rapor satırları ve tekil DTO'lar üzerinden sayıldı. Süre, kullanıcı adımından ilgili okuma ve görünürlük kontrollerinin bitimine kadar geçen yerel p50'dir. [Ölçüm senaryosu](../e2e/auth-c-common-read-cost.spec.ts)
+`48ad4019d3f9391c3afc0eba257329c2e1e0ee61` ve `1bbb5d61e3d0b0f13c6ad4d6d33e7e87d1eeffe2` aynı merkez yöneticisi fixture'ında, 1280×720 Desktop Chromium'da birer işçi ve beşer tekrarla ölçüldü. Rapor, API sözleşmesinde `R` olarak tanımlanan Edge ve doğrudan RPC okumalarını `reads` alanında toplar. Sayfa öğeleri, rapor satırları ve tekil DTO'lar bu alanda sayılır. Yazma işlemleri `commands` alanında kaydedilir. Yerel p50, kaydetme dahil her adımın başlamasından görünürlük ve sonuç kontrollerinin bitimine kadar geçen süredir. [Ölçüm senaryosu](../e2e/auth-c-common-read-cost.spec.ts)
 
 | Adım                            |         Okuma |         Satır |          p50 (ms) |
 | ------------------------------- | ------------: | ------------: | ----------------: |
@@ -37,6 +37,8 @@
 `account_get_v1` / organizasyon / merkez / rol / `management_state_get_v1` sırasıyla 11 / 3 / 5 / 3 / 21 kaldı. Geri ve ileri adımlarının her birinde organizasyon, merkez ve rol bir kez doğrulandı. `session_get_v1` 3'ten 1'e, toplam okuma 80'den 78'e ve dönen satır 84'ten 82'ye düştü. Tarayıcı aynı belgeyi korudu. Panelde sürüm 4 ile tek `class_save_v1` çalıştı ve güncel ders adı geri okundu. Yerel süreler adıma göre arttı veya azaldı.
 
 Development'ta önceden ayrılmış sentetik test sahibiyle güncel kaynak beş ekranı, geri/ileriyi, 20 öğelik ikinci üye sayfasını ve üye özetini tamamladı. Başlangıç kaynağında `people_list_v1`, her iki kaynakta Stüdyo açılışındaki bazı okumalar `503 TEMPORARY_FAILURE` döndürdü. Canlı süreler için sağlıklı önce/sonra çifti bekleniyor. Tek yazma ve sonuç okuması yerel fixture'da çalıştırıldı. [C-ortak kabulü](remaining-work.md#router-query-birlesik)
+
+Üyeler araması, uygulanan arama metni değiştiğinde ilk cursor'a döner. İlk açılış ve yalnız boşluk değişiklikleri mevcut sayfayı ve seçimi korur. [WF04 tarayıcı regresyonu](../e2e/auth-people-summary.spec.ts)
 
 ## Devam
 
