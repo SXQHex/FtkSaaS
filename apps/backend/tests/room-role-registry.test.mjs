@@ -116,6 +116,10 @@ test('Room configuration and scoped role reads through real Auth/API',async t=>{
   const all=await list(owner);assert(all.items.some(x=>x.id===orgManager.grant.primary_id));assert(all.items.some(x=>x.id===remote.grant.primary_id));assert(Number.isFinite(Date.parse(all.as_of)));
   for(const item of all.items)assert.equal(item.subscriber_number,(await rows('select private.subscriber_number($1,$2) n',[org,item.person_id]))[0].n);
   assert.deepEqual((await list(orgManager.u)).items,all.items);
+  const withNames=await list(owner,{include_person_display_names:true});
+  const person=await must(owner,'person_get_v1',{org_id:org,person_id:instructor.p});
+  assert.equal(withNames.items.find(x=>x.person_id===instructor.p).person_display_name,person.display_name);
+  assert.deepEqual(withNames.items.map(({person_display_name,...assignment})=>assignment),all.items);
   const scoped=await list(manager.u);assert(scoped.items.length>0);assert(scoped.items.every(x=>x.scope_center_id===center));
   assert(!(await list(manager.u,{person_id:remote.p})).items.length);
   await fail('roles_list_v1',{center_id:other,page:{}},'FORBIDDEN',manager.u);
@@ -140,6 +144,7 @@ test('Room configuration and scoped role reads through real Auth/API',async t=>{
   assert.deepEqual(ids,expected);assert.equal(new Set(ids).size,ids.length);
   const first=await list(owner,{page:{limit:1}});assert(first.next_cursor);
   await fail('roles_list_v1',{center_id:null,page:{cursor:first.next_cursor},person_id:student.p},'VALIDATION_FAILED');
+  await fail('roles_list_v1',{center_id:null,page:{cursor:first.next_cursor},include_person_display_names:true},'VALIDATION_FAILED');
   await fail('roles_list_v1',{center_id:null,page:{cursor:first.next_cursor}},'VALIDATION_FAILED',manager.u);
   await fail('roles_list_v1',{center_id:null,page:{cursor:'bad'}},'VALIDATION_FAILED');
   await fail('roles_list_v1',{center_id:null,page:{sort:'display_name_asc'}},'VALIDATION_FAILED');

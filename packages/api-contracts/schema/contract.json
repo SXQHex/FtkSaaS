@@ -3719,6 +3719,9 @@
         "account_access_granted": {
           "type": "boolean",
           "description": "True only for this active assignment bound to its matching active verified account link and active confirmed, nondeleted, nonbanned Auth account. No session/token/account identifiers; commands recheck current authority."
+        },
+        "person_display_name": {
+          "$ref": "#/$defs/Text"
         }
       },
       "required": [
@@ -4273,6 +4276,9 @@
         },
         "self_summary": {
           "$ref": "#/$defs/ReservationSelfSummary"
+        },
+        "person_display_name": {
+          "$ref": "#/$defs/Text"
         }
       },
       "required": [
@@ -5628,6 +5634,9 @@
         },
         "active_registration_count": {
           "$ref": "#/$defs/Count"
+        },
+        "venue_room_name": {
+          "$ref": "#/$defs/Text"
         }
       },
       "required": [
@@ -8613,6 +8622,10 @@
         },
         "state": {
           "$ref": "#/$defs/RecordState"
+        },
+        "include_person_display_names": {
+          "type": "boolean",
+          "description": "Include the canonical display name for returned rows only when the caller can independently read that person in the request scope."
         }
       },
       "required": [
@@ -11648,6 +11661,14 @@
         "include_self_summary": {
           "type": "boolean",
           "description": "For the caller’s own reservations in the returned page, include session title and interval, final attendance and the reservation cancellation policy."
+        },
+        "reservation_id": {
+          "$ref": "#/$defs/FtkUuid",
+          "description": "Filter by the exact reservation identity within the existing schedule scope and all other supplied filters."
+        },
+        "include_person_display_names": {
+          "type": "boolean",
+          "description": "Include the canonical display name for returned rows only when the caller can independently read that person in the request scope."
         }
       },
       "required": [
@@ -15026,6 +15047,10 @@
         },
         "page": {
           "$ref": "#/$defs/Page"
+        },
+        "include_person_display_names": {
+          "type": "boolean",
+          "description": "Include the canonical display name for returned rows only when the caller can independently read that person in the request scope."
         }
       },
       "required": [
@@ -26610,6 +26635,10 @@
         "include_payment_summary": {
           "type": "boolean",
           "default": false
+        },
+        "include_management_labels": {
+          "type": "boolean",
+          "description": "Add the internal room name only with existing room directory authority and duty names only with independent person read authority."
         }
       },
       "required": [
@@ -26876,6 +26905,9 @@
               "type": "null"
             }
           ]
+        },
+        "person_display_name": {
+          "$ref": "#/$defs/Text"
         }
       },
       "required": [
@@ -27201,15 +27233,56 @@
         },
         "preparation_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "selection": {
+          "type": "object",
+          "properties": {
+            "event_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "person_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "registration_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [
+            "event_id",
+            "person_id"
+          ],
+          "additionalProperties": false,
+          "description": "Discover a readable preparation by event and canonical person. Select an exact linked registration when supplied, otherwise the open preparation."
         }
       },
       "required": [
         "client_api_version",
         "request_id",
-        "org_id",
-        "preparation_id"
+        "org_id"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "required": [
+            "preparation_id"
+          ],
+          "not": {
+            "required": [
+              "selection"
+            ]
+          }
+        },
+        {
+          "required": [
+            "selection"
+          ],
+          "not": {
+            "required": [
+              "preparation_id"
+            ]
+          }
+        }
+      ]
     },
     "Success_event_payment_prepare": {
       "type": "object",
@@ -46177,6 +46250,12 @@
               "type": "null"
             }
           ]
+        },
+        "person_display_name": {
+          "$ref": "#/$defs/Text"
+        },
+        "assigned_display_name": {
+          "$ref": "#/$defs/Text"
         }
       },
       "required": [
@@ -100618,6 +100697,12 @@
     },
     "uuid_field_map": [
       {
+        "path": "#/$defs/Request_reservation_list/properties/reservation_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/ConfigurationScope/properties/center_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -110332,6 +110417,24 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Request_event_payment_get/properties/selection/properties/event_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_event_payment_get/properties/selection/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_event_payment_get/properties/selection/properties/registration_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Success_event_payment_prepare/properties/trace_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -118898,7 +119001,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 220,
+      "migration_count": 221,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

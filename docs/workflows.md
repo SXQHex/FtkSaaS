@@ -44,6 +44,8 @@ Hesap kimliği, native provider ve oturum komutlarının alan/sürüm ayrıntıl
 
 ## WF02
 
+`roles_list_v1(include_person_display_names:true)` görünür atama sayfasına `person_display_name` ekleyebilir. Ad, aynı organizasyon ve istek merkeziyle bağımsız `person_get_v1` okuması izinliyse canonical kayıttan gelir. Bu seçenek cursor kapsamına dahildir.
+
 Kesin merkez okumasında `centers_list_v1(center_id,page)` mevcut görünürlükle tek satır, saat dilimi ve sürüm döndürür. Erişilemeyen görünürlük kapsamı boş kalır. Ekip için `management_state_get_v1` üzerinden `permission_set_v1` seçicisinde `key:{person_id,permission_summary:true}` kullanılır. Dönen kişi canonical kimliktir. `versions` yazmanın kişi sürümünü, `permission_overrides` kayıtlı seçimi ve varsa override sürümünü taşır. `effective_staff_grant` canlı personel grant kontrolünün sonucudur. Her komut kendi ek plan, rol ve politika koşullarını uygular.
 
 **İlk plan keşfi.** Platform yetkilisi kuruluş veya ilk stüdyo talebi için `platform_directory_get_v1(view:initial_plans,page)` ile her plan adı, dönem ve para birimi için yürürlükteki son sürümü okur. Dönen sürüm kimliği `organization_create_v1.initial_plan_id` girdisidir. Kuruluş komutunun plan ve doğrulanmış hesap kontrolleri geçerlidir.
@@ -222,6 +224,8 @@ Canlı original writer preflight/abonelik/plan/CM ve kaynak satışın org/merke
 **Hak hareket defteri:** `entitlements_get_v1(person_id,center_id,ledger_sale_id,ledger_page)` yalnız aynı native rights sonucunda zaten görünen bir satışın `movements` sayfasını ekler. İki ledger alanı birlikte verilir; süreli satış için mevcut include_timed_rights/F16 gerekir. items içindeki tarih/tür/miktar, `balance_delta`, previous_id ve rezervasyon/etkinlik kaydı/satış kaynağı gerçek append-only hareketlerden gelir. Reserve/release miktarı bir hold hareketidir; pool balance_delta sıfır olabilir. Consume ve ona bağlı reverse ayrı satırlardır. Ledger bakiyenin kendisi veya audit_list değildir; ek audit yetkisi verilmez. created_at_asc cursor/limit≤200 ve kişi/satış/merkez bağı korunur; ledger alanları yoksa eski hak özeti aynıdır.
 
 ## WF06
+
+`reservation_list_v1(reservation_id,page)` mevcut seans ve kişi kapsamını kesin rezervasyon kimliğiyle kesiştirir. Okuma yetkisi varsa yanıt tek rezervasyonu ve ona bağlı `session_id` değerini içerir. Özel ders onay yanıtı kaybolduğunda aynı anahtarla `operation_status_get_v1`, kesin talep ayrıntısındaki `reservation_id`, kesin rezervasyon ve `session_get_v1` sırasıyla taze sonuç okunabilir. `include_person_display_names:true` yalnız izinli roster satırlarında bağımsız kişi okuyucusunun canonical adını ekler. İki seçenek de cursor kapsamına dahildir.
 
 **Öğrencinin yeni ders keşfi (W1-BE-20):** `calendar_get_v1(org_id,center_id,interval,page:{limit?,cursor?,sort:starts_at_asc},member_discovery:true)` yalnız o merkezde canlı öğrencilik ilişkisi olan native self aktöre açıktır. Normal takvim ve session_get görünürlüğü değişmez. Seçili UTC aralıkla kesişen, gelecekte başlayan planlı grup ve özel dersler; canlı merkez/plan, Starter seçili öğrenci/disiplin/oda/eğitmen ve mevcut writer’ın kapalı-sınıf erişim sınırıyla **limitten önce** süzülür. Kapalı sınıfta geniş org kredisi yeterli değildir; mevcut yazarın aradığı o sınıfa özel satın alınmış kapsam gerekir. Doluluk veya henüz açılmamış kayıt penceresi listeyi garanti rezervasyon listesine dönüştürmez. Public slug/yayın ya da yönetim katalogları kullanılmaz.
 
@@ -504,6 +508,8 @@ Yayımlanmış anlaşma zinciri immutable'dır; yerine geçen sürüm açık pre
 
 ## WF15
 
+`event_get_v1(include_management_labels:true)` görünür görev satırlarına bağımsız organizasyon kapsamlı kişi okuması izin veriyorsa `person_display_name` ekler. İç mekânın `venue_room_name` alanı mevcut merkez oda dizini yetkisini ister. `event_payment_get_v1` hazırlık kimliğini veya `selection:{event_id,person_id,registration_id?}` seçicisini kabul eder. Kayıt kimliği yoksa açık hazırlık, varsa aynı kişi ve etkinliğe bağlı kesin hazırlık okunur. Mevcut CM, tahsilat ve kendine ait hazırlık kuralları geçerlidir. Sonuç yokluğu `NOT_FOUND`, yetki reddi `FORBIDDEN` olarak döner.
+
 Yönetim etkinlik dizini: `event_list_v1(center_id,interval,discipline_id?,query?,status?,include_summary:true,page)` kullanır. `query` boş olmayan, kırpılmış başlığın büyük/küçük harfsiz literal alt dizisidir; `status` all/published/draft/occurred/cancelled olup saatten türetilmez. Başlık, disiplin, aralık kesişimi ve native görünürlük limitten önce; durum da cursor/limitten önce uygulanır. Cursor aktör/hesap, org/merkez, aralık, disiplin, arama, durum ve özet seçimine bağlıdır; filtre değişince ilk sayfaya dönülür. `as_of` sayfalama damgasıdır, değişmez veri snapshot'ı değildir; canlı yetki her çağrıda denetlenir. Bu seçenekler yoksa eski okuyucu ve DTO korunur.
 
 Özet açık merkez ve CM/organizasyon okuyucusu ister; F29 yanında mevcut finance_get özellik kapıları F06/F19 korunur. `summary` aynı yetkili merkez/aralık/disiplin/başlık kümesinde, seçili durum ve sayfadan bağımsız published/draft/occurred/cancelled sayılarını ve published etkinliklerin aktif kayıt sayısını verir. Yönetim satırındaki `active_registration_count` gerçek aktif kayıt sayısıdır. `pending_payments` yalnız published etkinliklere gerçekten kaydolmuş kişilerin bağlı borçlarının güncel kalanını para birimi bazında verir; iptal edilmiş kaydın halen borcu varsa dahildir. Kesin kayda dönüşmemiş ödeme hazırlığı hariçtir; bu alan bütün etkinlik nakit akışı/borç toplamı değildir. Pozitif bedelli olup gerçek borç bağı bulunamayan kayıt `unresolved_payment_registrations` sayılır; bilinmeyen bakiye sıfır sayılmaz. Sayfa satırlarıyla KPI hesaplanmaz; öz/atanmış eğitmen veya salt tahsilat yetkisinden yönetim özeti açılmaz.
@@ -525,6 +531,8 @@ Pakete bağlı kredi tüketmeyen katılım aynı etkinlikte `terms.package_usage
 `EventRegistrationView.package_eligible` canlı koşuldur; hak kaybı kayıt veya yeri otomatik iptal etmez. `package_eligible_at_attendance` yalnız son açık yoklama/düzeltme anının sonucudur. Uygun olmayan attended komutu reddedilir. Fiilen gerçekleşmiş uygunsuz katılımı CM gerekçeyle `record_ineligible_attendance=true` kullanarak kaydedebilir; false uygunluk işareti kalır ve ücretsiz hak onayı verilmez. Sonradan paket almak bu geçmiş sonucu değiştirmez; gerekçeli yoklama düzeltmesi açık işlemdir.
 
 ## WF16
+
+`crm_followup_list_v1(include_person_display_names:true)` mevcut takip sayfasındaki kişi ve varsa sorumlu için `person_display_name` ve `assigned_display_name` alanlarını ekleyebilir. Her alan aynı istek kapsamındaki canlı kişi okuma yetkisini gerektirir. Seçenek mevcut cursor kapsamına dahildir.
 
 **CRM aşama ve deneme sayaçları.** `leads_list_v1(include_pipeline_summary:true)` açık bir merkez ve canlı CRM pipeline yetkisiyle `pipeline_summary` döndürür. Arama, sorumlu ve görünürlük filtreleri uygulanır. Seçili aşama ve sayfa boyutu sayaçları daraltmaz. Katalogdaki boş aşamalar sıfır, aşamasız adaylar null anahtar ile döner. Deneme sayaçları farklı aday bazında açık adaya ait süresi geçmemiş teklif, aktif/tamamlanmış kayıt ve tamamlanmış yoklamadaki fiilî katılımı ayrı ayrı gösterir.
 

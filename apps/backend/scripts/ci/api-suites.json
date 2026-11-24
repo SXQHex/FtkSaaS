@@ -370,7 +370,7 @@
         {
           "line": 417,
           "path": "apps/backend/tests/event-directory-finance-acceptance.mjs",
-          "sha256": "362c947d82b73b4c1e9e65364ebb5eb54bc4d26d9b86158387c7aacf8f68c3ef"
+          "sha256": "be69a9ef078c0fe5b1123152c2ec5196e799dbac748cc7ba21e28dfb54c27479"
         },
         {
           "line": 418,
@@ -520,7 +520,7 @@
     },
     {
       "path": "apps/backend/tests/p01-lesson-requests.test.mjs",
-      "sha256": "ea270c4aece1ce7d29838d27a98427a5068763c864e1ff7abb79e5b0448cbf47",
+      "sha256": "0f43b8602e4df6a81321357d467d8eab93493c123ad520c2c923ce7181d658f3",
       "shared": [
         [
           3,
@@ -533,7 +533,7 @@
           "ranges": [
             [
               9,
-              160
+              176
             ]
           ]
         }
@@ -656,7 +656,7 @@
         {
           "line": 380,
           "path": "apps/backend/tests/crm-followup-projections-acceptance.mjs",
-          "sha256": "49d763d43cfb80f93cd92d2c612b349713335939e16b02b95a0344d40b263aae"
+          "sha256": "ea9f47c2dd96f0c4f9d28b6c39a03647e61976f56e3c73f9b5afd906c22c8d3e"
         },
         {
           "line": 381,
@@ -1235,7 +1235,7 @@
     },
     {
       "path": "apps/backend/tests/room-role-registry.test.mjs",
-      "sha256": "e9973f414975015eb68a7bf851a2a3795ef9080e848ef8f21e96220ba0d8504f",
+      "sha256": "e30ffa45022e918d508d0a15eb1e42132e00a0f899f34188ab9a45154e545435",
       "shared": [
         [
           2,
@@ -1248,7 +1248,7 @@
           "ranges": [
             [
               10,
-              310
+              315
             ]
           ]
         }
@@ -1260,12 +1260,12 @@
           "sha256": "c751eb4f6f337cc95bef8227a9e4f38d43e296e27d49ffbdfe2fae1b650eb7ab"
         },
         {
-          "line": 311,
+          "line": 316,
           "path": "apps/backend/tests/studio-setup-status-acceptance.mjs",
           "sha256": "f670e7043c585cb24b060a527c7fd2e3244dfabbbdd4d7414917bb59d727c460"
         },
         {
-          "line": 312,
+          "line": 317,
           "path": "apps/backend/tests/role-directory-filter-acceptance.mjs",
           "sha256": "f46c75b3f7664a0daf5a00c89690d74d03575373166e3f88b335b957a975a9a1"
         }

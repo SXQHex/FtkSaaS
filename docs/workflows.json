@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "098d60ca2ef22aca15a7e5bb0f94ce9903c5cea0a374a5fb66808cecc304f913",
-        "reason": "XREQ-072 paket ve SHA doğrulaması ile XREQ-073 operatör testi ve API kabul envanteri birlikte incelendi."
+        "fingerprint": "53590365591065e9c166ae9cb31ac93cd9c637e8025032bd40c955a7912b1045",
+        "reason": "Ortak DTO oluşturucuları yeni salt-okunur seçicileri ve isteğe bağlı alanları doğrular. Native kimlik, hata zarfı ve transport kuralları korunur."
       }
     },
     {
@@ -521,7 +521,8 @@
         "apps/backend/supabase/migrations/20261119170000_shared_center_authorization.sql",
         "apps/backend/supabase/migrations/20261119170002_sql_list_pagination.sql",
         "apps/backend/supabase/migrations/20261124012000_share_organization_read_locks.sql",
-        "apps/backend/supabase/migrations/20261124013000_scoped_read_projections.sql"
+        "apps/backend/supabase/migrations/20261124013000_scoped_read_projections.sql",
+        "apps/backend/supabase/migrations/20261124013200_exact_management_readbacks.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -549,8 +550,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "7fc2dc31f556f508692f0be0f07678f4d41f9f47eb4cd6f77bb0d3e89b1d1d7b",
-        "reason": "XREQ-073 merkez kabulü seçicili ve seçicisiz okumayı doğrular. Canlı rol iptali yalnız seçili merkezi etkiler ve yeniden atama erişimi geri getirir."
+        "fingerprint": "bfea39d8fa8a15f91da5cf2e70e7a83f73a81261dc0c0f0e735c7711cf28da67",
+        "reason": "Ekip atama sayfasındaki canonical ad mevcut bağımsız kişi yetkisini ve istek merkezini kullanır. Mevcut atama görünürlüğü ve cursor sözleşmesi korunur."
       }
     },
     {
@@ -1014,7 +1015,8 @@
         "apps/backend/database/lesson-request-student-note.sql",
         "apps/backend/supabase/migrations/20261118211500_lesson_request_student_note.sql",
         "apps/backend/database/reservation-selected-sale-scope.sql",
-        "apps/backend/supabase/migrations/20261120005843_reservation_selected_sale_scope.sql"
+        "apps/backend/supabase/migrations/20261120005843_reservation_selected_sale_scope.sql",
+        "apps/backend/supabase/migrations/20261124013200_exact_management_readbacks.sql"
       ],
       "operations": [
         "lesson_request_create_v1",
@@ -1029,8 +1031,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "793389ca361ba85e15742982645edfc4d7bef011b56c2d31fbfd1d6f56610c4e",
-        "reason": "XREQ-073 paylaşılan sözleşme ve test kaynağı incelendi. Bu akışın komutları, mevcut alanları ve yetki koşulları aynı."
+        "fingerprint": "4abdfe2563698a364fd4748c4ef16caee407732227e3078f05872f4abf040742",
+        "reason": "Kesin rezervasyon seçimi mevcut schedule kapsamını kesiştirir. Makbuz, talep sonucu ve rezervasyon üzerinden yeni seans kimliği doğrulanır."
       }
     },
     {
@@ -1805,7 +1807,8 @@
         "apps/backend/database/settings-sharing-consent.sql",
         "apps/backend/database/settings-sharing-events.sql",
         "apps/backend/database/event-directory-finance.sql",
-        "apps/backend/supabase/migrations/20261116210335_event_directory_finance.sql"
+        "apps/backend/supabase/migrations/20261116210335_event_directory_finance.sql",
+        "apps/backend/supabase/migrations/20261124013200_exact_management_readbacks.sql"
       ],
       "operations": [
         "event_save_v1",
@@ -1828,8 +1831,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "47caeb0ae7e358b98b1e7242a59b5eacb9778b2461b7906f817c0058ec51e371",
-        "reason": "Reviewed platform console code and the updated runtime and serial acceptance evidence for existing authority."
+        "fingerprint": "c07809aea48f5e0cfba2ee886b97a2ccd013750ff872a23074a743546d327823",
+        "reason": "Etkinlik etiketleri ve hazırlık seçicisi yalnız mevcut oda, kişi ve ödeme okuyucularının görünürlüğünde sonuç verir. Ödeme yazıcısı ayrıdır."
       }
     },
     {
@@ -1889,7 +1892,8 @@
         "apps/backend/supabase/migrations/20261117014803_crm_activity_discovery.sql",
         "apps/backend/supabase/migrations/20261117014805_management_work_discovery.sql",
         "apps/backend/database/crm-funnel-and-directory.sql",
-        "apps/backend/supabase/migrations/20261118212300_crm_funnel_and_directory.sql"
+        "apps/backend/supabase/migrations/20261118212300_crm_funnel_and_directory.sql",
+        "apps/backend/supabase/migrations/20261124013200_exact_management_readbacks.sql"
       ],
       "operations": [
         "leads_list_v1",
@@ -1904,8 +1908,8 @@
         "management_work_list_v1"
       ],
       "review": {
-        "fingerprint": "94c30a06fd9fa62397635a5ee27f7b78711d316097abae03f5caa0891548dc51",
-        "reason": "XREQ-073 paylaşılan sözleşme ve test kaynağı incelendi. Bu akışın komutları, mevcut alanları ve yetki koşulları aynı."
+        "fingerprint": "72b344fae2cf50b30641e26fc638312684c9d94f6cd92975b9538a28d308d89f",
+        "reason": "Mevcut takip sayfasına bağımsız kişi okuyucusunun izin verdiği canonical kişi ve sorumlu adları eklenir. CRM yetkisi ve dönem kapsamı korunur."
       }
     },
     {
