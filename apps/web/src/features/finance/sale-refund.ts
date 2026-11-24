@@ -1,3 +1,4 @@
+import { readFinanceOperationReceipt } from "./finance-receipt";
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { BackendError } from "../../lib/backend";
@@ -117,22 +118,8 @@ export async function writeSaleRefund(intent: SaleRefundIntent) {
   z.uuid().parse(result.primary_id);
   return result;
 }
-export async function readSaleRefundReceipt(intent: SaleRefundIntent) {
-  const backend = await scopedBackend(intent.scope),
-    result = await backend.call("operation_status_get_v1", {
-      client_api_version: 1,
-      request_id: uuidv7(),
-      org_id: intent.scope.orgId,
-      operation: intent.operation,
-      key: intent.request.operation_key,
-    });
-  if (
-    result.operation !== intent.operation ||
-    result.key !== intent.request.operation_key ||
-    (result.result_reference && result.result_reference.type !== "sales")
-  )
-    throw new Error("SALE_REFUND_RECEIPT_UNAVAILABLE");
-  return result;
+export function readSaleRefundReceipt(intent: SaleRefundIntent) {
+  return readFinanceOperationReceipt(intent);
 }
 export async function readSaleRefundResult(intent: SaleRefundIntent, id?: string) {
   // The native ACK references a refund fact, not a new sale or a cash movement.

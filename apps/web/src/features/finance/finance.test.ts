@@ -167,9 +167,25 @@ it("rereads the exact acknowledged root movement across native cursors and verif
   call.mockResolvedValue({
     operation: intent.operation,
     key: intent.request.operation_key,
+    status: "succeeded",
+    result_available: true,
     result_reference: { type: "debts", id: cashId },
   });
   await expect(readCollectionReceipt(intent)).rejects.toThrow("FINANCE_RECEIPT_UNAVAILABLE");
+});
+
+it("rejects malformed native receipt status and financial readback shape", async () => {
+  const intent = await collectionIntent(scope, selection, "Europe/Istanbul", draft());
+  call.mockResolvedValueOnce({
+    operation: intent.operation,
+    key: intent.request.operation_key,
+    status: "succeeded",
+    result_available: "true",
+    result_reference: { type: "cash_movements", id: cashId },
+  });
+  await expect(readCollectionReceipt(intent)).rejects.toThrow("FINANCE_RECEIPT_UNAVAILABLE");
+  call.mockResolvedValueOnce({ ...source(), movements: { items: false } });
+  await expect(readCollectionResult(intent, cashId)).rejects.toThrow("FINANCE_SOURCE_UNAVAILABLE");
 });
 
 it("accepts RFC3339 offset timestamps from the native financial projection", async () => {

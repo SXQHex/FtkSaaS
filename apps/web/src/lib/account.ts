@@ -1,12 +1,30 @@
 import { v7 as uuidv7 } from "uuid";
+import { z } from "zod";
 import { getBackend, queryBackendRead } from "./backend";
 
-export function readAccount(
+const platformScope = z.object({
+  organizations: z.boolean(),
+  organization_create: z.boolean(),
+  owner_manage: z.boolean(),
+  payment_verify: z.boolean(),
+  grace_extend: z.boolean(),
+  organization_suspend: z.boolean(),
+  operator_manage: z.boolean().optional(),
+});
+
+const actor = z.object({
+  id: z.uuid(),
+  state: z.enum(["active", "pending", "deletion_pending", "deleted"]),
+  display_name: z.string(),
+  platform_scope: platformScope.optional(),
+});
+
+export async function readAccount(
   includePlatformScope = false,
   accessToken?: string,
   signal?: AbortSignal,
 ) {
-  return queryBackendRead(
+  const account = await queryBackendRead(
     getBackend(accessToken),
     "account_get_v1",
     {
@@ -16,4 +34,6 @@ export function readAccount(
     },
     signal,
   );
+  if (!actor.safeParse(account).success) throw new Error("ACCOUNT_PROJECTION_INVALID");
+  return account;
 }

@@ -1,3 +1,4 @@
+import { requireAppOrigin } from "../../lib/public-config";
 import { getSupabaseClient } from "../../lib/supabase";
 import type { QueryClient } from "@tanstack/react-query";
 import { queryClient } from "../../lib/query-client";
@@ -25,8 +26,7 @@ export async function loginWithPassword(
 }
 
 export async function loginWithGoogle() {
-  const origin = import.meta.env.VITE_APP_ORIGIN?.trim();
-  if (!origin) throw new Error("APP_ORIGIN_REQUIRED");
+  const origin = requireAppOrigin();
   const { error } = await getSupabaseClient().auth.signInWithOAuth({
     provider: "google",
     options: { redirectTo: `${origin}/auth/callback` },

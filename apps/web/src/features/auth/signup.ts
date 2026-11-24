@@ -1,3 +1,4 @@
+import { requireAppOrigin } from "../../lib/public-config";
 import type { QueryClient } from "@tanstack/react-query";
 import type { Session } from "@supabase/supabase-js";
 import { checkSignup } from "../../lib/public-gateway";
@@ -17,8 +18,7 @@ export async function registerAccount(
   values: { name: string; email: string; password: string },
   queries: QueryClient = queryClient,
 ) {
-  const origin = import.meta.env.VITE_APP_ORIGIN?.trim();
-  if (!origin) throw new Error("APP_ORIGIN_REQUIRED");
+  const origin = requireAppOrigin();
   const check = await checkSignup(values.email);
   if (check.status === "account_exists") throw new Error("ACCOUNT_EXISTS");
   if (check.status !== "available") throw new Error("SIGNUP_CHECK_INVALID");
