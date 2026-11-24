@@ -100,6 +100,7 @@ beforeEach(() => {
         operation: r.operation,
         key: r.key,
         status: "succeeded",
+        result_available: true,
         result_reference: { type: "cash_movements", id: id(9) },
       };
     throw Error(`UNEXPECTED_API:${op}`);
@@ -271,6 +272,7 @@ it("does not acknowledge another collection's receipt or a pending operation", a
     operation: intent.operation,
     key: intent.request.operation_key,
     status: "succeeded",
+    result_available: true,
     result_reference: { type: "cash_movements", id: id(99) },
   });
   await expect(readRegisteredCollectionResult(intent, id(9))).rejects.toThrow(
@@ -280,6 +282,8 @@ it("does not acknowledge another collection's receipt or a pending operation", a
     operation: intent.operation,
     key: intent.request.operation_key,
     status: "in_progress",
+    result_available: false,
+    result_reference: null,
   });
   await expect(readRegisteredCollectionResult(intent, id(9))).rejects.toThrow(
     "EVENT_COLLECTION_RECEIPT_UNAVAILABLE",
@@ -299,6 +303,7 @@ it("propagates source read failures after receipt acknowledgment instead of repe
       operation: intent.operation,
       key: intent.request.operation_key,
       status: "succeeded",
+      result_available: true,
       result_reference: { type: "cash_movements", id: id(9) },
     })
     .mockRejectedValueOnce(Error("SERVICE_UNAVAILABLE"));

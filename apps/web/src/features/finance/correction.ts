@@ -1,3 +1,4 @@
+import { readFinanceOperationReceipt } from "./finance-receipt";
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
@@ -202,22 +203,8 @@ export async function writeCorrection(intent: CorrectionIntent) {
   z.uuid().parse(result.primary_id);
   return result;
 }
-export async function readCorrectionReceipt(intent: CorrectionIntent) {
-  const backend = await scopedBackend(intent.scope);
-  const receipt = await backend.call("operation_status_get_v1", {
-    client_api_version: 1,
-    request_id: uuidv7(),
-    org_id: intent.scope.orgId,
-    operation: intent.operation,
-    key: intent.request.operation_key,
-  });
-  if (
-    receipt.operation !== intent.operation ||
-    receipt.key !== intent.request.operation_key ||
-    (receipt.result_reference && receipt.result_reference.type !== "cash_movements")
-  )
-    throw new Error("FINANCE_RECEIPT_UNAVAILABLE");
-  return receipt;
+export function readCorrectionReceipt(intent: CorrectionIntent) {
+  return readFinanceOperationReceipt(intent);
 }
 export async function readCorrectionResult(
   intent: CorrectionIntent,

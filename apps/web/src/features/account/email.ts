@@ -1,8 +1,8 @@
+import { requireAppOrigin } from "../../lib/public-config";
 import { getSupabaseClient } from "../../lib/supabase";
 
 function callbackUrl() {
-  const origin = import.meta.env.VITE_APP_ORIGIN?.trim();
-  if (!origin) throw new Error("APP_ORIGIN_REQUIRED");
+  const origin = requireAppOrigin();
   return `${origin}/auth/callback`;
 }
 export async function requestEmailChange(email: string) {

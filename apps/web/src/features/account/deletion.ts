@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { BackendError, createBackend } from "../../lib/backend";
+import { BackendError, getBackend } from "../../lib/backend";
 import { getSupabaseClient } from "../../lib/supabase";
 import type { Preview } from "@ftksaas/api-contracts";
 import { MfaRequiredError, retirePreviousPasswordSession } from "./fresh-session";
@@ -44,11 +44,7 @@ async function sessionFor(actor?: string) {
   return data.session;
 }
 function backendFor(token: string) {
-  return createBackend({
-    functionsUrl: `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/backend-v1`,
-    publishableKey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-    getAccessToken: async () => token,
-  });
+  return getBackend(token);
 }
 export function prepareDeletion(actor: string, accountId: string, preview: Preview) {
   if (preview.blockers.length) throw new Error("DELETION_BLOCKED");

@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
-import { BackendError, createBackend } from "../../lib/backend";
+import { BackendError, getBackend } from "../../lib/backend";
 import { getSupabaseClient } from "../../lib/supabase";
 
 const storageKey = "ftk-invitation";
@@ -122,11 +122,7 @@ async function requireIntent(intent: AcceptanceIntent) {
   if (!data.session) throw new Error("INVITE_AUTH_REQUIRED");
   // Bind both calls to this invocation's native bearer; never re-read a different actor mid-flight.
   const token = data.session.access_token;
-  const backend = createBackend({
-    functionsUrl: `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/backend-v1`,
-    publishableKey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-    getAccessToken: async () => token,
-  });
+  const backend = getBackend(token);
   const account = await backend.call("account_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
