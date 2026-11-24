@@ -223,7 +223,7 @@ export function useSettingsDocument({
   function current(field: keyof SettingsDocumentPatch): string | boolean | null | undefined {
     if (!source) return undefined;
     if (Object.prototype.hasOwnProperty.call(draft, field)) return draft[field];
-    const value = values && Reflect.get(values, field);
+    const value: unknown = values && Reflect.get(values, field);
     return typeof value === "number"
       ? String(value)
       : typeof value === "string" || typeof value === "boolean" || value === null
@@ -359,15 +359,16 @@ export function useSettingsDocument({
         Object.fromEntries(
           Object.entries(draft)
             .filter(([field]) => keys.some((key) => key === field))
-            .map(([field, value]) => [
+            .map(([field, value]): [string, unknown] => [
               field,
               field in reminderChoices || field === "program_duration_minutes"
                 ? Number(value)
                 : value,
             ])
-            .filter(
-              ([field, value]) => value !== Reflect.get(source.document.values, field as string),
-            ),
+            .filter(([field, value]) => {
+              const currentValue: unknown = Reflect.get(source.document.values, field);
+              return value !== currentValue;
+            }),
         ),
       );
     } catch {

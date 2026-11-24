@@ -299,10 +299,14 @@ export function observeQueryAccessFailures(queries: QueryClient, actions: Access
       if (checking) actions.onChecking(false);
       checking = false;
     }
+    const { query } = event;
+    const queryKey: unknown = query.queryKey;
+    if (!Array.isArray(queryKey)) return;
+    const key: QueryKey = queryKey;
     if (event.type === "added") {
       // A selected workspace can be created with automatic-scope initialData.
       // Capture that previous authority before its first real backend success.
-      if (isWorkspaceProjection(event.query.queryKey)) {
+      if (isWorkspaceProjection(key)) {
         remember(event.query.queryHash, event.query.state.data as Workspace | undefined);
       }
       return;
@@ -313,10 +317,9 @@ export function observeQueryAccessFailures(queries: QueryClient, actions: Access
       return;
     }
     if (event.type !== "updated") return;
-    const query = event.query;
     if (event.action.type === "success") {
       handled.delete(query.queryHash);
-      if (!isWorkspaceProjection(query.queryKey)) return;
+      if (!isWorkspaceProjection(key)) return;
       const current = query.state.data as Workspace | undefined;
       const previous = authorities.get(query.queryHash);
       remember(query.queryHash, current);
@@ -335,14 +338,14 @@ export function observeQueryAccessFailures(queries: QueryClient, actions: Access
           if (
             terminated ||
             !knownAccountId(queries) ||
-            cache.find({ queryKey: query.queryKey, exact: true }) !== query ||
+            cache.find({ queryKey: key, exact: true }) !== query ||
             query.state.data !== current
           )
             return;
           // An externally revoked role must invalidate every scoped feature,
           // including cached history pages and still pending responses.
           clearPrivateQueries(queries);
-          queries.setQueryData(query.queryKey, current);
+          queries.setQueryData(key, current);
           await actions.invalidateRoute();
         });
       }
@@ -357,8 +360,7 @@ export function observeQueryAccessFailures(queries: QueryClient, actions: Access
       if (handled.has(query.queryHash)) return;
       handled.add(query.queryHash);
     }
-    const key = query.queryKey;
-    const error = query.state.error;
+    const error: unknown = query.state.error;
     const accountId = kind === "permission" ? knownAccountId(queries) : undefined;
     const organizationId = accountId ? workspaceOrganization(queries, accountId, key) : undefined;
     if (kind === "permission" && !organizationId) return;

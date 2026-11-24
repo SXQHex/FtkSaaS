@@ -4,6 +4,15 @@ import { v7 as uuidv7 } from "uuid";
 import { BackendError, queryBackendRead } from "../../lib/backend";
 import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
 import type { Page_NotificationView, RequestNotificationsList } from "@ftksaas/api-contracts";
+const summaryCount = z.number().int().nonnegative().safe();
+const inboxSummary = z.strictObject({
+  total: summaryCount,
+  unread: summaryCount,
+  pending: summaryCount,
+  completed: summaryCount,
+  informational: summaryCount,
+  unavailable: summaryCount,
+});
 export type InboxVisibility = NonNullable<RequestNotificationsList["visibility"]>;
 export type InboxFilter = "all" | "unread" | "todo" | "archived" | "deleted";
 export const inboxKey = (scope: ClientScope) =>
@@ -120,17 +129,10 @@ export async function readInbox(
     if (item.payload.body !== undefined) z.string().parse(item.payload.body);
   }
   if (options) {
-    if (!page.summary) throw new Error("INBOX_SUMMARY_UNAVAILABLE");
-    for (const value of Object.values(page.summary))
-      z.number().int().nonnegative().safe().parse(value);
-    if (
-      page.summary.unread > page.summary.total ||
-      page.summary.pending +
-        page.summary.completed +
-        page.summary.informational +
-        page.summary.unavailable !==
-        page.summary.total
-    )
+    const summary = inboxSummary.safeParse(page.summary);
+    if (!summary.success) throw new Error("INBOX_SUMMARY_UNAVAILABLE");
+    const { total, unread, pending, completed, informational, unavailable } = summary.data;
+    if (unread > total || pending + completed + informational + unavailable !== total)
       throw new Error("INBOX_SUMMARY_UNAVAILABLE");
     for (const item of page.items) {
       z.number().int().positive().safe().parse(item.version);
