@@ -35,12 +35,16 @@ test("shares Query, Router and live Form state in one development panel", async 
   await page.getByRole("button", { name: "Close TanStack Query", exact: true }).click();
   await page.getByRole("button", { name: "Close TanStack Router", exact: true }).click();
 
+  const panel = page.getByTestId("tanstack-devtools-panel");
+  // The Form event listeners mount with the lazy inspector, after its workbench tab opens.
+  await expect(
+    panel.getByRole("button", { name: "TANSTACK TanStack Form", exact: true }),
+  ).toBeVisible();
   const input = page.getByRole("textbox", { name: "Örnek metin", exact: true });
   await input.fill("ab");
   await page.getByRole("button", { name: "Örneği gönder", exact: true }).click();
   await expect(page.getByText("schema-example", { exact: true })).toBeVisible();
   await page.getByText("schema-example", { exact: true }).click();
-  const panel = page.getByTestId("tanstack-devtools-panel");
   await expect(panel.getByText("Form values", { exact: true })).toBeVisible();
   await expect(panel.getByText("Individual Fields", { exact: true })).toBeVisible();
   await expect(panel).toContainText('"text": "ab"');
