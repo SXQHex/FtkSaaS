@@ -925,13 +925,13 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 <a id="o06"></a>
 ### O06 — Bağımsız imha sicili
 
-- [ ] **Durum:** Kaynak ve yerel test hazır · **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
+- [ ] **Durum:** [Sicil ve anahtar rotasyonu yerel kabulü](00-FtkSaaS-yeni-sohbet-devir.md#o06-yerel-anahtar-rotasyonu) geçti, bağımsız ortam kabulü açık · **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
 - **Bağımlılık:** O04,O05
 - **Kabul:** İmzalı sicil gerçek imha sonucuna ve bağımsız güncel checkpoint/trust kaynağına bağlıdır.
 - **Sınır/olumsuz durum:** Sicil ve trust aynı eski backup ile geriye alınamaz; tamamlanmamış imha başarı yazmaz.
 - **Doğrulama senaryosu:** Eski/eksik/sahte kayıt ve replay; anahtar erişim/rotasyon/kalıcılık işletim kanıtı.
 - **Kaynak alanı:** erasure-register/guard kaynakları; restore test
-- **Kalan:** O04/O05’in gerçek imha makbuzunu bağımsız kalıcı sicile bağla. Aynı yedekle geriye alınamayan checkpoint kaynağını, yazma yetkisini ve anahtar rotasyonunu kabulde doğrula.
+- **Kalan:** O04/O05’in tamamlanmış imha makbuzunu bağımsız kalıcı sicile bağla. Aynı yedekle geriye alınamayan checkpoint’i, yazma yetkisini ve [anahtar rotasyonunun](remote-backend-setup.md#managed-restore-prosedürünün-sınırı) işletim ortamındaki kabulünü doğrula.
 
 <a id="o07"></a>
 ### O07 — Guard ile gerçek restore yükleyicisi

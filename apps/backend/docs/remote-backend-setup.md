@@ -165,6 +165,8 @@ Kaynak ve hedef ayrı ve açık tanımlanır; deneme hedefi izole olmalıdır. M
 
 Restore doğrulaması tablo içerik checksum’ları, etkin ACL (NULL için acldefault), RLS/policy ve fonksiyon owner/security-definer/config/EXECUTE karşılaştırmasını kapsar. Native kullanıcı gerçek girişle ve aynı UUID ile denenir; eski access token’ın farklı projede geçerliliği varsayılmaz. Edge aynı kabul edilmiş kaynaktan kurulur. Storage metadata ve bütün nesne baytları ayrı taşınıp checksum/erişimle doğrulanır. Scheduler/binding, gerçek iş yükü ve kesinti toparlanması ayrıca sınanır. Tek dosya veya idle worker deneyi bütün envanter kabulü değildir.
 
+Sicil imza anahtarını değiştirirken [sicil adaptörüne](../scripts/erasure-register.mjs) bağımsız güncel checkpoint’teki özet, sıra ve eski açık anahtarı ver. Yeni Ed25519 anahtar çiftini kullan. Adaptör mevcut kayıtları korur, sırayı bir artırır ve yeni imzalı dosyayı yazar. Dönen özet, sıra ve yeni açık anahtarı, bağımsız checkpoint’in eski özet ve sırası hâlâ eşleşiyorsa birlikte yayımla. Yayımlama tamamlanana kadar geri yükleme kapalı kalır. Yedekte taşınan eski checkpoint ile devam edilmez. `.pending` bulunduğunda veya yazar kilidi alındığında mevcut dosyayı elle değiştirmeden yetkili sicil kurtarma adımına dön.
+
 `auth.mfa_factors` history ve kimlik projeksiyon trigger’ları, private identity/contact tabloları owner/ACL ve purge envanterine dahildir. Google-link/TOTP intent ve fence katmanları kaldırılmıştır. Faktör secret/OTP/token loga veya uygulama audit’ine taşınmaz. Kaldırılmış özel account_password_transactions/reset trigger taslağı restore listesine eklenmez. RPO/RTO; hazırlık, veri, Auth, Edge, Storage, config ve worker geri dönüşünü kapsayan gerçek ölçüm ister.
 
 ## P08 kurulum kaydı
