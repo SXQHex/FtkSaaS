@@ -8,6 +8,8 @@ Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin te
 - [x] Canlı RPC gecikmesini ve kişi listesi organizasyon kilidi bekleyişini ölç. İncelenen okumalarda paylaşımlı satır kilidini ve yazma/okuma çakışmasını izole PostgreSQL'de doğrula. [Ölçüm ve kaynak kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#hosted-api-gecikmesi).
 **Backend takibi kapalı.** Development yeniden ölçümü ve istek bazında eşleştirme sınırı [gecikme kaydındadır](00-FtkSaaS-yeni-sohbet-devir.md#hosted-api-gecikmesi). Kullanıcı kararıyla ek tanı koşusu bu başlıktan çıkarıldı.
 
+**Yeni development olayı.** Stüdyo ve Üyeler okumalarında Edge 503, iç RPC 500 ve PostgreSQL statement timeout kanıtı [24 Kasım olay kaydında](00-FtkSaaS-yeni-sohbet-devir.md#development-503-studyo). Süre sınırını tüketen neden ve sağlıklı hosted tekrar açık.
+
 <a id="xreq-073"></a>
 ## XREQ-073 — M09 native okuma kapsamı
 
@@ -947,7 +949,7 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 <a id="o08"></a>
 ### O08 — DB/Auth/Storage tam geri dönüş
 
-- [ ] **Durum:** [Yerel tatbikat](00-FtkSaaS-yeni-sohbet-devir.md#o08-yerel-restore-kabulu) ve [ayrı hosted hedefte sentetik mantıksal geri yükleme](00-FtkSaaS-yeni-sohbet-devir.md#o08-hosted-sentetik-restore) geçti, tam yapılandırma kabulü açık · **Tür:** H · **Plan:** Tümü · **Özellik:** F33,F30
+- [ ] **Durum:** [İzole hosted DB/Auth/Storage geri yüklemesi](00-FtkSaaS-yeni-sohbet-devir.md#o08-hosted-sentetik-restore) ve [kişisel takvim yapılandırması](00-FtkSaaS-yeni-sohbet-devir.md#o08-hosted-takvim-konfigurasyonu) doğrulandı, tam yapılandırma kabulü açık · **Tür:** H · **Plan:** Tümü · **Özellik:** F33,F30
 - **Bağımlılık:** O07
 - **Kabul:** DB/migration/ACL/RLS, Auth UUID/giriş ve Storage bayt/izinleri aynı snapshotla geri döner.
 - **Sınır/olumsuz durum:** Tek SQL veya dosya restore bütün kabul değildir; kaynak hedef ayrıdır.
@@ -969,7 +971,7 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 <a id="o10"></a>
 ### O10 — Yük ve kurtarma hedeflerini ölç
 
-- [ ] **Durum:** [Yerel Business ön ölçümü ve Edge tanısı](00-FtkSaaS-yeni-sohbet-devir.md#o10-yerel-business-on-olcum) tamamlandı, yerel gecikme hedefleri ve hosted pilot kabulü açık · **Tür:** D/H · **Plan:** Tümü · **Özellik:** F01,F08,F19,F28,F33
+- [ ] **Durum:** [Yerel okuma ve kritik yazma ölçümleri](00-FtkSaaS-yeni-sohbet-devir.md#o10-yerel-business-on-olcum) gecikme hedeflerini aştı. Tam hosted pilot ve RPO/RTO kabulü açık · **Tür:** D/H · **Plan:** Tümü · **Özellik:** F01,F08,F19,F28,F33
 - **Bağımlılık:** O02,O08
 - **Kabul:** Ayrı altyapı projesinde belirlenecek veri hacmi ve iş karışımıyla gecikme/queue/finans doğruluğu ve kurtarma hedefleri ölçülür. G02/G01/G03 için plan başına ayrı işletim kabulü oluşturmaz.
 - **Sınır/olumsuz durum:** Öğrenci sayısı eşzamanlı kullanıcı sayısı değildir; onaylanmamış SLA/eşik uydurulmaz.
