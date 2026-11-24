@@ -931,7 +931,7 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 
 **Native Storage dilimi:** [Yerel disk baytı](00-FtkSaaS-yeni-sohbet-devir.md#o03-o10-guncel-isletim-kontrolleri) ve [ayrı hosted hedefte eski imzalı URL ile yönetici okumasının reddi](00-FtkSaaS-yeni-sohbet-devir.md#o08-hosted-sentetik-restore) doğrulandı. Privacy işinde Storage hold ve geçici kopyaların imhası açık.
 
-**Geçici takip kopyaları:** Önizleme ve işlem bağlamı kopyalarının hold kontrollü expiry temizliği [yerel kaynak kabulünde](00-FtkSaaS-yeni-sohbet-devir.md#o05-gecici-takip-kopyalari) doğrulandı. Diğer geçici kopya ve Storage yüzeyleri açık.
+**Geçici takip kopyaları:** Önizleme ve işlem bağlamı kopyalarının hold kontrollü expiry temizliği [aday, main ve development kabulünü](00-FtkSaaS-yeni-sohbet-devir.md#o05-gecici-takip-kopyalari) geçti. Bir sonraki Storage kabulünün [nesne envanteri](00-FtkSaaS-yeni-sohbet-devir.md#o05-storage-envanter-kabul) ve [doğrulama sınırı](remote-backend-setup.md#o05-storage-on-kontrolu) kayıtlıdır.
 
 <a id="o06"></a>
 ### O06 — Bağımsız imha sicili
