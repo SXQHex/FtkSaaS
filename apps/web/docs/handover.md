@@ -21,11 +21,15 @@
 
 <a id="ts02-ts03-kaynak-ve-ortam-kabulu"></a>
 
-### TS02, TS03 ve TS05 kaynak ve ortam kabulü
+### Frontend tip güvenliği kaynak ve ortam kabulü
 
 [PR #438](https://github.com/SXQHex/FtkSaaS/pull/438) head `e5ff56bda3011f6b99e90d03c3d1f0939a2211bf`, main `b1cdf3550aabbbff0f155d53eb5bc2a07d03c25f`. [Frontend Checks](https://github.com/SXQHex/FtkSaaS/actions/runs/45427691146) kontrolleri ve 12 Desktop Chromium shard, aynı main SHA'sındaki [Main acceptance](https://github.com/SXQHex/FtkSaaS/actions/runs/45429583483) ile [Cloudflare build ve dağıtımı](https://github.com/SXQHex/FtkSaaS/actions/runs/45429780907) başarılı.
 
 [PR #440](https://github.com/SXQHex/FtkSaaS/pull/440) head `4963c92a3ff91cdb3af1ce05b3346116ce5e978c`, main `c30e088695c3eee0df7979abe9a918c009fb8af7`. [Frontend Checks](https://github.com/SXQHex/FtkSaaS/actions/runs/45429678908) kontrolleri ve 12 Desktop Chromium shard, aynı main SHA'sındaki [Main acceptance](https://github.com/SXQHex/FtkSaaS/actions/runs/45432274535) ve [Cloudflare delivery](https://github.com/SXQHex/FtkSaaS/actions/runs/45432410312) başarılı.
+
+TS01, TS04 ve TS06'nın kaynak değişiklikleri PR #442 ile main'e birleşti. Head `1d2112edcfc7d2a7d4b5d9145a16c863e3cd5bea` ve main `9c175e208c3430f498b584fa76e3e16eda3dfd10` aynı `db4b784c735abed49e8005ac3f60d236d14e4557` Git ağacına sahip. Aday kontrolleri ve 12 Desktop Chromium shard, main kabulü ve Cloudflare dağıtımı başarılı. [PR #442](https://github.com/SXQHex/FtkSaaS/pull/442) · [Frontend Checks](https://github.com/SXQHex/FtkSaaS/actions/runs/45435757155) · [Main acceptance](https://github.com/SXQHex/FtkSaaS/actions/runs/45438141527) · [Cloudflare delivery](https://github.com/SXQHex/FtkSaaS/actions/runs/45438308660)
+
+Development delivery aynı main kaynağını doğruladı. Supabase ağacı, hosted doğrulaması başarılı son development dağıtımından beri aynı. 24 Kasım 2026'da kullanıcı bu koşullar sağlandığında TS06'nın mevcut kurulumunun kapanışını onayladı. Onay birleşim sonrasında kaydedildi. #442'nin birleşim anındaki `ftksaas/merge-clean` sonucu politika kurulumu gerektiren başarısız durum olarak kaldı. [Development kaynak doğrulaması](https://github.com/SXQHex/FtkSaaS/actions/runs/45438308503) · [Hosted development doğrulaması](https://github.com/SXQHex/FtkSaaS/actions/runs/45434679289) · [PR kontrolleri](https://github.com/SXQHex/FtkSaaS/pull/442/checks)
 
 ### C-ortak ölçümü
 

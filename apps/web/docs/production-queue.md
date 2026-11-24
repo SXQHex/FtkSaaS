@@ -17,18 +17,7 @@ Her teslim ayrı branch ve Draft PR ile başlar. Kod, test ve kabul aynı kaynak
 
 ## Bağımsız tip güvenliği sırası
 
-**Karar:** Hazır kütüphanelere/üretici dosyalarına müdahale yok. Kaynak denetimi `main` `1ecad263a392a8112665cb6dd1d3b57e670c27fe`; bulgu ve kapanış ölçütleri yalnız [TS01–TS06](remaining-work.md#frontend-tip-guvenligi) altında. Mevcut M alanları otomatik kapanmaz.
-
-| Sıra | Görev                                       | Başlama/ayrılma sınırı                                                                  |
-| ---- | ------------------------------------------- | --------------------------------------------------------------------------------------- |
-| 1    | **TS01 · API yanıt sınırı**                 | Önce yüksek etkili native DTO/hata doğruluğu; mevcut korumayı yeniden kurma.            |
-| 2    | **TS02 · Vite ortam tipleri**               | Merkezi `VITE_*` tip ve config kontrolü; üçüncü taraf türleri değişmez.                 |
-| 3    | **TS03 · Rapor/public veri akışı**          | TS02 üzerine finans dosyası ve public bağlantı regresyonları.                           |
-| 4    | **TS04 · E2E native istek sınırı**          | Playwright `any` çıkışını kendi fixture'ında doğrula; assertion'lara dokunma.           |
-| 5    | **TS05 · Dinamik tip kaybı**                | `Reflect`, `Object.entries`, `JSON.parse`, Promise hata yollarını kaynak başına daralt. |
-| 6    | **TS06 · Betikler ve tip güvenliği kapısı** | Önce temizlenmiş `src` kapsamını koru; script/E2E uyarılarını ayrı partilerde ele al.   |
-
-**Teslim sınırı:** Öncelik 1–3 aynı veri güven sınırına bağlıysa bir mantıksal PR'da değerlendirilebilir; 4 ve 5 bağımsızdır. 6 ancak önceki kapsamın temizliği kanıtlanınca gelir. Büyük tek PR, dış kütüphane güncellemesi, generator düzeltmesi veya toplu CI gevşetmesi yapılmaz.
+[TS01–TS06 kapandı](remaining-work.md#frontend-tip-guvenligi).
 
 ## Paralel, bağımsız teslim açıkları
 
