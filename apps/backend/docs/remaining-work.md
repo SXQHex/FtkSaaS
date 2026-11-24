@@ -11,12 +11,7 @@ Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin te
 <a id="xreq-073"></a>
 ## XREQ-073 — M09 native okuma kapsamı
 
-- [x] Merkez ve Ekip seçicileri, takvim ve rezervasyon özetleri, aktif sınıf ataması, finans özetleri, public okuma ve Platform sıra seçicisi main’e alındı. Kaynak kabulü ve Supabase development teslimi geçti. [API kapsamı](../../../docs/requests.md#xreq-073-backend-uygulamasi) · [CI ve teslim kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#xreq-073-backend-kabulu).
-- [x] [Son kaynak paketi](../supabase/migrations/20261124013200_exact_management_readbacks.sql) Ekip, CRM takipleri ve rezervasyon sayfalarına yetkili canonical ad, etkinlik ayrıntısına mekân/görevli etiketi, etkinlik ödemesine kesin hazırlık seçicisi ve kayıp özel ders onayı için kesin rezervasyon okumasını ekler. İzole native Auth → Edge → Data API → PostgreSQL koşusunda dört ilgili API test dosyasındaki 57 test geçti.
-- [x] Yerel karşılaştırmada aynı beş Ekip ataması için 30 örnekte 5 istek ve 9 satırdan 1 istek ve 5 satıra inildi. p50 104,21 → 41,63 ms, p95 137,36 → 73,61 ms. Aynı ortamda bir oda, bir eğitmen ve bir sınıf için mevcut program, müsaitlik, kapanış ve anlaşma okumaları 6 paralel istek ve 3 satır döndürdü. p50 42,61 ms, p95 69,94 ms. Daha geniş Stüdyo projeksiyonu kararı development ölçümüne bağlıdır.
-- [x] Platform kurulum komutu talebin kimliğini, eşleşen hesabı ve adı açık durumdayken satır kilidi altında denetler. Bu kayıtta değişebilir bir taslak alanı bulunmadığı için kesin sıra okuyucusuna ek yazma sürümü eklenmedi.
-- [x] Son kaynak paketi PR #419 ile main’de. [Aday CI, main ve development kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#xreq-073-backend-kabulu) doğrulandı.
-- [ ] Development ortamında aynı görünür satırlarda eşdeğerliği, istek ve satır sayısını ve hosted gecikmeyi ölç. İstemci kabulü [Frontend M09](../../web/docs/remaining-work.md#router-query-birlesik) kaydında izlenir.
+**Kapalı — backend teslimi.** PR #412 ve #419 için kaynak, native CI, main ve development teslimi doğrulandı. Yerel karşılaştırma ve development ölçümünün kapsamı [kabul kaydında](00-FtkSaaS-yeni-sohbet-devir.md#xreq-073-backend-kabulu) yer alır. Kullanıcı kararıyla bu başlık altında ek canlı kabul koşusu planlanmaz. [Frontend M09](../../web/docs/remaining-work.md#router-query-birlesik) kendi kabul kaydında izlenir.
 
 <a id="ci503-native-baslangic"></a>
 ## CI503 — Native worker başlangıcı ve ödeme yanıtı teşhisi
@@ -116,7 +111,7 @@ Kullanıcı 16 Kasım’da talepleri sırayla değerlendirme, mevcut native eşl
 
 - [x] W1-BE-36 kaynak/runner: zorunlu bağımsız callback pini, private stdin native/expired CLI ve yabancı callback/gizlilik/restore unit kabulü; [XREQ-070](../../../docs/requests.md#xreq-070), kanıt [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-recovery-callback-acceptance).
 - [x] W1-BE-36 PR #328 ile main’e alındı. [Main ve development kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#web1-recovery-callback-acceptance) doğrulandı.
-- [ ] W1-BE-36 yeni app/izinli yerel callback’te gerçek teslim/PKCE/tüketilmiş proof ve ayrı doğal expiry kaynak/run/ortam kanıtı; eski S08 kabulü korunur, P01/G-PRO gerçek sağlayıcı alt kontrolü bu yeni kanıtı bekler.
+W1-BE-36 için ek canlı tekrar takibi [Web1 backend kapanışında](00-FtkSaaS-yeni-sohbet-devir.md#web1-backend-canli-takip-kapanisi) kapatıldı.
 
 ## Web1 ek backend talepleri — 15 Kasım
 
@@ -133,7 +128,7 @@ Kullanıcı son `request(1).md` dosyasındaki backend açıklarının kapatılma
 - [x] W1-BE-12 aday kaynak/SQL: kullanıcı onaylı ayrı sale.discount yetkisi ve org yüzdelik üst sınırı; preview/net satış/borç/iade uyumu; eksik ayar/grant kapalıdır. permission_set mevcut plan kapısı korunur.
 - [x] Son aday statik verify/kalite ve bağımsız son kaynak incelemesi; kanıt devir sahibindedir.
 - [x] PR313 kaynak full clean → aynı main kaynak kabulü → development dağıtım doğrulaması; kanıt devir sahibindedir.
-- [ ] Yeni hosted backend kabulü: W1-BE-03 tam directory ve W1-BE-07/08 gerçek oturumlu seans/receipt; yeni09–12 rol/plan/merkez/negatif durumları. SQL motoru başarısı gerçek Auth/Edge kabulü yerine geçmez.
+W1-BE-03 ve W1-BE-07–12 ek canlı tekrar takibi [Web1 backend kapanışında](00-FtkSaaS-yeni-sohbet-devir.md#web1-backend-canli-takip-kapanisi) kapatıldı.
 
 Kesin akış/DTO sınırı WF03/WF04/WF05/WF08 sahibindedir. Frontend ekranı veya frontend kabulü backend kapanış kapısı değildir; yalnız kendi kanıtıyla kapanış yapılır.
 
@@ -145,7 +140,7 @@ Kullanıcı 16 Kasım’da iki sözleşme önerisinin uygulanmasını onayladı.
 - [x] Ayrı planlı iptal preview/apply; mevcut CM/F17/ürün, stale/aynı-key, yalnız ilgili geçerliliği geri alma ve kesin rezervasyon koruması.
 - [x] Son kaynak statik/SQL doğrulama ve inceleme; kanıt devir sahibindedir.
 - [x] PR #314 aday full clean, main kabulü ve development teslimi doğrulandı. [Kaynak ve teslim kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#uye-profili-zaman-iptal).
-- [ ] Yeni hosted backend kabulü.
+Ek canlı tekrar takibi [Web1 backend kapanışında](00-FtkSaaS-yeni-sohbet-devir.md#web1-backend-canli-takip-kapanisi) kapatıldı.
 
 ## W1-BE-15/16 — Seans keşfi ve rezervasyonun gerçek kaynak hakkı
 
@@ -155,7 +150,7 @@ Kullanıcı gerekli backend açıklarını gidermeyi ve gereksiz geliştirme yer
 - [x] Görünür rezervasyon sayfasında opt-in gerçek kaynak/hak özeti; ayrı hak yetkisi, gizli/kapalı/atanmamış ayrımı ve immutable sürüm adı.
 - [x] Son kaynak SQL/static test ve bağımsız inceleme; native Auth/Edge kabulü aşağıdaki aday CI aşamasındadır.
 - [x] PR315 aday CI, main kaynak kanıtı ve development teslimi; kanıt devir sahibindedir.
-- [ ] Yeni hosted backend tekrar kabulü; E18 frontend kabulü ayrı kalır.
+Ek canlı tekrar takibi [Web1 backend kapanışında](00-FtkSaaS-yeni-sohbet-devir.md#web1-backend-canli-takip-kapanisi) kapatıldı.
 
 ## W1-BE-17 — Özel ders talep durumları ve merkez özeti
 
@@ -164,7 +159,7 @@ Kullanıcının backend açıklarını giderme görevinin E21 ekidir; ayrı PR'd
 - [x] Mevcut talep okuyucusunda opt-in durum/özet; terminal dört durum eşlemesi, native görünür kapsam ve cursor bağlama.
 - [x] Son kaynak SQL, tip kontrolü ve bağımsız inceleme tamamlandı.
 - [x] PR #317 ile kaynak, main ve development kabulü doğrulandı. [Ortak teslim kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#atanmis-seans-salon).
-- [ ] Gerekli hosted backend tekrarı.
+Ek canlı tekrar takibi [Web1 backend kapanışında](00-FtkSaaS-yeni-sohbet-devir.md#web1-backend-canli-takip-kapanisi) kapatıldı.
 
 ## W1-BE-18 — Atanmış seansın salon etiketi
 
@@ -173,7 +168,7 @@ Kullanıcı ayrı PR ile gerekli backend desteğini ve talep dosyasındaki doğr
 - [x] Mevcut calendar/session okuyucusunda opt-in typed güncel salon etiketi; canlı atama/rol, organizasyon/merkez ve mevcut seans görünürlüğü korunur. Yönetim keşfi veya yeni endpoint açılmaz.
 - [x] Son kaynak yerel doğrulama ve bağımsız inceleme tamamlandı.
 - [x] PR #317 aday CI, main ve development teslimi doğrulandı. [Ortak teslim kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#atanmis-seans-salon).
-- [ ] Gerekli hosted backend kabulü.
+Ek canlı tekrar takibi [Web1 backend kapanışında](00-FtkSaaS-yeni-sohbet-devir.md#web1-backend-canli-takip-kapanisi) kapatıldı.
 
 ## Backend çalışma modeli
 
