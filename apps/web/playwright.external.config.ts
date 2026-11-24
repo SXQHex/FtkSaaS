@@ -1,5 +1,5 @@
 import { defineConfig } from "@playwright/test";
-import { activeBrowserProfile } from "./playwright-device.js";
+import { activeBrowserProfile } from "./scripts/playwright-device.js";
 
 const baseURL = "http://127.0.0.1:4175";
 

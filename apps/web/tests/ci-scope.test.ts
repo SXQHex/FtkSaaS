@@ -14,7 +14,7 @@ import { dirname, join, resolve } from "node:path";
 import { parse } from "yaml";
 import { expect, test } from "vitest";
 import { affectedBrowserSpecs, eventScope, selectScope } from "../scripts/ci-scope.mjs";
-import { browserMatrix, refactoringBrowserMatrix } from "../scripts/browser-profiles.mjs";
+import { browserMatrix } from "../scripts/browser-profiles.mjs";
 function workflow(name: string) {
   return parse(readFileSync(resolve(process.cwd(), "../../.github/workflows", name), "utf8"));
 }
@@ -36,14 +36,16 @@ test("frontend retains build, coverage, isolation and four browser definitions",
   );
   expect(commands).not.toContain("pnpm check:frontend");
   expect(config.jobs.browsers.needs).toEqual(["scope", "checks"]);
-  expect(config.jobs.browsers["runs-on"]).toBe(
-    "${{ matrix.profile == 'mobile-webkit' && 'macos-26' || 'ubuntu-24.04' }}",
-  );
-  // The source proof requires successful steps on both operating systems.
-  for (const name of ["Prepare Ubuntu package sources", "Install selected browser"]) {
+  for (const name of ["scope", "checks", "browsers"])
+    expect(config.jobs[name]["runs-on"]).toBe("ubuntu-latest");
+  // The source proof requires successful dependency setup on every shard.
+  for (const [name, command] of [
+    ["Prepare Ubuntu package sources", "apps/web/scripts/ci-apt.mjs"],
+    ["Install selected browser", 'install --with-deps "$BROWSER"'],
+  ]) {
     const step = config.jobs.browsers.steps.find((item: { name?: string }) => item.name === name);
     expect(step.if).toBeUndefined();
-    expect(step.run).toContain('if [[ "$RUNNER_OS" == Linux ]]');
+    expect(step.run).toContain(command);
   }
   const browserCommands = config.jobs.browsers.steps.map(
     (step: { run?: string }) => step.run ?? "",
@@ -60,14 +62,21 @@ test("frontend retains build, coverage, isolation and four browser definitions",
   expect(commands).not.toContain("pnpm test:frontend:coverage");
   expect(commands).toContain("pnpm --filter @ftksaas/web test:isolation");
 });
-test("temporary refactoring CI runs twelve Desktop Chromium shards only", () => {
-  expect(refactoringBrowserMatrix).toEqual(
-    Array.from({ length: 12 }, (_, index) => ({
-      profile: "chromium",
-      engine: "chromium",
-      shard: index + 1,
-    })),
-  );
+test("frontend CI runs two shards per Chromium profile and four per WebKit profile", () => {
+  expect(browserMatrix).toEqual([
+    { profile: "chromium", engine: "chromium", shard: 1 },
+    { profile: "chromium", engine: "chromium", shard: 2 },
+    { profile: "mobile-chromium", engine: "chromium", shard: 1 },
+    { profile: "mobile-chromium", engine: "chromium", shard: 2 },
+    { profile: "mobile-webkit", engine: "webkit", shard: 1 },
+    { profile: "mobile-webkit", engine: "webkit", shard: 2 },
+    { profile: "mobile-webkit", engine: "webkit", shard: 3 },
+    { profile: "mobile-webkit", engine: "webkit", shard: 4 },
+    { profile: "webkit", engine: "webkit", shard: 1 },
+    { profile: "webkit", engine: "webkit", shard: 2 },
+    { profile: "webkit", engine: "webkit", shard: 3 },
+    { profile: "webkit", engine: "webkit", shard: 4 },
+  ]);
   expect(browserMatrix).toHaveLength(12);
 });
 
@@ -98,6 +107,8 @@ test("affected tests combine feature suites with smoke and expand on uncertain i
 });
 test("shared compatibility workflow performs type and graph checks without either application's test suite", () => {
   const config = workflow("frontend-compatibility.yml");
+  expect(config.jobs.scope["runs-on"]).toBe("ubuntu-latest");
+  expect(config.jobs.compatibility["runs-on"]).toBe("ubuntu-latest");
   const commands = config.jobs.compatibility.steps.flatMap((step: { run?: string }) =>
     step.run ? [step.run] : [],
   );

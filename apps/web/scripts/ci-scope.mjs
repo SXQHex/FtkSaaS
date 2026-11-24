@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { appendFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
-import { refactoringBrowserMatrix } from "./browser-profiles.mjs";
+import { browserMatrix } from "./browser-profiles.mjs";
 
 const documentRegistry = "apps/backend/scripts/ci/document-paths.json";
 const selector = "apps/web/scripts/ci-scope.mjs";
@@ -180,9 +180,7 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
   const { readFileSync } = await import("node:fs");
   const event = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, "utf8"));
   const scope = eventScope(process.env.GITHUB_EVENT_NAME, event, process.env.GITHUB_SHA);
-  // Twelve Chromium shards require the complete test inventory. The existing
-  // smoke-only selection has fewer than twelve cases and would create empty
-  // shards; [] instructs the runner to discover every Playwright test.
+  // The acceptance matrix covers the full Playwright inventory in each profile.
   const e2e = [];
   appendFileSync(
     process.env.GITHUB_OUTPUT,
@@ -191,7 +189,7 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
       `compatibility=${scope.compatibility}`,
       `e2e_base=${event.pull_request?.base?.sha ?? process.env.GITHUB_SHA}`,
       `e2e_specs=${JSON.stringify(e2e)}`,
-      `e2e_matrix=${JSON.stringify({ include: refactoringBrowserMatrix })}`,
+      `e2e_matrix=${JSON.stringify({ include: browserMatrix })}`,
       "",
     ].join("\n"),
   );

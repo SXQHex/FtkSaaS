@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { refactoringBrowserMatrix } from "./browser-profiles.mjs";
+import { browserMatrix } from "./browser-profiles.mjs";
 import { affectedBrowserSpecs, selectScope } from "./ci-scope.mjs";
 
 const workflows = {
@@ -12,7 +12,7 @@ const workflows = {
     jobs: [
       "scope",
       "checks",
-      ...refactoringBrowserMatrix.map(({ profile, shard }) => `browsers (${profile}, ${shard})`),
+      ...browserMatrix.map(({ profile, shard }) => `browsers (${profile}, ${shard})`),
     ],
   },
 };

@@ -6,7 +6,7 @@ import {
   type Locator,
   type Page,
 } from "@playwright/test";
-import { activeBrowserProfile } from "../playwright-device.js";
+import { activeBrowserProfile } from "../scripts/playwright-device.js";
 
 const touchContexts = new WeakMap<BrowserContext, boolean>();
 

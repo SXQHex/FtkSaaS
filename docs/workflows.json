@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "f6f90fdf6460bc233f2c93c9cf14bdb2b4324bdbb8a147ae5094e1f07056a93b",
-        "reason": "İmha migration sayımı, mevcut makine sözleşmesi envanteri ve üretim bağları doğrulandı."
+        "fingerprint": "7947fee7f4f5d919ec40833416a981dc53df6fd297ef7729309b5ce390c9a187",
+        "reason": "D04 için onaylanan sekiz kaynak parmak izi Ubuntu runner ve dört profilin tam 2/2/4/4 shard beklentilerini günceller. Native API, yetki, işlem sonucu ve ilgili kapsam denetimleri korunur."
       }
     },
     {

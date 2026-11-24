@@ -14,11 +14,6 @@ assert.match(env.GITHUB_RUN_ID ?? "", /^[1-9]\d*$/);
 assert(env.GITHUB_REPOSITORY, "BUILD_REPOSITORY_REQUIRED");
 assert.equal(git("rev-parse", "HEAD"), env.GITHUB_SHA, "BUILD_SOURCE_MISMATCH");
 const mode = process.argv[2];
-const mobileWebKitRestore = mode === "restore" && env.FTK_BROWSER_PROJECT === "mobile-webkit";
-if (mobileWebKitRestore) {
-  assert.deepEqual([process.platform, process.arch], ["darwin", "arm64"], "BUILD_RUNNER_MISMATCH");
-}
-// Only the macOS mobile WebKit job restores the static artifact across operating systems.
 const source = {
   version: 1,
   repository: env.GITHUB_REPOSITORY,
@@ -26,8 +21,8 @@ const source = {
   merge: env.GITHUB_SHA,
   tree: git("rev-parse", "HEAD^{tree}"),
   node: process.version,
-  platform: mobileWebKitRestore ? "linux" : process.platform,
-  arch: mobileWebKitRestore ? "x64" : process.arch,
+  platform: process.platform,
+  arch: process.arch,
   // Only a digest is recorded; never expose configuration values in artifacts/logs.
   inputs: sha256(
     JSON.stringify(

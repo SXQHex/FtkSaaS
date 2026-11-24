@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { expect, test } from "vitest";
 import { readBinding, validateProof, verifyMain } from "../scripts/ci-proof.mjs";
-import { refactoringBrowserMatrix } from "../scripts/browser-profiles.mjs";
+import { browserMatrix } from "../scripts/browser-profiles.mjs";
 
 function fixture(kind = "frontend", attempt = 1) {
   const binding = {
@@ -50,7 +50,7 @@ function fixture(kind = "frontend", attempt = 1) {
             "Upload verified build",
           ],
           ...Object.fromEntries(
-            refactoringBrowserMatrix.map(({ profile, shard }) => [
+            browserMatrix.map(({ profile, shard }) => [
               `browsers (${profile}, ${shard})`,
               [
                 "Install selected browser",
@@ -335,13 +335,27 @@ test.each([
   expect(() => validateProof(binding, proof)).toThrow("REQUIRED_CANDIDATE_JOBS");
 });
 
-test("refactoring accepts only twelve Desktop Chromium source-bound shards", () => {
+test("main accepts only the exact twelve source-bound shards across all four profiles", () => {
   const { binding, proof } = fixture();
   const actual = proof.jobs.filter((job) => job.name.startsWith("browsers ("));
-  expect(actual.map(({ name }) => name)).toEqual(
-    Array.from({ length: 12 }, (_, index) => `browsers (chromium, ${index + 1})`),
-  );
+  expect(actual.map(({ name }) => name)).toEqual([
+    "browsers (chromium, 1)",
+    "browsers (chromium, 2)",
+    "browsers (mobile-chromium, 1)",
+    "browsers (mobile-chromium, 2)",
+    "browsers (mobile-webkit, 1)",
+    "browsers (mobile-webkit, 2)",
+    "browsers (mobile-webkit, 3)",
+    "browsers (mobile-webkit, 4)",
+    "browsers (webkit, 1)",
+    "browsers (webkit, 2)",
+    "browsers (webkit, 3)",
+    "browsers (webkit, 4)",
+  ]);
   expect(() => validateProof(binding, proof)).not.toThrow();
   proof.jobs.push({ ...actual[0], name: "browsers (webkit, 1)" });
+  expect(() => validateProof(binding, proof)).toThrow("REQUIRED_CANDIDATE_JOBS");
+  proof.jobs.pop();
+  actual[3]!.name = "browsers (chromium, 3)";
   expect(() => validateProof(binding, proof)).toThrow("REQUIRED_CANDIDATE_JOBS");
 });

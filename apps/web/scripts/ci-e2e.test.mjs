@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { verifyShardPlan, verifyShardResult } from "./ci-e2e.mjs";
-import { refactoringBrowserShards } from "./browser-profiles.mjs";
 
 const profile = "mobile-webkit";
 
@@ -29,15 +28,15 @@ function report(ids, options = {}) {
   };
 }
 
-test("three browser shards must cover the selected inventory once", () => {
-  const all = report(["first", "second", "third"]);
-  const shards = ["first", "second", "third"].map((id) => report([id]));
+test("four Mobile WebKit shards must cover the selected inventory once", () => {
+  const all = report(["first", "second", "third", "fourth"]);
+  const shards = ["first", "second", "third", "fourth"].map((id) => report([id]));
   const files = ["static-build.spec.ts"];
   const expected = verifyShardPlan(all, shards, files, profile);
   verifyShardResult(shards[0], expected[0], profile);
   assert.throws(() => verifyShardPlan(all, shards.slice(1), files, profile), /Incomplete/);
   assert.throws(
-    () => verifyShardPlan(all, [shards[0], shards[0], shards[2]], files, profile),
+    () => verifyShardPlan(all, [shards[0], shards[0], shards[2], shards[3]], files, profile),
     /gaps or duplicates/,
   );
   assert.throws(() => verifyShardPlan(all, shards, ["absent.spec.ts"], profile), /missing/);
@@ -52,21 +51,18 @@ test("three browser shards must cover the selected inventory once", () => {
   );
 });
 
-test("twelve Desktop Chromium shards must cover every selected test once", () => {
-  const ids = refactoringBrowserShards.map((index) => `case-${index}`);
+test("two Desktop Chromium shards must cover every selected test once", () => {
+  const ids = ["case-1", "case-2"];
   const all = report(ids, { projectId: "chromium" });
   const shards = ids.map((id) => report([id], { projectId: "chromium" }));
   const files = ["static-build.spec.ts"];
-  const plan = verifyShardPlan(all, shards, files, "chromium", refactoringBrowserShards);
-  assert.equal(plan.length, 12);
+  const plan = verifyShardPlan(all, shards, files, "chromium");
+  assert.equal(plan.length, 2);
   for (const [index, shard] of shards.entries()) verifyShardResult(shard, plan[index], "chromium");
+  assert.throws(() => verifyShardPlan(all, shards.slice(1), files, "chromium"), /Incomplete/);
+  const duplicatedShard = [shards[0], shards[0]];
   assert.throws(
-    () => verifyShardPlan(all, shards.slice(1), files, "chromium", refactoringBrowserShards),
-    /Incomplete/,
-  );
-  const duplicatedShard = [...shards.slice(0, 11), shards[0]];
-  assert.throws(
-    () => verifyShardPlan(all, duplicatedShard, files, "chromium", refactoringBrowserShards),
+    () => verifyShardPlan(all, duplicatedShard, files, "chromium"),
     /gaps or duplicates/,
   );
 });

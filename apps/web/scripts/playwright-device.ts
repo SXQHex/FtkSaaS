@@ -1,5 +1,5 @@
 import { devices } from "@playwright/test";
-import { browserProfiles } from "./scripts/browser-profiles.mjs";
+import { browserProfiles } from "./browser-profiles.mjs";
 
 export function activeBrowserProfile() {
   const project = process.env.FTK_BROWSER_PROJECT ?? "chromium";
