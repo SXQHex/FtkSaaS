@@ -506,6 +506,8 @@ Yöntem veri yüzeyine ve kalan saklama amacına göre seçilir; bütün kayıtl
 
 Yok etme tamamlanması, ilgili verinin canlı tablo dışında dosya/export/geçici kopya, sağlayıcı logları ve yedekler dahil ilgili bütün ortamlarda geri getirilemezliğinin doğrulanmasını gerektirir. SQL satır silme veya alan boşaltma tek başına bu tamamlanma iddiasını vermez. Somut hold veya belgeli saklama gerekçesi varsa yalnız gerekli kayıt/alan sınırlı tutulur; genel profil arşivlenmez. Anonimleştirme ancak kişisel bağlantının gereksiz olduğu, ayrıca onaylanmış çıktı için geri eşleme riski doğrulanarak seçilebilir; mevcut hesap/finans/denetim referansları bu adla sunulmaz. Süreler yukarıdaki sınıflardan alınır; bu yöntem seçimi yeni süre veya hukuki saklama gerekçesi oluşturmaz.
 
+FtkSaaS, doğrudan yönetebildiği veri yüzeylerinde imhayı uygular ve doğrular. Sağlayıcının kendi yönettiği altyapı logları, kopyaları ve yedeklerinin fiziksel imhasını sağlayıcı yürütür. FtkSaaS, mevzuatın gerektirdiği durumlarda ilgili talebi iletir ve sonucu takip eder. Uygulamanın DB ve Auth teslimi ile sağlayıcı imha takibi ayrı kaydedilir. Genel yok etme bildirimi yukarıdaki doğrulama koşullarına tabidir.
+
 ### Resmî kaynaklar ve sınır
 
 - KVKK Silme/Yok Etme/Anonimleştirme Yönetmeliği, m.7, 11–12: https://www.kvkk.gov.tr/Icerik/5441/KISISEL-VERILERIN-SILINMESI-YOK-EDILMESI-VEYA-ANONIM-HALE-GETIRILMESI-HAKKINDA-YONETMELIK

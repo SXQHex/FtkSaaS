@@ -186,6 +186,15 @@ test('P07 billing and privacy use live Auth, atomic receipts and scoped native w
    await db.query('insert into private.account_auth_erasure_scopes(db_role,account_id,provider_origin) values($1,$2,$3)',[role,memberAccount.id,new URL(context().env.API_URL).origin]);
    const flow=key(),foreignFlow=key(),ownAudit=key(),actorAudit=key(),subjectAudit=key(),foreignAudit=key(),stable=key();
    const token=key(),foreignToken=key();
+   const ownSecurityEvent=key(),foreignSecurityEvent=key();
+   for(const [id,actorId,sessionId] of [[ownSecurityEvent,memberAccount.id,member.session_id],[foreignSecurityEvent,account.id,owner.session_id]]){
+    const operationId=key(),hash=operationId.replaceAll('-','').repeat(2);
+    await db.query("insert into core.operation_receipts(id,actor_account_id,actor_fingerprint,operation,key_hash,payload_hash,state,result_expires_at) values($1,$2,$3,'account_session_label_v1',$4,$4,'succeeded',clock_timestamp()+interval '30 days')",[operationId,actorId,actorId,hash]);
+    await db.query("insert into private.account_security_events(id,account_id,operation_id,action,session_id,affected_count) values($1,$2,$3,'session_labelled',$4,1)",[id,actorId,operationId,sessionId]);
+   }
+   const securityEvent=async id=>(await q('select * from private.account_security_events where id=$1',[id]))[0];
+   const ownSecurityBefore=await securityEvent(ownSecurityEvent),foreignSecurityBefore=await securityEvent(foreignSecurityEvent);
+   await assert.rejects(db.query('update private.account_security_events set session_id=null where id=$1',[ownSecurityEvent]),/INTEGRITY_VIOLATION/);
    for(const [id,user] of [[token,member.id],[foreignToken,owner.id]])await db.query(
     "insert into auth.one_time_tokens(id,user_id,token_type,token_hash,relates_to) values($1,$2,'recovery_token',$3,$4)",
     [id,user,'synthetic-'+id,'synthetic-recovery-'+id]
@@ -253,11 +262,24 @@ test('P07 billing and privacy use live Auth, atomic receipts and scoped native w
    const proof=await q('select * from private.account_auth_erasures where request_id=$1',[request]);assert.equal(proof.length,1);
    assert.deepEqual(await eraseNativeAccount({db:c,request:entry.request,apiUrl:env.API_URL,serviceKey:env.SERVICE_ROLE_KEY}),{state:'completed'});
    await assert.rejects(db.query('delete from private.account_auth_erasures where request_id=$1',[request]),/INTEGRITY_VIOLATION/);
+   await db.query("insert into core.retention_holds(id,org_id,subject_table,subject_id,reason,authority_reference,review_at) values($1,$2,'private.account_security_events',$3,'Synthetic security event hold','synthetic-test',clock_timestamp()-interval '1 day')",[hold,org,ownSecurityEvent]);
    assert.equal((await execute(c,entry,true)).ok,true);
    const manifest=(await q('select scopes from private.p07_privacy_manifests where request_id=$1',[request]))[0].scopes;
    assert.equal(manifest.auth.principal_erasure.state,'completed');assert.equal(manifest.auth.state,'pending');
    assert.equal(manifest.auth.residue_erasure.state,'completed');
    assert.equal((await q('select state from core.privacy_requests where id=$1',[request]))[0].state,'partial');
+   assert.equal(manifest.database.security_history.state,'held');
+   assert.deepEqual(await securityEvent(ownSecurityEvent),ownSecurityBefore);
+   await db.query('delete from core.retention_holds where id=$1',[hold]);
+   await db.query("update private.p07_privacy_jobs set next_attempt_at=clock_timestamp()-interval '1 second' where id=$1",[globalJob]);
+   const [securityEntry]=await claim(c,true,null);assert.equal(securityEntry.request.job_id,globalJob);
+   const securityPass=await execute(c,securityEntry,true);assert.equal(securityPass.ok,true);
+   assert.deepEqual(await securityEvent(ownSecurityEvent),{...ownSecurityBefore,session_id:null});
+   assert.deepEqual(await securityEvent(foreignSecurityEvent),foreignSecurityBefore);
+   assert.deepEqual(await execute(c,securityEntry,true),securityPass);
+   const securityProof=(await q('select minimized_rows from private.account_security_history_minimizations where request_id=$1',[request]))[0];
+   assert.equal(Number(securityProof.minimized_rows),1);
+   await assert.rejects(db.query('delete from private.account_security_history_minimizations where request_id=$1',[request]),/INTEGRITY_VIOLATION/);
    // Trigger depth is not worker identity. A second global worker without the
    // exact Auth target binding must not borrow the original permit's role.
    const unbound=await native('ftk_p07_privacy_worker',true),late=key();
@@ -271,6 +293,7 @@ test('P07 billing and privacy use live Auth, atomic receipts and scoped native w
    assert.equal((await audit(late)).payload.actor_username,member.email);
    const deniedManifest=(await q('select scopes from private.p07_privacy_manifests where request_id=$1',[request]))[0].scopes;
    assert.equal(deniedManifest.auth.residue_erasure.state,'unbound');
+   assert.equal(deniedManifest.database.security_history.state,'unbound');
    await unbound.query('drop table p07_residue_attempt');await unbound.query('drop function pg_temp.p07_residue_attempt()');
   });
  }finally{

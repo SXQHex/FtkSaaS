@@ -613,6 +613,8 @@ Auth kalıntı aşaması, principal silmesinin ertelenmiş transaction kanıtın
 
 Hedef hesabın `auth.one_time_tokens` satırına konan saklama blokajı izin hazırlığını ve native hard delete işlemini durdurur. Süresi geçmiş bir `review_at` blokajı kaldırmaz. Başka hesaba ait token veya blokaj hedefi etkilemez. Blokaj yoksa Supabase ilişkili token satırlarını principal silme işlemiyle kaldırır. Ertelenmiş yokluk kontrolü bu satırları da kapsar.
 
+Profil ve native Auth imhasının makbuzları oluştuktan sonra aynı hesaba ve veritabanı instance’ına bağlı P07 worker, uygulama güvenlik geçmişindeki hedef oturum kimliğini boşaltır. Olay, zaman, işlem bağlantısı ve diğer hesapların satırları korunur. Hesap, Auth kullanıcısı, oturum, olay veya bağlı işlem üzerindeki somut saklama blokajı adımı durdurur. Aktif oturum ya da başka hesaba ait aynı kimlik tespitinde işlem hata verir. Kanıt iç manifestin `database.security_history` alanına yazılır. Ana talep mevcut imha koşullarına göre ilerler.
+
 ## WF18
 
 Business merkezler arası hesaplaşma. Yetkili A merkezi hareketleri/istekleri/authority okur → açık satış bedeli payı üzerinden `settlement_request_submit_v1` → B yetkilisi dondurulmuş hedefe `settlement_request_decide_v1` ile onay veya gerekçeli ret verir → istek/hareket/bakiye yeniden okunur. Withdraw ayrı komuttur. Aynı insan iki merkezde yetkili olabilir; her adımın farklı merkez yetkisi canlı doğrulanır. Süreli/sınırsız seans bedeli uydurulmaz; sadece A-B satış payı temeli kullanılır. Yetki/delegation değişikliği eski onayı veya finans geçmişini yeniden yazmaz.
