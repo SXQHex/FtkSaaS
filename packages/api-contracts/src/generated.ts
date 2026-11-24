@@ -8437,6 +8437,10 @@ export interface SessionView {
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id?: string
 class_id: (string | null)
 format: SessionFormat
 starts_at: Instant
@@ -11787,6 +11791,10 @@ center_id?: (string | null)
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 session_id: string
+/**
+ * Include the authorized session's canonical center_id. The input center_id remains an optional exact scope filter.
+ */
+include_center_id?: boolean
 include_work_calendar_exception?: boolean
 /**
  * Opt-in display labels only for sessions where the caller has a live instructor/assistant assignment. No room management permission.

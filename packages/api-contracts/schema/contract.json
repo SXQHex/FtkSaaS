@@ -4162,6 +4162,10 @@
         "id": {
           "$ref": "#/$defs/FtkUuid"
         },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid",
+          "description": "Canonical center of the authorized session when session_get_v1 requests include_center_id."
+        },
         "class_id": {
           "anyOf": [
             {
@@ -10563,6 +10567,10 @@
         },
         "session_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "include_center_id": {
+          "type": "boolean",
+          "description": "Include the authorized session's canonical center_id. The input center_id remains an optional exact scope filter."
         },
         "include_work_calendar_exception": {
           "type": "boolean"
@@ -101316,6 +101324,12 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/SessionView/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/SessionView/properties/class_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -119266,7 +119280,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 226,
+      "migration_count": 227,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

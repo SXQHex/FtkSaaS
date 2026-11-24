@@ -67,6 +67,20 @@ test('Schedule reads through real Auth -> Edge -> RPC',async t=>{
  const get=(u,s,b={})=>must(u,'session_get_v1',scope({session_id:s,...b}));
  const attendance=(u,s,b={})=>must(u,'attendance_get_v1',scope({center_id:c1,session_id:s,...b}));
  const ids=x=>x.items.map(v=>v.id);
+ await t.test('exact session center is opt-in and preserves the live read scope',async()=>{
+  const options={include_center_id:true};
+  for(const [actor,id,center] of [[owner,s1,c1],[owner,s3,c2],[student.u,s1,c1],[instructor.u,s1,c1]]){
+   const legacy=await get(actor,id);
+   assert(!('center_id' in legacy));
+   assert.deepEqual(await get(actor,id,options),{...legacy,center_id:center});
+  }
+  const scoped=await get(owner,s3,{...options,center_id:c2});
+  assert.equal(scoped.center_id,c2);
+  assert(!('center_id' in await get(owner,s3,{include_center_id:false})));
+  await fail(owner,'session_get_v1',{...options,session_id:s3,center_id:c1},'NOT_FOUND');
+  await fail(student.u,'session_get_v1',{...options,session_id:s3},'FORBIDDEN');
+  await fail(instructor.u,'session_get_v1',{...options,session_id:s2},'NOT_FOUND');
+ });
  await t.test('member time partitions filter the full authorized set before paging and retain their cutoff',async()=>{
   const p=key(),at=Date.now(),createdSessions=[],createdReservations=[],previousCount=reservations.length;
   await db.query("insert into core.people(id,org_id,display_name,state) values($1,$2,'Time filter learner','active')",[p,org]);
@@ -263,6 +277,7 @@ test('Schedule reads through real Auth -> Edge -> RPC',async t=>{
    assert.equal((await summary(instructor.u)).actor_class_duty,undefined);
    await changeAssignment('inactive',null);
    await fail(instructor.u,'session_get_v1',{session_id:s1},'NOT_FOUND');
+   await fail(instructor.u,'session_get_v1',{session_id:s1,include_center_id:true},'NOT_FOUND');
   }finally{
    await changeAssignment('active',null);
    await db.query("update core.sessions set assignment_mode='legacy' where org_id=$1 and id=$2",[org,s1]);
@@ -314,6 +329,11 @@ test('Schedule reads through real Auth -> Edge -> RPC',async t=>{
    await fail(owner,op,{...b,center_id:foreignCenter},'NOT_FOUND');
    await fail(stranger,op,b,'NOT_FOUND');
   }
+  const payment=await must(stranger,'saas_payment_submit_v1',{
+   org_id:foreignOrg,amount_minor:'1000',currency:'TRY',reference:'synthetic foreign schedule',occurred_at:new Date().toISOString(),
+  },key());
+  await must(platform,'saas_payment_verify_v1',{org_id:foreignOrg,payment_id:payment.primary_id,accepted:true},key());
+  await fail(stranger,'session_get_v1',{org_id:foreignOrg,session_id:s1,include_center_id:true},'NOT_FOUND');
  });
  await t.test('a session written through the current command is read with the same version and UTC times',async()=>{
   const it={starts_at:'2027-01-10T12:00:00+03:00',ends_at:'2027-01-10T13:00:00+03:00'};
@@ -441,13 +461,18 @@ test('Schedule reads through real Auth -> Edge -> RPC',async t=>{
  await t.test('account link removal invalidates existing token and all read routes',async()=>{
   await db.query("update core.account_links set state='revoked' where org_id=$1 and person_id=$2",[org,student.p]);
   for(const op of ['calendar_get_v1','reservation_list_v1','session_get_v1'])await fail(student.u,op,{...(op==='session_get_v1'?{session_id:s1}:{page:{},...(op==='calendar_get_v1'?{interval}:{})})},'NOT_FOUND');
+  await fail(student.u,'session_get_v1',{session_id:s1,include_center_id:true},'NOT_FOUND');
  });
  await t.test('current plan, billing, center state and provider session remain mandatory',async()=>{
   await db.query("update core.centers set state='inactive' where id=$1",[c2]);
   assert(!ids(await cal(owner)).includes(s3));
   await db.query("update core.centers set state='active' where id=$1",[c2]);
   await db.query("update core.saas_plan_versions set features=array_remove(features,'F08') where id=$1",[plan]);
-  try{await fail(owner,'session_get_v1',{session_id:s1},'PLAN_FEATURE_UNAVAILABLE');await fail(owner,'calendar_get_v1',{interval,page:{}},'PLAN_FEATURE_UNAVAILABLE');}
+  try{
+   await fail(owner,'session_get_v1',{session_id:s1},'PLAN_FEATURE_UNAVAILABLE');
+   await fail(owner,'session_get_v1',{session_id:s1,include_center_id:true},'PLAN_FEATURE_UNAVAILABLE');
+   await fail(owner,'calendar_get_v1',{interval,page:{}},'PLAN_FEATURE_UNAVAILABLE');
+  }
   finally{await db.query("update core.saas_plan_versions set features=array_append(features,'F08') where id=$1",[plan]);}
   await db.query("update core.saas_plan_versions set name='pro' where id=$1",[plan]);
   try{assert(!ids(await cal(owner)).includes(s3));await fail(owner,'session_get_v1',{session_id:s3},'PLAN_FEATURE_UNAVAILABLE');}finally{await db.query("update core.saas_plan_versions set name='business' where id=$1",[plan]);}
@@ -459,6 +484,7 @@ test('Schedule reads through real Auth -> Edge -> RPC',async t=>{
  await t.test('reads create no financial, entitlement, receipt or audit side effects; direct RPC denied',async()=>{
   const snapshot=async()=>JSON.stringify(await rows("select (select count(*) from core.operation_receipts where org_id=$1) receipts,(select count(*) from core.audit_events where org_id=$1) audit,(select count(*) from core.entitlement_movements where org_id=$1) rights,(select count(*) from core.cash_movements where org_id=$1) cash,(select count(*) from core.outbox_jobs where org_id=$1) outbox",[org]));
   const before=await snapshot();await cal(owner);await list(owner);await get(owner,s1);assert.equal(await snapshot(),before);
+  await get(owner,s1,{include_center_id:true});assert.equal(await snapshot(),before);
   const {env}=context();
   for(const op of ['calendar_get_v1','session_get_v1','reservation_list_v1']){
    const r=await fetch(env.API_URL+'/rest/v1/rpc/'+op,{method:'POST',headers:{apikey:env.ANON_KEY,authorization:'Bearer '+owner.jwt,'Content-Profile':'api_v1','content-type':'application/json'},body:JSON.stringify({p_request:{},p_actor_auth_id:owner.id,p_session_id:owner.session_id,p_ids:[]})});assert(!r.ok);
