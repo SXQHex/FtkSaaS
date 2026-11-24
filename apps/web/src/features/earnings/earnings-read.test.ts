@@ -99,6 +99,39 @@ it("all periods omit interval; historical immutable aliases and agreement metada
   expect(result.items[0]).toEqual(earning);
   expect(mock.call.mock.calls[0]![1]).not.toHaveProperty("interval");
 });
+it("reads period counts for the returned instructors without separate person requests", async () => {
+  const interval = { starts_at: "2026-11-01T00:00:00Z", ends_at: "2026-12-01T00:00:00Z" };
+  const rows = [
+    { ...person, closed_session_count: 3 },
+    { ...person, person_id: id(8), closed_session_count: 0 },
+  ];
+  mock.call.mockResolvedValueOnce(packet("instructors", rows));
+  const data = await readEarningsDirectory(scope, "instructors", {
+    interval,
+    includeClosedSessionCount: true,
+  });
+  expect(mock.call).toHaveBeenCalledExactlyOnceWith(
+    "instructor_finance_directory_get_v1",
+    expect.objectContaining({
+      center_id: scope.centerId,
+      interval,
+      include_closed_session_count: true,
+    }),
+  );
+  expect(
+    earningsPresentation(data, "Europe/Istanbul", i18n.getFixedT("tr")).people.map(
+      (row) => row.sessions,
+    ),
+  ).toEqual(["3", "0"]);
+  for (const count of [undefined, -1, Number.MAX_SAFE_INTEGER + 1]) {
+    mock.call.mockResolvedValueOnce(
+      packet("instructors", [{ ...person, closed_session_count: count }]),
+    );
+    await expect(
+      readEarningsDirectory(scope, "instructors", { interval, includeClosedSessionCount: true }),
+    ).rejects.toThrow();
+  }
+});
 it("rejects wrong view, duplicate rows/currencies, repeated cursor and unsafe counts or money", async () => {
   for (const response of [
     { ...packet("payments", [person]) },

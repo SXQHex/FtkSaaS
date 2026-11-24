@@ -184,7 +184,11 @@ export async function readStudioRooms(
   );
   return items.map((item) => roomRecord(scope, item));
 }
-function readClassRecords(scope: StudioScope, backend: Awaited<ReturnType<typeof studioBackend>>) {
+function readClassRows(
+  scope: StudioScope,
+  backend: Awaited<ReturnType<typeof studioBackend>>,
+  instructorId?: string,
+) {
   const operation = "class_save_v1" as const;
   return studioPages((cursor) =>
     backend.call("management_state_get_v1", {
@@ -193,14 +197,31 @@ function readClassRecords(scope: StudioScope, backend: Awaited<ReturnType<typeof
       org_id: scope.orgId,
       center_id: scope.centerId,
       operation,
-      selector: { operation, key: { include_waitlist: true } },
+      selector: {
+        operation,
+        key: {
+          include_waitlist: true,
+          ...(instructorId ? { class_assignment_instructor_id: instructorId } : {}),
+        },
+      },
       page: { limit: 50, ...(cursor ? { cursor } : {}) },
     }),
-  ).then((items) => items.map((item) => classRecord(scope, item)));
+  );
 }
 
-export async function readStudioClasses(scope: StudioScope, signal?: AbortSignal) {
-  return readClassRecords(scope, await studioBackend(scope, signal));
+export async function readStudioInstructorClasses(
+  scope: StudioScope,
+  instructorId: string,
+  signal?: AbortSignal,
+) {
+  const items = await readClassRows(scope, await studioBackend(scope, signal), instructorId);
+  return items.map((item) => ({
+    lesson: classRecord(scope, item),
+    assignment:
+      item.current?.operation === "class_save_v1"
+        ? item.current.values.instructor_assignment
+        : undefined,
+  }));
 }
 
 export async function readStudioResources(
@@ -225,7 +246,7 @@ export async function readStudioResources(
       : studioPages((cursor) =>
           management({ operation: "room_save_v1", key: { include_details: true } }, cursor),
         ).then((items) => items.map((item) => roomRecord(scope, item))),
-    readClassRecords(scope, backend),
+    readClassRows(scope, backend).then((items) => items.map((item) => classRecord(scope, item))),
     studioPages((cursor) =>
       backend.call("disciplines_list_v1", {
         client_api_version: 1,

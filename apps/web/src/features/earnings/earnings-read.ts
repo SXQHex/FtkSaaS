@@ -17,6 +17,7 @@ const signedMoney = z
     (value) => BigInt(value) >= -9223372036854775808n && BigInt(value) <= 9223372036854775807n,
   );
 const positive = z.number().int().positive().safe();
+const count = z.number().int().nonnegative().safe();
 function validateTotals(totals: InstructorAccountTotal[]) {
   const currencies = new Set<string>();
   for (const total of totals) {
@@ -32,7 +33,12 @@ function validateTotals(totals: InstructorAccountTotal[]) {
 export async function readEarningsDirectory(
   scope: ClientScope,
   view: EarningsDirectoryView,
-  input: { personId?: string; interval?: Interval; cursor?: string } = {},
+  input: {
+    personId?: string;
+    interval?: Interval;
+    cursor?: string;
+    includeClosedSessionCount?: boolean;
+  } = {},
   readContext?: AccountReadContext,
 ) {
   const temporal = await getTemporal();
@@ -53,6 +59,7 @@ export async function readEarningsDirectory(
     view,
     ...(input.personId ? { person_id: input.personId } : {}),
     ...(input.interval ? { interval: { ...input.interval } } : {}),
+    ...(input.includeClosedSessionCount ? { include_closed_session_count: true } : {}),
     page: { limit: 20, ...(input.cursor ? { cursor: input.cursor } : {}) },
   });
   if (
@@ -62,7 +69,7 @@ export async function readEarningsDirectory(
   )
     throw new Error("EARNINGS_SOURCE_UNAVAILABLE");
   instant.parse(data.as_of);
-  z.number().int().nonnegative().safe().parse(data.closed_session_count);
+  count.parse(data.closed_session_count);
   validateTotals(data.totals);
   const ids = new Set<string>();
   for (const row of data.items) {
@@ -76,6 +83,8 @@ export async function readEarningsDirectory(
     if (ids.has(id)) throw new Error("EARNINGS_SOURCE_UNAVAILABLE");
     ids.add(id);
     if (row.kind === "instructor") {
+      if (input.includeClosedSessionCount || row.closed_session_count !== undefined)
+        count.parse(row.closed_session_count);
       if (input.personId && row.person_id !== input.personId)
         throw new Error("EARNINGS_SOURCE_UNAVAILABLE");
       validateTotals(row.totals);

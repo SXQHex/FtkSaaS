@@ -4,8 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import type { ClientScope, AccountReadContext } from "../../lib/scoped-backend";
-import type { InstructorFinancePayment, Interval } from "@ftksaas/api-contracts";
+import type { ClientScope } from "../../lib/scoped-backend";
+import type { InstructorFinancePayment } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
 import { capturePrivateReadback, readIntoCurrentQuery } from "../../lib/cache-invalidation";
 
@@ -24,31 +24,6 @@ type Editor =
   | { kind: "pay"; personId?: string }
   | { kind: "correct"; payment: InstructorFinancePayment }
   | { kind: "agreement"; personId: string; selectedId?: string };
-
-async function readVisibleCounts(
-  scope: ClientScope,
-  interval: Interval | undefined,
-  personIds: readonly string[],
-  readContext?: AccountReadContext,
-) {
-  const result: Record<string, number> = {};
-  for (let at = 0; at < personIds.length; at += 4) {
-    const batch = personIds.slice(at, at + 4);
-    const responses = await Promise.all(
-      batch.map((personId) =>
-        readEarningsDirectory(scope, "instructors", { personId, interval }, readContext),
-      ),
-    );
-    responses.forEach((response, offset) => {
-      result[batch[offset]!] = response.closed_session_count;
-    });
-  }
-  return result;
-}
-
-function instructorIds(items: Awaited<ReturnType<typeof readEarningsDirectory>>["items"]) {
-  return items.flatMap((row) => (row.kind === "instructor" ? [row.person_id] : [])).sort();
-}
 
 export function EarningsContent({
   scope,
@@ -97,21 +72,17 @@ export function EarningsContent({
     !lost &&
     (period === "all" || !!interval);
   const view = tab === "lines" ? "earnings" : tab;
+  const filters = {
+    personId: personId || undefined,
+    interval,
+    includeClosedSessionCount: view === "instructors" && !personId,
+  };
   const isCatalogView = view === "instructors" && !personId && !interval;
   const sharesCatalogPage = isCatalogView && !cursors[index];
   const directory = useQuery({
     queryKey: [...earningsKeys.directory(scope), view, personId, interval, cursors[index]],
     queryFn: (readContext) =>
-      readEarningsDirectory(
-        scope,
-        view,
-        {
-          personId: personId || undefined,
-          interval,
-          cursor: cursors[index],
-        },
-        readContext,
-      ),
+      readEarningsDirectory(scope, view, { ...filters, cursor: cursors[index] }, readContext),
     enabled: active && !sharesCatalogPage,
     retry: false,
     refetchOnWindowFocus: false,
@@ -120,7 +91,12 @@ export function EarningsContent({
     queryKey: earningsKeys.instructorCatalog(scope),
     initialPageParam: undefined as string | undefined,
     queryFn: ({ pageParam, client, signal }) =>
-      readEarningsDirectory(scope, "instructors", { cursor: pageParam }, { client, signal }),
+      readEarningsDirectory(
+        scope,
+        "instructors",
+        { cursor: pageParam, includeClosedSessionCount: true },
+        { client, signal },
+      ),
     getNextPageParam: (page) => page.next_cursor ?? undefined,
     enabled: active,
     retry: false,
@@ -151,15 +127,6 @@ export function EarningsContent({
           ).values(),
         ]
       : [];
-  // The native summary is requested only for visible instructors; no page rows are summed into a global count.
-  const visibleInstructors = instructorIds(!page.isError ? (page.data?.items ?? []) : []);
-  const counts = useQuery({
-    queryKey: [...earningsKeys.visibleCounts(scope), interval, visibleInstructors],
-    enabled: active && !personId && view === "instructors" && visibleInstructors.length > 0,
-    queryFn: (readContext) => readVisibleCounts(scope, interval, visibleInstructors, readContext),
-    retry: false,
-    refetchOnWindowFocus: false,
-  });
   const disciplines = useQuery({
     queryKey: ["earnings-agreement-disciplines", scope],
     queryFn: (readContext) => readDisciplineCatalog(scope, "center", readContext),
@@ -194,9 +161,7 @@ export function EarningsContent({
   const visibleCounts =
     readable && view === "instructors" && personId
       ? { [personId]: readable.closed_session_count }
-      : !counts.isError
-        ? counts.data
-        : undefined;
+      : undefined;
   const mapped = readable ? earningsPresentation(readable, timezone!, t, visibleCounts) : undefined;
   const resetPage = () => {
     setCursors([undefined]);
@@ -208,34 +173,23 @@ export function EarningsContent({
     await invalidateEarningsViews(queries, scope);
     assertCurrent();
     // A payment or agreement may invalidate the historical cursor chain.
-    const first = isCatalogView
-      ? await readIntoCurrentQuery(
-          queries,
-          earningsKeys.instructorCatalog(scope),
-          () => readEarningsDirectory(scope, "instructors"),
-          (value) => ({ pages: [value], pageParams: [undefined] }),
-        )
-      : await queries.fetchQuery({
-          queryKey: [...earningsKeys.directory(scope), view, personId, interval, undefined],
-          queryFn: () =>
-            readEarningsDirectory(scope, view, { personId: personId || undefined, interval }),
-          staleTime: 0,
-          retry: false,
-        });
-    assertCurrent();
-    const ids = instructorIds(first.items);
-    const [result] = await Promise.all([
-      isCatalogView ? Promise.resolve() : catalog.refetch(),
-      view === "instructors" && !personId && ids.length
-        ? queries.fetchQuery({
-            queryKey: [...earningsKeys.visibleCounts(scope), interval, ids],
-            queryFn: () => readVisibleCounts(scope, interval, ids),
-            staleTime: 0,
-            retry: false,
-          })
-        : Promise.resolve(),
-    ]);
-    if (result?.isError) throw Error("EARNINGS_REFRESH_UNAVAILABLE");
+    if (isCatalogView) {
+      await readIntoCurrentQuery(
+        queries,
+        earningsKeys.instructorCatalog(scope),
+        () => readEarningsDirectory(scope, "instructors", { includeClosedSessionCount: true }),
+        (value) => ({ pages: [value], pageParams: [undefined] }),
+      );
+    } else {
+      await queries.fetchQuery({
+        queryKey: [...earningsKeys.directory(scope), view, personId, interval, undefined],
+        queryFn: () => readEarningsDirectory(scope, view, filters),
+        staleTime: 0,
+        retry: false,
+      });
+      assertCurrent();
+      await catalog.refetch({ throwOnError: true });
+    }
     assertCurrent();
     setCursors([undefined]);
     setIndex(0);
@@ -247,13 +201,11 @@ export function EarningsContent({
     await router.invalidate();
     if (!sharesCatalogPage) void directory.refetch();
     void catalog.refetch();
-    if (!personId && view === "instructors" && visibleInstructors.length) void counts.refetch();
   }
   const sourceError =
     page.isError ||
     catalog.isError ||
     catalogInvalid ||
-    counts.isError ||
     months.isError ||
     lost ||
     workspace.isError;

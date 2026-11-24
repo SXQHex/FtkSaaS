@@ -108,7 +108,10 @@ export function SettingsPublicEditor({
       if (page) {
         const interval = await publicCalendarInterval();
         const read = (address: string) =>
-          readPublicCalendar({ slug: address, interval }, AbortSignal.timeout(15_000));
+          readPublicCalendar(
+            { slug: address, interval, discoveryOnly: true },
+            AbortSignal.timeout(15_000),
+          );
         const previous = publicPage?.slug ?? before.scope.orgId;
         const [current, former] = await Promise.all([
           read(page.slug),
