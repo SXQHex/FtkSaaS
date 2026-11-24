@@ -172,6 +172,13 @@ Yerel `verify` sözleşme, yönetişim ve restore testlerinde 468/468, CI araç 
 
 [PR #434](https://github.com/SXQHex/FtkSaaS/pull/434) `be2b22fef520ea7ba7464b5d7f173445d2826135` olarak main’e alındı ve [development dağıtımı](https://github.com/SXQHex/FtkSaaS/actions/runs/45413414581) başarılı oldu. Dağıtım tamamlandıktan sonraki ilk dört dakikalık log penceresinde etkilenen dört işlem için yeni örnek yoktu. Dağıtılan kaynakla canlı Stüdyo ve Üyeler tekrarı açık.
 
+<a id="development-503-urun-katalogu"></a>
+### Development 503 — Ürün kataloğu
+
+24 Kasım 2026’da 17.47.53 TSİ’de `products_list_v1`, [development dağıtımı](https://github.com/SXQHex/FtkSaaS/actions/runs/45417696259) sonrasında Edge v114 üzerinden HTTP 503 verdi. Edge 9,03 saniyede, iç RPC HTTP 500 ile 8,67 saniyede tamamlandı. Aynı PostgreSQL oturumu organizasyon satırında iki `FOR UPDATE` bekleyişinde toplam 5,58 saniye geçirdi ve `57014` statement timeout ile kesildi. Ardından aynı işlem için üç HTTP 200 kaydedildi.
+
+İzole native Supabase’de ürün listesi başka bir okuma organizasyon kilidini tutarken başarısız oldu. [Yeni migration](../supabase/migrations/20261124150021_share_product_list_read_lock.sql) yalnız `products_list_v1` için organizasyon kilidini `FOR SHARE` yapar. Eşzamanlı okumalar ilerlerken organizasyon yazma ve yetki kaldırma kilitleriyle çakışma sürer. [Kilit regresyonu](../tests/student-status-filter-acceptance.mjs) ve [Auth → Edge → RPC katalog kabulü](../tests/p01-catalog-entitlement-reads.test.mjs) toplam 22/22 geçti. Aday CI ve dağıtımdan sonra eşzamanlı canlı tekrar bekleniyor.
+
 <a id="xreq-071-backend-kapanisi"></a>
 ### XREQ-071 — Ödeme onayı backend incelemesi
 

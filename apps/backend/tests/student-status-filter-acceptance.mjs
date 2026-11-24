@@ -32,6 +32,7 @@ test('Student status filters selected-center current membership before paginatio
    ['settings_catalog_get_v1',{scope:'organization'}],
    ['management_state_get_v1',{center_id:center,operation:'availability_exception_save_v1',selector:{operation:'availability_exception_save_v1',key:{resource:{kind:'room',id:room}}}}],
    ['management_state_get_v1',{center_id:center,operation:'center_discipline_set_v1',selector:{operation:'center_discipline_set_v1',key:{discipline_id:discipline}}}],
+   ['products_list_v1',{center_id:center,page:{limit:1}}],
   ];
   try{
    for(const [operation,body] of reads){
