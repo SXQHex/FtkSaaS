@@ -2,8 +2,14 @@ import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { BackendError } from "../../lib/backend";
 import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
-import type { LessonRequestView, ManagementStateView, PersonView } from "@ftksaas/api-contracts";
+import type {
+  LessonRequestView,
+  ManagementStateView,
+  PersonView,
+  SessionView,
+} from "@ftksaas/api-contracts";
 import { getTemporal } from "../../lib/temporal";
+import { calendarSessionWithDiscipline } from "../schedule/calendar-session";
 import { readScheduleSession } from "../schedule/schedule-read";
 import type { RequestFilter } from "./lesson-requests-view";
 const positive = z.number().int().positive().safe(),
@@ -197,8 +203,8 @@ export async function readRequestSessions(
 ) {
   const { interval, instructorId } = await requestInterval(request),
     seen = new Set<string>(),
-    ids = new Set<string>();
-  if (exactSessionId) ids.add(exactSessionId);
+    candidates = new Map<string, SessionView | undefined>();
+  if (exactSessionId) candidates.set(exactSessionId, undefined);
   else {
     const backend = await scopedBackend(scope, undefined, readContext);
     let cursor: string | undefined;
@@ -207,6 +213,7 @@ export async function readRequestSessions(
         ...common(scope),
         request_id: uuidv7(),
         interval,
+        include_session_summary: true,
         page: { limit: 50, sort: "starts_at_asc", ...(cursor ? { cursor } : {}) },
       });
       for (const row of page.items)
@@ -216,15 +223,18 @@ export async function readRequestSessions(
           Date.parse(row.starts_at) === Date.parse(interval.starts_at) &&
           Date.parse(row.ends_at) === Date.parse(interval.ends_at)
         )
-          ids.add(row.id);
+          candidates.set(
+            z.uuid().parse(row.id),
+            candidates.has(row.id) ? undefined : calendarSessionWithDiscipline(row),
+          );
       cursor = page.next_cursor ?? undefined;
       if (cursor && seen.has(cursor)) throw new Error("LESSON_REQUEST_SESSIONS_UNAVAILABLE");
       if (cursor) seen.add(cursor);
     } while (cursor);
   }
   const sessions = [];
-  for (const id of ids) {
-    const session = await readScheduleSession(scope, id, undefined, readContext);
+  for (const [id, projection] of candidates) {
+    const session = projection ?? (await readScheduleSession(scope, id, undefined, readContext));
     if (
       session.format === "private" &&
       session.discipline_id === request.discipline_id &&

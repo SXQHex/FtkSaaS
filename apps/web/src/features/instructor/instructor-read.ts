@@ -5,6 +5,7 @@ import { scopedBackend } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
 import { getTemporal } from "../../lib/temporal";
 import type { CalendarItem, Interval, SessionView } from "@ftksaas/api-contracts";
+import { calendarSessionWithDiscipline } from "../schedule/calendar-session";
 import { readScheduleSession } from "../schedule/schedule-read";
 import { readSessionAttendance } from "../session-detail/session-detail-read";
 
@@ -67,6 +68,7 @@ export async function readInstructorCalendar(
       interval,
       resource: { kind: "person", id: personId },
       include_room_labels: true,
+      include_session_summary: true,
       page: { limit: 50, sort: "starts_at_asc", ...(cursor ? { cursor } : {}) },
     });
     if (page.items.length > 50) throw new Error("INSTRUCTOR_CALENDAR_UNAVAILABLE");
@@ -92,6 +94,9 @@ export async function readInstructorCalendar(
   for (let i = 0; i < calendar.length; i += 4) {
     const entries = await Promise.all(
       calendar.slice(i, i + 4).map(async (item) => {
+        const projected = calendarSessionWithDiscipline(item);
+        if (projected?.room_labels !== undefined && instructorAssigned(projected, personId))
+          return { item, session: projected };
         const session = await readScheduleSession(
           scope,
           item.id,
