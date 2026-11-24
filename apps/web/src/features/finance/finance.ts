@@ -122,15 +122,15 @@ export async function readCollectionAuthority(
       selector: { operation: "collection_record_v1", key: { person_id: personId } },
       page: { limit: 1 },
     });
-    const item = page.items[0];
+    const item = Array.isArray(page?.items) ? page.items[0] : undefined;
     if (
+      item?.exists !== true ||
       page.items.length !== 1 ||
       page.next_cursor ||
-      !item?.exists ||
       item.entity?.type !== "people" ||
       item.entity.id !== personId ||
       item.current?.operation !== "collection_record_v1" ||
-      item.current.values.person_id !== personId
+      item.current.values?.person_id !== personId
     )
       throw new Error("FINANCE_AUTHORITY_UNAVAILABLE");
     return true;

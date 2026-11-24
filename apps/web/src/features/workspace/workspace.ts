@@ -1,9 +1,49 @@
 import { v7 as uuidv7 } from "uuid";
+import { z } from "zod";
 import type { Session } from "@supabase/supabase-js";
 import { BackendError, getBackend } from "../../lib/backend";
 import { getSupabaseClient } from "../../lib/supabase";
 import { sameNativeSession } from "../auth/native-session-id";
 import type { OrganizationView, CenterView, RoleView } from "@ftksaas/api-contracts";
+
+const organizationAuthority = z.object({
+  id: z.uuid(),
+  self_context: z
+    .object({
+      person_id: z.uuid(),
+      centers: z.array(
+        z.object({
+          center_id: z.uuid(),
+          instructor: z.boolean().optional(),
+          student: z.boolean().optional(),
+          assistant: z.boolean().optional(),
+        }),
+      ),
+    })
+    .nullish(),
+  self_management_scope: z
+    .object({
+      owner: z.boolean(),
+      org_manager: z.boolean(),
+      managed_center_ids: z.array(z.uuid()),
+    })
+    .nullish(),
+});
+const centerAuthority = z.object({ id: z.uuid(), accessible: z.boolean() });
+const roleAuthority = z.object({
+  person_id: z.uuid(),
+  scope_center_id: z.uuid().nullable(),
+  role: z.enum([
+    "owner",
+    "org_manager",
+    "center_manager",
+    "staff",
+    "instructor",
+    "assistant",
+    "student",
+  ]),
+  account_access_granted: z.boolean().optional(),
+});
 
 function nextWorkspaceCursor(next: string | null | undefined, seen: Set<string>) {
   if (!next) return undefined;
@@ -78,6 +118,11 @@ async function readWorkspaceProjection(
       },
       signal,
     );
+    if (
+      !Array.isArray(page.items) ||
+      !page.items.every((org) => organizationAuthority.safeParse(org).success)
+    )
+      throw new Error("WORKSPACE_PROJECTION_INVALID");
     organizations.push(...page.items);
     cursor = nextWorkspaceCursor(page.next_cursor, cursors);
   } while (cursor);
@@ -101,6 +146,11 @@ async function readWorkspaceProjection(
         },
         signal,
       );
+      if (
+        !Array.isArray(page.items) ||
+        !page.items.every((center) => centerAuthority.safeParse(center).success)
+      )
+        throw new Error("WORKSPACE_PROJECTION_INVALID");
       centers.push(...page.items.filter((center) => center.accessible));
       cursor = nextWorkspaceCursor(page.next_cursor, cursors);
     } while (cursor);
@@ -120,6 +170,11 @@ async function readWorkspaceProjection(
             },
             signal,
           );
+          if (
+            !Array.isArray(page.items) ||
+            !page.items.every((role) => roleAuthority.safeParse(role).success)
+          )
+            throw new Error("WORKSPACE_PROJECTION_INVALID");
           roles.push(...page.items.filter((role) => role.state === "active"));
           cursor = nextWorkspaceCursor(page.next_cursor, cursors);
         } while (cursor);

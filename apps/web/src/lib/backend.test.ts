@@ -165,6 +165,22 @@ describe("backend transport", () => {
       id: request.request_id,
       state: "active",
       display_name: "Fixture",
+      identity: {
+        given_name: null,
+        family_name: null,
+        email: "fixture@example.invalid",
+        phone: null,
+        pending_email: null,
+        pending_phone: null,
+        email_verified_at: true,
+        phone_verified_at: null,
+        unverified_phone: null,
+      },
+    },
+    {
+      id: request.request_id,
+      state: "active",
+      display_name: "Fixture",
       platform_scope: { owner_manage: "true" },
     },
   ])("rejects a malformed account projection before it can grant frontend access", async (data) => {

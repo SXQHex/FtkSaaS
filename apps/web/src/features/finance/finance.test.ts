@@ -94,6 +94,10 @@ it("uses the native writer authority selector and never derives collection permi
     operation: "collection_record_v1",
     key: { person_id: selection.personId },
   });
+  call.mockResolvedValueOnce({ items: [{ ...row, exists: "false" }], next_cursor: null });
+  await expect(readCollectionAuthority(scope, selection.personId)).rejects.toThrow(
+    "FINANCE_AUTHORITY_UNAVAILABLE",
+  );
   call.mockResolvedValue({
     items: [{ ...row, entity: { type: "people", id: scope.accountId } }],
     next_cursor: null,
