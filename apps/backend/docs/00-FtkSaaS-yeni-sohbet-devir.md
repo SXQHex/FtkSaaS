@@ -41,12 +41,37 @@ Geri yükleme öncesinde 206 uygulama relation’ı, 1.013 rutin, 83 trigger, RL
 <a id="o04-hosted-sentetik-auth-imhasi"></a>
 **O04 hosted imha dilimi:** Aynı izole hedefte tatbikat için açılan ayrı sentetik hesap normal Auth ve Edge silme talebi yolunu kullandı. Native `ftk_ops_p07_privacy` rolü eski oturumu kapatan talep sonrasında profil imhasını ve Auth silme iznini işledi. Sağlayıcı hard delete sonrasında yönetici okuması 404 döndü ve parola girişi reddedildi. İlgili identity ve oturum kalıntı sayıları sıfırdı. Uygulama ana imha talebini `partial` olarak korudu. Geçici Cron ve reauth ayarları kaldırıldı. Geri yüklenen üç Auth hesabı ve iki Storage nesnesi korundu.
 
+Son salt okunur kontrolde Auth imha makbuzu ve ana talebin `partial` durumu tekrar doğrulandı. Hedef hesap, identity ve oturum satırı sayısı sıfırdı. İmha anının 20 dakika öncesi ve sonrası için sağlayıcının ayrı loglarında aynı sentetik özneyle eşleşen üç `auth_logs` ve üç `auth_audit_logs` satırı görüldü. Sayılar kanal bazındadır ve aynı olay iki kanalda yer alabilir. Sağlayıcı Free plan için son bir günlük log erişimi yayımlıyor. Erişim süresi dolduktan sonraki okuma ve sağlayıcının fiziksel imha kanıtı açık. [Supabase Auth audit depoları](https://supabase.com/docs/guides/auth/audit-logs), [planın log erişim süresi](https://supabase.com/kb/troubleshooting/check-usage-for-monthly-active-users-mau-MwZaBs).
+
+Bu ortamda tamamlanmış privacy talebi bulunmadığı için O06’nın tamamlanmış imha makbuzu girdisi ve O09’un bu makbuzla güvenli açılışı bekliyor.
+
+İzole yerel Supabase’de kişisel takvimin native Auth ve gerçek HTTP yaşam döngüsü, restore guard ve gerçek PostgreSQL yükleyici birlikte **56/56** geçti. Eski ve imzası değiştirilmiş sicil reddedildi. İmha kaydıyla eşleşen satır yükleyiciye ulaşmadı ve hazırlıktan sonra değişen checkpoint commit’i engelledi. Kişisel takvimin hosted yapılandırma kabulü ayrı bekliyor.
+
 Snapshot ile doğrulanmış hosted uygulama okuması arasında 26 dakika 27 saniye geçti. Bu süre bu tatbikata aittir. Dış sağlayıcı yapılandırması ve sırları, bağımsız kalıcı imha sicili ve O10 pilot ölçümü kendi kabul kapsamlarında açık. Güvenli özet `.artifacts/o08-pr428-hosted-logical-restore.json` makbuzunda durur.
 
 <a id="o10-yerel-business-on-olcum"></a>
 ### O10 — Yerel Business ön ölçümü
 
 10 sentetik organizasyonda 5.000 aktif öğrenci ve 50 ayrı native Auth kullanıcısıyla, her işlem için 100 örnekten oluşan 400 karışık loopback isteği çalıştı. İstek hatası görülmedi. p95 süreleri kişi listesinde 6.205 ms, kişi detayında 5.711 ms, haftalık takvimde 5.932 ms ve CSV işini başlatmada 5.856 ms oldu. Dört süre de kendi pilot hedefini aştı. 100 rapor işi, organizasyona bağlı native worker ile tek denemede işlendi. CSV checksum’ları eşleşti ve abonelik tahsilatı toplamı ile kayıt sayısı korundu. Kritik yazma iş yükü, hosted pilot gecikmesi ve pilot RPO/RTO kabulü açık.
+
+#### O10 — Edge gecikmesi tanısı
+
+Yerel ortam yeniden başlatıldı. Aynı 10 organizasyon ve 50 sentetik kullanıcıyla `oneshot` çalışma politikası altında 1, 10, 25 ve 50 eşzamanlı istek denendi. Doğrudan native Auth okuması, uygulama RPC’si çalıştırmadan yöntem doğrulamasında biten Edge isteği ve gerçek Edge okuması ayrı dalgalarda ölçüldü. 50 eşzamanlılıkta her kontrol 200 istek, üç gerçek okuma işlemi toplam 200 istek üretti. Beklenen yanıtların tamamı alındı.
+
+| Eşzamanlı istek | Auth p95 (ms) | Edge yöntem kontrolü p95 (ms) | Kişi listesi p95 (ms) | Kişi detayı p95 (ms) | Haftalık takvim p95 (ms) |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 1 | 3 | 67 | 121 | 141 | 114 |
+| 10 | 18 | 605 | 1.248 | 1.003 | 1.076 |
+| 25 | 20 | 1.563 | 2.846 | 3.093 | 3.000 |
+| 50 | 35 | 2.937 | 5.902 | 5.670 | 5.596 |
+
+Yerel PostgreSQL’in birikimli işlem istatistiklerinde en uzun kişi listesi sorgusu 307 ms, kişi detayı 15 ms, takvim 40 ms ve rapor başlatma 13 ms sürdü. Edge yöntem kontrolü uygulama sorgusuna ulaşmadan yavaşladığı için yerel gateway ve Edge çalıştırma yolu da gecikmeye katkıda bulunuyor. Ayrı dalga p95’leri birbirinden çıkarılarak katman süreleri hesaplanmadı.
+
+Seri native program ve seans yaşam döngüsü testleri **47/47** geçti. Business senaryosu rezervasyon, iptal, tahsilat, yoklama kapatma, finans ve hak kayıtlarının işlevsel doğrulamasını çalıştırdı. Bu seri testlerde eşzamanlı kritik yazma p95’i ölçülmedi.
+
+Aynı izole hosted projede tek geri yüklenmiş sentetik kullanıcıyla küçük bir karşılaştırma yapıldı. On eşzamanlı istekte 30 kişi listesi okumasının istemci p95’i 892 ms, sağlayıcının `x-envoy-upstream-service-time` başlığı p95’i 707 ms oldu. Seri 10 okumada bu değerler 1.203 ve 1.030 ms idi. Sağlayıcı Edge logunda 40 okumanın `execution_time_ms` p95’i 771 ms, RPC’ye gitmeyen 40 yöntem kontrolünün p95’i 103 ms oldu. Ölçüm tek organizasyon ve tek oturum kapsamındadır. Hosted kabulü için 10 organizasyon × 500 öğrenci, 50 ayrı kullanıcı ve kritik yazma karışımı gerekir. Hedefte üç Auth kullanıcısı ve iki Storage nesnesi korundu. Ölçüm özeti `.artifacts/o10-isolated-latency-diagnostic.json` dosyasındadır. [Supabase Edge log alanları](https://supabase.com/docs/guides/observability/log-field-reference).
+
+Tanının backend kaynakları `1bbb5d61e3d0b0f13c6ad4d6d33e7e87d1eeffe2` ile doğrulanan main `6959681bbda304019df9fa726918e5eb7f23f84d` arasında aynıydı. [Main kanıtı](https://github.com/SXQHex/FtkSaaS/actions/runs/45398814473).
 
 <a id="xreq-073-backend-kabulu"></a>
 ## XREQ-073 — Native okuma kabulü

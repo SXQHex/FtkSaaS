@@ -969,7 +969,7 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 <a id="o10"></a>
 ### O10 — Yük ve kurtarma hedeflerini ölç
 
-- [ ] **Durum:** [Yerel Business ön ölçümü](00-FtkSaaS-yeni-sohbet-devir.md#o10-yerel-business-on-olcum) gecikme hedeflerini aştı, hosted pilot kabulü açık · **Tür:** D/H · **Plan:** Tümü · **Özellik:** F01,F08,F19,F28,F33
+- [ ] **Durum:** [Yerel Business ön ölçümü ve Edge tanısı](00-FtkSaaS-yeni-sohbet-devir.md#o10-yerel-business-on-olcum) tamamlandı, yerel gecikme hedefleri ve hosted pilot kabulü açık · **Tür:** D/H · **Plan:** Tümü · **Özellik:** F01,F08,F19,F28,F33
 - **Bağımlılık:** O02,O08
 - **Kabul:** Ayrı altyapı projesinde belirlenecek veri hacmi ve iş karışımıyla gecikme/queue/finans doğruluğu ve kurtarma hedefleri ölçülür. G02/G01/G03 için plan başına ayrı işletim kabulü oluşturmaz.
 - **Sınır/olumsuz durum:** Öğrenci sayısı eşzamanlı kullanıcı sayısı değildir; onaylanmamış SLA/eşik uydurulmaz.
