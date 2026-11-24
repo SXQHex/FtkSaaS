@@ -25,9 +25,28 @@ Aynı main kaynağında P07 lifecycle, export retention, native Auth imha orkest
 
 Yerel native Storage’da tatbikatın özel nesnesi indirildi, silindi ve silme tekrarlandı. Ortam yeniden başladıktan sonra eski imzalı URL erişimi reddetti, nesnenin disk baytları yoktu ve kontrol nesnesinin SHA-256 özeti eşleşti. Bütünleşik privacy işinde hold kontrollü Storage imhası ve sağlayıcı kopyalarının doğrulaması [açık kabul kapsamındadır](remaining-work.md#o05).
 
-Kullanıcı onayıyla Frankfurt’ta ücretsiz `ftksaas-ops-recovery` projesi (`fuiidquhnqevrozizdcj`) açıldı. Sağlayıcı `ACTIVE_HEALTHY` durumunu doğruladı. Ön kontrolde uygulama şeması, migration kaydı, Auth kullanıcısı, Storage nesnesi ve Edge işlevi yoktu. Yükleme için hedefle sınırlı CLI erişimi, sentetik DB ve Storage paketi ve bağımsız güncel sicil gerekiyor.
+Kullanıcı onayıyla Frankfurt’ta ücretsiz `ftksaas-ops-recovery` projesi (`fuiidquhnqevrozizdcj`) açıldı. Sağlayıcı `ACTIVE_HEALTHY` durumunu doğruladı. Uygulama şeması ve sentetik veriler [hosted geri yükleme tatbikatında](#o08-hosted-sentetik-restore) kuruldu.
 
-O10 yerel ön ölçümünde 10 organizasyon × 500 aktif öğrenci ve 50 eşzamanlı kullanıcı profili kaydedildi. Liste, detay, haftalık takvim ve CSV iş başlatma karışımı ölçümden önce belirlendi. Starter kotası ilk veri kurulumunu beklenen biçimde reddetti. Disk kapasitesi nedeniyle Business profiliyle yeni yerel koşu başlatılmadı. Pilot gecikme ve RPO/RTO ölçümleri [açık işte](remaining-work.md#o10) duruyor.
+O10’un önceden belirlenen 10 organizasyon × 500 aktif öğrenci ve 50 eşzamanlı kullanıcı profili [yerel Business ön ölçümünde](#o10-yerel-business-on-olcum) yürütüldü.
+
+<a id="o08-hosted-sentetik-restore"></a>
+### O08 — Ayrı hosted hedefte sentetik mantıksal geri yükleme
+
+24 Kasım 2026’da `1bbb5d61e3d0b0f13c6ad4d6d33e7e87d1eeffe2` kaynağıyla izole yerel Supabase’den DB dökümü ve iki özel Storage nesnesi aynı kurtarma noktasına bağlandı. Paket Frankfurt’taki ayrı hosted hedefe geri yüklendi. Kaynak ve hedefte 221 migration’ın sırası ve SQL özetleri eşleşti. DDL kesintisinde hedef geçmişi ve yarım dosyanın şema izleri denetlendi. Kalan 43 migration doğrulanan noktadan uygulandı. [Kaynak SHA’nın main CI kanıtı](https://github.com/SXQHex/FtkSaaS/actions/runs/45383138005).
+
+Geri yükleme öncesinde 206 uygulama relation’ı, 1.013 rutin, 83 trigger, RLS politikaları, grant’lar ve sahiplik eşleşti. İmzalı sentetik checkpoint değiştirilmiş snapshot’ı reddetti. Hosted hedefte geç hata probu kısmi Auth, organizasyon, hesap veya Storage kaydı bırakmadan rollback yaptı. Asıl yükleme 35 tabloda 99 yeni satırı yabancı anahtar kontrolleriyle doğruladı. Sekiz uygulama yan etki tetikleyicisi işlem içinde durdurulup tekrar etkinleştirildi. Eski bildirim işi açılmadı.
+
+İki sentetik kullanıcı özgün UUID’leriyle native giriş yaptı. Organizasyon ve merkez Edge’den aynı değerlerle okundu. İki özel Storage nesnesi SHA-256 ile eşleşti ve anonim kullanıcı ile organizasyon dışındaki kullanıcıya erişim reddedildi. Native `p06` Cron, yedekteki raporu tek denemede tamamladı. CSV baytları DB ile eşleşti, kabul oturumları kapatıldı ve tatbikatın Cron işi durduruldu. Ayrı O05 nesnesinin silinmesi ve tekrarı sonrasında eski imzalı URL ile yönetici okuması reddedildi. Geri yüklenen iki kontrol nesnesi korunmuştu.
+
+<a id="o04-hosted-sentetik-auth-imhasi"></a>
+**O04 hosted imha dilimi:** Aynı izole hedefte tatbikat için açılan ayrı sentetik hesap normal Auth ve Edge silme talebi yolunu kullandı. Native `ftk_ops_p07_privacy` rolü eski oturumu kapatan talep sonrasında profil imhasını ve Auth silme iznini işledi. Sağlayıcı hard delete sonrasında yönetici okuması 404 döndü ve parola girişi reddedildi. İlgili identity ve oturum kalıntı sayıları sıfırdı. Uygulama ana imha talebini `partial` olarak korudu. Geçici Cron ve reauth ayarları kaldırıldı. Geri yüklenen üç Auth hesabı ve iki Storage nesnesi korundu.
+
+Snapshot ile doğrulanmış hosted uygulama okuması arasında 26 dakika 27 saniye geçti. Bu süre bu tatbikata aittir. Dış sağlayıcı yapılandırması ve sırları, bağımsız kalıcı imha sicili ve O10 pilot ölçümü kendi kabul kapsamlarında açık. Güvenli özet `.artifacts/o08-pr428-hosted-logical-restore.json` makbuzunda durur.
+
+<a id="o10-yerel-business-on-olcum"></a>
+### O10 — Yerel Business ön ölçümü
+
+10 sentetik organizasyonda 5.000 aktif öğrenci ve 50 ayrı native Auth kullanıcısıyla, her işlem için 100 örnekten oluşan 400 karışık loopback isteği çalıştı. İstek hatası görülmedi. p95 süreleri kişi listesinde 6.205 ms, kişi detayında 5.711 ms, haftalık takvimde 5.932 ms ve CSV işini başlatmada 5.856 ms oldu. Dört süre de kendi pilot hedefini aştı. 100 rapor işi, organizasyona bağlı native worker ile tek denemede işlendi. CSV checksum’ları eşleşti ve abonelik tahsilatı toplamı ile kayıt sayısı korundu. Kritik yazma iş yükü, hosted pilot gecikmesi ve pilot RPO/RTO kabulü açık.
 
 <a id="xreq-073-backend-kabulu"></a>
 ## XREQ-073 — Native okuma kabulü
