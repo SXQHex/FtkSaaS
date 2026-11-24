@@ -15,7 +15,7 @@ Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin te
 - [x] [Son kaynak paketi](../supabase/migrations/20261124013200_exact_management_readbacks.sql) Ekip, CRM takipleri ve rezervasyon sayfalarına yetkili canonical ad, etkinlik ayrıntısına mekân/görevli etiketi, etkinlik ödemesine kesin hazırlık seçicisi ve kayıp özel ders onayı için kesin rezervasyon okumasını ekler. İzole native Auth → Edge → Data API → PostgreSQL koşusunda dört ilgili API test dosyasındaki 57 test geçti.
 - [x] Yerel karşılaştırmada aynı beş Ekip ataması için 30 örnekte 5 istek ve 9 satırdan 1 istek ve 5 satıra inildi. p50 104,21 → 41,63 ms, p95 137,36 → 73,61 ms. Aynı ortamda bir oda, bir eğitmen ve bir sınıf için mevcut program, müsaitlik, kapanış ve anlaşma okumaları 6 paralel istek ve 3 satır döndürdü. p50 42,61 ms, p95 69,94 ms. Daha geniş Stüdyo projeksiyonu kararı development ölçümüne bağlıdır.
 - [x] Platform kurulum komutu talebin kimliğini, eşleşen hesabı ve adı açık durumdayken satır kilidi altında denetler. Bu kayıtta değişebilir bir taslak alanı bulunmadığı için kesin sıra okuyucusuna ek yazma sürümü eklenmedi.
-- [ ] Son kaynak paketinin aday CI, main kabulü ve development teslimini doğrula.
+- [x] Son kaynak paketi PR #419 ile main’de. [Aday CI, main ve development kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#xreq-073-backend-kabulu) doğrulandı.
 - [ ] Development ortamında aynı görünür satırlarda eşdeğerliği, istek ve satır sayısını ve hosted gecikmeyi ölç. İstemci kabulü [Frontend M09](../../web/docs/remaining-work.md#router-query-birlesik) kaydında izlenir.
 
 <a id="ci503-native-baslangic"></a>
@@ -115,7 +115,7 @@ Kullanıcı 16 Kasım’da talepleri sırayla değerlendirme, mevcut native eşl
 - [x] W1-BE-35 PR327 aday/main kaynak kabulü ve development teslimi; kanıt [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-manager-role-discovery), frontend kabulü ayrı.
 
 - [x] W1-BE-36 kaynak/runner: zorunlu bağımsız callback pini, private stdin native/expired CLI ve yabancı callback/gizlilik/restore unit kabulü; [XREQ-070](../../../docs/requests.md#xreq-070), kanıt [devirde](00-FtkSaaS-yeni-sohbet-devir.md#web1-recovery-callback-acceptance).
-- [ ] W1-BE-36 Draft PR push → aday CI → ayrıca yetkili merge/main/development teslimi.
+- [x] W1-BE-36 PR #328 ile main’e alındı. [Main ve development kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#web1-recovery-callback-acceptance) doğrulandı.
 - [ ] W1-BE-36 yeni app/izinli yerel callback’te gerçek teslim/PKCE/tüketilmiş proof ve ayrı doğal expiry kaynak/run/ortam kanıtı; eski S08 kabulü korunur, P01/G-PRO gerçek sağlayıcı alt kontrolü bu yeni kanıtı bekler.
 
 ## Web1 ek backend talepleri — 15 Kasım
@@ -144,8 +144,8 @@ Kullanıcı 16 Kasım’da iki sözleşme önerisinin uygulanmasını onayladı.
 - [x] Geriye uyumlu typed zaman filtresi; sunucu başlangıç sınırı cursor’a bağlı, filtre limit öncesi ve canlı aktör/kişi/merkez sınırında.
 - [x] Ayrı planlı iptal preview/apply; mevcut CM/F17/ürün, stale/aynı-key, yalnız ilgili geçerliliği geri alma ve kesin rezervasyon koruması.
 - [x] Son kaynak statik/SQL doğrulama ve inceleme; kanıt devir sahibindedir.
-- [ ] Aday full clean → main kaynak kanıtı → development dağıtım doğrulaması.
-- [ ] Yeni hosted backend kabulü; frontend ekran kabulü ayrı kalır.
+- [x] PR #314 aday full clean, main kabulü ve development teslimi doğrulandı. [Kaynak ve teslim kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#uye-profili-zaman-iptal).
+- [ ] Yeni hosted backend kabulü.
 
 ## W1-BE-15/16 — Seans keşfi ve rezervasyonun gerçek kaynak hakkı
 
@@ -162,16 +162,18 @@ Kullanıcı gerekli backend açıklarını gidermeyi ve gereksiz geliştirme yer
 Kullanıcının backend açıklarını giderme görevinin E21 ekidir; ayrı PR'da yürür. Kesin tüketim WF06, frontend kabulü kendi TODO/E21 alanındadır. Kaynak/ortam kanıtı [devir](00-FtkSaaS-yeni-sohbet-devir.md#ozel-ders-durum-ozet) sahibindedir.
 
 - [x] Mevcut talep okuyucusunda opt-in durum/özet; terminal dört durum eşlemesi, native görünür kapsam ve cursor bağlama.
-- [x] Son kaynak SQL/typed/static test ve bağımsız inceleme; native Auth/Edge kabulü aday CI aşamasındadır.
-- [ ] Aday CI → main kaynak kanıtı → development teslimi; gerekli hosted tekrar ve E21 kabulü ayrı.
+- [x] Son kaynak SQL, tip kontrolü ve bağımsız inceleme tamamlandı.
+- [x] PR #317 ile kaynak, main ve development kabulü doğrulandı. [Ortak teslim kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#atanmis-seans-salon).
+- [ ] Gerekli hosted backend tekrarı.
 
 ## W1-BE-18 — Atanmış seansın salon etiketi
 
 Kullanıcı ayrı PR ile gerekli backend desteğini ve talep dosyasındaki doğru tüketim yolunu istedi. Kesin sözleşme [WF03](../../../docs/workflows.md#wf03), kaynak/ortam kanıtı [devir](00-FtkSaaS-yeni-sohbet-devir.md#atanmis-seans-salon) sahibindedir. E24 frontend kabulü ayrı kalır.
 
 - [x] Mevcut calendar/session okuyucusunda opt-in typed güncel salon etiketi; canlı atama/rol, organizasyon/merkez ve mevcut seans görünürlüğü korunur. Yönetim keşfi veya yeni endpoint açılmaz.
-- [x] Son kaynak yerel doğrulama ve bağımsız inceleme; native kabul aday CI aşamasında.
-- [ ] Aday CI → main kaynak kanıtı → development teslimi; gerekli hosted backend kabulü.
+- [x] Son kaynak yerel doğrulama ve bağımsız inceleme tamamlandı.
+- [x] PR #317 aday CI, main ve development teslimi doğrulandı. [Ortak teslim kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#atanmis-seans-salon).
+- [ ] Gerekli hosted backend kabulü.
 
 ## Backend çalışma modeli
 
@@ -1002,7 +1004,8 @@ Bu kapılar backend teslimini değerlendirir. Kaynak, gerekli native CI, main/de
 <a id="g03"></a>
 ### G03 — Business ekleri ve toplam backend kabulü
 
-- [ ] **Tür:** D/H · **Plan:** Business/Tümü · **Özellik:** F01–F33
+- [x] **Tür:** D/H · **Plan:** Business/Tümü · **Özellik:** F01–F33
+- **Kapanış kanıtı:** [G03 kaynak ve gerçek ortam kabul eşleştirmesi](00-FtkSaaS-yeni-sohbet-devir.md#g03-business-kabulu).
 - **Bağımlılık:** Kabul edilmiş ortak Pro temeli (G02), Starter kısıt kabulü (G01), B01–B04 ve ortak O01/O02/O11 kanıtı. Ayrı Business işletim/yük/restore kabulü eklenmez; O03–O10 bu teslimin sonrasındadır. Business temel ders/finans/Auth motorunu yeniden geliştirmez.
 - **Kabul:** Beş merkeze/1250 aktif öğrenciye kadar aynı uygulama; orgda tek kişi/Abone No ve kota sayımı, merkez izolasyonu, ortak inbox/rapor, merkezler arası hak kullanımı, satış bedeli payı ve karşı merkez onaylı hesaplaşma birlikte doğrulanır.
 - **Sınır/olumsuz durum:** Org yetkisi merkez operasyon yetkisi sayılmaz; her A/B adımında canlı kapsam doğrulanır. Geçmiş finans/ödeme/hakediş yeniden yazılmaz; tek taraflı hesaplaşma, mükerrer kişi sayımı ve scope sızıntısı reddedilir.
@@ -1011,7 +1014,7 @@ Bu kapılar backend teslimini değerlendirir. Kaynak, gerekli native CI, main/de
 
 ## F01–F33 kapsama izi
 
-A03.1 operasyonları tek WF sahibine ve F01–F33 normatif plan izine bağladı; güncel eşleme ve operasyon envanteri [üretilmiş API haritasından](../../../docs/functions.md) okunur. `features=[]` olan ortak ayar/medya operasyonları WF12 üzerinden S10 kapsamındadır. Ortak altyapıya yapay F etiketi atanmadı. Aşağıdaki akışların kaynak/test bağları `docs/workflows.json`, okunabilir görünümü [API haritası](../../../docs/functions.md) sahibindedir. Eksik WF test bağları mevcut gerçek test/SQL fixture kaynaklarıyla tamamlandı; yeni runtime başarısı iddia edilmez. Abonelik yükseltme/iptal testlerinin SQL dispatcher kabulü gerçek HTTP kabulünden ayrılır; grace uzatmanın negatif yetki kontrolü olumlu uzatma kabulü değildir. Bu eksikler S16 ve O10 kapsamında kalır. Her özelliğin hosted/plan bütünlük kabulü ilgili S/P/B/O ve G görevlerinde açık kalır; aday kaynağın test/ortam sonucu yalnız devirde tutulur.
+A03.1 operasyonları tek WF sahibine ve F01–F33 normatif plan izine bağladı; güncel eşleme ve operasyon envanteri [üretilmiş API haritasından](../../../docs/functions.md) okunur. `features=[]` olan ortak ayar/medya operasyonları WF12 üzerinden S10 kapsamındadır. Ortak altyapıya yapay F etiketi atanmadı. Aşağıdaki akışların kaynak/test bağları `docs/workflows.json`, okunabilir görünümü [API haritası](../../../docs/functions.md) sahibindedir. Eksik WF test bağları mevcut gerçek test/SQL fixture kaynaklarıyla tamamlandı; yeni runtime başarısı iddia edilmez. Abonelik yükseltme/iptal testlerinin SQL dispatcher kabulü gerçek HTTP kabulünden ayrılır; grace uzatmanın negatif yetki kontrolü olumlu uzatma kabulü değildir. Bu eksikler S16 ve O10 kapsamında kalır. Özelliklerin hosted ve plan bütünlüğü kabulü ilgili S/P/B/O ve G görevlerinde izlenir. Kaynak ve ortam kanıtı devir kaydındadır.
 
 A03 ve G03 genel iz/kabul kapılarıdır. Aşağıdaki tablo görev navigasyonudur; ikinci durum veya plan erişimi matrisi değildir. Plan erişimi yalnız ürün sözleşmesinden alınır.
 

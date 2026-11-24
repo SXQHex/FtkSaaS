@@ -191,7 +191,7 @@ it("M04 invalidates earnings periods, catalog and counts per center", async () =
     ["earnings-directory", scope, "earnings", "person-a", "2026-10", "cursor-2"],
     ["earnings-directory", scope, "instructors", "", "2026-11", "cursor-1"],
     ["earnings-instructor-catalog", scope],
-    ["earnings-visible-counts", scope, "2026-10", { items: [] }],
+    ["earnings-directory", scope, "instructors", "", "2026-10", undefined],
   ];
   for (const key of keys) cache(queries, key);
   const otherKey = ["earnings-directory", other, "earnings", "person-a", "cursor-2"];

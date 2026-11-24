@@ -11,6 +11,13 @@ test("manager native directory preserves global currency totals, historical agre
   await expect(page.getByText("7 tekil kapalı ders seansı", { exact: true })).toBeVisible();
   const row = page.getByRole("row").filter({ hasText: "Örnek Eğitmen" });
   await expect(row.getByRole("gridcell", { name: "3", exact: true })).toBeVisible();
+  const instructorReads = f.reads.filter((request) => request.view === "instructors");
+  expect(instructorReads).toHaveLength(1);
+  expect(instructorReads[0]).toMatchObject({
+    include_closed_session_count: true,
+    center_id: I.center,
+  });
+  expect(instructorReads[0]).not.toHaveProperty("person_id");
   await expect(page.getByText("₺1.000,00 · €50,00", { exact: true }).first()).toBeVisible();
   await page.getByRole("tab", { name: "Eğitmenler", exact: true }).focus();
   await page.keyboard.press("ArrowRight");

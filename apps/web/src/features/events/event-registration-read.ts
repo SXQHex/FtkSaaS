@@ -204,43 +204,31 @@ export async function readRegistrationPayment(
 ): Promise<RegistrationPayment> {
   const backend = await scopedBackend(scope, undefined, readContext);
   try {
-    const page = await backend.call("management_state_get_v1", {
-      ...common(scope),
-      request_id: uuidv7(),
-      operation: "event_payment_prepare_v1",
-      selector: {
-        operation: "event_payment_prepare_v1",
-        key: { event_id: eventId, person_id: personId },
-      },
-      page: { limit: 20 },
-    });
-    const ids = new Set<string>();
-    for (const row of page.items) {
-      if (row.operation !== "event_payment_prepare_v1")
-        throw new Error("EVENT_PAYMENT_UNAVAILABLE");
-      if (!row.exists) continue;
-      if (row.entity?.type !== "event_payment_preparations" || ids.has(row.entity.id))
-        throw new Error("EVENT_PAYMENT_UNAVAILABLE");
-      ids.add(z.uuid().parse(row.entity.id));
-      const value = validateEventPayment(
-        await backend.call("event_payment_get_v1", {
-          ...common(scope),
-          request_id: uuidv7(),
-          preparation_id: row.entity.id,
-        }),
-        scope,
-        eventId,
-        personId,
-        row.entity.id,
-      );
-      if (registrationId ? value.registration_id === registrationId : value.state === "prepared")
-        return { kind: "available", value };
-    }
-    // An absent, hidden or older cursor result is not evidence of a zero debt or a free registration.
-    return { kind: "unavailable" };
+    const value = validateEventPayment(
+      await backend.call("event_payment_get_v1", {
+        ...common(scope),
+        request_id: uuidv7(),
+        selection: {
+          event_id: z.uuid().parse(eventId),
+          person_id: z.uuid().parse(personId),
+          ...(registrationId ? { registration_id: z.uuid().parse(registrationId) } : {}),
+        },
+      }),
+      scope,
+      eventId,
+      personId,
+    );
+    if (
+      value.registration_id !== (registrationId ?? null) ||
+      (!registrationId && value.state !== "prepared")
+    )
+      throw new Error("EVENT_PAYMENT_UNAVAILABLE");
+    return { kind: "available", value };
   } catch (error) {
-    if (error instanceof BackendError && ["FORBIDDEN", "NOT_FOUND"].includes(error.code))
-      return { kind: "restricted" };
+    if (error instanceof BackendError) {
+      if (error.code === "NOT_FOUND") return { kind: "unavailable" };
+      if (error.code === "FORBIDDEN") return { kind: "restricted" };
+    }
     throw error;
   }
 }

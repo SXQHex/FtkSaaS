@@ -25,7 +25,8 @@ export function earningsPresentation(
     lines: EarningsLineRow[] = [],
     payments: EarningsPaymentRow[] = [];
   for (const row of data.items) {
-    if (row.kind === "instructor")
+    if (row.kind === "instructor") {
+      const count = counts[row.person_id] ?? row.closed_session_count;
       people.push({
         id: row.person_id,
         name: row.display_name,
@@ -41,15 +42,12 @@ export function earningsPresentation(
         agreementDetail: t(($) => $.earnings.agreementVersions, {
           count: row.agreement_ids.length,
         }),
-        sessions:
-          counts[row.person_id] === undefined
-            ? "—"
-            : new Intl.NumberFormat("tr-TR").format(counts[row.person_id]!),
+        sessions: count === undefined ? "—" : new Intl.NumberFormat("tr-TR").format(count),
         earned: amount(row.totals, "earned_minor"),
         paid: amount(row.totals, "paid_minor"),
         remaining: amount(row.totals, "remaining_minor"),
       });
-    else if (row.kind === "earning") {
+    } else if (row.kind === "earning") {
       const value = row.earning;
       lines.push({
         id: value.id,
