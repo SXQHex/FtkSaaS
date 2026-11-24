@@ -24,7 +24,7 @@ test('signed malformed request ID array is rejected',()=>{const x=fixture();cons
 for(const name of ['snapshot','captured_at'])test('snapshot metadata cannot hide structured payload in '+name,()=>{const x=fixture();const data=JSON.parse(x.snapshotBytes);data[name]={hidden_rows:[{id:erased}]};x.snapshotBytes=Buffer.from(JSON.stringify(data));x.trust.snapshot_sha256=sha256(x.snapshotBytes);assert.throws(()=>inspectRestore(x),/INVALID_SNAPSHOT/);});
 
 // Real disk + Ed25519 adapter tests: no database/provider substitutes.
-const {appendErasure}=await import('../scripts/erasure-register.mjs');
+const {appendErasure,rotateErasureRegister}=await import('../scripts/erasure-register.mjs');
 const fs=await import('node:fs');const path=await import('node:path');const os=await import('node:os');
 function diskFixture(run){const dir=fs.mkdtempSync(path.join(os.tmpdir(),'erasure-register-'));try{return run(path.join(dir,'ledger.json'));}finally{fs.rmSync(dir,{recursive:true,force:true});}}
 function appendArgs(file){return{file,privateKeyPem:privateKey.export({type:'pkcs8',format:'pem'}),publicKeyPem:pem,sourceProjectRef:'abcdefghijklmnopqrst',expectedHead:null,expectedSequence:0,entry:{request_id:request,kind:'account',subject_ids:[erased],completed_at:'2026-10-29T10:00:00.000Z'},now:'2026-10-29T11:00:00.000Z'};}
@@ -32,6 +32,55 @@ test('durable register signs a verifiable head and replay is byte-identical',()=
 test('stale writer and conflicting receipt cannot overwrite register',()=>diskFixture(file=>{const args=appendArgs(file),first=appendErasure(args);assert.throws(()=>appendErasure(args),/REGISTER_HEAD_CONFLICT/);assert.throws(()=>appendErasure({...args,expectedHead:first.sha256,expectedSequence:1,entry:{...args.entry,subject_ids:[other]}}),/ERASURE_RECEIPT_CONFLICT/);assert.equal(sha256(fs.readFileSync(file)),first.sha256);}));
 test('another writer lock is not removed and crash pending file is not overwritten',()=>diskFixture(file=>{const args=appendArgs(file);fs.writeFileSync(file+'.lock','');assert.throws(()=>appendErasure(args),/EEXIST/);assert(fs.existsSync(file+'.lock'));fs.unlinkSync(file+'.lock');fs.writeFileSync(file+'.pending','ambiguous');assert.throws(()=>appendErasure(args),/REGISTER_RECOVERY_REQUIRED/);assert.equal(fs.readFileSync(file+'.pending','utf8'),'ambiguous');assert(!fs.existsSync(file));}));
 test('invalid receipt cannot create a head or leave a normal-call lock',()=>diskFixture(file=>{const args=appendArgs(file);assert.throws(()=>appendErasure({...args,entry:{...args.entry,subject_ids:[]}}),/INVALID_ERASURE_ENTRY/);assert(!fs.existsSync(file));assert(!fs.existsSync(file+'.lock'));}));
+
+function rotationArgs(args,head){
+ const pair=generateKeyPairSync('ed25519');
+ return {
+  file:args.file,sourceProjectRef:args.sourceProjectRef,expectedHead:head.sha256,expectedSequence:head.sequence,
+  previousPublicKeyPem:args.publicKeyPem,privateKeyPem:pair.privateKey.export({type:'pkcs8',format:'pem'}),
+  publicKeyPem:pair.publicKey.export({type:'spki',format:'pem'}),now:'2026-10-29T11:01:00.000Z'
+ };
+}
+
+test('key rotation preserves receipts and requires a new trusted head before restore',()=>diskFixture(file=>{
+ const args=appendArgs(file),first=appendErasure(args),rotation=rotationArgs(args,first),oldBytes=fs.readFileSync(file);
+ const rotated=rotateErasureRegister(rotation),newBytes=fs.readFileSync(file);
+ assert.equal(rotated.sequence,2);
+ assert.equal(rotated.sha256,sha256(newBytes));
+ assert.equal(fs.statSync(file).mode&0o777,0o600);
+ assert.deepEqual(JSON.parse(newBytes).erasures,JSON.parse(oldBytes).erasures);
+ const safe=fixture(),oldTrust={...safe.trust,ledger_sha256:first.sha256,ledger_sequence:1};
+ assert.throws(()=>inspectRestore({...safe,ledgerBytes:newBytes,trust:oldTrust}),/LEDGER_DIGEST_MISMATCH/);
+ const newTrust={...safe.trust,ledger_sha256:rotated.sha256,ledger_sequence:2,ledger_public_key_pem:rotation.publicKeyPem};
+ assert.throws(()=>inspectRestore({...safe,ledgerBytes:oldBytes,trust:newTrust}),/LEDGER_DIGEST_MISMATCH/);
+ assert.throws(()=>inspectRestore({...safe,ledgerBytes:newBytes,trust:{...newTrust,ledger_public_key_pem:pem}}),/INVALID_LEDGER_SIGNATURE/);
+ assert.equal(inspectRestore({...safe,ledgerBytes:newBytes,trust:newTrust}).erased_subjects,1);
+ const unsafe=fixture({id:erased});
+ assert.throws(()=>inspectRestore({...unsafe,ledgerBytes:newBytes,trust:{...newTrust,snapshot_sha256:sha256(unsafe.snapshotBytes)}}),/ERASED_SUBJECT_PRESENT/);
+ const nextEntry={...args.entry,request_id:other,subject_ids:[other]};
+ const next={...args,expectedHead:rotated.sha256,expectedSequence:2,entry:nextEntry,now:rotation.now};
+ assert.throws(()=>appendErasure(next),/INVALID_LEDGER_SIGNATURE/);
+ const appended=appendErasure({...next,privateKeyPem:rotation.privateKeyPem,publicKeyPem:rotation.publicKeyPem});
+ assert.equal(appended.sequence,3);
+ assert.deepEqual(JSON.parse(fs.readFileSync(file)).erasures,[args.entry,nextEntry]);
+}));
+
+test('stale, conflicting and interrupted key rotation leaves the original register intact',()=>diskFixture(file=>{
+ const args=appendArgs(file),first=appendErasure(args),rotation=rotationArgs(args,first),before=fs.readFileSync(file);
+ assert.throws(()=>rotateErasureRegister({...rotation,expectedHead:'0'.repeat(64)}),/REGISTER_HEAD_CONFLICT/);
+ assert.throws(()=>rotateErasureRegister({...rotation,expectedSequence:2}),/REGISTER_SEQUENCE_CONFLICT/);
+ assert.throws(()=>rotateErasureRegister({...rotation,previousPublicKeyPem:rotation.publicKeyPem}),/REGISTER_ROTATION_SAME_KEY/);
+ assert.throws(()=>rotateErasureRegister({...rotation,previousPublicKeyPem:rotationArgs(args,first).publicKeyPem}),/INVALID_LEDGER_SIGNATURE/);
+ assert.throws(()=>rotateErasureRegister({...rotation,privateKeyPem:args.privateKeyPem}),/REGISTER_KEY_MISMATCH/);
+ fs.writeFileSync(file+'.lock','active restore');
+ assert.throws(()=>rotateErasureRegister(rotation),/EEXIST/);
+ assert.equal(fs.readFileSync(file+'.lock','utf8'),'active restore');
+ fs.unlinkSync(file+'.lock');
+ fs.writeFileSync(file+'.pending','uncertain write');
+ assert.throws(()=>rotateErasureRegister(rotation),/REGISTER_RECOVERY_REQUIRED/);
+ assert.equal(fs.readFileSync(file+'.pending','utf8'),'uncertain write');
+ assert.deepEqual(fs.readFileSync(file),before);
+}));
 const {guardedRestore}=await import('../scripts/guarded-restore.mjs');
 async function restoreFixture(run){const dir=fs.mkdtempSync(path.join(os.tmpdir(),'guarded-restore-'));try{const x=fixture();const file=path.join(dir,'ledger.json');fs.writeFileSync(file,x.ledgerBytes,{mode:0o600});return await run(x,file);}finally{fs.rmSync(dir,{recursive:true,force:true});}}
 test('guarded adapter receives frozen validated snapshot under register lock',()=>restoreFixture(async(x,file)=>{let called=false;const result=await guardedRestore({...x,registerFile:file,apply:async(snapshot,proof)=>{called=true;assert(fs.existsSync(file+'.lock'));assert(Object.isFrozen(snapshot.tables[0].rows[0]));assert.equal(snapshot.tables[0].rows[0].id,other);assert.equal(proof.snapshot_sha256,x.trust.snapshot_sha256);}});assert(called);assert.equal(result.result,'validated_snapshot_adapter_completed');assert(!fs.existsSync(file+'.lock'));}));

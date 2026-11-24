@@ -47,6 +47,9 @@ Bu ortamda tamamlanmış privacy talebi bulunmadığı için O06’nın tamamlan
 
 İzole yerel Supabase’de kişisel takvimin native Auth ve gerçek HTTP yaşam döngüsü, restore guard ve gerçek PostgreSQL yükleyici birlikte **56/56** geçti. Eski ve imzası değiştirilmiş sicil reddedildi. İmha kaydıyla eşleşen satır yükleyiciye ulaşmadı ve hazırlıktan sonra değişen checkpoint commit’i engelledi.
 
+<a id="o06-yerel-anahtar-rotasyonu"></a>
+**O06–O09 yerel rotasyon kabulü.** Yeni Ed25519 anahtarıyla sicil başı ilerledi ve önceki kayıtlar aynı kaldı. Yanlış veya eski baş, eski imza, bir başka işlemin kilidi ve yarım yazma kaydı reddedildi. Bağımsız bir checkpoint dosyası kullanıldığında eski checkpoint ve sicil içeren arşiv, izole PostgreSQL hedefinde hiçbir satır yüklemedi. Güncel imzalı sicilin izin verdiği satırlar tam geri döndü. Yükleme sonunda yeni bağlantılara izin verilmedi. Sicil, guard ve gerçek PostgreSQL yükleyici kontrolleri birlikte **53/53** geçti. Kalıcı harici checkpoint ve tamamlanmış imha makbuzu kendi işletim kabulünü bekliyor.
+
 <a id="o08-hosted-takvim-konfigurasyonu"></a>
 **Kişisel takvim yapılandırması.** Kullanıcı onayıyla `7c4f8e7f471c9d0fa6064f76927766601a741ee4` kaynağının takvim işlevi yalnız izole kurtarma projesine dağıtıldı. Hedefe ait abonelik adresi, sentetik seans URL şablonu ve yeni bir takvim imza anahtarı tanımlandı. Geri yüklenen hesap native giriş yaptı. Abonelik oluşturma ve tekrar, gerçek ICS GET/HEAD ve `no-store`, yenilemeyle eski adresin reddi, eski sürüm reddi ve iptal sonrası 404 geçti. Hedefte etkin test aboneliği kalmadı. Üç Auth hesabı, tek organizasyon ve iki Storage nesnesi korundu. `backend-v1` JWT şartı ve yetkisiz istekte 401 doğrulandı. Seansın frontend rotası ve erişim kaybı senaryosu bu hosted koşuda çalıştırılmadı. [Aynı SHA’nın main kanıtı](https://github.com/SXQHex/FtkSaaS/actions/runs/45404516607).
 
@@ -166,6 +169,8 @@ Frontend tekrarındaki `management_state_get_v1` / `availability_exception_save_
 İzole native Supabase’de Stüdyo kapanış okumasının aynı organizasyondaki paylaşımlı satır kilidini beklediği gösterildi. Regression testi önce mevcut kaynakta kırıldı. Yeni append-only SQL, kapanış ve merkez disiplini için yalnız eşleşen `management_state_get_v1` seçicilerine `FOR SHARE` uygular. Bu okumalar yan yana ilerler ve aynı organizasyondaki yazma kilidiyle çakışmaya devam eder. İki native test dosyasında 24/24 kontrol geçti. Bu yerel sonuç kilit bekleyişi için bir düzeltme kanıtıdır. Development olayı için kalan diğer süre kaynakları ve canlı tekrar ölçümü açıktır.
 
 Yerel `verify` sözleşme, yönetişim ve restore testlerinde 468/468, CI araç testlerinde 149/150 verdi. Linux `/proc` bellek örneğini isteyen mevcut observer testi macOS’ta `PROC_UNAVAILABLE` ile kaldı. Bu kontrolün sonucu Linux aday koşusunda doğrulanır.
+
+[PR #434](https://github.com/SXQHex/FtkSaaS/pull/434) `be2b22fef520ea7ba7464b5d7f173445d2826135` olarak main’e alındı ve [development dağıtımı](https://github.com/SXQHex/FtkSaaS/actions/runs/45413414581) başarılı oldu. Dağıtım tamamlandıktan sonraki ilk dört dakikalık log penceresinde etkilenen dört işlem için yeni örnek yoktu. Dağıtılan kaynakla canlı Stüdyo ve Üyeler tekrarı açık.
 
 <a id="xreq-071-backend-kapanisi"></a>
 ### XREQ-071 — Ödeme onayı backend incelemesi

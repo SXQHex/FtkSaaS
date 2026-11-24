@@ -8,6 +8,7 @@ import {generateKeyPairSync,sign,randomUUID} from 'node:crypto';
 import {connect,stackStatus} from '../scripts/db.mjs';
 import {restorePostgresSnapshot} from '../scripts/postgres-restore.mjs';
 import {canonical,sha256} from '../scripts/restore-guard.mjs';
+import {rotateErasureRegister} from '../scripts/erasure-register.mjs';
 
 // Real isolated databases on the existing loopback CI PostgreSQL. No hosted URL,
 // reset, service key, constraint bypass, provider or mocked SQL connection.
@@ -68,6 +69,35 @@ test('guarded PostgreSQL recovery retains atomic rows and a closed connection ga
    await assert.rejects(load(rows,{...evidence,readCheckpoint:async()=>({...evidence.trust,ledger_sequence:++reads===1?1:2})}),/CURRENT_CHECKPOINT_CHANGED/);
    assert.equal(reads,2);assert.equal(await gate(),false);
    assert.equal((await inspect('select count(*)::int as n from recovery.parents')).rows[0].n,0);
+  }));
+  await t.test('a rotated independent checkpoint rejects archived trust and fences the PostgreSQL recovery',()=>withTarget(async({load,gate,inspect,database})=>{
+   const rows=tables(),old=proof(rows);
+   const archivedRegister=path.join(dir,randomUUID()+'.json');
+   fs.copyFileSync(old.registerFile,archivedRegister);
+   const {privateKey:newPrivate,publicKey:newPublic}=generateKeyPairSync('ed25519');
+   const newPublicPem=newPublic.export({type:'spki',format:'pem'});
+   const next=rotateErasureRegister({
+    file:old.registerFile,sourceProjectRef:old.trust.source_project_ref,
+    expectedHead:old.trust.ledger_sha256,expectedSequence:old.trust.ledger_sequence,
+    previousPublicKeyPem:old.trust.ledger_public_key_pem,
+    privateKeyPem:newPrivate.export({type:'pkcs8',format:'pem'}),publicKeyPem:newPublicPem
+   });
+   const checkpointDir=fs.mkdtempSync(path.join(os.tmpdir(),'postgres-restore-trust-'));
+   try{
+    const checkpoint=path.join(checkpointDir,'current.json');
+    const current={...old.trust,ledger_sha256:next.sha256,ledger_sequence:next.sequence,ledger_public_key_pem:newPublicPem};
+    fs.writeFileSync(checkpoint,JSON.stringify(current),{mode:0o600});
+    const readCheckpoint=async()=>JSON.parse(fs.readFileSync(checkpoint,'utf8'));
+    await admin.query('alter database "'+database+'" allow_connections false');
+    const archived={...old,registerFile:archivedRegister,readCheckpoint};
+    await assert.rejects(load(rows,archived),/CURRENT_CHECKPOINT_CHANGED/);
+    assert.equal(await gate(),false);
+    assert.equal((await inspect('select count(*)::int as n from recovery.parents')).rows[0].n,0);
+    const accepted=await load(rows,{...old,trust:current,readCheckpoint});
+    assert.equal(accepted.ledger_sequence,next.sequence);
+    assert.equal(await gate(),false);
+    assert.deepEqual((await inspect('select id,label,payload from recovery.parents')).rows,rows[0].rows);
+   }finally{fs.rmSync(checkpointDir,{recursive:true,force:true});}
   }));
   await t.test('nonempty target is preserved without merging or truncating it',()=>withTarget(async({load,gate,inspect})=>{
    await inspect("insert into recovery.parents values ('"+randomUUID()+"','Existing synthetic','{}')");

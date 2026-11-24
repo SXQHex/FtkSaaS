@@ -2029,8 +2029,8 @@
         "platform_operator_access_set_v1"
       ],
       "review": {
-        "fingerprint": "1d0d6b2686e43344eb0215a7166e505e44abc5ac64dae3530fe86fb16624a998",
-        "reason": "Platform operatör dizini kabulü eşzamanlı test üyeliklerinden bağımsızdır. Etiket ve uygunluk doğrulamaları korunur."
+        "fingerprint": "4c71edc1391508440937f666de6b14be6b863ab3e02256145dc764b391550e87",
+        "reason": "Sicil kayıtlarını koruyan imza anahtarı değişimi ve bağımsız checkpoint ile gerçek PostgreSQL bağlantı kapısı doğrulandı. Silme işlemi ve istemci sözleşmesi aynı."
       }
     },
     {
