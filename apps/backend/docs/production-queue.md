@@ -6,21 +6,15 @@ Bu dosya **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibi
 
 **18 Kasım Web1 v67:** PR #340’ın ilk on maddesi main’de. Onaylanan ilk kurulum, yoklama, etkinlik başvurusu, yayın adresi ve bildirim görünürlüğü (43/49/55–57) PR #341 ile main’e alındı. PR #342, denetim aktarımını (34), vergi profilini (58) ve platform konsolunu (59) main’e aldı. PR #343, manuel fatura ve sahip geçmişini (58) main’e aldı. Sıradaki platform konsolu dilimi ilk plan keşfi, ödeme dönemi ve ek süre, ardından operatör üyeliğidir (60–62). Ölçütler [backend backlog’undadır](remaining-work.md#web1-v67-backend).
 
-**17 Kasım Web1 görevi:** İlk35 talebin backend kaynak/main/development teslimi tamamlandı. Yeni W1-BE-36 kabul aracı callback düzeltmesi ve P01/G-PRO gerçek sağlayıcı devamı yürür; frontend sayfa kabulü yeniden açılmaz. Görev/kabul [backlog](remaining-work.md#w1-be-1927--web1-backend-ihtiyaçları), kaynak/run/ortam [devir](00-FtkSaaS-yeni-sohbet-devir.md#web1-recovery-callback-acceptance) sahibindedir. G03 kapsamı ve sonraki sıra korunur; unit veya eski başka callback kanıtı yeni hosted kabulü değildir.
+**17 Kasım Web1 görevi:** İlk35 talebin backend kaynak/main/development teslimi tamamlandı. W1-BE-36 callback kabul aracı main ve development’a teslim edildi. Yeni callback için gerçek sağlayıcı kabulü izlenir; frontend sayfa kabulü yeniden açılmaz. Görev/kabul [backlog](remaining-work.md#w1-be-1927--web1-backend-ihtiyaçları), kaynak/run/ortam [devir](00-FtkSaaS-yeni-sohbet-devir.md#web1-recovery-callback-acceptance) sahibindedir.
 
 **13 Kasım statik SPA görevi:** Kullanıcının açık önceliğiyle [S18](remaining-work.md#s18) önce kayıt ön kontrolü, sonra public başvuru ve diğer transport kabulleriyle yürütüldü; ölçütler karşılandığından mevcut G03 sırasına dönülür. Kaynak/ortam kanıtının sahibi [devir kaydıdır](00-FtkSaaS-yeni-sohbet-devir.md#statik-spa).
 
 **13 Kasım içerik kataloğu görevi:** [S17](remaining-work.md#s17) mevcut sıra içindeki backend teslimini tamamladı; kalan açık işlerin sırası aşağıdadır. Kaynak/CI/main/development kanıtı yalnız [devirde](00-FtkSaaS-yeni-sohbet-devir.md#icerik-katalogu), frontend çağrı/gösterim bağımlılığı [XREQ-045](../../../docs/requests.md#xreq-045) sahibindedir. Frontend kabulü backend işini yeniden açmaz.
 
-Kabul edilmiş Pro ortak temeli ve [G01](remaining-work.md#g01) Starter kısıt kabulü ardından sıradaki paket [G03](remaining-work.md#g03) ile Business ekleridir. S/P/B görev kimlikleri korunur; bu harfler ayrı kod tabanları veya bağımsız ürün geliştirme programları değildir. Tamamlanmış Pro kabulünün kanıt sahibi [G02 uzlaştırmasıdır](00-FtkSaaS-yeni-sohbet-devir.md#g02-bagli-zincir-incelemesi).
+[G02 Pro](remaining-work.md#g02), [G01 Starter](remaining-work.md#g01) ve [G03 Business](remaining-work.md#g03) backend kabul kapıları kapalıdır. Business ölçütlerinin kaynak ve gerçek ortam eşleştirmesi [G03 devrindedir](00-FtkSaaS-yeni-sohbet-devir.md#g03-business-kabulu).
 
-**Aktif sıra.** G03 ve ardından ayrı O03–O10 altyapı projesi. Görevlerin durumu [backlog’da](remaining-work.md), doğrulanmış sonuçları [devirde](00-FtkSaaS-yeni-sohbet-devir.md) tutulur.
-
-G01'in dar F17 düzeltmesi ve kaynak/native CI/main/development/gerçek Starter ortam kabulü [G01 devrinde](00-FtkSaaS-yeni-sohbet-devir.md#g01-starter-kisit-kabulu) tamamlandı. Bu kapanış G03 veya Business işlevlerinin kabulü değildir.
-
-| Öncelik | Paket | Bağımlılık ve kontrol noktası |
-|---|---|---|
-| 1 | [B01–B04](remaining-work.md#business-işlevleri) ve [G03](remaining-work.md#g03) | Mevcut Business kaynak/alt kabul kanıtını kullan; çok merkez, izolasyon ve ortak kullanım/hesaplaşma işlevlerini doğrula. |
+**Sonraki planlı paket.** Business sonrası [O03–O10 altyapı projesi](remaining-work.md#business-sonrası-ayrı-altyapı-projesi). Plan kabulü dışındaki uygulama ve ortam takipleri [backend backlog’unda](remaining-work.md) izlenir.
 
 Teslim paketinde kullanıcının istediği genel backend belge tutarlılığı taraması tamamlanır: mevcut backlog/teslim kuyruğu/devir ile main'deki yayın farkları ve eski açık/kapalı anlatımlar aynı kaynak kanıtına göre uzlaştırılır. Bu teslim kontrolüdür; yeni roadmap veya ikinci durum listesi açılmaz.
 
