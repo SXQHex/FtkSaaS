@@ -7,7 +7,16 @@
 
 Node 24.22.3 ve yerel PostgreSQL 17.12 üzerinde [restore guard](../tests/restore-guard.test.mjs), [native Auth imha runner birim testleri](../tests/native-account-erasure-unit.mjs) ve [PostgreSQL restore kabulü](../tests/postgres-restore-acceptance.mjs) **57/57** geçti. Restore kabulü ayrı geçici DB’lerde gerçek PostgreSQL kullanarak yetkili satır yükünü, kapalı bağlantı kapısını, geç FK hatasında rollback’i, checkpoint değişimini ve silinmiş özne reddini doğruladı. Auth runner testleri orkestrasyonu kapsar. Bu koşuda hosted Auth, Storage ve tam Supabase restore doğrulaması yapılmadı.
 
-Erişilebilen Supabase envanterinde FtkSaaS dışında ayrı restore projesi veya development branch görülmedi. O08 için gereken birlikte alınmış DB/Storage kurtarma paketi ve izole hedef, O06 için kalıcı bağımsız checkpoint ve gerçek imha makbuzu bu koşuda doğrulanamadı. Kalan kabul ölçütleri [backlog’dadır](remaining-work.md#business-sonrası-ayrı-altyapı-projesi).
+<a id="o08-yerel-restore-kabulu"></a>
+### O08 — İki yerel Supabase ortamında geri yükleme
+
+24 Kasım 2026’da [PR #425’in birleşen kaynağı](https://github.com/SXQHex/FtkSaaS/commit/5fa8ee30b396fe09be2cc9154bf08dfacf9bce61) ile iki bağımsız loopback Supabase ortamında sentetik geri yükleme tatbikatı geçti. Her ortamın API ve DB portları ile PostgreSQL instance kimliği ayrıydı. Supabase CLI 3.0.0 ve PostgreSQL 17.11 kullanıldı. Aynı kaynak kurtarma noktasındaki DB dökümü ve iki özel Storage nesnesi birlikte alındı. [Kaynak SHA’nın belge CI kanıtı](https://github.com/SXQHex/FtkSaaS/actions/runs/45374049211).
+
+Hedefe aynı şema ve Edge kaynağı kuruldu. Yükleme sonrasında 241 tablo, 221 uygulama migration’ı, sequence, sağlayıcı migration geçmişi, şema, sahiplik, rol üyelikleri, ACL ve RLS eşleşti. Hedef yeniden başladıktan sonra iki sentetik kullanıcı özgün UUID’leriyle native giriş yaptı. Organizasyon ve merkez Edge’den okundu. İki özel Storage nesnesinin SHA-256 özeti eşleşti ve anonim kullanıcı ile organizasyon dışındaki kullanıcıya erişim reddedildi. Yerel config ve Supabase’in sağladığı anahtarların envanteri doğrulandı.
+
+Beş scheduler tanımı kapalı durumda eşleştirildi. Hedefte açılan `p06` native Cron işi, yedekten gelen raporu gerçek `ftk_ops_p06` rolüyle tek denemede tamamladı. Edge’den indirilen CSV, hedef DB’deki içerikle eşleşti. Kaynaktaki rapor beklemede kaldı, organizasyon ve Storage yeniden okundu. Kabul oturumları kapatıldı ve iki geçici ortam durduruldu. SHA-256 özetleri ve sonuçlar yerel `.artifacts/o08-pr425-local-restore.json` makbuzunda durur.
+
+Restore guard, yedekten ayrı bir dizindeki imzalı sentetik sicille doğrulandı ve değiştirilmiş snapshot’ı reddetti. O06’nın kalıcı bağımsız checkpoint ve gerçek imha makbuzu, O08’in hosted yedeği ve dış sağlayıcı sırları, O09’un yeniden imha senaryosu ve O10’un pilot RPO/RTO ölçümü açık. [Kalan kabul ölçütleri](remaining-work.md#business-sonrası-ayrı-altyapı-projesi).
 
 <a id="xreq-073-backend-kabulu"></a>
 ## XREQ-073 — Native okuma kabulü

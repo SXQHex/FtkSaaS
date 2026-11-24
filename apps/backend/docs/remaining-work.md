@@ -945,13 +945,13 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 <a id="o08"></a>
 ### O08 — DB/Auth/Storage tam geri dönüş
 
-- [ ] **Durum:** Tam geri yükleme hedefi bekleniyor · **Tür:** H · **Plan:** Tümü · **Özellik:** F33,F30
+- [ ] **Durum:** [İki yerel Supabase ortamında sentetik tatbikat geçti](00-FtkSaaS-yeni-sohbet-devir.md#o08-yerel-restore-kabulu), hosted kabul açık · **Tür:** H · **Plan:** Tümü · **Özellik:** F33,F30
 - **Bağımlılık:** O07
 - **Kabul:** DB/migration/ACL/RLS, Auth UUID/giriş ve Storage bayt/izinleri aynı snapshotla geri döner.
 - **Sınır/olumsuz durum:** Tek SQL veya dosya restore bütün kabul değildir; kaynak hedef ayrıdır.
 - **Doğrulama senaryosu:** DB mutabakatı, gerçek giriş, Storage checksum; Edge/config/secret envanteri ve worker binding doğrulaması.
 - **Kaynak alanı:** restore runbook ve mevcut araçlar
-- **Kalan:** Aynı kurtarma noktasından DB ve Storage yedeği ile izole ayrı Supabase hedefinde [tam restore prosedürünü](remote-backend-setup.md#managed-restore-prosedürünün-sınırı) yürüt.
+- **Kalan:** Aynı kurtarma noktasına ait managed DB ve Storage yedeğini ayrı ve izole hosted Supabase hedefinde [tam restore prosedürüyle](remote-backend-setup.md#managed-restore-prosedürünün-sınırı) geri yükle. Dış sağlayıcı yapılandırmasını ve gereken sırların hedefte yeniden sağlandığını doğrula.
 
 <a id="o09"></a>
 ### O09 — Backup non-resurrection kabulü
