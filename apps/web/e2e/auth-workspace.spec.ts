@@ -378,13 +378,16 @@ test("workspace entry offers authorized studios and keeps the selected center on
   await expect(studioHeading).toBeFocused();
   await expect(page.getByRole("radio", { name: /Askıdaki stüdyo/ })).toBeDisabled();
   await expect(page.getByRole("button", { name: "Devam et", exact: true })).toBeDisabled();
-  await page.getByRole("radio", { name: "Açık stüdyo", exact: true }).check();
+  const studio = page.getByRole("radio", { name: "Açık stüdyo", exact: true });
+  await activate(studio, "Space");
+  await expect(studio).toBeChecked();
   await activate(page.getByRole("button", { name: "Devam et", exact: true }));
   await expect(page.getByRole("heading", { name: "Çalışacağın merkezi seç" })).toBeFocused();
   await expect(page.getByRole("radio", { name: "Yetkisiz merkez" })).toHaveCount(0);
   await activate(page.getByRole("button", { name: "Stüdyo seçimine dön" }));
   await expect(studioHeading).toBeFocused();
-  await page.getByRole("radio", { name: "Açık stüdyo", exact: true }).check();
+  if (!(await studio.isChecked())) await activate(studio, "Space");
+  await expect(studio).toBeChecked();
   await activate(page.getByRole("button", { name: "Devam et", exact: true }));
   const selected = page.getByRole("radio", { name: "Seçilen merkez", exact: true });
   await activate(selected, "Space");

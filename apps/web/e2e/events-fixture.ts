@@ -54,7 +54,7 @@ export const event: EventView = {
 export async function mockEvents(
   page: Page,
   mode: "normal" | "unknown" | "result" | "denied" | "empty" | "directory" | "starter" = "normal",
-  options: { limited?: boolean; missingPayments?: boolean } = {},
+  options: { limited?: boolean; missingPayments?: boolean; openList?: boolean } = {},
 ) {
   await mockStudio(page);
   await page.clock.install({ time: new Date("2026-11-16T12:00:00Z") });
@@ -245,8 +245,10 @@ export async function mockEvents(
   await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
-  await page.goto(`${origin}/o/${I.org}/c/${I.center}/events`);
-  await expect(page.getByRole("heading", { name: "Etkinlikler", exact: true })).toBeVisible();
+  if (options.openList !== false) {
+    await page.goto(`${origin}/o/${I.org}/c/${I.center}/events`);
+    await expect(page.getByRole("heading", { name: "Etkinlikler", exact: true })).toBeVisible();
+  }
   return state;
 }
 export async function openEvent(page: Page) {

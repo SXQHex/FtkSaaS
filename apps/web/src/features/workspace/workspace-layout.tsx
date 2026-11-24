@@ -231,7 +231,7 @@ export function WorkspaceLayout({
         pathname={pathname}
       />
       <SidebarInset className="min-w-0">
-        <header className="workspace-topbar @container/workspace sticky top-0 z-10 flex h-14 shrink-0 items-center gap-2 border-b bg-background/95 px-4 backdrop-blur">
+        <header className="workspace-topbar @container/workspace sticky top-0 z-10 flex min-h-14 shrink-0 items-center gap-2 border-b bg-background/95 px-4 py-1 backdrop-blur">
           <NavigationTrigger />
           <Separator
             orientation="vertical"
@@ -252,7 +252,7 @@ export function WorkspaceLayout({
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
-          <div className="ml-auto flex shrink-0 items-center gap-2">
+          <div className="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-2 min-[641px]:shrink-0 min-[641px]:flex-nowrap">
             {setupScope &&
               !subscription.isError &&
               !subscription.isFetching &&

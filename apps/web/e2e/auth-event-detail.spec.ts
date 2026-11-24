@@ -738,7 +738,7 @@ test("event closed attendance correction and performed duty each require a separ
   // on mobile WebKit in CI. Preserve every assertion and scan with a bounded
   // per-scenario teardown budget; other projects retain their default.
   if (browserName === "webkit" && isMobile) testInfo.setTimeout(testInfo.timeout + 20_000);
-  const state = await mockEventDetail(page);
+  const state = await mockEventDetail(page, "normal", { openDetail: false });
   await page.clock.setFixedTime(new Date("2026-11-15T19:00:00Z"));
   await mockCalendarEvent(page, state.event);
   state.event.attendance_state = "closed";
@@ -883,7 +883,11 @@ test("event closed attendance correction and performed duty each require a separ
 
   const instructor = await newPageForCurrentDevice(browser);
   try {
-    const self = await mockSessionDetail(instructor, { existing: true, instructor: true });
+    const self = await mockSessionDetail(instructor, {
+      existing: true,
+      instructor: true,
+      openDetail: false,
+    });
     await instructor.clock.setFixedTime(new Date("2026-11-15T19:00:00Z"));
     const selfSnapshots: string[] = [];
     await instructor.route("**/functions/v1/backend-v1/instructor_account_get_v1", (route) => {

@@ -1,4 +1,4 @@
-import { activate, hasTouchInput, attemptOutsideDismissal } from "./device-input.js";
+import { activate, hasTouchInput } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { mockNative, origin } from "./auth-fixture.js";
 import common from "../src/locales/tr/common.json" with { type: "json" };
@@ -19,6 +19,10 @@ test("an open reauthentication dialog stays hidden and inert until the new nativ
   const dialog = page.locator('[data-slot="dialog"]');
   await expect(dialog).toBeVisible();
   await dialog.getByLabel("Parola", { exact: true }).fill("fixture-password");
+  const submit = dialog.getByRole("button", { name: "Devam et", exact: true });
+  const touch = hasTouchInput(page);
+  if (touch) await submit.scrollIntoViewIfNeeded();
+  const submitBox = touch ? await submit.boundingBox() : null;
 
   let release!: () => void;
   const revalidation = new Promise<void>((resolve) => {
@@ -34,11 +38,14 @@ test("an open reauthentication dialog stays hidden and inert until the new nativ
   try {
     // The second native password exchange creates S2 through the real SDK.
     // Hold its private reads so the portal cannot pass only after the handoff.
-    await activate(dialog.getByRole("button", { name: "Devam et", exact: true }));
+    await activate(submit);
     await expect.poll(() => calls.exchange).toBe(2);
     await expect.poll(() => heldReads).toBeGreaterThan(0);
     await expect(dialog).toHaveCount(1);
     await expect(dialog).toBeHidden();
+    await expect
+      .poll(() => dialog.evaluate((element) => Boolean(element.closest("[inert]"))))
+      .toBe(true);
     await expect(
       page.getByRole("dialog", { name: common.sessions.closeOthers, exact: true }),
     ).toHaveCount(0);
@@ -49,8 +56,16 @@ test("an open reauthentication dialog stays hidden and inert until the new nativ
     await expect(loading).toBeVisible();
     await expect(loading.getByRole("progressbar")).toBeVisible();
 
-    if (hasTouchInput(page)) {
-      await attemptOutsideDismissal(loading);
+    if (touch) {
+      if (!submitBox) throw new Error("The original submit target was not visible");
+      const point = { x: submitBox.x + submitBox.width / 2, y: submitBox.y + submitBox.height / 2 };
+      expect(
+        await loading.evaluate(
+          (element, { x, y }) => element.contains(element.ownerDocument.elementFromPoint(x, y)),
+          point,
+        ),
+      ).toBe(true);
+      await page.touchscreen.tap(point.x, point.y);
       await expect(loading).toBeVisible();
       await expect(dialog).toBeHidden();
     } else {
@@ -71,6 +86,7 @@ test("an open reauthentication dialog stays hidden and inert until the new nativ
     }
     await expect(page).toHaveURL(`${origin}/account`);
     expect(calls.othersKeys).toHaveLength(0);
+    expect(calls.exchange).toBe(2);
 
     release();
     await expect(dialog).toBeVisible();

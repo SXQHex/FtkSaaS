@@ -7,6 +7,7 @@ import {
   origin,
 } from "./auth-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
+import { assertLayoutFit, readLayoutFit } from "./layout.js";
 import common from "../src/locales/tr/common.json" with { type: "json" };
 
 const B = {
@@ -208,6 +209,24 @@ test("multiple roles reset navigation when the selected organization changes to 
     nav.getByRole("link", { name: common.workspace.links.finance, exact: true }),
   ).toHaveAttribute("href", `/o/${I.org}/c/${I.center}/finance`);
   await closeWorkspaceNavigation(page);
+  const viewport = page.viewportSize();
+  if (!viewport) throw new Error("The workspace requires an emulated viewport");
+  await page.setViewportSize({ ...viewport, width: 320 });
+  try {
+    const toolbar = page.locator(".workspace-topbar");
+    await expect(
+      toolbar.getByRole("radio", { name: common.workspace.viewLabels.management }),
+    ).toBeInViewport({ ratio: 1 });
+    await expect(
+      toolbar.getByRole("radio", { name: common.workspace.viewLabels.instructor }),
+    ).toBeInViewport({ ratio: 1 });
+    await expect(
+      toolbar.getByRole("button", { name: common.workspace.searchButtonLabel }),
+    ).toBeInViewport({ ratio: 1 });
+    assertLayoutFit(await readLayoutFit(page));
+  } finally {
+    await page.setViewportSize(viewport);
+  }
   await activate(
     page.getByRole("radio", { name: common.workspace.viewLabels.instructor, exact: true }),
     "Space",
