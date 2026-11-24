@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `c31f63c841a7d0db5f9a5132b756e2ba4f0af6b083846ba14b08b8fcdd645052`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `4960ad0aa688a9436d4885768677b1b656812deb95f91030ad7b1ea1abbe3c41`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 222. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 223. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -230,3 +230,4 @@ Sıralı migration: 222. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261124013100_exact_public_finance_and_setup_reads.sql](../apps/backend/supabase/migrations/20261124013100_exact_public_finance_and_setup_reads.sql) | `f770dfdbb4fa45fedf9412ab7403f533e20625192be86e13899ed586e1c3d43b` |
 | [20261124013200_exact_management_readbacks.sql](../apps/backend/supabase/migrations/20261124013200_exact_management_readbacks.sql) | `c6c38223f8f7933113ab282fad4b84ba77095713269e66ccde0952562edada12` |
 | [20261124134857_share_center_configuration_read_locks.sql](../apps/backend/supabase/migrations/20261124134857_share_center_configuration_read_locks.sql) | `0043835cf1697b984edce74094de9ec823082b8d7759daf423842c20e510c297` |
+| [20261124150021_share_product_list_read_lock.sql](../apps/backend/supabase/migrations/20261124150021_share_product_list_read_lock.sql) | `1dd215a7f9f32f3f83ae25fe296fdd120dbac39b1ab51f3cf7fe5f6a1821dcfe` |
