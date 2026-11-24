@@ -70,17 +70,18 @@ export async function readCorrectionBase(
     selector: { operation: "collection_correct_preview_v1", key: { cash_movement_id: id } },
     page: { limit: 1 },
   });
-  const item = page.items[0],
-    versions =
-      item?.versions.filter((x) => x.entity.type === "cash_movements" && x.entity.id === id) ?? [];
+  const item = Array.isArray(page?.items) ? page.items[0] : undefined,
+    versions = Array.isArray(item?.versions)
+      ? item.versions.filter((x) => x?.entity?.type === "cash_movements" && x.entity.id === id)
+      : [];
   if (
+    item?.exists !== true ||
     page.items.length !== 1 ||
     page.next_cursor ||
-    !item?.exists ||
     item.entity?.type !== "cash_movements" ||
     item.entity.id !== id ||
     item.current?.operation !== "collection_correct_preview_v1" ||
-    item.current.values.cash_movement_id !== id ||
+    item.current.values?.cash_movement_id !== id ||
     versions.length !== 1 ||
     !Number.isSafeInteger(versions[0]!.version) ||
     versions[0]!.version < 1

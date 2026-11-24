@@ -155,6 +155,26 @@ afterEach(() => {
   vi.resetAllMocks();
   vi.unstubAllEnvs();
 });
+it.each([
+  ["centers_list_v1", { id: centerId, accessible: "false" }],
+  [
+    "roles_list_v1",
+    {
+      person_id: personId,
+      scope_center_id: centerId,
+      role: "center_manager",
+      state: "active",
+      account_access_granted: "false",
+    },
+  ],
+])("rejects malformed workspace authority from %s", async (operation, item) => {
+  server.use(
+    http.post(`https://backend.invalid/functions/v1/backend-v1/${operation}`, () =>
+      HttpResponse.json({ ok: true, data: { items: [item] }, trace_id: accountId }),
+    ),
+  );
+  await expect(readWorkspace(accountId)).rejects.toThrow("WORKSPACE_PROJECTION_INVALID");
+});
 it.each(["organizations_list_v1", "centers_list_v1", "roles_list_v1"])(
   "stops a repeated %s cursor after the second response",
   async (operation) => {

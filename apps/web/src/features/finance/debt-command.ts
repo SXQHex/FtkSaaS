@@ -52,18 +52,20 @@ export async function readDebtBase(
     selector,
     page: { limit: 1 },
   });
-  const item = page.items[0],
-    versions = item?.versions.filter((x) => x.entity.type === "debts" && x.entity.id === id) ?? [];
+  const item = Array.isArray(page?.items) ? page.items[0] : undefined,
+    versions = Array.isArray(item?.versions)
+      ? item.versions.filter((x) => x?.entity?.type === "debts" && x.entity.id === id)
+      : [];
   if (
+    item?.exists !== true ||
     page.items.length !== 1 ||
     page.next_cursor ||
-    !item?.exists ||
     item.entity?.type !== "debts" ||
     item.entity.id !== id ||
     item.current?.operation !== operation ||
-    item.current.values.debt_id !== id ||
+    item.current.values?.debt_id !== id ||
     (item.current.operation === "student_credit_offset_v1" &&
-      item.current.values.person_id !== selection.personId) ||
+      item.current.values?.person_id !== selection.personId) ||
     versions.length !== 1 ||
     !Number.isSafeInteger(versions[0]!.version) ||
     versions[0]!.version < 1
