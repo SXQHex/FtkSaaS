@@ -1,3 +1,4 @@
+import { activate, attemptOutsideDismissal } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page, Route } from "@playwright/test";
 import { mockStudio, openStudio, studioIds as I } from "./studio-fixture.js";
@@ -251,13 +252,14 @@ test("Access directory: server filters/cursors, summary scope, independent permi
   await expect(page.getByRole("tab", { name: "Davetler 20", exact: true })).toBeVisible();
   await expect(page.getByRole("tab", { name: "Hesap bağlantıları 1", exact: true })).toBeVisible();
   expect((await scanAccessibility(page, "access-invitations-desktop")).violations).toEqual([]);
-  await page.getByRole("tab", { name: /Hesap bağlantıları/ }).click();
-  await page.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await activate(page.getByRole("tab", { name: /Hesap bağlantıları/ }));
+  await activate(page.getByRole("button", { name: "Sonraki", exact: true }));
   await expect(page.getByText("Fixture Other", { exact: true })).toBeVisible();
-  await page
-    .getByRole("radiogroup", { name: "Hesap durumu", exact: true })
-    .getByRole("radio", { name: "Bağlı", exact: true })
-    .click();
+  await activate(
+    page
+      .getByRole("radiogroup", { name: "Hesap durumu", exact: true })
+      .getByRole("radio", { name: "Bağlı", exact: true }),
+  );
   await expect(page.getByText("Fixture Account Link", { exact: true })).toBeVisible();
   expect(state.reads.at(-1)?.key).toMatchObject({
     directory: "center",
@@ -279,9 +281,9 @@ test("Access directory: server filters/cursors, summary scope, independent permi
       .getByText("Fixture Invite", { exact: true }),
   ).toBeVisible();
   await expect(page.getByRole("alert")).toBeVisible();
-  await page.getByRole("button", { name: /İptal et — Fixture Invite/ }).click();
+  await activate(page.getByRole("button", { name: /İptal et — Fixture Invite/ }));
   const dialog = page.getByRole("alertdialog");
-  await dialog.getByRole("button", { name: "Daveti iptal et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Daveti iptal et", exact: true }));
   await expect(
     dialog.getByText("İşlem kaydedildi; güncel bilgiler yüklendi.", { exact: true }),
   ).toBeVisible();
@@ -295,15 +297,15 @@ test("Access actions: same-key lost-reply recovery, versioned unlink and acknowl
   const state = await mockAccess(page);
   state.lostCancelReply = true;
   await openAccess(page);
-  await page.getByRole("button", { name: /İptal et — Fixture Invite/ }).click();
+  await activate(page.getByRole("button", { name: /İptal et — Fixture Invite/ }));
   const dialog = page.getByRole("alertdialog");
   await expect(dialog.getByRole("button", { name: "Vazgeç", exact: true })).toBeFocused();
-  await dialog.getByRole("button", { name: "Daveti iptal et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Daveti iptal et", exact: true }));
   await expect(dialog.getByRole("button", { name: /Aynı isteği/ })).toBeVisible();
-  await page.keyboard.press("Escape");
+  await attemptOutsideDismissal(dialog);
   await expect(dialog).toBeVisible();
   await expect(dialog.getByRole("button", { name: "Vazgeç", exact: true })).toBeDisabled();
-  await dialog.getByRole("button", { name: /Aynı isteği/ }).click();
+  await activate(dialog.getByRole("button", { name: /Aynı isteği/ }));
   await expect(
     dialog.getByText("İşlem kaydedildi; güncel bilgiler yüklendi.", { exact: true }),
   ).toBeVisible();
@@ -312,23 +314,25 @@ test("Access actions: same-key lost-reply recovery, versioned unlink and acknowl
   expect(cancels[0]?.payload.operation_key).toBe(cancels[1]?.payload.operation_key);
   expect(state.invitationVersion).toBe(3);
   expect((await scanAccessibility(page, "access-cancel-result-dialog")).violations).toEqual([]);
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await page.getByRole("tab", { name: /Hesap bağlantıları/ }).click();
-  await page.getByRole("button", { name: /Bağlantıyı kaldır — Fixture Account Link/ }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
+  await activate(page.getByRole("tab", { name: /Hesap bağlantıları/ }));
+  await activate(page.getByRole("button", { name: /Bağlantıyı kaldır — Fixture Account Link/ }));
   await dialog.getByLabel("Gerekçe", { exact: false }).fill("Kontrollü test");
-  await dialog.getByRole("button", { name: "Bağlantıyı kaldır", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Bağlantıyı kaldır", exact: true }));
   await expect(
     dialog.getByText("İşlem kaydedildi; güncel bilgiler yüklendi.", { exact: true }),
   ).toBeVisible();
   expect(state.writes.filter((write) => write.operation === "unlink")).toHaveLength(1);
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await page.getByRole("button", { name: /Bağlama daveti gönder — Fixture Account Link/ }).click();
-  await dialog.getByRole("button", { name: "Daveti gönder", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
+  await activate(
+    page.getByRole("button", { name: /Bağlama daveti gönder — Fixture Account Link/ }),
+  );
+  await activate(dialog.getByRole("button", { name: "Daveti gönder", exact: true }));
   await expect(
     dialog.getByRole("button", { name: "Güncel durumu oku", exact: true }),
   ).toBeVisible();
   const before = state.jobReads;
-  await dialog.getByRole("button", { name: "Güncel durumu oku", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Güncel durumu oku", exact: true }));
   await expect.poll(() => state.jobReads).toBeGreaterThan(before);
   expect(state.writes.filter((write) => write.operation === "invite")).toHaveLength(1);
   expect(state.linked).toBe(false);
@@ -337,8 +341,8 @@ test("Access actions: same-key lost-reply recovery, versioned unlink and acknowl
 test("M03: an old account cursor rereads after confirmed unlink", async ({ page }) => {
   const state = await mockAccess(page);
   await openAccess(page);
-  await page.getByRole("tab", { name: /Hesap bağlantıları/ }).click();
-  await page.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await activate(page.getByRole("tab", { name: /Hesap bağlantıları/ }));
+  await activate(page.getByRole("button", { name: "Sonraki", exact: true }));
   await expect(page.getByText("Fixture Other", { exact: true })).toBeVisible();
   const cursorReads = () =>
     state.reads.filter(
@@ -346,7 +350,7 @@ test("M03: an old account cursor rereads after confirmed unlink", async ({ page 
         read.operation === "account_link_remove_v1" && read.cursor === "synthetic-next-page",
     ).length;
   const oldCursorReads = cursorReads();
-  await page.getByRole("button", { name: "Önceki", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Önceki", exact: true }));
   await expect(page.getByText("Fixture Account Link", { exact: true })).toBeVisible();
 
   const firstPageReads = () =>
@@ -357,10 +361,10 @@ test("M03: an old account cursor rereads after confirmed unlink", async ({ page 
         !read.cursor,
     ).length;
   const oldFirstPageReads = firstPageReads();
-  await page.getByRole("button", { name: /Bağlantıyı kaldır — Fixture Account Link/ }).click();
+  await activate(page.getByRole("button", { name: /Bağlantıyı kaldır — Fixture Account Link/ }));
   const dialog = page.getByRole("alertdialog");
   await dialog.getByLabel("Gerekçe", { exact: false }).fill("Kontrollü test");
-  await dialog.getByRole("button", { name: "Bağlantıyı kaldır", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Bağlantıyı kaldır", exact: true }));
   await expect(
     dialog.getByText("İşlem kaydedildi; güncel bilgiler yüklendi.", { exact: true }),
   ).toBeVisible();
@@ -369,8 +373,8 @@ test("M03: an old account cursor rereads after confirmed unlink", async ({ page 
   // Invalidation is not a network storm: the old cursor is reread only on return.
   expect(cursorReads()).toBe(oldCursorReads);
 
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await page.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
+  await activate(page.getByRole("button", { name: "Sonraki", exact: true }));
   await expect(page.getByText("Fixture Other", { exact: true })).toBeVisible();
   expect(cursorReads()).toBe(oldCursorReads + 1);
 });
@@ -387,12 +391,12 @@ test("M03: a forbidden invitation directory never blocks authorized account read
   await expect(
     page.getByRole("grid", { name: "Davetler" }).getByText("Fixture Invite", { exact: true }),
   ).toHaveCount(0);
-  await page.getByRole("tab", { name: /Hesap bağlantıları/ }).click();
+  await activate(page.getByRole("tab", { name: /Hesap bağlantıları/ }));
   await expect(page.getByText("Fixture Account Link", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: /Bağlantıyı kaldır — Fixture Account Link/ }).click();
+  await activate(page.getByRole("button", { name: /Bağlantıyı kaldır — Fixture Account Link/ }));
   const dialog = page.getByRole("alertdialog");
   await dialog.getByLabel("Gerekçe", { exact: false }).fill("Kontrollü test");
-  await dialog.getByRole("button", { name: "Bağlantıyı kaldır", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Bağlantıyı kaldır", exact: true }));
   await expect(
     dialog.getByText("İşlem kaydedildi; güncel bilgiler yüklendi.", { exact: true }),
   ).toBeVisible();
@@ -405,11 +409,11 @@ test("M03: two forbidden post-write directories remain unread until permission r
 }) => {
   const state = await mockAccess(page);
   await openAccess(page);
-  await page.getByRole("button", { name: /İptal et — Fixture Invite/ }).click();
+  await activate(page.getByRole("button", { name: /İptal et — Fixture Invite/ }));
   const dialog = page.getByRole("alertdialog");
   state.failInvitations = true;
   state.failAccounts = true;
-  await dialog.getByRole("button", { name: "Daveti iptal et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Daveti iptal et", exact: true }));
   await expect(
     dialog.getByText(
       "İşlem kaydedildi; güncel durum henüz okunamadı. Yazıyı tekrarlamadan yeniden oku.",
@@ -423,7 +427,7 @@ test("M03: two forbidden post-write directories remain unread until permission r
   await expect(retry).toBeEnabled();
   state.failInvitations = false;
   state.failAccounts = false;
-  await retry.click();
+  await activate(retry);
   await expect(
     dialog.getByText("İşlem kaydedildi; güncel bilgiler yüklendi.", { exact: true }),
   ).toBeVisible();
@@ -443,14 +447,14 @@ test("M03: person entry invitation rereads the access directories after job read
         !read.cursor,
     ).length;
 
-  await page.getByRole("button", { name: "Üye davet et", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Üye davet et", exact: true }));
   const sheet = page.getByRole("dialog");
   await sheet.getByLabel("Ad soyad", { exact: false }).fill("Fixture Entry Invite");
   await sheet.getByLabel("E-posta", { exact: false }).fill("entry@example.invalid");
-  await sheet.getByRole("button", { name: "Kişiyi oluştur", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Kişiyi oluştur", exact: true }));
   await expect(sheet.getByText("Kişi kaydedildi. Davet için ayrıca onay ver.")).toBeVisible();
   const afterCreate = invitationFirstPageReads();
-  await sheet.getByRole("button", { name: "Daveti gönder", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Daveti gönder", exact: true }));
   await expect.poll(() => state.jobReads).toBe(1);
   await expect.poll(invitationFirstPageReads).toBeGreaterThan(afterCreate);
   const created = state.studioPeople.find(
@@ -467,11 +471,11 @@ test("M03: entry invitation readback failure preserves one write and supports re
 }) => {
   const state = await mockAccess(page);
   await openAccess(page);
-  await page.getByRole("button", { name: "Üye davet et", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Üye davet et", exact: true }));
   const sheet = page.getByRole("dialog");
   await sheet.getByLabel("Ad soyad", { exact: false }).fill("Fixture Entry Recovery");
   await sheet.getByLabel("E-posta", { exact: false }).fill("recovery@example.invalid");
-  await sheet.getByRole("button", { name: "Kişiyi oluştur", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Kişiyi oluştur", exact: true }));
   await expect(sheet.getByText("Kişi kaydedildi. Davet için ayrıca onay ver.")).toBeVisible();
 
   // The person-created notice appears before the required access directory
@@ -480,7 +484,7 @@ test("M03: entry invitation readback failure preserves one write and supports re
   await expect(send).toBeEnabled();
   state.failInvitations = true;
   state.failAccounts = true;
-  await send.click();
+  await activate(send);
   await expect(
     sheet.getByText("Davet işi oluşturuldu; güncel durum okunamadı.", { exact: false }),
   ).toBeVisible();
@@ -489,7 +493,7 @@ test("M03: entry invitation readback failure preserves one write and supports re
   await expect(retry).toBeEnabled();
   state.failInvitations = false;
   state.failAccounts = false;
-  await retry.click();
+  await activate(retry);
   await expect.poll(() => state.jobReads).toBe(2);
   const created = state.studioPeople.find(
     (person) => person.display_name === "Fixture Entry Recovery",
@@ -505,19 +509,19 @@ test("inviting from Members refreshes the warm access directory in the same SPA"
 }) => {
   const state = await mockAccess(page);
   await openAccess(page);
-  await page.getByRole("button", { name: "Üyeler", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Üyeler", exact: true }));
   await expect(page.getByRole("heading", { name: "Üyeler", exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Üye davet et", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Üye davet et", exact: true }));
   const sheet = page.getByRole("dialog");
   await sheet.getByLabel("Ad soyad", { exact: false }).fill("Fixture People Invite");
   await sheet.getByLabel("E-posta", { exact: false }).fill("people-invite@example.invalid");
-  await sheet.getByRole("button", { name: "Kişiyi oluştur", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Kişiyi oluştur", exact: true }));
   await expect(sheet.getByText("Kişi kaydedildi. Davet için ayrıca onay ver.")).toBeVisible();
-  await sheet.getByRole("button", { name: "Daveti gönder", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Daveti gönder", exact: true }));
   await expect(sheet.getByRole("button", { name: "Güncel durumu oku", exact: true })).toBeEnabled();
   state.invitationLabel = "Updated Fixture Invite";
-  await sheet.getByRole("button", { name: "Kapat", exact: true }).first().click();
-  await page.getByRole("button", { name: "Davetler ve hesaplar", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Kapat", exact: true }).first());
+  await activate(page.getByRole("button", { name: "Davetler ve hesaplar", exact: true }));
   const invites = page.getByRole("grid", { name: "Davetler", exact: true });
   await expect(invites.getByText("Updated Fixture Invite", { exact: true })).toBeVisible();
   await expect(invites.getByText("Fixture Invite", { exact: true })).toHaveCount(0);

@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import type { Page, Request, Response, Route } from "@playwright/test";
 import type { CalendarItem, SuccessPeopleList } from "@ftksaas/api-contracts";
 import contract from "@ftksaas/api-contracts/schema" with { type: "json" };
@@ -289,7 +290,7 @@ test("C-ortak measures scoped SPA reads, cursor and single-write readback", asyn
   const membersGrid = page.getByRole("grid", { name: "Üyeler", exact: true });
   await expect(membersGrid.getByText("Sentetik üye 01", { exact: true })).toBeVisible();
   await measure.finish("members");
-  await page.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Sonraki", exact: true }));
   await expect(membersGrid.getByText("Sentetik üye 21", { exact: true })).toBeVisible();
   await measure.finish("members-cursor");
 
@@ -313,18 +314,18 @@ test("C-ortak measures scoped SPA reads, cursor and single-write readback", asyn
   await measure.finish("forward-to-settings");
 
   await clickWorkspaceLink(page, "Stüdyo");
-  await page.getByRole("tab", { name: "Dersler ve salonlar", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Dersler ve salonlar", exact: true }));
   const firstClass = page.getByRole("button", { name: "Başlangıç grubu", exact: true });
   await expect(firstClass).toBeVisible();
   await measure.finish("return-to-studio");
-  await firstClass.click();
+  await activate(firstClass);
   const dialog = page.getByRole("dialog");
   const className = dialog.locator("#class-name");
   await expect(className).toHaveValue("Başlangıç grubu");
   await measure.finish("class-panel");
 
   await className.fill("C-ortak güncel ders");
-  await dialog.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Kaydet", exact: true }));
   await expect(dialog).toHaveCount(0);
   await expect(
     page.getByRole("button", { name: "C-ortak güncel ders", exact: true }),

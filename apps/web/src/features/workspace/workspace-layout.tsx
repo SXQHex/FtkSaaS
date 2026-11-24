@@ -294,7 +294,7 @@ export function WorkspaceLayout({
                 </ToggleGroup>
               </>
             )}
-            <div className="hidden min-[641px]:inline-flex">
+            <div className="inline-flex">
               <NavigationSearch
                 settingsUrl={settingsUrl}
                 memberScope={memberSearchScope}

@@ -1,3 +1,4 @@
+import { activate, closeWithDevice, hasTouchInput, submitWithDevice } from "./device-input.js";
 import type { FailureEnvelope } from "@ftksaas/api-contracts";
 import { test, expect } from "./test.js";
 import { expectEmptyActionCell, scanAccessibility } from "./accessibility.js";
@@ -13,7 +14,7 @@ test("native recovery callback survives URL cleaning, reload and password save",
   await page.goto("/forgot-password");
   await captureAuth(page, "e04", testInfo);
   await page.getByLabel("E-posta").fill("fixture@example.invalid");
-  await page.getByRole("button", { name: "Bağlantı gönder" }).click();
+  await activate(page.getByRole("button", { name: "Bağlantı gönder" }));
   await expect(page.getByRole("heading", { name: "E-postanı kontrol et" })).toBeVisible();
   expect(calls.recover).toBe(1);
   await page.goto("/auth/callback?code=fixture-recovery-code&next=/reset-password");
@@ -28,11 +29,11 @@ test("native recovery callback survives URL cleaning, reload and password save",
   await captureAuth(page, "e05", testInfo);
   await page.getByLabel("Yeni parola").fill("fixture-new-password");
   await page.getByLabel("Parola tekrar").fill("different-password");
-  await page.getByRole("button", { name: "Parolayı kaydet" }).click();
+  await activate(page.getByRole("button", { name: "Parolayı kaydet" }));
   await expect(page.getByText("Parolalar eşleşmiyor.")).toBeVisible();
   expect(calls.password).toBe(0);
   await page.getByLabel("Parola tekrar").fill("fixture-new-password");
-  await page.getByRole("button", { name: "Parolayı kaydet" }).click();
+  await activate(page.getByRole("button", { name: "Parolayı kaydet" }));
   await expect(page.getByRole("status")).toHaveText("Parolan kaydedildi.");
   expect(calls.exchange).toBe(1);
   expect(calls.password).toBe(1);
@@ -44,7 +45,7 @@ test("native recovery callback survives URL cleaning, reload and password save",
 test("native OAuth callback exchanges once and enters the protected account", async ({ page }) => {
   const calls = await mockNative(page);
   await page.goto("/login");
-  await page.getByRole("button", { name: "Google ile devam et" }).click();
+  await activate(page.getByRole("button", { name: "Google ile devam et" }));
   await expect(page).toHaveURL(`${origin}/account`);
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   expect(calls.exchange).toBe(1);
@@ -58,10 +59,10 @@ test("resending confirmation is explicit and does not claim email verification",
   await page.goto("/verify-email");
   await captureAuth(page, "e03", testInfo);
   expect(calls.resend).toBe(0);
-  await page.getByRole("button", { name: "Yeniden gönder" }).click();
+  await activate(page.getByRole("button", { name: "Yeniden gönder" }));
   expect(calls.resend).toBe(0);
   await page.getByLabel("E-posta").fill("fixture@example.invalid");
-  await page.getByRole("button", { name: "Yeniden gönder" }).click();
+  await activate(page.getByRole("button", { name: "Yeniden gönder" }));
   await expect(page.getByRole("status")).toContainText("Uygun bir kayıt varsa");
   await expect(page.getByRole("heading", { name: "E-postan doğrulandı" })).toHaveCount(0);
   expect(calls.resend).toBe(1);
@@ -77,7 +78,7 @@ test("native TOTP keeps the protected target closed until verification and AAL2 
   await expect(page).toHaveURL(`${origin}/login`);
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/mfa`);
   await expect(page.getByLabel("Doğrulama kodu")).toBeVisible();
   await page.reload();
@@ -85,12 +86,12 @@ test("native TOTP keeps the protected target closed until verification and AAL2 
   expect(calls.account).toBe(0);
   const code = page.getByLabel("Doğrulama kodu");
   await code.fill("000000");
-  await code.press("Enter");
+  await submitWithDevice(page.getByRole("button", { name: "Doğrula", exact: true }));
   await expect(page.getByText("Kod doğrulanamadı. Güncel kodla yeniden dene.")).toBeVisible();
   await expect(page).toHaveURL(`${origin}/mfa`);
   expect(calls.account).toBe(0);
   await code.fill("123456");
-  await code.press("Enter");
+  await submitWithDevice(page.getByRole("button", { name: "Doğrula", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   expect(calls.challenge).toBe(2);
@@ -113,37 +114,37 @@ test("native TOTP enrollment cancels safely then verifies and rereads without re
   await page.goto("/login");
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
-  await page.getByRole("tab", { name: "Güvenlik" }).click();
+  await activate(page.getByRole("tab", { name: "Güvenlik" }));
   await expect(page.getByRole("button", { name: "Kur", exact: true })).toBeVisible();
   await captureAuth(page, "e10-security", testInfo);
-  await page.getByRole("button", { name: "Kur", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Kur", exact: true }));
   await expect(page.getByLabel("Uygulamadaki 6 haneli kod")).toBeVisible();
   await captureAuth(page, "e10-totp-dialog", testInfo);
-  await page.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(page.getByRole("dialog")).toHaveCount(0);
   expect(calls.enroll).toBe(1);
   expect(calls.remove).toBe(0);
-  await page.getByRole("button", { name: "Kaldır", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Kaldır", exact: true }));
   expect(calls.remove).toBe(0);
-  await page.getByRole("button", { name: "Uygulamayı kaldır", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Uygulamayı kaldır", exact: true }));
   await expect(page.getByRole("dialog")).toHaveCount(0);
   expect(calls.remove).toBe(1);
-  await page.getByRole("button", { name: "Kur", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Kur", exact: true }));
   await page.getByLabel("Uygulamadaki 6 haneli kod").fill("123456");
   calls.rejectNextAccount = true;
-  await page.getByRole("button", { name: "Kodu doğrula", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Kodu doğrula", exact: true }));
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.getByText("İşlem sonrasında güvenlik bilgileri yenilenemedi.")).toBeVisible();
   await expect(page.getByText("Doğrulama uygulaması etkinleştirildi")).toBeVisible();
-  await page.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Yeniden dene", exact: true }));
   await expect(page.getByRole("status")).toHaveText("Güvenlik bilgileri yenilendi.");
   expect(calls.verify).toBe(1);
   expect(calls.enroll).toBe(2);
   await expect(page.getByText("SYNTHETIC-TEST-KEY")).toHaveCount(0);
   await page.reload();
-  await page.getByRole("tab", { name: "Güvenlik" }).click();
+  await activate(page.getByRole("tab", { name: "Güvenlik" }));
   await expect(page.getByText("Doğrulanmış uygulama")).toBeVisible();
   expect(errors).toEqual([]);
 });
@@ -157,44 +158,44 @@ test("session pages preserve provider IDs, label intent retries and selected rev
   await page.goto("/login");
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
-  await page.getByRole("tab", { name: "Oturumlar", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Oturumlar", exact: true }));
   await expect(page.getByText("Chromium, fixture desktop")).toBeVisible();
   await expect(page.getByRole("button", { name: "Oturumu kapat", exact: true })).toHaveCount(0);
-  await page.getByRole("button", { name: "Daha fazla", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Daha fazla", exact: true }));
   await expect(page.getByText("Firefox, fixture phone")).toBeVisible();
   await captureAuth(page, "e10-sessions", testInfo);
-  await page
-    .getByRole("button", { name: "Firefox, fixture phone etiketini düzenle", exact: true })
-    .click();
+  await activate(
+    page.getByRole("button", { name: "Firefox, fixture phone etiketini düzenle", exact: true }),
+  );
   await page.getByLabel("Oturum etiketi", { exact: true }).fill("Fixture phone label");
   calls.rejectNextLabel = true;
-  await page.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Kaydet", exact: true }));
   await expect(page.getByText("Etiket kaydedilemedi.", { exact: false })).toBeVisible();
-  await page.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Kaydet", exact: true }));
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.getByText("Fixture phone label", { exact: true })).toBeVisible();
   expect(calls.labelKeys).toHaveLength(2);
   expect(calls.labelKeys[1]).toBe(calls.labelKeys[0]);
-  await page
-    .getByRole("button", { name: "Fixture phone label etiketini düzenle", exact: true })
-    .click();
+  await activate(
+    page.getByRole("button", { name: "Fixture phone label etiketini düzenle", exact: true }),
+  );
   await page.getByLabel("Oturum etiketi", { exact: true }).fill("Conflicting label");
   calls.conflictNextLabel = true;
-  await page.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Kaydet", exact: true }));
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(
     page.getByText("Oturum etiketi başka bir yerde değişti.", { exact: false }),
   ).toBeVisible();
-  await page
-    .getByRole("button", { name: "Updated in another tab etiketini düzenle", exact: true })
-    .click();
+  await activate(
+    page.getByRole("button", { name: "Updated in another tab etiketini düzenle", exact: true }),
+  );
   await expect(page.getByLabel("Oturum etiketi", { exact: true })).toHaveValue(
     "Updated in another tab",
   );
   await page.getByLabel("Oturum etiketi", { exact: true }).fill("Final fixture phone");
-  await page.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Kaydet", exact: true }));
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.getByText("Final fixture phone", { exact: true })).toBeVisible();
   expect(calls.labelKeys).toHaveLength(4);
@@ -204,10 +205,10 @@ test("session pages preserve provider IDs, label intent retries and selected rev
   const target = await revokeButton.boundingBox();
   expect(target?.width).toBeGreaterThanOrEqual(24);
   expect(target?.height).toBeGreaterThanOrEqual(24);
-  await revokeButton.click();
+  await activate(revokeButton);
   await expect(page.getByText("Oturum kapatma doğrulanamadı.", { exact: false })).toBeVisible();
   await expect(page.getByText("Final fixture phone", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Oturumu kapat", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Oturumu kapat", exact: true }));
   await expect(page.getByText("Final fixture phone", { exact: true })).toHaveCount(0);
   await expect(page.getByText("Chromium, fixture desktop")).toBeVisible();
   const current = page.getByRole("row").filter({ hasText: "Bu cihaz" });
@@ -226,13 +227,13 @@ test("fresh native password session is adopted and exact proof survives others r
   await page.goto("/login");
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
-  await page.getByRole("tab", { name: "Oturumlar", exact: true }).click();
-  await page.getByRole("button", { name: "Diğerlerini kapat", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Oturumlar", exact: true }));
+  await activate(page.getByRole("button", { name: "Diğerlerini kapat", exact: true }));
   await captureAuth(page, "e10-others-fresh", testInfo);
   await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
-  await page.getByRole("button", { name: "Devam et", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Devam et", exact: true }));
   await expect(
     page.getByRole("button", { name: "Diğer oturumları kapat", exact: true }),
   ).toBeVisible();
@@ -241,9 +242,9 @@ test("fresh native password session is adopted and exact proof survives others r
   expect(calls.revokeKeys).toHaveLength(0);
   expect(calls.othersKeys).toHaveLength(0);
   calls.rejectNextOthers = true;
-  await page.getByRole("button", { name: "Diğer oturumları kapat", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Diğer oturumları kapat", exact: true }));
   await expect(page.getByText("Oturum kapatma doğrulanamadı.", { exact: false })).toBeVisible();
-  await page.getByRole("button", { name: "Diğer oturumları kapat", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Diğer oturumları kapat", exact: true }));
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.getByText("Bu cihaz", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Daha fazla", exact: true })).toHaveCount(0);
@@ -262,36 +263,36 @@ test("fresh password requiring TOTP uses the canonical MFA route before others c
   await page.goto("/login");
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/mfa`);
   await page.getByLabel("Doğrulama kodu").fill("123456");
-  await page.getByRole("button", { name: "Doğrula", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Doğrula", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
-  await page.getByRole("tab", { name: "Oturumlar", exact: true }).click();
-  await page.getByRole("button", { name: "Diğerlerini kapat", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Oturumlar", exact: true }));
+  await activate(page.getByRole("button", { name: "Diğerlerini kapat", exact: true }));
   await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
-  await page.getByRole("button", { name: "Devam et", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Devam et", exact: true }));
   await expect(page).toHaveURL(`${origin}/mfa`);
   expect(calls.othersKeys).toHaveLength(0);
   expect(calls.previousSessionRevocations).toBe(0);
   await page.getByLabel("Doğrulama kodu").fill("654321");
-  await page.getByRole("button", { name: "Doğrula", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Doğrula", exact: true }));
   await expect.poll(() => calls.verify).toBe(2);
   await expect(page).toHaveURL(`${origin}/mfa`);
   expect(calls.previousSessionRevocations).toBe(0);
   await page.getByLabel("Doğrulama kodu").fill("123456");
-  await page.getByRole("button", { name: "Doğrula", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Doğrula", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   expect(calls.previousSessionRevocations).toBe(1);
   expect(calls.revokeKeys).toHaveLength(0);
   expect(calls.othersKeys).toHaveLength(0);
-  await page.getByRole("tab", { name: "Oturumlar", exact: true }).click();
-  await page.getByRole("button", { name: "Daha fazla", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Oturumlar", exact: true }));
+  await activate(page.getByRole("button", { name: "Daha fazla", exact: true }));
   await expect(page.getByText("Firefox, fixture phone")).toBeVisible();
   await expect(page.getByText("Previous fixture browser")).toHaveCount(0);
-  await page.getByRole("button", { name: "Diğerlerini kapat", exact: true }).click();
-  await page.getByRole("button", { name: "Yeni giriş yaptım", exact: true }).click();
-  await page.getByRole("button", { name: "Diğer oturumları kapat", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Diğerlerini kapat", exact: true }));
+  await activate(page.getByRole("button", { name: "Yeni giriş yaptım", exact: true }));
+  await activate(page.getByRole("button", { name: "Diğer oturumları kapat", exact: true }));
   await expect(page.getByRole("dialog")).toHaveCount(0);
   const current = page.getByRole("row").filter({ hasText: "Bu cihaz" });
   await expectEmptyActionCell(current.getByRole("gridcell").last());
@@ -308,33 +309,33 @@ test("profile uses management versions, preserves conflicting drafts and retries
   await page.goto("/login");
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   const name = page.getByLabel("Görünen ad", { exact: true });
   await expect(name).toHaveValue("Fixture Account");
   await captureAuth(page, "e10-profile-text", testInfo);
   await name.fill("First draft");
   calls.rejectNextProfile = true;
-  await page.getByRole("button", { name: "Değişiklikleri kaydet", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Değişiklikleri kaydet", exact: true }));
   await expect(page.getByText("Kaydetme doğrulanamadı.", { exact: false })).toBeVisible();
-  await page.getByRole("button", { name: "Değişiklikleri kaydet", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Değişiklikleri kaydet", exact: true }));
   await expect(page.getByRole("status")).toHaveText("Değişiklikler kaydedildi.");
   expect(calls.profileKeys[1]).toBe(calls.profileKeys[0]);
   await name.fill("Conflicting draft");
   calls.conflictNextProfile = true;
-  await page.getByRole("button", { name: "Değişiklikleri kaydet", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Değişiklikleri kaydet", exact: true }));
   await expect(page.getByText("Profil başka bir yerde değişti.", { exact: false })).toBeVisible();
   await expect(name).toHaveValue("Conflicting draft");
-  await page.getByRole("button", { name: "Güncel verileri yükle", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Güncel verileri yükle", exact: true }));
   await expect(name).toHaveValue("Remote profile");
   await name.fill("Final draft");
   calls.blockProfileReads = true;
-  await page.getByRole("button", { name: "Değişiklikleri kaydet", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Değişiklikleri kaydet", exact: true }));
   await expect(page.getByText("Profil kaydedildi. Güncel bilgiler yenilenemedi.")).toBeVisible();
   await expect(name).toBeDisabled();
   const writes = calls.profileKeys.length;
   calls.blockProfileReads = false;
-  await page.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Yeniden dene", exact: true }));
   await expect(name).toBeEnabled();
   await expect(name).toHaveValue("Final draft");
   expect(calls.profileKeys).toHaveLength(writes);
@@ -358,7 +359,7 @@ test("private photo stays a profile draft until save, reloads through authentica
   await page.goto("/login");
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   const file = page.locator('input[type="file"]');
   await file.setInputFiles({
@@ -372,16 +373,16 @@ test("private photo stays a profile draft until save, reloads through authentica
   const image = page.locator('[data-slot="avatar-image"]');
   await expect(image).toHaveAttribute("data-state", "loaded");
   expect(calls.photoWrites).toHaveLength(0);
-  await page.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(image).toHaveCount(0);
   await file.setInputFiles("e2e/fixtures/profile-photo.png");
   await expect(image).toHaveAttribute("data-state", "loaded");
   await page.getByLabel("Ad", { exact: true }).fill("Photo draft");
   calls.rejectNextProfile = true;
-  await page.getByRole("button", { name: "Değişiklikleri kaydet", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Değişiklikleri kaydet", exact: true }));
   await expect(page.getByText("Kaydetme doğrulanamadı.", { exact: false })).toBeVisible();
   await expect(image).toHaveAttribute("data-state", "loaded");
-  await page.getByRole("button", { name: "Değişiklikleri kaydet", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Değişiklikleri kaydet", exact: true }));
   await expect(page.getByRole("status")).toHaveText("Değişiklikler kaydedildi.");
   await expect(image).toHaveAttribute("data-state", "loaded");
   expect(calls.profileKeys[1]).toBe(calls.profileKeys[0]);
@@ -394,12 +395,12 @@ test("private photo stays a profile draft until save, reloads through authentica
   await page.reload();
   await expect(page.getByText("Profil fotoğrafı okunamadı.", { exact: false })).toBeVisible();
   await expect(image).toHaveCount(0);
-  await page.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Yeniden dene", exact: true }));
   await expect(image).toHaveAttribute("data-state", "loaded");
-  await page.getByRole("button", { name: "Kaldır", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Kaldır", exact: true }));
   await expect(image).toHaveCount(0);
   expect(calls.photoWrites).toHaveLength(1);
-  await page.getByRole("button", { name: "Değişiklikleri kaydet", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Değişiklikleri kaydet", exact: true }));
   await expect(page.getByRole("status")).toHaveText("Değişiklikler kaydedildi.");
   await page.reload();
   await expect(image).toHaveCount(0);
@@ -416,11 +417,11 @@ test("account password change handles native current-password and old-session no
   await page.goto("/login");
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
-  await page.getByRole("tab", { name: "Güvenlik", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Güvenlik", exact: true }));
   const documentScans = await captureAuth(page, "e10-password-page", testInfo);
-  await page.getByRole("button", { name: "Parolayı değiştir", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Parolayı değiştir", exact: true }));
   const dialog = page.getByRole("dialog");
   const submit = dialog.getByRole("button", { name: "Parolayı değiştir", exact: true });
   await expect(dialog).toBeVisible();
@@ -431,35 +432,39 @@ test("account password change handles native current-password and old-session no
   await page.getByLabel("Mevcut parola", { exact: true }).fill("fixture-current-password");
   await page.getByLabel("Yeni parola", { exact: true }).fill("fixture-new-password");
   await page.getByLabel("Yeni parola tekrar", { exact: true }).fill("mismatch");
-  await page.getByLabel("Yeni parola tekrar", { exact: true }).press("Tab");
+  if (hasTouchInput(page)) {
+    await activate(page.getByLabel("Yeni parola", { exact: true }));
+  } else {
+    await page.getByLabel("Yeni parola tekrar", { exact: true }).press("Tab");
+  }
   await expect(submit).toBeDisabled();
   await expect(page.getByText("Parolalar eşleşmiyor.")).toBeVisible();
   expect(calls.password).toBe(0);
   await page.getByLabel("Yeni parola tekrar", { exact: true }).fill("fixture-new-password");
   calls.rejectCurrentPassword = true;
-  await submit.click();
+  await activate(submit);
   await expect(page.getByText("Mevcut parola eksik veya hatalı.", { exact: false })).toBeVisible();
   expect(calls.passwordCodeSends).toBe(0);
   calls.passwordNeedsCode = true;
-  await submit.click();
+  await activate(submit);
   await expect(page.getByLabel("Güvenlik kodu", { exact: true })).toBeVisible();
   expect(calls.passwordCodeSends).toBe(0);
-  await page.getByRole("button", { name: "Kod gönder", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Kod gönder", exact: true }));
   await expect(page.getByText("Kod gönderme isteği kabul edildi. Gelen kodu yaz.")).toBeVisible();
   await page.getByLabel("Güvenlik kodu", { exact: true }).fill("invalid-nonce");
   calls.rejectPasswordCode = true;
-  await submit.click();
+  await activate(submit);
   await expect(
     page.getByText("Kod geçersiz, süresi dolmuş veya kullanılmış. Yeni kod iste."),
   ).toBeVisible();
   await expect(page.getByLabel("Güvenlik kodu", { exact: true })).toHaveValue("");
   expect(calls.passwordCodeSends).toBe(1);
-  await page.getByRole("button", { name: "Kod gönder", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Kod gönder", exact: true }));
   await page.getByLabel("Güvenlik kodu", { exact: true }).fill("valid-nonce");
-  await submit.click();
+  await activate(submit);
   await expect(dialog).toHaveCount(0);
   await expect(page).toHaveURL(`${origin}/account`);
-  await page.getByRole("tab", { name: "Oturumlar", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Oturumlar", exact: true }));
   await expect(page.getByText("Bu cihaz", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Daha fazla", exact: true })).toHaveCount(0);
   expect(calls.passwordCodeSends).toBe(2);
@@ -476,58 +481,65 @@ test("native Google linking returns through the existing callback and selected u
   await page.goto("/login");
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
-  await page.getByRole("tab", { name: "Güvenlik", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Güvenlik", exact: true }));
   calls.rejectNextIdentityLink = true;
-  await page.getByRole("button", { name: "Google ile bağla", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Google ile bağla", exact: true }));
   await expect(
     page.getByText("Google hesabı bağlama başlatılamadı.", { exact: false }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Yeniden dene", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
-  await page.getByRole("tab", { name: "Güvenlik", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Güvenlik", exact: true }));
   await expect(page.getByText("google@example.invalid", { exact: true })).toBeVisible();
   expect(calls.identityLink).toBe(2);
   expect(calls.exchange).toBe(2);
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.getByRole("button", { name: "Bağlantıyı kaldır", exact: true }).hover();
+  if (!hasTouchInput(page)) {
+    await page.getByRole("button", { name: "Bağlantıyı kaldır", exact: true }).hover();
+  }
   await captureAuth(page, "e10-google-linked", testInfo);
-  await page.getByRole("button", { name: "Bağlantıyı kaldır", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Bağlantıyı kaldır", exact: true }));
   await expect(
     page.getByRole("dialog").getByText("google@example.invalid", { exact: false }),
   ).toBeVisible();
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page
-    .getByRole("dialog")
-    .getByRole("button", { name: "Google bağlantısını kaldır", exact: true })
-    .hover();
+  if (!hasTouchInput(page)) {
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: "Google bağlantısını kaldır", exact: true })
+      .hover();
+  }
   await captureAuth(page, "e10-google-unlink", testInfo);
-  await page.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Vazgeç", exact: true }));
   expect(calls.identityUnlink).toBe(0);
-  await page.getByRole("button", { name: "Bağlantıyı kaldır", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Bağlantıyı kaldır", exact: true }));
   calls.rejectNextIdentityUnlink = true;
-  await page
-    .getByRole("dialog")
-    .getByRole("button", { name: "Google bağlantısını kaldır", exact: true })
-    .click();
+  await activate(
+    page
+      .getByRole("dialog")
+      .getByRole("button", { name: "Google bağlantısını kaldır", exact: true }),
+  );
   await expect(page.getByText("Bağlantı kaldırma doğrulanamadı.", { exact: false })).toBeVisible();
   calls.blockIdentityReads = true;
-  await page
-    .getByRole("dialog")
-    .getByRole("button", { name: "Google bağlantısını kaldır", exact: true })
-    .click();
+  await activate(
+    page
+      .getByRole("dialog")
+      .getByRole("button", { name: "Google bağlantısını kaldır", exact: true }),
+  );
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.getByText("Bağlı giriş yöntemleri okunamadı.", { exact: false })).toBeVisible();
   await expect(page.getByRole("button", { name: "Google ile bağla", exact: true })).toBeDisabled();
   await expect(page.getByText("Bağlı", { exact: true })).toHaveCount(0);
   const removals = calls.identityUnlink;
   calls.blockIdentityReads = false;
-  await page
-    .getByRole("alert")
-    .filter({ hasText: "Bağlı giriş yöntemleri okunamadı." })
-    .getByRole("button", { name: "Yeniden dene", exact: true })
-    .click();
+  await activate(
+    page
+      .getByRole("alert")
+      .filter({ hasText: "Bağlı giriş yöntemleri okunamadı." })
+      .getByRole("button", { name: "Yeniden dene", exact: true }),
+  );
   await expect(page.getByRole("button", { name: "Google ile bağla", exact: true })).toBeEnabled();
   expect(calls.identityUnlink).toBe(removals);
   expect(errors).toEqual([]);
@@ -549,7 +561,7 @@ test("the last Google login method stays protected with a long provider email", 
         response.request().method() === "POST" &&
         response.ok(),
     ),
-    page.getByRole("button", { name: "Giriş yap", exact: true }).click(),
+    activate(page.getByRole("button", { name: "Giriş yap", exact: true })),
   ]);
   await expect(page).toHaveURL(`${origin}/account`);
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
@@ -558,7 +570,7 @@ test("the last Google login method stays protected with a long provider email", 
   calls.identityEmail = `${"a".repeat(63)}@${"b".repeat(50)}.example.invalid`;
   calls.onlyGoogleIdentity = true;
   await page.reload();
-  await page.getByRole("tab", { name: "Güvenlik", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Güvenlik", exact: true }));
   await expect(page.getByRole("button", { name: "Bağlantıyı kaldır", exact: true })).toBeDisabled();
   expect(calls.identityUnlink).toBe(0);
   await captureAuth(page, "e10-google-last-long-email", testInfo);
@@ -575,10 +587,10 @@ test("native email request preserves profile drafts and separates pending/no-cod
   await page.goto("/login");
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   await page.getByLabel("Görünen ad", { exact: true }).fill("Unsaved profile draft");
-  await page.getByRole("button", { name: "E-postayı değiştir", exact: true }).click();
+  await activate(page.getByRole("button", { name: "E-postayı değiştir", exact: true }));
   const dialog = page.getByRole("dialog");
   const request = dialog.getByRole("button", { name: "Değişim isteği gönder", exact: true });
   await expect(page.getByLabel("Güncel e-posta", { exact: true })).toHaveValue(
@@ -586,24 +598,24 @@ test("native email request preserves profile drafts and separates pending/no-cod
   );
   await captureAuth(page, "e10-email-new", testInfo);
   await page.getByLabel("Yeni e-posta", { exact: true }).fill("invalid");
-  await request.click();
+  await activate(request);
   await expect(page.getByText("Geçerli bir e-posta adresi gir.")).toBeVisible();
   expect(calls.emailUpdate).toBe(0);
   await page.getByLabel("Yeni e-posta", { exact: true }).fill("next@example.invalid");
   calls.rejectNextEmailUpdate = true;
-  await request.click();
+  await activate(request);
   await expect(page.getByText("E-posta işlemi doğrulanamadı.", { exact: false })).toBeVisible();
   await expect(page.getByLabel("Yeni e-posta", { exact: true })).toHaveValue(
     "next@example.invalid",
   );
   await expect(request).toBeEnabled();
   calls.blockProfileReads = true;
-  await request.click();
+  await activate(request);
   await expect(page.getByText("İstek işlendi. Güncel hesap bilgileri yenilenemedi.")).toBeVisible();
   await expect(request).toBeDisabled();
   const writes = calls.emailUpdate;
   calls.blockProfileReads = false;
-  await dialog.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Yeniden dene", exact: true }));
   await expect(page.getByLabel("Güncel e-posta", { exact: true })).toHaveValue(
     "fixture@example.invalid",
   );
@@ -612,12 +624,14 @@ test("native email request preserves profile drafts and separates pending/no-cod
   );
   expect(calls.emailUpdate).toBe(writes);
   await captureAuth(page, "e10-email-pending", testInfo);
-  await dialog.getByRole("button", { name: "Bekleyen adrese yeniden gönder", exact: true }).click();
+  await activate(
+    dialog.getByRole("button", { name: "Bekleyen adrese yeniden gönder", exact: true }),
+  );
   await expect(
     page.getByText("Yeniden gönderme isteği işlendi. Onay iletisini kontrol et."),
   ).toBeVisible();
   expect(calls.emailResend).toBe(1);
-  await dialog.getByLabel("Kapat", { exact: true }).click();
+  await activate(dialog.getByLabel("Kapat", { exact: true }));
   await expect(page.getByLabel("Görünen ad", { exact: true })).toHaveValue("Unsaved profile draft");
   expect(calls.profileKeys).toHaveLength(0);
   await page.goto("/auth/callback?message=email_change_confirmation_sent");
@@ -625,7 +639,7 @@ test("native email request preserves profile drafts and separates pending/no-cod
   await expect(page.getByRole("heading", { name: "Hesap doğrulaması" })).toBeVisible();
   expect(calls.exchange).toBe(1);
   await captureAuth(page, "e10-email-no-code", testInfo);
-  await page.getByRole("link", { name: "Hesabım", exact: true }).click();
+  await activate(page.getByRole("link", { name: "Hesabım", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   await expect(page.getByLabel("E-posta", { exact: false })).toHaveValue("fixture@example.invalid");
   calls.completeEmailChangeOnExchange = true;
@@ -633,7 +647,7 @@ test("native email request preserves profile drafts and separates pending/no-cod
   await expect(page).toHaveURL(`${origin}/account`);
   await expect(page.getByLabel("E-posta", { exact: false })).toHaveValue("next@example.invalid");
   expect(calls.exchange).toBe(2);
-  await page.getByRole("button", { name: "E-postayı değiştir", exact: true }).click();
+  await activate(page.getByRole("button", { name: "E-postayı değiştir", exact: true }));
   await expect(page.getByLabel("Güncel e-posta", { exact: true })).toHaveValue(
     "next@example.invalid",
   );
@@ -651,7 +665,7 @@ test("account theme uses versioned user settings, exact retry and read-only reco
   await page.goto("/login");
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   const dark = page.getByRole("radio", { name: "Koyu", exact: true });
   const light = page.getByRole("radio", { name: "Açık", exact: true });
@@ -665,25 +679,25 @@ test("account theme uses versioned user settings, exact retry and read-only reco
   calls.settingsWriteGate = new Promise<void>((resolve) => {
     releaseWrite = resolve;
   });
-  await dark.click();
+  await activate(dark);
   await expect.poll(() => calls.settingsKeys.length).toBe(1);
-  await page.getByRole("tab", { name: "Güvenlik", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Güvenlik", exact: true }));
   await expect(page.getByRole("radiogroup", { name: "Tema" })).not.toBeVisible();
-  await page.getByRole("tab", { name: "Profil", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Profil", exact: true }));
   await expect(dark).toBeDisabled();
   expect(calls.settingsKeys).toHaveLength(1);
   releaseWrite();
   await expect(
     page.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }),
   ).toBeVisible();
-  await page.getByRole("tab", { name: "Güvenlik", exact: true }).click();
-  await page.getByRole("tab", { name: "Profil", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Güvenlik", exact: true }));
+  await activate(page.getByRole("tab", { name: "Profil", exact: true }));
   await expect(
     page.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }),
   ).toBeVisible();
   await expect(light).toBeDisabled();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "system");
-  await page.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }));
   await expect(page.getByText("Görünüm tercihi kaydedildi.")).toBeVisible();
   expect(calls.settingsKeys[1]).toBe(calls.settingsKeys[0]);
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
@@ -692,29 +706,29 @@ test("account theme uses versioned user settings, exact retry and read-only reco
   );
   expect(calls.profileKeys).toHaveLength(0);
   calls.conflictNextSettings = true;
-  await light.click();
+  await activate(light);
   await expect(page.getByText("Tercih başka bir işlemle değişti.", { exact: false })).toBeVisible();
   await expect(dark).toBeDisabled();
-  await page.getByRole("button", { name: "Güncel tercihi yükle", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Güncel tercihi yükle", exact: true }));
   await expect(dark).toBeEnabled();
-  await dark.click();
+  await activate(dark);
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   expect(calls.settingsKeys[3]).not.toBe(calls.settingsKeys[2]);
   calls.blockSettingsReads = true;
-  await light.click();
+  await activate(light);
   await expect(page.getByText("Tercih kaydedildi. Güncel görünüm okunamadı.")).toBeVisible();
   await expect(dark).toBeDisabled();
   await expect(page.getByRole("button", { name: "Yeniden dene", exact: true })).toBeEnabled();
   const writes = calls.settingsKeys.length;
   calls.blockSettingsReads = false;
-  await page.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Yeniden dene", exact: true }));
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   expect(calls.settingsKeys).toHaveLength(writes);
   await page.reload();
   await expect(light).toHaveAttribute("aria-checked", "true");
   await page.emulateMedia({ colorScheme: "dark" });
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-  await system.click();
+  await activate(system);
   await expect(page.locator("html")).toHaveAttribute("data-theme", "system");
   await page.reload();
   await expect(system).toBeChecked();
@@ -727,9 +741,9 @@ test("account theme uses versioned user settings, exact retry and read-only reco
       .locator('[data-slot="card"]')
       .filter({ has: page.getByRole("heading", { name: "Görünüm", exact: true }) }),
   );
-  await page.getByRole("tab", { name: "Güvenlik", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Güvenlik", exact: true }));
   await expect(page.locator("html")).toHaveAttribute("data-theme", "system");
-  await page.getByRole("button", { name: "Çıkış yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Çıkış yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/login`);
   await expect(page.locator("html")).not.toHaveAttribute("data-theme");
   expect(errors).toEqual([]);
@@ -746,7 +760,7 @@ test("font scale preserves exact pending intents, system choice, keyboard access
   await page.goto("/login");
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   const scale = page.getByRole("combobox", { name: "Ölçek", exact: true });
   await expect(scale).toHaveValue("system");
@@ -758,9 +772,9 @@ test("font scale preserves exact pending intents, system choice, keyboard access
     page.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }),
   ).toBeVisible();
   await expect(scale).toBeDisabled();
-  await page.getByRole("tab", { name: "Güvenlik", exact: true }).click();
-  await page.getByRole("tab", { name: "Profil", exact: true }).click();
-  await page.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Güvenlik", exact: true }));
+  await activate(page.getByRole("tab", { name: "Profil", exact: true }));
+  await activate(page.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }));
   await expect(page.locator("html")).toHaveCSS("font-size", "20px");
   expect(calls.settingsKeys[1]).toBe(calls.settingsKeys[0]);
   expect(calls.settingsPatches[1]).toEqual({ font_scale: 1.25 });
@@ -784,7 +798,7 @@ test("font scale preserves exact pending intents, system choice, keyboard access
       .filter({ has: page.getByRole("heading", { name: "Görünüm", exact: true }) }),
   );
   const emailTrigger = page.getByRole("button", { name: "E-postayı değiştir", exact: true });
-  await emailTrigger.click();
+  await activate(emailTrigger);
   const emailDialog = page.getByRole("dialog");
   await expect(emailDialog.getByLabel("Yeni e-posta", { exact: true })).toBeVisible();
   expect((await scanAccessibility(page, "email-sheet-200-percent")).violations).toEqual([]);
@@ -793,15 +807,17 @@ test("font scale preserves exact pending intents, system choice, keyboard access
   expect(dialogBounds!.x).toBeGreaterThanOrEqual(0);
   expect(dialogBounds!.x + dialogBounds!.width).toBeLessThanOrEqual(page.viewportSize()!.width);
   await page.screenshot({ path: ".tmp/e10-appearance-scale-sheet-200-390-dark.png" });
-  await emailDialog.getByLabel("Kapat", { exact: true }).click();
+  await activate(emailDialog.getByLabel("Kapat", { exact: true }));
   await expect(page.locator('[data-slot="sheet-overlay"]')).toHaveCount(0);
   await expect(emailTrigger).toBeFocused();
   await scale.focus();
   await expect(scale).toBeFocused();
-  await page.keyboard.press("Shift+Tab");
-  await expect(page.getByRole("radio", { name: "Koyu", exact: true })).toBeFocused();
-  await page.keyboard.press("Tab");
-  await expect(scale).toBeFocused();
+  if (!hasTouchInput(page)) {
+    await page.keyboard.press("Shift+Tab");
+    await expect(page.getByRole("radio", { name: "Koyu", exact: true })).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(scale).toBeFocused();
+  }
   const focusedBounds = await scale.boundingBox();
   expect(focusedBounds).not.toBeNull();
   expect(focusedBounds!.x).toBeGreaterThanOrEqual(0);
@@ -835,7 +851,7 @@ test("font scale preserves exact pending intents, system choice, keyboard access
   await expect(page.getByRole("button", { name: "Yeniden dene", exact: true })).toBeEnabled();
   const writes = calls.settingsKeys.length;
   calls.blockSettingsReads = false;
-  await page.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Yeniden dene", exact: true }));
   await expect(scale).toHaveValue("system");
   await expect(page.locator("html")).toHaveCSS("font-size", "16px");
   expect(calls.settingsKeys).toHaveLength(writes);
@@ -848,7 +864,7 @@ test("font scale preserves exact pending intents, system choice, keyboard access
       .locator('[data-slot="card"]')
       .filter({ has: page.getByRole("heading", { name: "Görünüm", exact: true }) }),
   );
-  await page.getByRole("button", { name: "Çıkış yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Çıkış yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/login`);
   await expect(page.locator("html")).not.toHaveAttribute("data-theme");
   expect(await page.locator("html").evaluate((element) => element.style.fontSize)).toBe("");
@@ -863,7 +879,7 @@ test("minimum saved font scale and 320 CSS pixel reflow keep the same WCAG 2.2 A
   await page.goto("/login");
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("fixture-password");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   const scale = page.getByRole("combobox", { name: "Ölçek", exact: true });
   await expect(scale).toHaveValue("0.75");
   await expect(page.locator("html")).toHaveCSS("font-size", "12px");
@@ -915,22 +931,21 @@ for (const colorScheme of ["light", "dark"] as const) {
     });
     await page.goto("/verify-email");
     const resend = page.getByRole("button", { name: "Yeniden gönder" });
-    await resend.click();
+    await activate(resend);
     const email = page.getByLabel("E-posta");
     await email.fill("invalid");
-    await resend.click();
+    await activate(resend);
     await expect(email).toHaveAttribute("aria-invalid", "true");
     await expect(email).toHaveAccessibleDescription("Geçerli bir e-posta adresi gir.");
     expect(attempts).toBe(0);
     await email.fill("fixture@example.invalid");
-    await resend.click();
+    await activate(resend);
     await expect(page.getByRole("alert")).toBeVisible();
     await expect(email).toHaveValue("fixture@example.invalid");
     expect(attempts).toBe(1);
     expect((await scanAccessibility(page, "verification-rate-limit")).violations).toEqual([]);
     await expect(resend).toBeEnabled();
-    await resend.focus();
-    await page.keyboard.press("Enter");
+    await activate(resend, "Enter");
     await expect(page.getByRole("status")).toContainText("Uygun bir kayıt varsa");
     await expect(page.getByRole("alert")).toHaveCount(0);
     await expect(email).toHaveValue("fixture@example.invalid");
@@ -1007,7 +1022,7 @@ test("signup validates policy, stops existing accounts and requests native confi
   const submit = page.getByRole("button", { name: "Hesap oluştur", exact: true });
   await page.getByLabel("Parola tekrar", { exact: true }).fill("Fixture123");
   await password.fill("weak");
-  await submit.click();
+  await activate(submit);
   await expect(password).toHaveJSProperty(
     "validationMessage",
     "En az 8 karakter, büyük harf, küçük harf ve sayı içerir.",
@@ -1015,7 +1030,7 @@ test("signup validates policy, stops existing accounts and requests native confi
   expect(checks).toBe(0);
   await password.fill("Fixture123");
   await page.getByLabel("Parola tekrar", { exact: true }).fill("different");
-  await submit.click();
+  await activate(submit);
   await expect(page.getByLabel("Parola tekrar", { exact: true })).toHaveJSProperty(
     "validationMessage",
     "Parolalar eşleşmiyor.",
@@ -1024,7 +1039,10 @@ test("signup validates policy, stops existing accounts and requests native confi
   const confirmation = page.getByLabel("Parola tekrar", { exact: true });
   await confirmation.fill("Fixture123");
   await expect(confirmation).toHaveJSProperty("validationMessage", "");
-  await confirmation.press("Enter");
+  await submitWithDevice(
+    page.getByRole("button", { name: "Hesap oluştur", exact: true }),
+    confirmation,
+  );
   await expect(page.getByRole("alert")).toContainText(
     "Bu e-posta adresiyle ilişkili bir hesap zaten var.",
   );
@@ -1032,12 +1050,18 @@ test("signup validates policy, stops existing accounts and requests native confi
   expect(signups).toBe(0);
   expect((await scanAccessibility(page, "signup-existing-account")).violations).toEqual([]);
   status = "temporary";
-  await confirmation.press("Enter");
+  await submitWithDevice(
+    page.getByRole("button", { name: "Hesap oluştur", exact: true }),
+    confirmation,
+  );
   await expect(page.getByRole("alert")).toContainText("Kayıt tamamlanamadı");
   expect(checks).toBe(2);
   expect(signups).toBe(0);
   status = "available";
-  await confirmation.press("Enter");
+  await submitWithDevice(
+    page.getByRole("button", { name: "Hesap oluştur", exact: true }),
+    confirmation,
+  );
   await expect(page).toHaveURL(`${origin}/verify-email`);
   await expect(page.getByRole("heading", { name: "E-postanı doğrula" })).toBeVisible();
   expect(checks).toBe(3);
@@ -1045,7 +1069,7 @@ test("signup validates policy, stops existing accounts and requests native confi
   expect(scopeReads).toHaveLength(0);
   await page.goto("/auth/callback?code=fixture-signup-confirmed");
   await expect(page).toHaveURL(`${origin}/account`);
-  await page.getByRole("button", { name: "Menüyü aç veya kapat", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Menüyü aç veya kapat", exact: true }));
   const studioLink = page
     .getByRole("navigation", { name: "Ana menü", exact: true })
     .getByRole("link", { name: "Stüdyo", exact: true });
@@ -1053,7 +1077,7 @@ test("signup validates policy, stops existing accounts and requests native confi
     "href",
     `/o/${studioIds.org}/c/${studioIds.center}/studio`,
   );
-  await page.keyboard.press("Escape");
+  await closeWithDevice(page.getByRole("button", { name: "Menüyü kapat", exact: true }));
   expect(scopeReads.some((row) => row.operation === "account_get_v1")).toBe(true);
   expect(scopeReads.some((row) => row.operation === "organizations_list_v1")).toBe(true);
   expect(
@@ -1070,7 +1094,7 @@ test("signup validates policy, stops existing accounts and requests native confi
     org_id: studioIds.org,
     person_id: studioIds.self,
   });
-  await page.getByRole("button", { name: "Çıkış yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Çıkış yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/login`);
   await expect(page.getByRole("button", { name: "Giriş yap", exact: true })).toBeVisible();
   const beforeExpired = scopeReads.length;
@@ -1080,14 +1104,14 @@ test("signup validates policy, stops existing accounts and requests native confi
   await expect(page).toHaveURL(`${origin}/auth/callback`);
   await expect(page.getByRole("alert")).toBeVisible();
   expect(scopeReads).toHaveLength(beforeExpired);
-  await page.getByRole("link", { name: "Girişe dön", exact: true }).click();
+  await activate(page.getByRole("link", { name: "Girişe dön", exact: true }));
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
-  await page.getByRole("button", { name: "Menüyü aç veya kapat", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Menüyü aç veya kapat", exact: true }));
   await expect(studioLink).toBeVisible();
-  await page.keyboard.press("Escape");
+  await closeWithDevice(page.getByRole("button", { name: "Menüyü kapat", exact: true }));
   expect(scopeReads.length).toBeGreaterThan(beforeExpired);
   expect(signups).toBe(1);
 });
@@ -1102,7 +1126,7 @@ test("signup Google uses shared OAuth without submitting password registration",
     return route.fulfill({ json: {} });
   });
   await page.goto("/signup");
-  await page.getByRole("button", { name: "Google ile kayıt ol" }).click();
+  await activate(page.getByRole("button", { name: "Google ile kayıt ol" }));
   await expect(page).toHaveURL(`${origin}/account`);
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   expect(calls.exchange).toBe(1);

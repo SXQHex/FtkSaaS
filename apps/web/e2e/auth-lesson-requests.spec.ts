@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import type { LessonRequestView, ManagementStateView, SessionView } from "@ftksaas/api-contracts";
@@ -302,7 +303,7 @@ async function fixture(
   await page.goto(`${origin}/login`);
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/requests`);
@@ -312,7 +313,7 @@ async function fixture(
   return { writes, reads, detail, resultReads, reservationSources };
 }
 async function open(page: Page) {
-  await page.getByRole("row", { name: /Sentetik Talep Üyesi/ }).click();
+  await activate(page.getByRole("row", { name: /Sentetik Talep Üyesi/ }));
   const sheet = page.getByRole("dialog");
   await expect(sheet.getByRole("button", { name: "Reddet", exact: true })).toBeEnabled();
   return sheet;
@@ -345,21 +346,21 @@ test("request rejection requires reason then rereads native state", async ({ pag
   const state = await fixture(page);
   const sheet = await open(page);
   const note = "Temel adımları çalışmak isterim.";
-  await sheet.getByRole("button", { name: "Kapat", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Kapat", exact: true }));
   Object.assign(state.detail, { student_note: note });
   await page.reload();
   await expect((await open(page)).getByText(note, { exact: true })).toBeVisible();
-  await sheet.getByRole("button", { name: "Reddet", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Reddet", exact: true }));
   const reason = sheet.getByLabel("Ret gerekçesi", { exact: true });
   await expect(reason).toHaveAttribute("aria-describedby", "request-reason-hint");
-  await sheet.getByRole("button", { name: "Reddi gönder", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Reddi gönder", exact: true }));
   expect(state.writes).toHaveLength(0);
   const error = await sheet.locator("#request-reason-error").innerText();
   const hint = await sheet.locator("#request-reason-hint").innerText();
   expect(error).not.toBe("");
   await expect(reason).toHaveAccessibleDescription(`${hint} ${error}`);
   await reason.fill("Saat uygun değil");
-  await sheet.getByRole("button", { name: "Reddi gönder", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Reddi gönder", exact: true }));
   await expect(
     sheet.getByText("İşlem kaydedildi ve güncel talep okundu.", { exact: true }),
   ).toBeVisible();
@@ -372,14 +373,14 @@ test("unknown request outcome locks closing and recovers receipt without another
 }) => {
   const state = await fixture(page, "unknown");
   const sheet = await open(page);
-  await sheet.getByRole("button", { name: "Reddet", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Reddet", exact: true }));
   await sheet.getByLabel("Ret gerekçesi", { exact: true }).fill("Uygun değil");
-  await sheet.getByRole("button", { name: "Reddi gönder", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Reddi gönder", exact: true }));
   await expect(
     sheet.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }),
   ).toBeVisible();
   await expect(sheet.getByRole("button", { name: "Kapat", exact: true })).toBeDisabled();
-  await sheet.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
   await expect(
     sheet.getByText("İşlem kaydedildi ve güncel talep okundu.", { exact: true }),
   ).toBeVisible();
@@ -390,11 +391,11 @@ test("alternative submission uses center timezone and never approves automatical
 }) => {
   const state = await fixture(page);
   const sheet = await open(page);
-  await sheet.getByRole("button", { name: "Alternatif öner", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Alternatif öner", exact: true }));
   expect(state.writes).toHaveLength(0);
   await sheet.getByLabel("Gün", { exact: true }).fill("2026-12-02");
   await sheet.getByLabel("Başlangıç", { exact: true }).fill("13:00");
-  await sheet.getByRole("button", { name: "Alternatifi gönder", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Alternatifi gönder", exact: true }));
   await expect(
     sheet.getByText("İşlem kaydedildi ve güncel talep okundu.", { exact: true }),
   ).toBeVisible();
@@ -403,7 +404,7 @@ test("alternative submission uses center timezone and never approves automatical
     { interval: { starts_at: "2026-12-02T10:00:00Z", ends_at: "2026-12-02T11:00:00Z" } },
   ]);
   expect(state.detail.reservation_id).toBeNull();
-  await sheet.getByRole("button", { name: "Güncel talebi oku", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Güncel talebi oku", exact: true }));
   await expect(
     sheet.getByRole("heading", { name: "Sentetik Talep Üyesi özel ders talebi", exact: true }),
   ).toBeVisible();
@@ -439,7 +440,7 @@ for (const mode of ["existing", "create", "create-lost-ack", "create-mismatched-
           : "normal",
     );
     const sheet = await open(page);
-    await sheet.getByRole("button", { name: "Onayla", exact: true }).click();
+    await activate(sheet.getByRole("button", { name: "Onayla", exact: true }));
     const submit = sheet.getByRole("button", {
       name: "Onayla ve rezervasyon oluştur",
       exact: true,
@@ -462,20 +463,21 @@ for (const mode of ["existing", "create", "create-lost-ack", "create-mismatched-
       await sheet.getByLabel("Eğitmen", { exact: true }).selectOption(I.instructor);
       await sheet.getByLabel("Kontenjan", { exact: true }).fill("1");
     }
-    await sheet
-      .getByRole("checkbox", {
+    await activate(
+      sheet.getByRole("checkbox", {
         name: "Seansı ve onay yolunu kontrol ettim. Kesin rezervasyon oluşturulmasını onaylıyorum.",
         exact: true,
-      })
-      .press("Space");
+      }),
+      "Space",
+    );
     const submittedAt = performance.now();
-    await submit.click();
+    await activate(submit);
     if (mode === "create-lost-ack") {
       await expect(
         sheet.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }),
       ).toBeVisible();
       expect(state.resultReads).toHaveLength(0);
-      await sheet.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+      await activate(sheet.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
     }
     await expect(
       sheet.getByText("İşlem kaydedildi ve güncel talep okundu.", { exact: true }),
@@ -501,7 +503,7 @@ for (const mode of ["existing", "create", "create-lost-ack", "create-mismatched-
             },
           },
     );
-    await sheet.getByRole("button", { name: "Geri", exact: true }).click();
+    await activate(sheet.getByRole("button", { name: "Geri", exact: true }));
     await expect(
       sheet.getByText("Güncel rezervasyon ve seans okundu.", { exact: true }),
     ).toBeVisible();
@@ -531,11 +533,11 @@ test("status change resets native cursor and keeps server counters independent o
   const state = await fixture(page, "directory");
   await expect(page.getByText("25", { exact: true })).toBeVisible();
   await expect(page.getByText("12", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Sonraki", exact: true }));
   await expect
     .poll(() => state.reads.some((r) => (r.page as { cursor?: string })?.cursor === "pending:next"))
     .toBe(true);
-  await page.getByRole("radio", { name: "Sonuçlanan", exact: true }).click();
+  await activate(page.getByRole("radio", { name: "Sonuçlanan", exact: true }));
   await expect(page.getByRole("gridcell", { name: "Onaylanan", exact: true })).toBeVisible();
   const resolved = state.reads.filter(
     (r) => (r.selector as { key: { status?: string } }).key.status === "resolved",
@@ -546,12 +548,12 @@ test("status change resets native cursor and keeps server counters independent o
   });
   expect(resolved.at(-1)!.page).not.toHaveProperty("cursor");
   await expect(page.getByText("25", { exact: true })).toBeVisible();
-  await page.getByRole("radio", { name: "Alternatif önerildi", exact: true }).click();
+  await activate(page.getByRole("radio", { name: "Alternatif önerildi", exact: true }));
   await expect(
     page.getByRole("gridcell", { name: "Alternatif önerildi", exact: true }),
   ).toBeVisible();
   await expect(page.getByRole("button", { name: "Önceki", exact: true })).toBeDisabled();
-  await page.getByRole("radio", { name: "Tümü", exact: true }).click();
+  await activate(page.getByRole("radio", { name: "Tümü", exact: true }));
   await expect
     .poll(() =>
       state.reads.some((r) => (r.selector as { key: { status?: string } }).key.status === "all"),

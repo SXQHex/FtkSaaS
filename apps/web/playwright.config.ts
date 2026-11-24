@@ -1,12 +1,8 @@
-import { defineConfig, devices } from "@playwright/test";
-import { browserProfiles } from "./scripts/browser-profiles.mjs";
+import { defineConfig } from "@playwright/test";
+import { activeBrowserProfile } from "./playwright-device.js";
 
 const baseURL = "http://127.0.0.1:4173";
-const project = process.env.FTK_BROWSER_PROJECT ?? "chromium";
-if (!Object.hasOwn(browserProfiles, project)) throw new Error("Unknown browser project");
-const { device: deviceName, engine } = browserProfiles[project as keyof typeof browserProfiles];
-const device = devices[deviceName];
-if (device?.defaultBrowserType !== engine) throw new Error("Browser profile engine mismatch");
+const { project, device, engine } = activeBrowserProfile();
 
 export default defineConfig({
   testDir: "./e2e",

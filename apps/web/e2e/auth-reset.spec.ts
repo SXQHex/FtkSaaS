@@ -1,3 +1,4 @@
+import { activate, hasTouchInput, submitWithDevice } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { origin, mockNative } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
@@ -13,7 +14,7 @@ for (const colorScheme of ["light", "dark"] as const) {
       const calls = await mockNative(page);
       await page.goto("/forgot-password");
       await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
-      await page.getByRole("button", { name: "Bağlantı gönder" }).click();
+      await activate(page.getByRole("button", { name: "Bağlantı gönder" }));
       await expect(page.getByRole("heading", { name: "E-postanı kontrol et" })).toBeVisible();
       await page.goto("/auth/callback?code=fixture-recovery-code&next=/reset-password");
       await expect(page).toHaveURL(`${origin}/reset-password`);
@@ -30,30 +31,37 @@ for (const colorScheme of ["light", "dark"] as const) {
         confirm,
         page.getByRole("button", { name: "Parolayı kaydet" }),
       ];
-      await controls[0]!.focus();
+      const touch = hasTouchInput(page);
+      if (!touch) await controls[0]!.focus();
       for (const [index, control] of controls.entries()) {
-        if (index > 0) await page.keyboard.press("Tab");
-        await expect(control).toBeFocused();
+        if (touch) {
+          await control.scrollIntoViewIfNeeded();
+        } else {
+          if (index > 0) await page.keyboard.press("Tab");
+          await expect(control).toBeFocused();
+        }
         await expect(control).toBeInViewport({ ratio: 1 });
         const box = await control.boundingBox();
         expect(box).not.toBeNull();
         expect(box!.x).toBeGreaterThanOrEqual(0);
         expect(box!.x + box!.width).toBeLessThanOrEqual(width + 1);
       }
-      for (const control of controls.slice(0, -1).reverse()) {
-        await page.keyboard.press("Shift+Tab");
-        await expect(control).toBeFocused();
-        await expect(control).toBeInViewport({ ratio: 1 });
+      if (!touch) {
+        for (const control of controls.slice(0, -1).reverse()) {
+          await page.keyboard.press("Shift+Tab");
+          await expect(control).toBeFocused();
+          await expect(control).toBeInViewport({ ratio: 1 });
+        }
       }
       await password.fill("Fixture123");
       await confirm.fill("Different123");
-      await page.keyboard.press("Enter");
+      await submitWithDevice(page.getByRole("button", { name: "Parolayı kaydet" }));
       await expect(confirm).toHaveAttribute("aria-invalid", "true");
       await expect(confirm).toHaveAccessibleDescription("Parolalar eşleşmiyor.");
       expect(calls.password).toBe(0);
       expect((await scanAccessibility(page, "recovery-password-mismatch")).violations).toEqual([]);
       await confirm.fill("Fixture123");
-      await page.keyboard.press("Enter");
+      await submitWithDevice(page.getByRole("button", { name: "Parolayı kaydet" }));
       await expect(page.getByRole("status")).toContainText("Parolan kaydedildi.");
       expect(calls.exchange).toBe(1);
       expect(calls.password).toBe(1);

@@ -1,3 +1,4 @@
+import { activate, attemptOutsideDismissal, hasTouchInput } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { scanAccessibility } from "./accessibility.js";
 import {
@@ -9,7 +10,7 @@ import {
 } from "./studio-fixture.js";
 
 async function openInstructor(page: import("@playwright/test").Page) {
-  await page.getByRole("button", { name: /Örnek Eğitmen/ }).click();
+  await activate(page.getByRole("button", { name: /Örnek Eğitmen/ }));
   const dialog = page.getByRole("dialog");
   await expect(dialog.locator("#instructor-name")).toBeEditable();
   return dialog;
@@ -44,16 +45,14 @@ test("Studio instructor: acknowledged contact edit is not replayed when class gr
   ]);
   await dialog.locator("#instructor-email").fill("changed@example.invalid");
   const lesson = dialog.getByRole("checkbox", { name: "Başlangıç grubu", exact: true });
-  await lesson.focus();
-  await page.keyboard.press("Space");
+  await activate(lesson, "Space");
   const approval = dialog.getByRole("checkbox", {
     name: "Sınıf ve disiplin bağlarındaki değişiklikleri ve gelecek seanslara etkisini onaylıyorum.",
     exact: true,
   });
-  await approval.focus();
-  await page.keyboard.press("Space");
+  await activate(approval, "Space");
   state.unknownOperation = "class_assignment_set_v1";
-  await dialog.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Kaydet", exact: true }));
   const retry = dialog.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true });
   await expect(retry).toBeVisible();
   expect(state.writes.map((write) => write.operation)).toEqual([
@@ -63,7 +62,7 @@ test("Studio instructor: acknowledged contact edit is not replayed when class gr
   expect((await scanAccessibility(page, "studio-instructor-partial-unknown")).violations).toEqual(
     [],
   );
-  await retry.click();
+  await activate(retry);
   await expect(
     dialog.getByText("İşlemler kaydedildi; güncel bilgiler yüklendi.", { exact: true }),
   ).toBeVisible();
@@ -150,26 +149,25 @@ test("Studio instructor: revocation keeps its preview and key through an unknown
   const lifetime = await page.evaluate("performance.timeOrigin");
   await studioScheduleChoice(page, studioIds.instructor, true);
   const sheet = await openInstructor(page);
-  await sheet.getByRole("button", { name: "Eğitmen rolünü kaldır", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Eğitmen rolünü kaldır", exact: true }));
   const dialog = page.getByRole("dialog", { name: "Eğitmen rolünü kaldır", exact: true });
   await expect(
     dialog.getByText("Bu önizlemede etkilenen gelecek seans bulunmuyor.", { exact: true }),
   ).toBeVisible();
   await expect(dialog.getByRole("button", { name: "Vazgeç", exact: true })).toBeFocused();
   await dialog.locator("#instructor-revoke-reason").fill("Fixture görev sona erdi");
-  await dialog.getByRole("checkbox").focus();
-  await page.keyboard.press("Space");
+  await activate(dialog.getByRole("checkbox"), "Space");
   state.nextWrite = "unknown";
-  await dialog.getByRole("button", { name: "Rolü kaldır", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Rolü kaldır", exact: true }));
   const retry = dialog.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true });
   await expect(retry).toBeVisible();
   await expect(dialog.getByRole("button", { name: "Vazgeç", exact: true })).toBeDisabled();
-  await page.keyboard.press("Escape");
+  await attemptOutsideDismissal(dialog);
   await expect(dialog).toBeVisible();
   expect((await scanAccessibility(page, "studio-instructor-revoke-unknown")).violations).toEqual(
     [],
   );
-  await retry.click();
+  await activate(retry);
   await expect(dialog).toHaveCount(0);
   expect(state.writes).toHaveLength(2);
   expect(state.writes[0]!.key).toBe(state.writes[1]!.key);
@@ -204,23 +202,28 @@ for (const width of [1440, 320]) {
     ];
     await openStudio(page);
     await page.setViewportSize({ width, height: 1000 });
-    await page.getByRole("button", { name: /Örnek Eğitmen/ }).click();
+    await activate(page.getByRole("button", { name: /Örnek Eğitmen/ }));
     const dialog = page.getByRole("dialog");
     await expect(dialog.locator("#instructor-name")).toHaveAttribute("readonly", "");
     await expect(dialog.locator("#instructor-name-source")).toContainText("Hesap profilinden");
     await expect(dialog.locator("#instructor-email")).toHaveAttribute("readonly", "");
     await expect(dialog.locator("#instructor-email-hint")).toContainText("Giriş hesabından");
     const select = dialog.getByLabel("İletişim e-postası seç", { exact: true });
-    await select.focus();
-    await expect(select).toBeFocused();
-    await select.selectOption("1");
-    await page.keyboard.press("Tab");
+    if (hasTouchInput(page)) {
+      await select.selectOption("1");
+      await activate(dialog.locator("#instructor-email"));
+    } else {
+      await select.focus();
+      await expect(select).toBeFocused();
+      await select.selectOption("1");
+      await page.keyboard.press("Tab");
+    }
     await expect(dialog.locator("#instructor-email")).toBeFocused();
     await expect(dialog.locator("#instructor-email")).toHaveValue("local@example.invalid");
     await expect(dialog.locator("#instructor-email")).toBeEditable();
     expect(state.writes).toEqual([]);
     await dialog.locator("#instructor-email").fill("changed@example.invalid");
-    await dialog.getByRole("button", { name: "Kaydet", exact: true }).click();
+    await activate(dialog.getByRole("button", { name: "Kaydet", exact: true }));
     await expect(
       dialog.getByText("İşlemler kaydedildi; güncel bilgiler yüklendi.", { exact: true }),
     ).toBeVisible();
@@ -233,7 +236,7 @@ for (const width of [1440, 320]) {
     await select.selectOption("new");
     await dialog.locator("#instructor-email").fill("added@example.invalid");
     expect(state.effects).toHaveLength(1);
-    await dialog.getByRole("button", { name: "Kaydet", exact: true }).click();
+    await activate(dialog.getByRole("button", { name: "Kaydet", exact: true }));
     await expect(
       dialog.getByText("İşlemler kaydedildi; güncel bilgiler yüklendi.", { exact: true }),
     ).toBeVisible();
@@ -262,7 +265,7 @@ test("Studio person policy: omitted metadata remains read-only without blocking 
     { kind: "email", value: "unknown@example.invalid", verified_at: "2026-11-01T00:00:00Z" },
   ];
   await openStudio(page);
-  await page.getByRole("button", { name: /Örnek Eğitmen/ }).click();
+  await activate(page.getByRole("button", { name: /Örnek Eğitmen/ }));
   const dialog = page.getByRole("dialog");
   await expect(dialog.locator("#instructor-name")).toHaveAttribute("readonly", "");
   await expect(dialog.locator("#instructor-email")).toHaveAttribute("readonly", "");

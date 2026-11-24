@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { clickWorkspaceLink } from "./auth-fixture.js";
 import { test, expect } from "./test.js";
 import { mockStudio, openStudio, studioIds as I } from "./studio-fixture.js";
@@ -23,22 +24,22 @@ test("new rooms and capacities replace cached calendar choices without a documen
   await expect(page.getByRole("button", { name: "Seans ekle", exact: true })).toBeEnabled();
   await expect(rooms.locator("option")).toHaveCount(2);
   await clickWorkspaceLink(page, "Stüdyo");
-  await page.getByRole("tab", { name: "Dersler ve salonlar", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Dersler ve salonlar", exact: true }));
   for (const [name, capacity] of [
     ["Yeni küçük salon", 0],
     ["Yeni büyük salon", 24],
   ] as const) {
-    await page.getByRole("button", { name: "Salon ekle", exact: true }).click();
+    await activate(page.getByRole("button", { name: "Salon ekle", exact: true }));
     const dialog = page.getByRole("dialog");
     await dialog.getByRole("textbox", { name: "Salon adı", exact: true }).fill(name);
     await dialog.getByRole("spinbutton", { name: "Kontenjan", exact: true }).fill(String(capacity));
-    await dialog.getByRole("button", { name: "Salonu ekle", exact: true }).click();
+    await activate(dialog.getByRole("button", { name: "Salonu ekle", exact: true }));
     await expect(dialog).toHaveCount(0);
-    await page.getByRole("button", { name, exact: true }).click();
+    await activate(page.getByRole("button", { name, exact: true }));
     await expect(dialog.getByRole("spinbutton", { name: "Kontenjan", exact: true })).toHaveValue(
       String(capacity),
     );
-    await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+    await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
   }
   await clickWorkspaceLink(page, "Ders programı");
   await expect(rooms.locator("option")).toHaveCount(4);

@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import { mockNative, openWorkspaceNavigation, origin } from "./auth-fixture.js";
@@ -6,7 +7,7 @@ async function signIn(page: Page) {
   await page.goto(`${origin}/login`);
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
 }
@@ -60,7 +61,7 @@ test("states route transport retry only rereads the failed loader and recovers t
   const retry = page.getByRole("button", { name: "Tekrar dene", exact: true });
   await retry.focus();
   transportUnavailable = false;
-  await page.keyboard.press("Enter");
+  await activate(retry, "Enter");
   await expect(page.getByRole("heading", { name: "Yardım", exact: true })).toBeFocused();
   expect(attempts).toBeGreaterThanOrEqual(2);
   await expect(page.getByRole("button", { name: "Adresi kopyala", exact: true })).toBeEnabled();
@@ -89,8 +90,7 @@ test("states native version conflict provides reread and never a force-overwrite
   await expect(page.getByRole("button", { name: /üzerine yaz/i })).toHaveCount(0);
   conflict = false;
   const reload = page.getByRole("button", { name: "Güncel kaydı yükle", exact: true });
-  await reload.focus();
-  await page.keyboard.press("Enter");
+  await activate(reload, "Enter");
   await expect(page.getByRole("heading", { name: "Yardım", exact: true })).toBeFocused();
 });
 test("states offline notice follows the browser signal without losing the mounted page or replaying a writer", async ({
@@ -157,7 +157,7 @@ test("states SPA navigation shares account cache while direct URL reload recheck
   await page.evaluate("globalThis.__spaMarker = true");
   await openWorkspaceNavigation(page);
   const helpNavigation = page.getByRole("navigation", { name: "Yardım", exact: true });
-  await helpNavigation.getByRole("link", { name: "Yardım", exact: true }).click();
+  await activate(helpNavigation.getByRole("link", { name: "Yardım", exact: true }));
   await expect(page).toHaveURL(`${origin}/help`);
   await expect(page.getByRole("heading", { name: "Yardım", exact: true })).toBeVisible();
   const spaMarker = await page.evaluate("globalThis.__spaMarker");

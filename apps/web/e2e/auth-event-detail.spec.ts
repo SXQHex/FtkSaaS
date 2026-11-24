@@ -1,3 +1,4 @@
+import { activate, closeWithDevice } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { mockEventDetail, detailIds as D } from "./event-detail-fixture.js";
 import { mockSessionDetail } from "./session-detail-fixture.js";
@@ -68,20 +69,20 @@ test("event registration reads and accepts only the chosen member's own document
   page,
 }) => {
   const state = await mockEventDetail(page, "normal", { documents: true });
-  await page.getByRole("button", { name: "Katılımcı ekle", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Katılımcı ekle", exact: true }));
   const sheet = page.getByRole("dialog");
   const next = sheet.getByRole("button", { name: "Devam", exact: true });
   const person = sheet.getByLabel("Kişi", { exact: true });
   const read = sheet.getByRole("button", { name: "Etkinlik koşulları belgesini oku", exact: true });
   await person.selectOption(I.instructor);
-  await next.click();
+  await activate(next);
   const back = sheet.getByRole("button", { name: "Geri", exact: true });
   await expect(back).toBeVisible();
   await expect(read).toHaveCount(0);
   expect(state.reads.some(({ op }) => op === "document_requirements_get_v1")).toBe(false);
-  await next.click();
-  await sheet.getByRole("checkbox", { name: "Kaydı onaylıyorum", exact: true }).press("Space");
-  await sheet.getByRole("button", { name: "Kaydı onayla", exact: true }).click();
+  await activate(next);
+  await activate(sheet.getByRole("checkbox", { name: "Kaydı onaylıyorum", exact: true }), "Space");
+  await activate(sheet.getByRole("button", { name: "Kaydı onayla", exact: true }));
   await expect(
     sheet.getByText(
       "Üye, kaydı tamamlamadan önce kendi hesabından etkinlik belgesini kabul etmeli.",
@@ -89,16 +90,20 @@ test("event registration reads and accepts only the chosen member's own document
   ).toBeVisible();
   expect(state.event.registrations).toEqual([]);
   expect(state.writes).toEqual([]);
-  await back.click();
-  await back.click();
+  await activate(back);
+  await activate(back);
   await person.selectOption(I.self);
-  await next.click();
-  await read.click();
+  await activate(next);
+  await activate(read);
   await expect(sheet.getByText("Sentetik etkinlik koşulları", { exact: true })).toBeVisible();
-  await sheet
-    .getByRole("checkbox", { name: "Belgeyi okudum, bu işlem için kabul ediyorum.", exact: true })
-    .press("Space");
-  await sheet.getByRole("button", { name: "Belgeyi kabul et", exact: true }).click();
+  await activate(
+    sheet.getByRole("checkbox", {
+      name: "Belgeyi okudum, bu işlem için kabul ediyorum.",
+      exact: true,
+    }),
+    "Space",
+  );
+  await activate(sheet.getByRole("button", { name: "Belgeyi kabul et", exact: true }));
   await expect(sheet.getByText("Kabul edildi", { exact: true })).toBeVisible();
   expect(state.writes.map(({ op }) => op)).toEqual(["document_accept_v1"]);
   expect(state.writes[0]?.request.context).toMatchObject({
@@ -108,12 +113,12 @@ test("event registration reads and accepts only the chosen member's own document
   const previews = () =>
     state.reads.filter(({ op }) => op === "event_registration_preview_v1").length;
   const before = previews();
-  await next.click();
+  await activate(next);
   const save = sheet.getByRole("button", { name: "Kaydı onayla", exact: true });
   await expect(save).toBeDisabled();
   expect(previews()).toBe(before + 1);
-  await sheet.getByRole("checkbox", { name: "Kaydı onaylıyorum", exact: true }).press("Space");
-  await save.click();
+  await activate(sheet.getByRole("checkbox", { name: "Kaydı onaylıyorum", exact: true }), "Space");
+  await activate(save);
   await expect(sheet.getByText(saved, { exact: true })).toBeVisible();
   expect(state.writes.map(({ op }) => op)).toEqual(["document_accept_v1", "event_register_v1"]);
   expect(state.event.registrations?.[0]?.person_id).toBe(I.self);
@@ -134,9 +139,9 @@ async function accept(page: Page, button: string, options?: { dialogAlreadyOpen:
   }
   await acknowledgement.focus();
   await expect(acknowledgement).toBeFocused();
-  await acknowledgement.press("Space");
+  await activate(acknowledgement, "Space");
   await expect(acknowledgement).toBeChecked();
-  await dialog.getByRole("button", { name: button, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: button, exact: true }));
   return dialog;
 }
 test("event detail shows native unknown payment and requires reviewed actual start and one-person attendance", async ({
@@ -155,23 +160,23 @@ test("event detail shows native unknown payment and requires reviewed actual sta
   await expect(page.getByRole("row", { name: /Örnek kişi/ })).toContainText(
     "Ödeme kaynağı paylaşılmıyor",
   );
-  await page.getByRole("tab", { name: "Yoklama", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Yoklama", exact: true }));
   await page.getByLabel("Fiilî başlangıç", { exact: true }).fill("2026-11-15T18:05");
   await page.getByLabel("Gerekçe", { exact: true }).fill("Müzik sistemi geç açıldı");
-  await page.getByRole("button", { name: "Fiilî başlangıcı kaydet", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Fiilî başlangıcı kaydet", exact: true }));
   const start = await accept(page, "Fiilî başlangıcı kaydet");
   await expect(start.getByText(saved, { exact: true })).toBeVisible();
-  await start.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(start.getByRole("button", { name: "Vazgeç", exact: true }));
   expect(state.event.actual_started_at).toBe("2026-11-15T15:05:00Z");
-  await page.getByRole("radio", { name: "Geldi", exact: true }).click();
+  await activate(page.getByRole("radio", { name: "Geldi", exact: true }));
   const mark = await accept(page, "Örnek kişi için yoklama");
   await expect(mark.getByText(saved, { exact: true })).toBeVisible();
-  await mark.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(mark.getByRole("button", { name: "Vazgeç", exact: true }));
   expect(state.event.registrations![0]!.attendance_result).toBe("attended");
-  await page.getByRole("button", { name: "Yoklamayı kapat", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Yoklamayı kapat", exact: true }));
   const close = await accept(page, "Yoklamayı kapat");
   await expect(close.getByText(saved, { exact: true })).toBeVisible();
-  await close.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(close.getByRole("button", { name: "Vazgeç", exact: true }));
   expect(state.event.attendance_state).toBe("closed");
 });
 
@@ -179,7 +184,7 @@ test("event details never pair a new revision with the previous times while duty
   page,
 }) => {
   const state = await mockEventDetail(page);
-  await page.getByRole("tab", { name: "Yoklama", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Yoklama", exact: true }));
   const planned = page.getByLabel("Planlanan başlangıç", { exact: true });
   const actual = page.getByLabel("Fiilî başlangıç", { exact: true });
   await expect(planned).toHaveValue(/18:00/);
@@ -221,11 +226,11 @@ test("event details never pair a new revision with the previous times while duty
   });
 
   try {
-    await page.getByRole("button", { name: "Fiilî başlangıcı kaydet", exact: true }).click();
+    await activate(page.getByRole("button", { name: "Fiilî başlangıcı kaydet", exact: true }));
     const dialog = await accept(page, "Fiilî başlangıcı kaydet");
     await dutyRead;
     await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
-    await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+    await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
     await expect(planned.and(page.locator('input[value$="18:00"]'))).toHaveCount(0);
   } finally {
     release();
@@ -239,35 +244,35 @@ test("package practice uses the selected right for eligibility and closes withou
   page,
 }) => {
   const state = await mockEventDetail(page, "normal", { practice: true });
-  await page.getByRole("button", { name: "Katılımcı ekle", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Katılımcı ekle", exact: true }));
   const sheet = page.getByRole("dialog");
   await sheet.getByLabel("Kişi", { exact: true }).selectOption(I.instructor);
   await sheet
     .getByLabel("Kayıt için paket", { exact: true })
     .selectOption(state.practiceRight.sale_id);
   const next = sheet.getByRole("button", { name: "Devam", exact: true });
-  await next.click();
-  await next.click();
-  await sheet.getByRole("checkbox", { name: "Kaydı onaylıyorum", exact: true }).press("Space");
-  await sheet.getByRole("button", { name: "Kaydı onayla", exact: true }).click();
+  await activate(next);
+  await activate(next);
+  await activate(sheet.getByRole("checkbox", { name: "Kaydı onaylıyorum", exact: true }), "Space");
+  await activate(sheet.getByRole("button", { name: "Kaydı onayla", exact: true }));
   await expect(sheet.getByText(saved, { exact: true })).toBeVisible();
-  await sheet.getByRole("button", { name: "Güncel verileri yükle", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Güncel verileri yükle", exact: true }));
   await expect(page.getByRole("row", { name: /Örnek Eğitmen/ })).toContainText("Paket uygun");
-  await page.getByRole("tab", { name: "Yoklama", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Yoklama", exact: true }));
   await page.getByLabel("Fiilî başlangıç", { exact: true }).fill("2026-11-15T18:05");
   await page.getByLabel("Gerekçe", { exact: true }).fill("Sentetik Pratik başladı");
-  await page.getByRole("button", { name: "Fiilî başlangıcı kaydet", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Fiilî başlangıcı kaydet", exact: true }));
   const start = await accept(page, "Fiilî başlangıcı kaydet");
   await expect(start.getByText(saved, { exact: true })).toBeVisible();
-  await start.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await page.getByRole("radio", { name: "Geldi", exact: true }).click();
+  await activate(start.getByRole("button", { name: "Vazgeç", exact: true }));
+  await activate(page.getByRole("radio", { name: "Geldi", exact: true }));
   const mark = await accept(page, "Örnek Eğitmen için yoklama");
   await expect(mark.getByText(saved, { exact: true })).toBeVisible();
-  await mark.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await page.getByRole("button", { name: "Yoklamayı kapat", exact: true }).click();
+  await activate(mark.getByRole("button", { name: "Vazgeç", exact: true }));
+  await activate(page.getByRole("button", { name: "Yoklamayı kapat", exact: true }));
   const close = await accept(page, "Yoklamayı kapat");
   await expect(close.getByText(saved, { exact: true })).toBeVisible();
-  await close.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(close.getByRole("button", { name: "Vazgeç", exact: true }));
   expect(state.event.attendance_state).toBe("closed");
   expect(state.event.registrations?.[0]).toMatchObject({
     person_id: I.instructor,
@@ -285,38 +290,38 @@ test("event unknown result keeps the frozen action and recovers its exact receip
   page,
 }) => {
   const state = await mockEventDetail(page, "unknown");
-  await page.getByRole("button", { name: "Etkinliği tamamla", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Etkinliği tamamla", exact: true }));
   const dialog = await accept(page, "Etkinliği tamamla");
   await expect(dialog.getByText(/Sonuç bilinmiyor/)).toBeVisible();
   await expect(dialog.getByRole("button", { name: "Vazgeç", exact: true })).toBeDisabled();
-  await dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(1);
   expect(state.effects).toBe(1);
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
 });
 test("event acknowledged write retries result reads and never repeats the command", async ({
   page,
 }) => {
   const state = await mockEventDetail(page, "unread");
-  await page.getByRole("button", { name: "Etkinliği tamamla", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Etkinliği tamamla", exact: true }));
   const dialog = await accept(page, "Etkinliği tamamla");
   await expect(dialog.getByText(/güncel sonuç henüz okunamadı/)).toBeVisible();
-  await dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(1);
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
 });
 test("event native authority denial does not manufacture a successful mutation", async ({
   page,
 }) => {
   const state = await mockEventDetail(page, "denied");
-  await page.getByRole("button", { name: "Etkinliği tamamla", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Etkinliği tamamla", exact: true }));
   const dialog = await accept(page, "Etkinliği tamamla");
   await expect(dialog.getByRole("alert").last()).toBeVisible();
   expect(state.writes).toHaveLength(0);
   expect(state.event.state).toBe("published");
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
 });
 test("event cancellation exposes server effects before its separately reviewed apply", async ({
   page,
@@ -427,14 +432,14 @@ test("event cancellation exposes server effects before its separately reviewed a
   const movements = page.getByRole("grid", { name: "Hareketler", exact: true });
   await clickWorkspaceLink(page, "Finans");
   await expect(movements.getByRole("gridcell", { name: "TRY ₺100,00", exact: true })).toBeVisible();
-  await debtTab.click();
+  await activate(debtTab);
   await expect(debts.getByRole("gridcell", { name: "TRY ₺400,00", exact: true })).toBeVisible();
-  await page.getByRole("tab", { name: /Alacaklar/ }).click();
+  await activate(page.getByRole("tab", { name: /Alacaklar/ }));
   await expect.poll(() => financeReads.at(-1)).toBe("credits:");
   const calendarEvent = page.getByRole("button", { name: /Etkinlik Tango atölyesi/ });
   await clickWorkspaceLink(page, "Ders programı");
-  await calendarEvent.press("Enter");
-  await page.getByRole("button", { name: "Etkinliği iptal et", exact: true }).click();
+  await activate(calendarEvent, "Enter");
+  await activate(page.getByRole("button", { name: "Etkinliği iptal et", exact: true }));
   const dialog = page.getByRole("alertdialog");
   await dialog
     .getByLabel("Gerekçe (zorunlu, geçmişe yazılır)", { exact: true })
@@ -447,16 +452,16 @@ test("event cancellation exposes server effects before its separately reviewed a
   await accept(page, "Etkinliği iptal et", { dialogAlreadyOpen: true });
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   expect(state.event.state).toBe("cancelled");
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
   await clickWorkspaceLink(page, "Finans");
   await expect(movements.getByRole("gridcell", { name: "TRY ₺100,00", exact: true })).toBeVisible();
   await expect
     .poll(() => financeReads.filter((read) => read.startsWith("movements:")).length)
     .toBe(2);
-  await page.getByRole("tab", { name: /Alacaklar/ }).click();
+  await activate(page.getByRole("tab", { name: /Alacaklar/ }));
   const creditRow = credits.getByRole("row").filter({ hasText: participant.display_name! });
   await expect(creditRow).toContainText("₺100,00");
-  await debtTab.click();
+  await activate(debtTab);
   await expect
     .poll(() => financeReads.filter((read) => read.startsWith("debts:")).at(-1))
     .toBe("debts:");
@@ -478,7 +483,7 @@ test("event cancellation exposes server effects before its separately reviewed a
       response.url().endsWith("/event_get_v1") &&
       response.request().postDataJSON().include_payment_summary === true,
   );
-  await calendarEvent.press("Enter");
+  await activate(calendarEvent, "Enter");
   const result = await (await eventRead).json();
   expect(result.data).toMatchObject({
     id: state.event.id,
@@ -528,26 +533,26 @@ async function mockCalendarEvent(page: Page, row: EventView) {
   });
 }
 async function paidRegistration(page: Page) {
-  await page.getByRole("button", { name: "Katılımcı ekle", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Katılımcı ekle", exact: true }));
   const sheet = page.getByRole("dialog");
   await sheet.getByLabel("Kişi", { exact: true }).selectOption(I.instructor);
-  await sheet.getByRole("button", { name: "Devam", exact: true }).click();
-  await sheet.getByRole("button", { name: "Ödeme hazırlığını oluştur", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Devam", exact: true }));
+  await activate(sheet.getByRole("button", { name: "Ödeme hazırlığını oluştur", exact: true }));
   const prepare = await accept(page, "Ödeme hazırlığını oluştur");
   await expect(prepare.getByText(saved, { exact: true })).toBeVisible();
-  await prepare.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await sheet.getByRole("radio", { name: "Şimdi tahsil edilecek", exact: true }).click();
+  await activate(prepare.getByRole("button", { name: "Vazgeç", exact: true }));
+  await activate(sheet.getByRole("radio", { name: "Şimdi tahsil edilecek", exact: true }));
   await sheet.getByLabel("Tutar (alt birim)", { exact: true }).fill("45000");
   await sheet.getByLabel("Yöntem", { exact: true }).selectOption("bank_transfer");
   await sheet.getByLabel("Referans", { exact: true }).fill("SENTETIK-ODEME");
   await sheet.getByLabel("Tahsilat tarihi ve saati", { exact: true }).fill("2026-11-16T15:00");
-  await sheet.getByRole("button", { name: "Tahsilatı incele", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Tahsilatı incele", exact: true }));
   const collect = await accept(page, "Tahsilatı kaydet");
   await expect(collect.getByText(saved, { exact: true })).toBeVisible();
-  await collect.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await sheet.getByRole("button", { name: "Devam", exact: true }).click();
-  await sheet.getByRole("checkbox", { name: "Kaydı onaylıyorum", exact: true }).press("Space");
-  await sheet.getByRole("button", { name: "Kaydı onayla", exact: true }).click();
+  await activate(collect.getByRole("button", { name: "Vazgeç", exact: true }));
+  await activate(sheet.getByRole("button", { name: "Devam", exact: true }));
+  await activate(sheet.getByRole("checkbox", { name: "Kaydı onaylıyorum", exact: true }), "Space");
+  await activate(sheet.getByRole("button", { name: "Kaydı onayla", exact: true }));
   return sheet;
 }
 test("reopening an event payment never offers a warm balance after a failed read", async ({
@@ -555,13 +560,13 @@ test("reopening an event payment never offers a warm balance after a failed read
 }) => {
   const state = await mockEventDetail(page);
   async function selectPerson() {
-    await page.getByRole("button", { name: "Katılımcı ekle", exact: true }).click();
+    await activate(page.getByRole("button", { name: "Katılımcı ekle", exact: true }));
     const sheet = page.getByRole("dialog");
     await sheet.getByLabel("Kişi", { exact: true }).selectOption(I.instructor);
     return sheet;
   }
   let sheet = await selectPerson();
-  await sheet.getByRole("button", { name: "Devam", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Devam", exact: true }));
   const discoveryReads = state.reads.filter(
     ({ op, request }) => op === "event_payment_get_v1" && request.selection,
   );
@@ -571,11 +576,11 @@ test("reopening an event payment never offers a warm balance after a failed read
     center_id: I.center,
     selection: { event_id: state.event.id, person_id: I.instructor },
   });
-  await sheet.getByRole("button", { name: "Ödeme hazırlığını oluştur", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Ödeme hazırlığını oluştur", exact: true }));
   const preparation = await accept(page, "Ödeme hazırlığını oluştur");
   await expect(preparation.getByText(saved, { exact: true })).toBeVisible();
-  await preparation.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await sheet.getByRole("button", { name: "Close", exact: true }).click();
+  await activate(preparation.getByRole("button", { name: "Vazgeç", exact: true }));
+  await activate(sheet.getByRole("button", { name: "Close", exact: true }));
   await expect(sheet).toHaveCount(0);
 
   let rejectedReads = 0;
@@ -594,8 +599,8 @@ test("reopening an event payment never offers a warm balance after a failed read
   expect(rejectedReads).toBe(1);
 
   denyPayment = false;
-  await sheet.getByRole("button", { name: "Yeniden dene", exact: true }).click();
-  await sheet.getByRole("button", { name: "Devam", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Yeniden dene", exact: true }));
+  await activate(sheet.getByRole("button", { name: "Devam", exact: true }));
   await expect(sheet.getByText("Kalan borç", { exact: true })).toBeVisible();
   expect(state.writes.map(({ op }) => op)).toEqual(["event_payment_prepare_v1"]);
 });
@@ -670,7 +675,7 @@ test("event paid registration separates reviewed debt preparation, targeted bank
   await expect(ledger).toBeVisible();
   expect(financeSnapshots).toEqual([[]]);
   await clickWorkspaceLink(page, "Ders programı");
-  await calendarEvent.press("Enter");
+  await activate(calendarEvent, "Enter");
   await expect(page.getByRole("heading", { name: state.event.name, exact: true })).toBeVisible();
   const sheet = await paidRegistration(page);
   await expect(sheet.getByText(saved, { exact: true }).first()).toBeVisible();
@@ -691,15 +696,15 @@ test("event paid registration separates reviewed debt preparation, targeted bank
     preview: { id: D.preview },
   });
   expect(state.event.registrations).toHaveLength(1);
-  await sheet.getByRole("button", { name: "Geri", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Geri", exact: true }));
   // The registration is already acknowledged; dismiss through the ready sheet's close control.
-  await page.keyboard.press("Escape");
+  await closeWithDevice(sheet.getByRole("button", { name: /^(Close|Kapat|Vazgeç)$/ }).first());
   await expect(page.getByRole("row", { name: /Örnek Eğitmen/ })).toBeVisible();
   await clickWorkspaceLink(page, "Finans");
   await expect(ledger.getByRole("gridcell", { name: "TRY ₺450,00", exact: true })).toBeVisible();
   expect(financeSnapshots).toEqual([[], [D.cash]]);
   await clickWorkspaceLink(page, "Ders programı");
-  await calendarEvent.press("Enter");
+  await activate(calendarEvent, "Enter");
   await expect(page.getByRole("row", { name: /Örnek Eğitmen/ })).toBeVisible();
   expect(state.writes.map(({ op }) => op)).toEqual([
     "event_payment_prepare_v1",
@@ -721,7 +726,7 @@ test("event capacity race reports settled preparation without a participant or d
     registration_id: null,
   });
   expect(state.writes.filter((row) => row.op === "event_register_v1")).toHaveLength(1);
-  await page.keyboard.press("Escape");
+  await closeWithDevice(sheet.getByRole("button", { name: /^(Close|Kapat|Vazgeç)$/ }).first());
 });
 test("event closed attendance correction and performed duty each require a separate reviewed native command", async ({
   page,
@@ -831,32 +836,32 @@ test("event closed attendance correction and performed duty each require a separ
       response.url().endsWith("/instructor_finance_directory_get_v1") &&
       response.request().postDataJSON().view === "earnings",
   );
-  await lines.click();
+  await activate(lines);
   await (await initialEarnings).finished();
   expect(earningSnapshots).toEqual([[]]);
   await clickWorkspaceLink(page, "Ders programı");
-  await calendarEvent.press("Enter");
-  await page.getByRole("tab", { name: "Yoklama", exact: true }).click();
-  await page.getByRole("button", { name: "Yoklamayı düzenle", exact: true }).click();
+  await activate(calendarEvent, "Enter");
+  await activate(page.getByRole("tab", { name: "Yoklama", exact: true }));
+  await activate(page.getByRole("button", { name: "Yoklamayı düzenle", exact: true }));
   const dialog = page.getByRole("alertdialog");
   await dialog.getByLabel("Düzeltilecek katılımcı", { exact: true }).selectOption(D.registration);
-  await dialog.getByRole("radio", { name: "Gelmedi", exact: true }).click();
+  await activate(dialog.getByRole("radio", { name: "Gelmedi", exact: true }));
   await dialog
     .getByLabel("Gerekçe (zorunlu, geçmişe yazılır)", { exact: true })
     .fill("Katılımcı kaydı kontrol edildi");
   await accept(page, "Yoklamayı düzenle");
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
   expect(state.event.registrations![0]!.attendance_result).toBe("no_show");
-  await page.getByRole("button", { name: "Etkinliği tamamla", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Etkinliği tamamla", exact: true }));
   const complete = await accept(page, "Etkinliği tamamla");
   await expect(complete.getByText(saved, { exact: true })).toBeVisible();
-  await complete.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await page.getByRole("button", { name: "Doğrula", exact: true }).click();
+  await activate(complete.getByRole("button", { name: "Vazgeç", exact: true }));
+  await activate(page.getByRole("button", { name: "Doğrula", exact: true }));
   await expect(
     page.getByRole("alertdialog").getByRole("button", { name: "Doğrula", exact: true }),
   ).toBeDisabled();
-  await page.getByRole("radio", { name: "Görev yapıldı", exact: true }).click();
+  await activate(page.getByRole("radio", { name: "Görev yapıldı", exact: true }));
   const duty = await accept(page, "Doğrula");
   await expect(duty.getByText(saved, { exact: true })).toBeVisible();
   expect(state.event.duties![0]!.performed).toBe(true);
@@ -865,14 +870,14 @@ test("event closed attendance correction and performed duty each require a separ
     "event_complete_v1",
     "event_duty_verify_v1",
   ]);
-  await duty.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(duty.getByRole("button", { name: "Vazgeç", exact: true }));
   await clickWorkspaceLink(page, "Hakediş");
-  await lines.click();
+  await activate(lines);
   const earningRow = page.getByRole("row").filter({ hasText: state.event.name });
   await expect(earningRow).toContainText("₺120,00");
   expect(earningSnapshots).toEqual([[], [`${earningId}:${assignment.id}`]]);
   await clickWorkspaceLink(page, "Ders programı");
-  await calendarEvent.press("Enter");
+  await activate(calendarEvent, "Enter");
   await expect(page.getByRole("heading", { name: state.event.name, exact: true })).toBeVisible();
   expect(state.writes.filter(({ op }) => op === "event_duty_verify_v1")).toHaveLength(1);
 
@@ -927,12 +932,12 @@ test("event draft publication and participant cancellation preserve separate rev
     version: 1,
   });
   await page.reload();
-  await page.getByRole("button", { name: "Yayımla", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Yayımla", exact: true }));
   const publish = await accept(page, "Yayımla");
   await expect(publish.getByText(saved, { exact: true })).toBeVisible();
-  await publish.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(publish.getByRole("button", { name: "Vazgeç", exact: true }));
   const row = page.getByRole("row", { name: /Örnek kişi/ });
-  await row.getByRole("button", { name: "Kaydı iptal et", exact: true }).click();
+  await activate(row.getByRole("button", { name: "Kaydı iptal et", exact: true }));
   const cancel = page.getByRole("alertdialog");
   await cancel
     .getByLabel("Gerekçe (zorunlu, geçmişe yazılır)", { exact: true })
@@ -949,5 +954,5 @@ test("event draft publication and participant cancellation preserve separate rev
     reason: "Katılımcı talebi",
   });
   expect(state.event.registrations![0]!.state).toBe("cancelled");
-  await cancel.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(cancel.getByRole("button", { name: "Vazgeç", exact: true }));
 });

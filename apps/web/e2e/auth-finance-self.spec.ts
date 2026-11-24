@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
@@ -76,11 +77,11 @@ async function setup(page: Page, self = true) {
   await page.goto(origin + "/login");
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(origin + "/account");
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/finance`);
-  await page.getByRole("button", { name: common.financeDirectory.personal, exact: true }).click();
+  await activate(page.getByRole("button", { name: common.financeDirectory.personal, exact: true }));
   await expect.poll(() => people.length).toBe(1);
   return { studio, reads };
 }
@@ -93,12 +94,12 @@ test("student self finance remains readable when people and center directory dis
     .getByRole("combobox", { name: common.finance.member, exact: true })
     .selectOption(I.self);
   await page.getByLabel(common.finance.currency, { exact: true }).fill("TRY");
-  await page.getByRole("button", { name: common.finance.read, exact: true }).click();
+  await activate(page.getByRole("button", { name: common.finance.read, exact: true }));
   await expect.poll(() => state.reads.length).toBe(1);
   await expect(
     page.getByRole("button", { name: common.finance.actions.collect, exact: true }),
   ).toBeDisabled();
-  await page.getByRole("tab", { name: /Alacaklar/ }).click();
+  await activate(page.getByRole("tab", { name: /Alacaklar/ }));
   const grid = page.getByRole("grid", { name: common.finance.credits, exact: true });
   await expect(grid.getByText("₺200,00", { exact: true })).toBeVisible();
   await expect(grid.getByText("₺100,00", { exact: true })).toBeVisible();
@@ -156,7 +157,7 @@ test("student self finance remains readable when people and center directory dis
       }
       return route.fallback();
     });
-    await manager.getByRole("tab", { name: /Alacaklar/ }).click();
+    await activate(manager.getByRole("tab", { name: /Alacaklar/ }));
     const managerGrid = manager.getByRole("grid", { name: common.finance.credits, exact: true });
     await expect(managerGrid.getByText("TRY ₺200,00", { exact: true })).toBeVisible();
     await expect(managerGrid.getByText("₺100,00", { exact: true })).toBeVisible();
@@ -196,14 +197,14 @@ test("pinned native directory selection survives a denied person directory witho
       });
     return route.fallback();
   });
-  await page.getByRole("button", { name: common.finance.actions.correct, exact: true }).click();
+  await activate(page.getByRole("button", { name: common.finance.actions.correct, exact: true }));
   const panel = page.getByRole("dialog", { name: common.finance.titles.correct, exact: true });
   await expect(panel.getByText(common.finance.authorityUnavailable, { exact: true })).toBeVisible();
-  await panel.getByRole("button", { name: common.finance.close, exact: true }).click();
+  await activate(panel.getByRole("button", { name: common.finance.close, exact: true }));
   await expect(
     page.getByRole("combobox", { name: common.finance.member, exact: true }),
   ).toHaveValue(I.instructor);
-  await page.getByRole("button", { name: common.finance.read, exact: true }).click();
+  await activate(page.getByRole("button", { name: common.finance.read, exact: true }));
   await expect.poll(() => state.personalReads.length).toBeGreaterThan(0);
   expect(
     state.personalReads.every((row) => row.person_id === I.instructor && row.currency === "TRY"),

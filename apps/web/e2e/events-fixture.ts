@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 import type { EventView, RequestEventSave, ProductView } from "@ftksaas/api-contracts";
@@ -241,7 +242,7 @@ export async function mockEvents(
   await page.goto(`${origin}/login`);
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/events`);
@@ -249,15 +250,16 @@ export async function mockEvents(
   return state;
 }
 export async function openEvent(page: Page) {
-  await page.getByRole("row", { name: /Tango atölyesi/ }).click();
-  await page.getByRole("button", { name: "Düzenle", exact: true }).click();
+  await activate(page.getByRole("row", { name: /Tango atölyesi/ }));
+  await activate(page.getByRole("button", { name: "Düzenle", exact: true }));
   const dialog = page.getByRole("dialog");
   await expect(dialog.getByLabel("Başlık", { exact: true })).toHaveValue("Tango atölyesi");
   return dialog;
 }
 export async function reviewEvent(page: Page) {
-  await page
-    .getByRole("dialog")
-    .getByRole("checkbox", { name: "Şartları, görevlileri ve etkilerini inceledim.", exact: true })
-    .press("Space");
+  const review = page.getByRole("dialog").getByRole("checkbox", {
+    name: "Şartları, görevlileri ve etkilerini inceledim.",
+    exact: true,
+  });
+  await activate(review, "Space");
 }

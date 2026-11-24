@@ -1,3 +1,4 @@
+import { activate } from "../e2e/device-input.js";
 import { test, expect } from "../e2e/test.js";
 import { fillApplication, prepareApplication } from "../e2e/public-application-fixture.js";
 import { publicForm } from "../e2e/public-calendar-fixture.js";
@@ -31,7 +32,7 @@ test("P12.5 public application uses the real Turnstile widget and test Siteverif
   await fillApplication(page, false);
   const submit = page.getByRole("button", { name: "Başvuruyu gönder", exact: true });
   await expect(async () => {
-    if (!fixture.mutations.length) await submit.click();
+    if (!fixture.mutations.length) await activate(submit);
     expect(fixture.mutations).toHaveLength(1);
   }).toPass({ timeout: 20_000 });
   await expect(

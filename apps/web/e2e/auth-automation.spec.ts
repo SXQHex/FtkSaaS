@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import type {
@@ -300,7 +301,7 @@ async function fixture(
   await page.goto(`${origin}/login`);
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/automation`);
@@ -317,7 +318,7 @@ test("Starter keeps automation and segment creation disabled after native plan d
 }) => {
   const state = await fixture(page, "starter");
   await expect(page.getByRole("button", { name: "Otomasyon ekle", exact: true })).toBeDisabled();
-  await page.getByRole("tab", { name: "Segmentler", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Segmentler", exact: true }));
   await expect(page.getByRole("button", { name: "Segment ekle", exact: true })).toBeDisabled();
   expect(state.writes).toHaveLength(0);
 });
@@ -327,7 +328,7 @@ test("automation native directory omits unsupported worker actions and reads the
   await page.setViewportSize({ width: 320, height: 950 });
   const state = await fixture(page);
   await expect(page.getByRole("button", { name: "Elle çalıştır", exact: true })).toHaveCount(0);
-  await page.getByRole("tab", { name: "Son işler", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Son işler", exact: true }));
   await expect(page.getByRole("grid", { name: "Son işler", exact: true })).toContainText(
     "Başarısız",
   );
@@ -352,18 +353,18 @@ test("automation creates an explicitly reviewed low-credit segment without inven
   page,
 }) => {
   const state = await fixture(page);
-  await page.getByRole("tab", { name: "Segmentler", exact: true }).click();
-  await page.getByRole("button", { name: "Segment ekle", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Segmentler", exact: true }));
+  await activate(page.getByRole("button", { name: "Segment ekle", exact: true }));
   const d = page.getByRole("dialog");
   await expect(d.getByText("Ad gerekli.", { exact: true })).toHaveCount(0);
-  await d.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await activate(d.getByRole("button", { name: "Kaydet", exact: true }));
   await expect(d.getByLabel("Segment adı", { exact: true })).toBeFocused();
   await expect(d.getByText("Ad gerekli.", { exact: true })).toBeVisible();
   await d.getByLabel("Segment adı", { exact: true }).fill("Az hak");
   await d.getByLabel("Koşul ekle", { exact: true }).selectOption("remaining");
   await d.getByLabel("Kalan hak", { exact: true }).fill("2");
-  await d.getByRole("checkbox", { name: review, exact: true }).press("Space");
-  await d.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await activate(d.getByRole("checkbox", { name: review, exact: true }), "Space");
+  await activate(d.getByRole("button", { name: "Kaydet", exact: true }));
   await expect(saved(page)).toBeVisible();
   expect(state.segment!.definition).toEqual({
     all: [
@@ -371,14 +372,14 @@ test("automation creates an explicitly reviewed low-credit segment without inven
       { field: "remaining_credits", operator: "lte", value: 2 },
     ],
   });
-  await d.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(d.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(page.getByRole("grid", { name: "Segmentler", exact: true })).toContainText("Az hak");
 });
 test("automation saves a native member followup with explicit threshold and leaves it disabled", async ({
   page,
 }) => {
   const state = await fixture(page);
-  await page.getByRole("button", { name: "Otomasyon ekle", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Otomasyon ekle", exact: true }));
   const d = page.getByRole("dialog");
   await d.getByLabel("Otomasyon adı", { exact: true }).fill("Yeni takip");
   await d.getByLabel("Segment", { exact: true }).selectOption("__none__");
@@ -386,8 +387,8 @@ test("automation saves a native member followup with explicit threshold and leav
   await d.getByLabel("Gün eşiği", { exact: true }).fill("3");
   await d.getByLabel("Ne yapar", { exact: true }).selectOption("followup");
   await d.getByLabel("Görev metni", { exact: true }).fill("Üyeyle görüş");
-  await d.getByRole("checkbox", { name: review, exact: true }).press("Space");
-  await d.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await activate(d.getByRole("checkbox", { name: review, exact: true }), "Space");
+  await activate(d.getByRole("button", { name: "Kaydet", exact: true }));
   await expect(saved(page)).toBeVisible();
   expect(state.definition).toMatchObject({
     name: "Yeni takip",
@@ -410,31 +411,32 @@ test("automation segment chooser reads a valid continuation again after a segmen
   const segment = dialog.getByLabel("Segment", { exact: true });
   const second = segment.locator(`option[value="${secondSegmentId}"]`);
 
-  await create.click();
+  await activate(create);
   await expect(segment).toContainText("Hakkı azalanlar");
-  await more.click();
+  await activate(more);
   await expect(second).toHaveText("İkinci sentetik segment");
   const readsBeforeClose = state.reads;
-  await close.click();
+  await activate(close);
   await expect(dialog).toHaveCount(0);
   expect(state.reads).toBe(readsBeforeClose);
 
-  await page.getByRole("tab", { name: "Segmentler", exact: true }).click();
-  await page
-    .getByRole("row")
-    .filter({ hasText: "Hakkı azalanlar" })
-    .getByRole("button", { name: "Düzenle", exact: true })
-    .click();
+  await activate(page.getByRole("tab", { name: "Segmentler", exact: true }));
+  await activate(
+    page
+      .getByRole("row")
+      .filter({ hasText: "Hakkı azalanlar" })
+      .getByRole("button", { name: "Düzenle", exact: true }),
+  );
   await dialog.getByLabel("Segment adı", { exact: true }).fill("Güncel sentetik segment");
-  await dialog.getByRole("checkbox", { name: review, exact: true }).press("Space");
-  await dialog.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await activate(dialog.getByRole("checkbox", { name: review, exact: true }), "Space");
+  await activate(dialog.getByRole("button", { name: "Kaydet", exact: true }));
   await expect(saved(page)).toBeVisible();
-  await close.click();
-  await page.getByRole("tab", { name: "Otomasyonlar", exact: true }).click();
+  await activate(close);
+  await activate(page.getByRole("tab", { name: "Otomasyonlar", exact: true }));
 
-  await create.click();
+  await activate(create);
   await expect(segment).toContainText("Güncel sentetik segment");
-  if (await more.isVisible()) await more.click();
+  if (await more.isVisible()) await activate(more);
   await expect(second).toHaveText("İkinci sentetik segment");
   await expect(more).toHaveCount(0);
   expect(state.writes).toHaveLength(1);
@@ -444,30 +446,31 @@ test("automation reviewed disable preserves definition and uses the actual versi
 }) => {
   const state = await fixture(page, "segment");
   const original = structuredClone(state.definition);
-  await page.getByRole("tab", { name: "Segmentler", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Segmentler", exact: true }));
   const openUsage = page.getByRole("button", { name: "Kullanan otomasyonlar", exact: true });
   const usage = page.getByRole("dialog");
-  await openUsage.click();
+  await activate(openUsage);
   await expect(usage.getByText("Açık", { exact: true })).toBeVisible();
-  await usage.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(usage.getByRole("button", { name: "Vazgeç", exact: true }));
   expect(state.discoveries).toHaveLength(1);
-  await page.getByRole("tab", { name: "Otomasyonlar", exact: true }).click();
-  await page
-    .getByRole("switch", { name: "Örnek takip otomasyonunu aç veya kapat", exact: true })
-    .press("Space");
+  await activate(page.getByRole("tab", { name: "Otomasyonlar", exact: true }));
+  await activate(
+    page.getByRole("switch", { name: "Örnek takip otomasyonunu aç veya kapat", exact: true }),
+    "Space",
+  );
   const d = page.getByRole("alertdialog");
   expect(state.writes).toHaveLength(0);
-  await d.getByRole("checkbox").press("Space");
-  await d.getByRole("button", { name: "Otomasyonu kapat", exact: true }).click();
+  await activate(d.getByRole("checkbox"), "Space");
+  await activate(d.getByRole("button", { name: "Otomasyonu kapat", exact: true }));
   await expect(saved(page)).toBeVisible();
   expect(state.writes[0]).toMatchObject({
     expected_version: 7,
     definition: { ...original, enabled: false },
   });
   expect(state.discoveries).toHaveLength(1);
-  await d.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await page.getByRole("tab", { name: "Segmentler", exact: true }).click();
-  await openUsage.click();
+  await activate(d.getByRole("button", { name: "Vazgeç", exact: true }));
+  await activate(page.getByRole("tab", { name: "Segmentler", exact: true }));
+  await activate(openUsage);
   await expect(usage.getByText("Kapalı", { exact: true })).toBeVisible();
   expect(state.discoveries).toHaveLength(2);
 });
@@ -475,7 +478,7 @@ test("automation unknown write recovers via the exact receipt without another ef
   page,
 }) => {
   const state = await fixture(page, "unknown");
-  await page.getByRole("tab", { name: "Otomasyonlar", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Otomasyonlar", exact: true }));
   const toggle = page.getByRole("switch", {
     name: "Örnek takip otomasyonunu aç veya kapat",
     exact: true,
@@ -483,17 +486,17 @@ test("automation unknown write recovers via the exact receipt without another ef
   await expect(toggle).toBeEnabled();
   await toggle.focus();
   await expect(toggle).toBeFocused();
-  await page.keyboard.press("Space");
+  await activate(toggle, "Space");
   const d = page.getByRole("alertdialog");
-  await d.getByRole("checkbox").press("Space");
-  await d.getByRole("button", { name: "Otomasyonu kapat", exact: true }).click();
-  await page.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await activate(d.getByRole("checkbox"), "Space");
+  await activate(d.getByRole("button", { name: "Otomasyonu kapat", exact: true }));
+  await activate(page.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
   await expect(saved(page)).toBeVisible();
   expect(state.writes).toHaveLength(1);
 });
 test("automation stale preflight rejects the reviewed toggle without writing", async ({ page }) => {
   const state = await fixture(page, "stale");
-  await page.getByRole("tab", { name: "Otomasyonlar", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Otomasyonlar", exact: true }));
   const toggle = page.getByRole("switch", {
     name: "Örnek takip otomasyonunu aç veya kapat",
     exact: true,
@@ -501,10 +504,10 @@ test("automation stale preflight rejects the reviewed toggle without writing", a
   await expect(toggle).toBeEnabled();
   await toggle.focus();
   await expect(toggle).toBeFocused();
-  await page.keyboard.press("Space");
+  await activate(toggle, "Space");
   const d = page.getByRole("alertdialog");
-  await d.getByRole("checkbox").press("Space");
-  await d.getByRole("button", { name: "Otomasyonu kapat", exact: true }).click();
+  await activate(d.getByRole("checkbox"), "Space");
+  await activate(d.getByRole("button", { name: "Otomasyonu kapat", exact: true }));
   await expect(d.getByRole("alert")).toBeVisible();
   expect(state.writes).toHaveLength(0);
 });
@@ -512,12 +515,12 @@ test("automation retry advances only the failed job and keeps the automation ver
   page,
 }) => {
   const state = await fixture(page);
-  await page.getByRole("tab", { name: "Son işler", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Son işler", exact: true }));
   await page.getByLabel("Son işleri gösterilecek otomasyon", { exact: true }).selectOption(autoId);
-  await page.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Yeniden dene", exact: true }));
   const d = page.getByRole("alertdialog");
-  await d.getByRole("checkbox").press("Space");
-  await d.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await activate(d.getByRole("checkbox"), "Space");
+  await activate(d.getByRole("button", { name: "Yeniden dene", exact: true }));
   await expect(saved(page)).toBeVisible();
   expect(state.version).toBe(7);
   expect(state.jobs[0]).toMatchObject({ version: 13, state: "pending" });
@@ -525,7 +528,7 @@ test("automation retry advances only the failed job and keeps the automation ver
     expected_version: 7,
     retry_job: { id: jobId, version: 12 },
   });
-  await d.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(d.getByRole("button", { name: "Vazgeç", exact: true }));
   const grid = page.getByRole("grid", { name: "Son işler", exact: true });
   await expect(grid).toContainText("Bekliyor");
   await expect(grid.getByText("Takip oluşturuldu", { exact: true })).toHaveCount(0);
@@ -539,7 +542,7 @@ test("automation retry advances only the failed job and keeps the automation ver
     result_reference: { type: "crm_activities", id: resultId },
   };
   for (let read = 0; read < 2; read++) {
-    await page.getByRole("button", { name: "Güncel işleri oku", exact: true }).click();
+    await activate(page.getByRole("button", { name: "Güncel işleri oku", exact: true }));
     await expect(grid.getByText(resultId, { exact: true })).toHaveCount(1);
   }
   await expect(grid.getByRole("row").filter({ hasText: resultId })).toContainText(
@@ -562,7 +565,7 @@ test("automation retry advances only the failed job and keeps the automation ver
   const reportsLink = page.getByRole("link", { name: "Merkez raporları", exact: true });
   await expect(reportsLink).toHaveAttribute("href", "/reports");
   const reportRequest = page.waitForRequest(reportEndpoint);
-  await reportsLink.press("Enter");
+  await activate(reportsLink, "Enter");
   await expect(page).toHaveURL(`${origin}/reports`);
   await expect(page.getByRole("tab", { name: "Özet", exact: true })).toBeVisible();
   expect((await reportRequest).postDataJSON()).toMatchObject({
@@ -575,15 +578,15 @@ test("automation notification preparation uses the actual template and explicit 
   page,
 }) => {
   const state = await fixture(page);
-  await page.getByRole("button", { name: "Otomasyon ekle", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Otomasyon ekle", exact: true }));
   const d = page.getByRole("dialog");
   await d.getByLabel("Otomasyon adı", { exact: true }).fill("İş uyarısı");
   await d.getByLabel("Segment", { exact: true }).selectOption("__none__");
   await d.getByLabel("Hazırlık şablonu", { exact: true }).selectOption("center:work-alert");
   await expect(d.getByLabel("Gün eşiği", { exact: true })).toBeDisabled();
-  await d.getByRole("checkbox", { name: "Bana uyarı gönder", exact: true }).press("Space");
-  await d.getByRole("checkbox", { name: review, exact: true }).press("Space");
-  await d.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await activate(d.getByRole("checkbox", { name: "Bana uyarı gönder", exact: true }), "Space");
+  await activate(d.getByRole("checkbox", { name: review, exact: true }), "Space");
+  await activate(d.getByRole("button", { name: "Kaydet", exact: true }));
   await expect(saved(page)).toBeVisible();
   expect(state.definition).toMatchObject({
     segment_id: null,
@@ -599,8 +602,8 @@ test("automation segment insights read saved matches and usage on demand with au
   await page.setViewportSize({ width: 320, height: 950 });
   const state = await fixture(page, "segment");
   expect(state.discoveries).toHaveLength(0);
-  await page.getByRole("tab", { name: "Segmentler", exact: true }).click();
-  await page.getByRole("button", { name: "Eşleşmeleri göster", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Segmentler", exact: true }));
+  await activate(page.getByRole("button", { name: "Eşleşmeleri göster", exact: true }));
   const dialog = page.getByRole("dialog");
   await expect(dialog).toContainText("Örnek eşleşen üye");
   await expect(dialog).toContainText("Hedef kitle");
@@ -613,11 +616,11 @@ test("automation segment insights read saved matches and usage on demand with au
     },
     page: { limit: 20, sort: "created_at_asc" },
   });
-  await dialog.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Sonraki", exact: true }));
   await expect(dialog).toContainText("İkinci örnek üye");
   expect(state.discoveries.at(-1)).toMatchObject({ page: { cursor: "segment-next" } });
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await page.getByRole("button", { name: "Kullanan otomasyonlar", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
+  await activate(page.getByRole("button", { name: "Kullanan otomasyonlar", exact: true }));
   await expect(dialog).toContainText("Örnek takip");
   expect(state.discoveries.at(-1)).toMatchObject({
     selector: { key: { discovery: "automations", segment_id: segmentId } },
@@ -628,9 +631,9 @@ test("automation queue keeps native summary and resets cursor on state filter in
   page,
 }) => {
   const state = await fixture(page, "paged");
-  await page.getByRole("tab", { name: "Son işler", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Son işler", exact: true }));
   await expect(page.getByText("90", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Sonraki", exact: true }));
   await expect.poll(() => state.discoveries.at(-1)?.page).toMatchObject({ cursor: "queue-next" });
   await page.getByLabel("İş durumu", { exact: true }).selectOption("succeeded");
   await expect
@@ -648,16 +651,16 @@ test("automation denied insight hides cached members and retries only the read",
   page,
 }) => {
   const state = await fixture(page, "segment");
-  await page.getByRole("tab", { name: "Segmentler", exact: true }).click();
-  await page.getByRole("button", { name: "Eşleşmeleri göster", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Segmentler", exact: true }));
+  await activate(page.getByRole("button", { name: "Eşleşmeleri göster", exact: true }));
   const dialog = page.getByRole("dialog");
   await expect(dialog).toContainText("Örnek eşleşen üye");
   state.denied = true;
-  await dialog.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Sonraki", exact: true }));
   await expect(dialog.getByRole("alert")).toContainText("Otomasyon kaynağı okunamadı.");
   await expect(dialog.getByText("Örnek eşleşen üye", { exact: true })).toHaveCount(0);
   state.denied = false;
-  await dialog.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Yeniden dene", exact: true }));
   await expect(dialog).toContainText("Örnek eşleşen üye");
   expect(state.writes).toHaveLength(0);
 });
@@ -666,11 +669,11 @@ test("automation retries an older discovered job outside recent twenty with exac
   page,
 }) => {
   const state = await fixture(page, "older");
-  await page.getByRole("tab", { name: "Son işler", exact: true }).click();
-  await page.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Son işler", exact: true }));
+  await activate(page.getByRole("button", { name: "Yeniden dene", exact: true }));
   const dialog = page.getByRole("alertdialog");
-  await dialog.getByRole("checkbox").press("Space");
-  await dialog.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await activate(dialog.getByRole("checkbox"), "Space");
+  await activate(dialog.getByRole("button", { name: "Yeniden dene", exact: true }));
   await expect(saved(page)).toBeVisible();
   expect(state.writes).toHaveLength(1);
   expect(state.writes[0]).toMatchObject({

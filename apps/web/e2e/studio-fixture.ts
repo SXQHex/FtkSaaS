@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import type { ResourceRef } from "@ftksaas/api-contracts";
 import { expect, type Page, type Route } from "@playwright/test";
 import type {
@@ -759,7 +760,7 @@ export async function openStudio(page: Page) {
   await page.goto(`${origin}/login`);
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await clickWorkspaceLink(page, "Stüdyo");
@@ -771,12 +772,12 @@ export async function openStudio(page: Page) {
 // Warm and revisit the real assignment picker in the same document/query lifetime.
 export async function studioScheduleChoice(page: Page, instructorId: string, eligible: boolean) {
   await clickWorkspaceLink(page, "Ders programı");
-  await page.getByRole("button", { name: "Seans ekle", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Seans ekle", exact: true }));
   const panel = page.getByRole("dialog");
   await expect(
     panel.locator(`#schedule-create-instructor option[value="${instructorId}"]`),
   ).toHaveCount(eligible ? 1 : 0);
-  await panel.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Vazgeç", exact: true }));
   await clickWorkspaceLink(page, "Stüdyo");
   await expect(page.getByRole("heading", { name: "Stüdyo", exact: true })).toBeVisible();
 }

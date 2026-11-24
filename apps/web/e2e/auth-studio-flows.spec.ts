@@ -1,3 +1,4 @@
+import { activate, attemptOutsideDismissal } from "./device-input.js";
 import { clickWorkspaceLink } from "./auth-fixture.js";
 import { test, expect } from "./test.js";
 import { scanAccessibility } from "./accessibility.js";
@@ -8,14 +9,14 @@ import { mockStudio, mockStudioCalendar, openStudio, studioIds } from "./studio-
 import common from "../src/locales/tr/common.json" with { type: "json" };
 
 async function newRoom(page: import("@playwright/test").Page) {
-  await page.getByRole("tab", { name: "Dersler ve salonlar", exact: true }).click();
-  await page.getByRole("button", { name: "Salon ekle", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Dersler ve salonlar", exact: true }));
+  await activate(page.getByRole("button", { name: "Salon ekle", exact: true }));
   return page.getByRole("dialog");
 }
 
 async function newRoomClosure(page: import("@playwright/test").Page) {
-  await page.getByRole("tab", { name: "Kapanışlar", exact: true }).click();
-  await page.getByRole("button", { name: "Kapanış ekle", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Kapanışlar", exact: true }));
+  await activate(page.getByRole("button", { name: "Kapanış ekle", exact: true }));
   const dialog = page.getByRole("dialog");
   await expect(dialog.getByText(/Europe\/Istanbul merkez saat dilimine/)).toBeVisible();
   await dialog.locator('[name="target"]').selectOption(studioIds.room);
@@ -48,14 +49,14 @@ test("Studio flow: unknown room result replays its key once and preserves zero c
     .fill("Sıfır kontenjanlı salon");
   await dialog.getByRole("spinbutton", { name: "Kontenjan", exact: true }).fill("0");
   state.nextWrite = "unknown";
-  await dialog.getByRole("button", { name: "Salonu ekle", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Salonu ekle", exact: true }));
   const retry = dialog.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true });
   await expect(retry).toBeVisible();
   await expect(dialog.getByRole("button", { name: "Vazgeç", exact: true })).toBeDisabled();
-  await page.keyboard.press("Escape");
+  await attemptOutsideDismissal(dialog);
   await expect(dialog).toBeVisible();
   expect((await scanAccessibility(page, "studio-room-unknown")).violations).toEqual([]);
-  await retry.click();
+  await activate(retry);
   await expect(dialog).toHaveCount(0);
   const writes = state.writes.filter((write) => write.operation === "room_save_v1");
   expect(writes).toHaveLength(2);
@@ -76,7 +77,7 @@ test("Studio flow: acknowledged room never writes again after a failed summary r
     .fill("Okuma yeniden deneme salonu");
   await dialog.getByRole("spinbutton", { name: "Kontenjan", exact: true }).fill("12");
   state.failedReads.add("management_state_get_v1");
-  await dialog.getByRole("button", { name: "Salonu ekle", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Salonu ekle", exact: true }));
   await expect(dialog.getByText(/Değişiklik kaydedildi; güncel liste okunamadı/)).toBeVisible();
   expect(state.effects).toEqual(["room_save_v1"]);
   expect((await scanAccessibility(page, "studio-room-ack-read-failure")).violations).toEqual([]);
@@ -98,7 +99,7 @@ test("Studio flow: acknowledged room never writes again after a failed summary r
       retryReads.push("room_save_v1");
   };
   page.on("request", observeReadback);
-  await dialog.getByRole("button", { name: "Listeyi yeniden yükle", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Listeyi yeniden yükle", exact: true }));
   await expect(dialog).toHaveCount(0);
   page.off("request", observeReadback);
   expect(state.native.account).toBeGreaterThan(accountReadsBeforeRetry);
@@ -118,21 +119,21 @@ test("Studio flow: stale room version needs an explicit fresh read and new inten
 }) => {
   const state = await mockStudio(page);
   await openStudio(page);
-  await page.getByRole("tab", { name: "Dersler ve salonlar", exact: true }).click();
-  await page.getByRole("button", { name: "Ana salon", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Dersler ve salonlar", exact: true }));
+  await activate(page.getByRole("button", { name: "Ana salon", exact: true }));
   const dialog = page.getByRole("dialog");
   const name = dialog.getByRole("textbox", { name: "Salon adı", exact: true });
   await expect(name).toBeEditable();
   await name.fill("Yerel taslak");
   state.rooms[0]!.version = 3;
   state.rooms[0]!.name = "Sunucudaki son ad";
-  await dialog.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Kaydet", exact: true }));
   await expect(dialog.getByText(/Kayıt başka bir işlemle değişti/)).toBeVisible();
   await expect(name).toHaveValue("Yerel taslak");
-  await dialog.getByRole("button", { name: "Güncel kaydı yükle", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Güncel kaydı yükle", exact: true }));
   await expect(name).toHaveValue("Sunucudaki son ad");
   await name.fill("Son sürümle kayıt");
-  await dialog.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Kaydet", exact: true }));
   await expect(dialog).toHaveCount(0);
   expect(state.writes.map((write) => write.payload.expected_version)).toEqual([2, 3]);
   expect(new Set(state.writes.map((write) => write.key)).size).toBe(2);
@@ -150,7 +151,7 @@ test("Studio flow: closure appends using the center version and inclusive local 
     if (!request.url().endsWith("/backend-v1/management_state_get_v1")) return;
     if (isRoomClosureRead(request.postDataJSON())) roomClosureReads++;
   });
-  await dialog.getByRole("button", { name: "Kapanışı kaydet", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Kapanışı kaydet", exact: true }));
   await expect(dialog).toHaveCount(0);
   expect(state.writes).toHaveLength(1);
   expect(state.writes[0]!.payload).toMatchObject({
@@ -182,12 +183,12 @@ test("Studio flow: an acknowledged closure missing from the fresh source only re
       },
     });
   });
-  await dialog.getByRole("button", { name: "Kapanışı kaydet", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Kapanışı kaydet", exact: true }));
   await expect(dialog.getByRole("status")).toContainText(common.studio.closureSavedUnread);
   const retry = dialog.getByRole("button", { name: common.studio.retryRead, exact: true });
   await expect(retry).toBeEnabled();
   expect(roomClosureReads).toBe(1);
-  await retry.click();
+  await activate(retry);
   await expect(dialog).toHaveCount(0);
   expect(roomClosureReads).toBe(2);
   expect(state.writes).toHaveLength(1);
@@ -262,9 +263,9 @@ test("Studio flow: replacement terms reset approval and unknown publication neve
   });
   async function programReview(blocked: boolean) {
     await clickWorkspaceLink(page, "Ders programı");
-    await page.getByRole("button", { name: "Seans ekle", exact: true }).click();
+    await activate(page.getByRole("button", { name: "Seans ekle", exact: true }));
     const panel = page.getByRole("dialog");
-    await panel.getByRole("radio", { name: "Haftalık seri", exact: true }).click();
+    await activate(panel.getByRole("radio", { name: "Haftalık seri", exact: true }));
     await panel.locator("#schedule-create-class").selectOption(studioIds.lesson);
     await panel.locator("#schedule-create-instructor").selectOption(studioIds.instructor);
     await panel.locator("#schedule-create-room").selectOption(studioIds.room);
@@ -273,8 +274,8 @@ test("Studio flow: replacement terms reset approval and unknown publication neve
     await panel.locator("#schedule-create-time").fill("11:17");
     await panel.locator("#schedule-create-duration").fill("30");
     await panel.locator("#schedule-create-weeks").fill("1");
-    await panel.getByRole("button", { name: "Pzt", exact: true }).click();
-    await panel.getByRole("button", { name: "Seansları önizle", exact: true }).click();
+    await activate(panel.getByRole("button", { name: "Pzt", exact: true }));
+    await activate(panel.getByRole("button", { name: "Seansları önizle", exact: true }));
     if (blocked) {
       await expect(panel.getByRole("alert")).toHaveText(common.schedule.errors.configuration);
       await expect(panel.getByRole("button", { name: "Seriyi oluştur", exact: true })).toHaveCount(
@@ -286,15 +287,15 @@ test("Studio flow: replacement terms reset approval and unknown publication neve
       ).toBeVisible();
       await expect(panel.getByRole("alert")).toHaveCount(0);
     }
-    await panel.getByRole("button", { name: "Vazgeç", exact: true }).click();
+    await activate(panel.getByRole("button", { name: "Vazgeç", exact: true }));
     await clickWorkspaceLink(page, "Stüdyo");
   }
   await openStudio(page);
   const documentTime = await page.evaluate(() => performance.timeOrigin);
   await programReview(true);
   expect(state.writes).toHaveLength(0);
-  await page.getByRole("tab", { name: "Anlaşmalar", exact: true }).click();
-  await page.getByRole("button", { name: /Örnek Eğitmen/ }).click();
+  await activate(page.getByRole("tab", { name: "Anlaşmalar", exact: true }));
+  await activate(page.getByRole("button", { name: /Örnek Eğitmen/ }));
   const dialog = page.getByRole("dialog");
   const amount = dialog.getByLabel("Tutar (en küçük para birimi)", { exact: true });
   await expect(amount).toHaveValue("12550");
@@ -303,17 +304,17 @@ test("Studio flow: replacement terms reset approval and unknown publication neve
   await dialog.locator("#agreement-until").fill("2031-01-01T09:00");
   await dialog.locator("#agreement-reason").fill("Fixture ileri yürürlük sürümü");
   const approval = dialog.getByRole("checkbox");
-  await approval.press("Space");
+  await activate(approval, "Space");
   await expect(approval).toBeChecked();
   await amount.fill("26000");
   await expect(approval).not.toBeChecked();
-  await approval.press("Space");
+  await activate(approval, "Space");
   state.nextWrite = "unknown";
-  await dialog.getByRole("button", { name: "Yeni sürümü yayınla", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Yeni sürümü yayınla", exact: true }));
   const retry = dialog.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true });
   await expect(retry).toBeVisible();
   expect((await scanAccessibility(page, "studio-agreement-unknown")).violations).toEqual([]);
-  await retry.click();
+  await activate(retry);
   await expect(dialog).toHaveCount(0);
   expect(state.writes).toHaveLength(2);
   expect(state.writes[0]!.key).toBe(state.writes[1]!.key);
@@ -375,12 +376,12 @@ test("Studio flow: a verified active assignment cannot submit a duplicate grant"
   state.accountLinked = true;
   state.roles[0]!.accountAccessGranted = true;
   await openStudio(page);
-  await page.getByRole("button", { name: "Eğitmen ekle", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Eğitmen ekle", exact: true }));
   let dialog = page.getByRole("dialog");
-  await dialog.getByRole("radio", { name: "Mevcut kişi", exact: true }).click();
-  await dialog.getByRole("button", { name: "Kişi ara", exact: true }).click();
+  await activate(dialog.getByRole("radio", { name: "Mevcut kişi", exact: true }));
+  await activate(dialog.getByRole("button", { name: "Kişi ara", exact: true }));
   await dialog.locator("#existing-instructor-person").selectOption(studioIds.instructor);
-  await dialog.getByRole("button", { name: "Kuruluma devam et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Kuruluma devam et", exact: true }));
   dialog = page.getByRole("dialog");
   await expect(
     dialog.getByText("Doğrulanmış hesaba eğitmen yetkisi bağlı", { exact: true }),
@@ -391,7 +392,7 @@ test("Studio flow: a verified active assignment cannot submit a duplicate grant"
   ).toHaveCount(0);
   expect(state.writes).toEqual([]);
   state.roles[0]!.accountAccessGranted = false;
-  await dialog.getByRole("button", { name: "Hesap bağını kontrol et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Hesap bağını kontrol et", exact: true }));
   await expect(dialog.getByText("Görev etkin", { exact: true })).toBeVisible();
   await expect(dialog.locator("#instructor-role-grant")).toBeVisible();
   await expect(dialog.getByRole("checkbox")).not.toBeChecked();
@@ -407,14 +408,14 @@ test("Studio agreement: explicit new instructor/discipline/format terms create a
   const state = await mockStudio(page);
   const original = structuredClone(state.agreements[0]);
   await openStudio(page);
-  await page.getByRole("tab", { name: "Anlaşmalar", exact: true }).click();
-  await page.getByRole("button", { name: "Anlaşma hazırla", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Anlaşmalar", exact: true }));
+  await activate(page.getByRole("button", { name: "Anlaşma hazırla", exact: true }));
   const panel = page.getByRole("dialog", { name: "Anlaşma hazırla", exact: true });
   await expect(panel.locator("#agreement-person")).toBeEnabled();
   await panel.locator("#agreement-person").selectOption(studioIds.instructor);
   await panel.locator("#agreement-discipline").selectOption(studioIds.discipline);
   await panel.locator("#agreement-format").selectOption("private");
-  await panel.getByRole("radio", { name: "Seans başı", exact: true }).press("Space");
+  await activate(panel.getByRole("radio", { name: "Seans başı", exact: true }), "Space");
   await panel.locator("#agreement-currency").fill("TRY");
   await panel
     .locator('select[id^="agreement-general-"][id$="-kind"]')
@@ -426,8 +427,8 @@ test("Studio agreement: explicit new instructor/discipline/format terms create a
   await panel.locator("#agreement-until").fill("2031-01-01T09:00");
   await panel.locator("#agreement-reason").fill("Kontrollü yeni özel ders anlaşması");
   expect(state.writes).toHaveLength(0);
-  await panel.getByRole("checkbox").press("Space");
-  await panel.getByRole("button", { name: "Yeni sürümü yayınla", exact: true }).click();
+  await activate(panel.getByRole("checkbox"), "Space");
+  await activate(panel.getByRole("button", { name: "Yeni sürümü yayınla", exact: true }));
   await expect(panel).toHaveCount(0);
   expect(state.effects).toEqual(["instructor_agreement_publish_v1"]);
   expect(state.agreements).toHaveLength(2);
@@ -446,10 +447,7 @@ test("Studio agreement: explicit new instructor/discipline/format terms create a
       components: [{ kind: "session_fixed", amount_minor: "25000" }],
     },
   });
-  await page
-    .getByRole("button", { name: /Örnek Eğitmen/ })
-    .last()
-    .click();
+  await activate(page.getByRole("button", { name: /Örnek Eğitmen/ }).last());
   await expect(page.getByRole("dialog").locator("#agreement-format")).toHaveValue("private");
   await expect(
     page.getByRole("dialog").getByLabel("Tutar (en küçük para birimi)", { exact: true }),

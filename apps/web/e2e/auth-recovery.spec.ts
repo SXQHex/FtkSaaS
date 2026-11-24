@@ -1,3 +1,4 @@
+import { hasTouchInput, submitWithDevice } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { mockNative, origin } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
@@ -36,28 +37,35 @@ for (const colorScheme of ["light", "dark"] as const) {
         page.getByRole("button", { name: "Bağlantı gönder" }),
         page.getByRole("link", { name: "Girişe dön" }),
       ];
-      await controls[0]!.focus();
+      const touch = hasTouchInput(page);
+      if (!touch) await controls[0]!.focus();
       for (const [index, control] of controls.entries()) {
-        if (index > 0) await page.keyboard.press("Tab");
-        await expect(control).toBeFocused();
+        if (touch) {
+          await control.scrollIntoViewIfNeeded();
+        } else {
+          if (index > 0) await page.keyboard.press("Tab");
+          await expect(control).toBeFocused();
+        }
         await expect(control).toBeInViewport({ ratio: 1 });
         const box = await control.boundingBox();
         expect(box).not.toBeNull();
         expect(box!.x).toBeGreaterThanOrEqual(0);
         expect(box!.x + box!.width).toBeLessThanOrEqual(width + 1);
       }
-      for (const control of controls.slice(0, -1).reverse()) {
-        await page.keyboard.press("Shift+Tab");
-        await expect(control).toBeFocused();
-        await expect(control).toBeInViewport({ ratio: 1 });
+      if (!touch) {
+        for (const control of controls.slice(0, -1).reverse()) {
+          await page.keyboard.press("Shift+Tab");
+          await expect(control).toBeFocused();
+          await expect(control).toBeInViewport({ ratio: 1 });
+        }
       }
       await email.fill("invalid");
-      await page.keyboard.press("Enter");
+      await submitWithDevice(page.getByRole("button", { name: "Parolayı kaydet" }));
       await expect(email).toHaveAttribute("aria-invalid", "true");
       await expect(email).toHaveAccessibleDescription("Geçerli bir e-posta adresi gir.");
       expect(attempts).toBe(0);
       await email.fill("fixture@example.invalid");
-      await page.keyboard.press("Enter");
+      await submitWithDevice(page.getByRole("button", { name: "Parolayı kaydet" }));
       await expect(page.getByRole("alert")).toBeVisible();
       await expect(email).toHaveValue("fixture@example.invalid");
       expect(attempts).toBe(1);
@@ -65,7 +73,7 @@ for (const colorScheme of ["light", "dark"] as const) {
         [],
       );
       await email.focus();
-      await page.keyboard.press("Enter");
+      await submitWithDevice(page.getByRole("button", { name: "Parolayı kaydet" }));
       await expect(page.getByRole("heading", { name: "E-postanı kontrol et" })).toBeVisible();
       await expect(page.getByRole("status")).toContainText("Adres uygunsa");
       expect(attempts).toBe(2);

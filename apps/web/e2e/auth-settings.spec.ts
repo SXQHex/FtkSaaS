@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { clickWorkspaceLink, origin } from "./auth-fixture.js";
@@ -171,7 +172,7 @@ test("settings creates a master and an explicitly selected center relation with 
   await page.goto(`${origin}/login`);
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   const lifetime = await page.evaluate("window.__disciplineLifetime = performance.timeOrigin");
   await clickWorkspaceLink(page, "Ders programı");
@@ -183,46 +184,46 @@ test("settings creates a master and an explicitly selected center relation with 
     await scope.selectOption("organization");
     const add = page.getByRole("button", { name: "Disiplin ekle", exact: true });
     await expect(add).toBeEnabled();
-    await add.click();
+    await activate(add);
     const sheet = page.getByRole("dialog", { name: "Disiplin", exact: true });
     await expect(sheet).toBeVisible();
     await sheet.getByLabel("Disiplin adı", { exact: true }).fill(name);
-    await sheet.getByRole("button", { name: "Değişiklikleri kaydet", exact: true }).click();
+    await activate(sheet.getByRole("button", { name: "Değişiklikleri kaydet", exact: true }));
     const review = page.getByRole("dialog", { name: "Disiplin değişikliğini incele", exact: true });
     await expect(review).toBeVisible();
     expect(writes).toHaveLength(index * 2);
 
     expect((await scanAccessibility(page, "discipline-explicit-review")).violations).toEqual([]);
-    await review.getByRole("checkbox").press("Space");
+    await activate(review.getByRole("checkbox"), "Space");
     await expect(review.getByRole("checkbox")).toBeChecked();
-    await review
-      .getByRole("button", { name: "Onaylanan değişiklikleri uygula", exact: true })
-      .click();
+    await activate(
+      review.getByRole("button", { name: "Onaylanan değişiklikleri uygula", exact: true }),
+    );
     await expect(sheet.getByRole("status")).toContainText(
       "Güncel disiplin kaydı yeniden okunarak doğrulandı.",
     );
-    await sheet.getByRole("button", { name: "Vazgeç", exact: true }).click();
+    await activate(sheet.getByRole("button", { name: "Vazgeç", exact: true }));
     await expect(sheet).toHaveCount(0);
     await page.setViewportSize({ width: 320, height: 1000 });
     await scope.selectOption("center");
     const table = page.getByRole("grid", { name: "Disiplinler", exact: true });
     const row = table.getByRole("row").filter({ hasText: name });
     await expect(row.getByText("Merkez listesinde yok", { exact: true })).toBeVisible();
-    await row.getByRole("button", { name: "Düzenle", exact: true }).click();
+    await activate(row.getByRole("button", { name: "Düzenle", exact: true }));
     await expect(sheet.getByLabel("Disiplin adı", { exact: true })).toHaveValue(name);
     await expect(sheet.getByLabel("Disiplin adı", { exact: true })).toHaveAttribute("readonly", "");
-    await sheet.getByRole("button", { name: "Değişiklikleri kaydet", exact: true }).click();
+    await activate(sheet.getByRole("button", { name: "Değişiklikleri kaydet", exact: true }));
     await expect(review).toBeVisible();
     expect(writes).toHaveLength(index * 2 + 1);
-    await review.getByRole("checkbox").press("Space");
+    await activate(review.getByRole("checkbox"), "Space");
     await expect(review.getByRole("checkbox")).toBeChecked();
-    await review
-      .getByRole("button", { name: "Onaylanan değişiklikleri uygula", exact: true })
-      .click();
+    await activate(
+      review.getByRole("button", { name: "Onaylanan değişiklikleri uygula", exact: true }),
+    );
     await expect(sheet.getByRole("status")).toContainText(
       "Güncel disiplin kaydı yeniden okunarak doğrulandı.",
     );
-    await sheet.getByRole("button", { name: "Vazgeç", exact: true }).click();
+    await activate(sheet.getByRole("button", { name: "Vazgeç", exact: true }));
   }
   expect(writes.map((item) => item.operation)).toEqual([
     "discipline_save_v1",
@@ -241,8 +242,8 @@ test("settings creates a master and an explicitly selected center relation with 
   await expect.poll(() => catalogReads).toBeGreaterThan(beforeCalendar);
   expect(await page.evaluate("performance.timeOrigin")).toBe(lifetime);
   await clickWorkspaceLink(page, "Stüdyo");
-  await page.getByRole("tab", { name: "Dersler ve salonlar", exact: true }).click();
-  await page.getByRole("button", { name: "Ders türü ekle", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Dersler ve salonlar", exact: true }));
+  await activate(page.getByRole("button", { name: "Ders türü ekle", exact: true }));
   const choices = page.getByRole("dialog").getByRole("combobox", { name: "Disiplin", exact: true });
   await expect(
     choices.getByRole("option", { name: "Sentetik yeni disiplin", exact: true }),
@@ -250,5 +251,5 @@ test("settings creates a master and an explicitly selected center relation with 
   await expect(
     choices.getByRole("option", { name: "Sentetik ikinci disiplin", exact: true }),
   ).toHaveCount(1);
-  await page.getByRole("dialog").getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(page.getByRole("dialog").getByRole("button", { name: "Vazgeç", exact: true }));
 });

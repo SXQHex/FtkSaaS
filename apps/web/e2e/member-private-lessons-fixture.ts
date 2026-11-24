@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { expect, type Page } from "@playwright/test";
 import type { LessonRequestView } from "@ftksaas/api-contracts";
 import { mockOwnReservations } from "./member-reservations-fixture.js";
@@ -208,10 +209,11 @@ export async function mockOwnPrivateLessons(
       });
     return route.fallback();
   });
-  await page
-    .getByRole("navigation", { name: "Üye menüsü", exact: true })
-    .getByRole("link", { name: "Özel ders", exact: true })
-    .click();
+  await activate(
+    page
+      .getByRole("navigation", { name: "Üye menüsü", exact: true })
+      .getByRole("link", { name: "Özel ders", exact: true }),
+  );
   await expect(page).toHaveURL(`${origin}/member/private-lessons?org=${I.org}&center=${I.center}`);
   await expect(page.getByRole("heading", { name: "Özel ders", exact: true })).toBeVisible();
   return {
@@ -230,7 +232,7 @@ export async function mockOwnPrivateLessons(
   };
 }
 export async function openOwnRequestForm(page: Page) {
-  await page.getByRole("button", { name: "Yeni talep", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Yeni talep", exact: true }));
   const dialog = page.getByRole("dialog");
   await dialog.getByRole("combobox", { name: "Disiplin", exact: true }).selectOption(I.discipline);
   await dialog.getByLabel("Tarih", { exact: true }).fill("2026-11-20");

@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import type { ManagementWorkView } from "@ftksaas/api-contracts";
@@ -248,23 +249,23 @@ test("center work uses real global counts, cursor back navigation and a real att
 }) => {
   const state = await setup(page);
   await expect(state.card.getByRole("status")).toHaveText("Seçili merkezde 3 yetkili bekleyen iş");
-  await state.card.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await activate(state.card.getByRole("button", { name: "Sonraki", exact: true }));
   await expect(
     state.card.getByText("Bu sayfada bekleyen yönetim işi yok.", { exact: true }),
   ).toBeVisible();
   await expect(
     state.card.getByText("Bu kapsamda bekleyen yönetim işi yok.", { exact: true }),
   ).toHaveCount(0);
-  await state.card.getByRole("button", { name: "Önceki", exact: true }).click();
-  await state.card
-    .getByRole("listitem")
-    .filter({ hasText: "Açık ders yoklaması" })
-    .getByRole("button", { name: "İşi aç", exact: true })
-    .click();
-  await page
-    .getByRole("dialog")
-    .getByRole("link", { name: "İlgili akışı aç", exact: true })
-    .click();
+  await activate(state.card.getByRole("button", { name: "Önceki", exact: true }));
+  await activate(
+    state.card
+      .getByRole("listitem")
+      .filter({ hasText: "Açık ders yoklaması" })
+      .getByRole("button", { name: "İşi aç", exact: true }),
+  );
+  await activate(
+    page.getByRole("dialog").getByRole("link", { name: "İlgili akışı aç", exact: true }),
+  );
   await expect(page).toHaveURL(new RegExp(`/sessions/${S.session}\\?tab=attendance$`));
   await expect(page.getByRole("tab", { name: "Yoklama", exact: true })).toHaveAttribute(
     "aria-selected",
@@ -278,31 +279,30 @@ test("denied work source hides its old details and reload distinguishes denial f
 }) => {
   const state = await setup(page);
   state.setSourceDenied();
-  await state.card
-    .getByRole("listitem")
-    .filter({ hasText: "Merkez takip kaydı" })
-    .getByRole("button", { name: "İşi aç", exact: true })
-    .click();
+  await activate(
+    state.card
+      .getByRole("listitem")
+      .filter({ hasText: "Merkez takip kaydı" })
+      .getByRole("button", { name: "İşi aç", exact: true }),
+  );
   const dialog = page.getByRole("dialog");
   await expect(dialog.getByRole("alert")).toContainText("İş kaynağı okunamadı");
   await expect(dialog.getByText("Özgün takip notu", { exact: true })).toHaveCount(0);
   state.setDenied();
   const readsBeforeClose = state.lists.length;
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(dialog).toHaveCount(0);
   await expect(state.card.getByText("Merkez takip kaydı", { exact: true })).toBeVisible();
   expect(state.lists).toHaveLength(readsBeforeClose);
-  await state.card
-    .getByRole("button", { name: "İş listesini yeniden oku", exact: true })
-    .last()
-    .click();
+  await activate(
+    state.card.getByRole("button", { name: "İş listesini yeniden oku", exact: true }).last(),
+  );
   await expect(state.card.getByRole("alert")).toBeVisible();
   await expect(state.card.getByText("Merkez takip kaydı", { exact: true })).toHaveCount(0);
   state.setEmpty();
-  await state.card
-    .getByRole("button", { name: "İş listesini yeniden oku", exact: true })
-    .last()
-    .click();
+  await activate(
+    state.card.getByRole("button", { name: "İş listesini yeniden oku", exact: true }).last(),
+  );
   await expect(
     state.card.getByText("Bu kapsamda bekleyen yönetim işi yok.", { exact: true }),
   ).toBeVisible();
@@ -313,21 +313,22 @@ for (const mode of ["retry", "receipt", "ackUnread"] as const)
     await page.emulateMedia({ colorScheme: "dark" });
     await page.setViewportSize({ width: 320, height: 950 });
     const state = await setup(page, mode);
-    await state.card
-      .getByRole("listitem")
-      .filter({ hasText: "Merkez takip kaydı" })
-      .getByRole("button", { name: "İşi aç", exact: true })
-      .click();
+    await activate(
+      state.card
+        .getByRole("listitem")
+        .filter({ hasText: "Merkez takip kaydı" })
+        .getByRole("button", { name: "İşi aç", exact: true }),
+    );
     let dialog = page.getByRole("dialog");
     await dialog
       .getByRole("textbox", { name: "Takip sonucunu kaydet", exact: true })
       .fill("Görüşüldü");
-    await dialog.getByRole("button", { name: "Sonucu incele", exact: true }).click();
+    await activate(dialog.getByRole("button", { name: "Sonucu incele", exact: true }));
     dialog = page.getByRole("dialog");
-    await dialog.getByRole("checkbox").press("Space");
-    await dialog
-      .getByRole("button", { name: "Onaylanan değişiklikleri uygula", exact: true })
-      .click();
+    await activate(dialog.getByRole("checkbox"), "Space");
+    await activate(
+      dialog.getByRole("button", { name: "Onaylanan değişiklikleri uygula", exact: true }),
+    );
     if (mode === "ackUnread") {
       await expect(
         dialog.getByText(
@@ -346,16 +347,16 @@ for (const mode of ["retry", "receipt", "ackUnread"] as const)
         ),
       ).toBeVisible();
     await expect(dialog.getByRole("button", { name: "Vazgeç", exact: true })).toBeDisabled();
-    await dialog
-      .getByRole("button", {
+    await activate(
+      dialog.getByRole("button", {
         name: mode === "retry" ? "Aynı isteği yeniden dene" : "İşlem sonucunu kontrol et",
         exact: true,
-      })
-      .click();
+      }),
+    );
     await expect(
       dialog.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),
     ).toBeVisible();
-    await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+    await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
     await expect(state.card.getByText("Merkez takip kaydı", { exact: true })).toHaveCount(0);
     await expect(state.card.getByRole("status")).toHaveText(
       "Seçili merkezde 2 yetkili bekleyen iş",
@@ -368,21 +369,23 @@ test("application work opens the existing review writer and rereads the queue af
   page,
 }) => {
   const state = await setup(page);
-  await state.card
-    .getByRole("listitem")
-    .filter({ hasText: "Bekleyen örnek başvuru" })
-    .getByRole("button", { name: "İşi aç", exact: true })
-    .click();
+  await activate(
+    state.card
+      .getByRole("listitem")
+      .filter({ hasText: "Bekleyen örnek başvuru" })
+      .getByRole("button", { name: "İşi aç", exact: true }),
+  );
   const dialog = page.getByRole("dialog");
   await dialog.getByLabel("Başvuru işlemi", { exact: true }).selectOption("close");
-  await dialog
-    .getByRole("checkbox", { name: "İşlemi ve etkilerini inceledim.", exact: true })
-    .press("Space");
-  await dialog.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await activate(
+    dialog.getByRole("checkbox", { name: "İşlemi ve etkilerini inceledim.", exact: true }),
+    "Space",
+  );
+  await activate(dialog.getByRole("button", { name: "Kaydet", exact: true }));
   await expect(
     dialog.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),
   ).toBeVisible();
-  await dialog.getByRole("button", { name: "Kapat", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Kapat", exact: true }));
   await expect(state.card.getByText("Bekleyen örnek başvuru", { exact: true })).toHaveCount(0);
   expect(state.applicationResultReads()).toBe(1);
   expect(state.writes).toHaveLength(1);

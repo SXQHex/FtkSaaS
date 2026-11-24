@@ -1,3 +1,4 @@
+import { activate, attemptOutsideDismissal } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import { mockEventDetail, detailIds as D } from "./event-detail-fixture.js";
@@ -16,28 +17,29 @@ async function openPayment(
   });
   const row = page.getByRole("row", { name: /Mevcut kayıt/ });
   await expect(row).toContainText("400,00");
-  await row.getByRole("button", { name: "Ödemeyi incele", exact: true }).click();
+  await activate(row.getByRole("button", { name: "Ödemeyi incele", exact: true }));
   const sheet = page.getByRole("dialog", { name: "Ödemeyi incele", exact: true });
   await expect(sheet.getByText("Kaydın değişmez bedeli", { exact: true })).toBeVisible();
   await expect(
     sheet.getByRole("button", { name: "Ödeme hazırlığını oluştur", exact: true }),
   ).toHaveCount(0);
-  await sheet.getByRole("radio", { name: "Şimdi tahsil edilecek", exact: true }).click();
+  await activate(sheet.getByRole("radio", { name: "Şimdi tahsil edilecek", exact: true }));
   await sheet.getByLabel("Tutar (alt birim)", { exact: true }).fill("20000");
   await sheet.getByLabel("Yöntem", { exact: true }).selectOption("bank_transfer");
   await sheet.getByLabel("Referans", { exact: true }).fill("SENTETIK-KAYIT");
   await sheet.getByLabel("Tahsilat tarihi ve saati", { exact: true }).fill("2026-11-16T15:00");
-  await sheet.getByRole("button", { name: "Tahsilatı incele", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Tahsilatı incele", exact: true }));
   const confirmation = page.getByRole("alertdialog");
   await expect(confirmation.getByRole("button", { name: "Vazgeç", exact: true })).toBeFocused();
   return { state, sheet, confirmation };
 }
 async function collect(page: Page) {
   const d = page.getByRole("alertdialog");
-  await d
-    .getByRole("checkbox", { name: "İşlemi ve etkilerini inceledim, onaylıyorum.", exact: true })
-    .press("Space");
-  await d.getByRole("button", { name: "Tahsilatı kaydet", exact: true }).click();
+  await activate(
+    d.getByRole("checkbox", { name: "İşlemi ve etkilerini inceledim, onaylıyorum.", exact: true }),
+    "Space",
+  );
+  await activate(d.getByRole("button", { name: "Tahsilatı kaydet", exact: true }));
 }
 test("existing unprepared registration collects only real debts with immutable fee and native balance readback", async ({
   page,
@@ -68,10 +70,10 @@ test("existing unprepared registration collects only real debts with immutable f
         row.op === "event_payment_get_v1",
     ),
   ).toBe(false);
-  await confirmation.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(confirmation.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(sheet).toContainText("300,00");
   await expect(sheet).toContainText("200,00");
-  await sheet.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(page.getByRole("row", { name: /Mevcut kayıt/ })).toContainText("200,00");
 });
 test("existing registration unknown collection locks the sheet and recovers one native write", async ({
@@ -82,17 +84,17 @@ test("existing registration unknown collection locks the sheet and recovers one 
   await expect(
     confirmation.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }),
   ).toBeVisible();
-  await page.keyboard.press("Escape");
+  await attemptOutsideDismissal(confirmation);
   await expect(confirmation).toBeVisible();
   await expect(confirmation.getByRole("button", { name: "Vazgeç", exact: true })).toBeDisabled();
-  await confirmation
-    .getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true })
-    .click();
+  await activate(
+    confirmation.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }),
+  );
   await expect(confirmation.getByText(saved, { exact: true })).toBeVisible();
   expect(state.effects).toBe(1);
   expect(state.writes).toHaveLength(1);
-  await confirmation.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await sheet.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(confirmation.getByRole("button", { name: "Vazgeç", exact: true }));
+  await activate(sheet.getByRole("button", { name: "Vazgeç", exact: true }));
 });
 test("existing registration ACK recovery repeats only scoped receipt and balance reads", async ({
   page,
@@ -105,9 +107,9 @@ test("existing registration ACK recovery repeats only scoped receipt and balance
       { exact: true },
     ),
   ).toBeVisible();
-  await confirmation
-    .getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true })
-    .click();
+  await activate(
+    confirmation.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }),
+  );
   await expect(confirmation.getByText(saved, { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(1);
 });
@@ -150,14 +152,14 @@ for (const status of ["no_cash_due", "missing", "restricted"] as const)
       await expect(row).toContainText("Bu kaydın ödeme bilgilerini okuma yetkisi yok.");
       await expect(row.getByRole("button", { name: "Ödemeyi incele", exact: true })).toHaveCount(0);
     } else {
-      await row.getByRole("button", { name: "Ödemeyi incele", exact: true }).click();
+      await activate(row.getByRole("button", { name: "Ödemeyi incele", exact: true }));
       const sheet = page.getByRole("dialog", { name: "Ödemeyi incele", exact: true });
       await expect(sheet).toContainText(
         status === "missing"
           ? "Kaydın ödeme kaynağı eksik; bakiye bilinmiyor."
           : "Nakit bedel gerekmiyor.",
       );
-      await sheet.getByRole("radio", { name: "Şimdi tahsil edilecek", exact: true }).click();
+      await activate(sheet.getByRole("radio", { name: "Şimdi tahsil edilecek", exact: true }));
       await expect(
         sheet.getByRole("button", { name: "Tahsilatı incele", exact: true }),
       ).toBeDisabled();
@@ -178,9 +180,9 @@ test("existing collection retains its pending frame when the required event read
   ).toBeVisible();
   await expect(page.getByRole("heading", { name: "Tango atölyesi", exact: true })).toBeVisible();
   await expect(confirmation.getByRole("button", { name: "Vazgeç", exact: true })).toBeDisabled();
-  await confirmation
-    .getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true })
-    .click();
+  await activate(
+    confirmation.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }),
+  );
   await expect(confirmation.getByText(saved, { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(1);
 });
@@ -193,9 +195,9 @@ test("existing collection reuses one confirmed event read for the sheet and deta
   await expect(confirmation.getByText(saved, { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(1);
   expect(state.collectionReads).toBe(1);
-  await confirmation.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(confirmation.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(sheet).toContainText("200,00");
-  await sheet.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(page.getByRole("row", { name: /Mevcut kayıt/ })).toContainText("200,00");
   expect(state.collectionReads).toBe(1);
 });

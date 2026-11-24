@@ -1,3 +1,4 @@
+import { activate, attemptOutsideDismissal } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
@@ -91,16 +92,16 @@ async function setup(
   await page.goto(origin + "/login");
   await page.getByLabel("E-posta", { exact: true }).fill("synthetic@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("synthetic-password");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(origin + "/account");
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/finance`);
-  await page.getByRole("button", { name: "Üye bazlı finans", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Üye bazlı finans", exact: true }));
   await page.getByLabel("Üye", { exact: true }).selectOption(I.instructor);
   await page.getByLabel("Para birimi", { exact: true }).fill("TRY");
-  await page.getByRole("button", { name: "Finansı getir", exact: true }).click();
-  await page.getByRole("tab", { name: /Alacaklar/ }).click();
-  await page.getByRole("button", { name: "Nakit iade", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Finansı getir", exact: true }));
+  await activate(page.getByRole("tab", { name: /Alacaklar/ }));
+  await activate(page.getByRole("button", { name: "Nakit iade", exact: true }));
   const panel = page.getByRole("dialog");
   await expect(panel).toHaveAccessibleName("Nakit iade");
   await expect(panel.getByRole("radio")).toHaveCount(0);
@@ -116,26 +117,26 @@ test("mobile cash refund reviews current credit, records one native refund and r
   await page.setViewportSize({ width: 320, height: 950 });
   const { writes, panel } = await setup(page);
   await panel.getByLabel("Tutar (para biriminin alt birimi)", { exact: true }).fill("40000");
-  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Etkiyi incele", exact: true }));
   await expect(
     panel.getByText("Üye alacağı iade tutarı için yetersiz.", { exact: true }),
   ).toBeVisible();
   expect(writes).toHaveLength(0);
   await panel.getByLabel("Tutar (para biriminin alt birimi)", { exact: true }).fill("10000");
   expect((await scanAccessibility(page, "credit-refund-editor")).violations).toEqual([]);
-  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Etkiyi incele", exact: true }));
   await expect(panel.getByRole("button", { name: "İadeyi kaydet", exact: true })).toBeDisabled();
   await expect(panel.getByText("₺300,00", { exact: true })).toBeVisible();
   expect(writes).toHaveLength(0);
-  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+  await activate(panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }), "Space");
   await expect(panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true })).toBeChecked();
   expect((await scanAccessibility(page, "credit-refund-review")).violations).toEqual([]);
-  await panel.getByRole("button", { name: "İadeyi kaydet", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "İadeyi kaydet", exact: true }));
   await expect(
     panel.getByText("Nakit iade hareketi ve güncel alacak doğrulandı.", { exact: true }),
   ).toBeVisible();
   expect(writes).toHaveLength(1);
-  await panel.getByRole("button", { name: "Kapat", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Kapat", exact: true }));
   await expect(
     page
       .getByRole("grid", { name: "Alacaklar", exact: true })
@@ -145,7 +146,7 @@ test("mobile cash refund reviews current credit, records one native refund and r
 });
 test("finance read or collection permission cannot authorize cash refund", async ({ page }) => {
   const { writes, panel } = await setup(page, { denied: true });
-  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Etkiyi incele", exact: true }));
   await expect(
     panel.getByText("Bu kişi için nakit iade yetkisi doğrulanamadı.", { exact: true }),
   ).toBeVisible();
@@ -156,16 +157,16 @@ test("unknown refund preserves its frozen key after receipt failure and cannot d
   page,
 }) => {
   const { writes, panel } = await setup(page, { unknown: true });
-  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
-  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
-  await panel.getByRole("button", { name: "İadeyi kaydet", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Etkiyi incele", exact: true }));
+  await activate(panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }), "Space");
+  await activate(panel.getByRole("button", { name: "İadeyi kaydet", exact: true }));
   const retry = panel.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true });
   await expect(retry).toBeVisible();
-  await panel.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
   await expect(retry).toBeEnabled();
-  await page.keyboard.press("Escape");
+  await attemptOutsideDismissal(panel);
   await expect(panel).toBeVisible();
-  await retry.click();
+  await activate(retry);
   await expect(
     panel.getByText("Nakit iade hareketi ve güncel alacak doğrulandı.", { exact: true }),
   ).toBeVisible();
@@ -178,9 +179,9 @@ test("credit consumed after review is a native rejection without optimistic refu
   page,
 }) => {
   const { writes, panel } = await setup(page, { race: true });
-  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
-  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
-  await panel.getByRole("button", { name: "İadeyi kaydet", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Etkiyi incele", exact: true }));
+  await activate(panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }), "Space");
+  await activate(panel.getByRole("button", { name: "İadeyi kaydet", exact: true }));
   await expect(
     panel.getByText("İade uygulanamadı. Güncel alacağı kontrol edip yeniden incele.", {
       exact: true,
@@ -188,7 +189,7 @@ test("credit consumed after review is a native rejection without optimistic refu
   ).toBeVisible();
   await expect(panel.getByRole("button", { name: "İadeyi kaydet", exact: true })).toBeDisabled();
   expect(writes).toHaveLength(1);
-  await panel.getByRole("button", { name: "Kapat", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Kapat", exact: true }));
   await expect(
     page
       .getByRole("grid", { name: "Alacaklar", exact: true })

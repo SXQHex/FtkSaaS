@@ -24,6 +24,8 @@ Refactoring tamamlanana dek otomatik frontend CI'si yalnız **Desktop Chromium**
 
 <a id="router--query-birleşik-veri-yaşam-döngüsü"></a>
 
+Yerel D04 doğrulaması için `FTK_BROWSER_PROJECT` değerleri `chromium`, `mobile-chromium` (Pixel 7), `webkit` (13,6 inç MacBook Air, DPR 2, 1280×832 CSS ekranı) ve `mobile-webkit` (iPhone 15) olarak seçilir. `test:e2e --workers=1` bütün senaryoları tek işçiyle çalıştırır. Harici kabul koşusu da aynı profil seçimini kullanır. Dokunma aktarımı [test girdisi yardımcısındaki](../e2e/device-input.ts) Playwright context ayarından alınır. Chromium’da bölge kaydırması dokunma girdisiyle, WebKit’te taşma ve konum yerel kaydırma API’siyle sınanır. WebKit’in gerçek parmak kaydırması, fiziksel cihaz veya iOS Simulator kanıtı ister. WCAG reflow testleri kontrollü 320 CSS piksel senaryolarını ayrıca korur.
+
 ## Router + Query birleşik veri yaşam döngüsü
 
 **Tek mimari iş:** “Aşama 1” ve “Aşama 2” ayrı teslimler değil. Kod denetiminin somut M01–M14 bulguları, açık maddeleri, kaynakları, öncelikleri ve kapanış testleri yalnız [aktif frontend backlog'unda](remaining-work.md#router-query-birlesik) tutulur. Bu bölüm yürürlükteki teknik tercihin **nedenini** açıklar; uygulama ve CI kabulünü ileri tarihli/otomatik tamamlanmış saymaz.

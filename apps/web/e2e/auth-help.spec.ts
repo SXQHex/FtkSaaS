@@ -1,3 +1,4 @@
+import { activate, hasTouchInput } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import { mockNative, openWorkspaceNavigation, origin } from "./auth-fixture.js";
@@ -7,7 +8,7 @@ async function setup(page: Page) {
   await page.goto(`${origin}/login`);
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await page.goto(`${origin}/help`);
@@ -31,10 +32,8 @@ test("help has all reference groups and questions, supports multiple keyboard di
   ]);
   const questions = page.locator("[data-slot=accordion-trigger]");
   await expect(questions).toHaveCount(27);
-  await questions.nth(0).focus();
-  await page.keyboard.press("Enter");
-  await questions.nth(1).focus();
-  await page.keyboard.press("Space");
+  await activate(questions.nth(0), "Enter");
+  await activate(questions.nth(1), "Space");
   await expect(questions.nth(0)).toHaveAttribute("aria-expanded", "true");
   await expect(questions.nth(1)).toHaveAttribute("aria-expanded", "true");
   expect((await scanAccessibility(page, "help-two-expanded-questions")).violations).toEqual([]);
@@ -56,9 +55,18 @@ test("help has all reference groups and questions, supports multiple keyboard di
   ).toBeVisible();
   await search.clear();
   await expect(questions).toHaveCount(27);
-  await page.keyboard.press("Control+k");
+  const touch = hasTouchInput(page);
+  if (touch) {
+    const searchButton = page.getByRole("button", { name: "Ara… Ctrl K", exact: true });
+    await expect(searchButton).toBeVisible();
+    await activate(searchButton);
+  } else {
+    await page.keyboard.press("Control+k");
+  }
+  const command = page.getByRole("dialog", { name: "Sayfalarda ara", exact: true });
   await expect(page.getByRole("dialog", { name: "Sayfalarda ara", exact: true })).toBeVisible();
-  await page.keyboard.press("Escape");
+  if (touch) await activate(command.getByRole("button", { name: "Kapat", exact: true }));
+  else await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Durum ekranları", exact: true })).toHaveCount(0);
 });
@@ -80,14 +88,15 @@ test("help copies the displayed approved contact repeatedly without disabling or
   await setup(page);
   const displayed = await page.locator("main dd").first().textContent();
   const copy = page.getByRole("button", { name: "Adresi kopyala", exact: true });
-  await copy.focus();
-  await page.keyboard.press("Enter");
+  await activate(copy, "Enter");
   await expect(
     page.getByRole("status").filter({ hasText: "Destek adresi kopyalandı." }),
   ).toBeVisible();
-  await expect(copy).toBeFocused();
+  if (!hasTouchInput(page)) {
+    await expect(copy).toBeFocused();
+  }
   await expect(copy).toBeEnabled();
-  await page.keyboard.press("Enter");
+  await activate(copy, "Enter");
   await expect
     .poll(() =>
       page.evaluate(
@@ -119,7 +128,7 @@ for (const failure of ["denied", "missing"] as const)
     }, failure);
     await setup(page);
     const copy = page.getByRole("button", { name: "Adresi kopyala", exact: true });
-    await copy.click();
+    await activate(copy);
     await expect(
       page.getByRole("status").filter({ hasText: "Adres kopyalanamadı." }),
     ).toBeVisible();
@@ -131,7 +140,7 @@ for (const failure of ["denied", "missing"] as const)
         value: { writeText: async () => {} },
       }),
     );
-    await copy.click();
+    await activate(copy);
     await expect(
       page.getByRole("status").filter({ hasText: "Destek adresi kopyalandı." }),
     ).toBeVisible();
@@ -139,8 +148,8 @@ for (const failure of ["denied", "missing"] as const)
 test("help remains protected after native signout", async ({ page }) => {
   await setup(page);
   await openWorkspaceNavigation(page);
-  await page.getByRole("button", { name: /Fixture Account/ }).click();
-  await page.getByRole("menuitem", { name: "Çıkış yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: /Fixture Account/ }));
+  await activate(page.getByRole("menuitem", { name: "Çıkış yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/login`);
   await expect(
     page.getByRole("heading", { name: "Hesabına giriş yap", exact: true }),

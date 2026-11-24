@@ -128,7 +128,7 @@ export function NavigationSearch({
       <Button
         variant="outline"
         size="sm"
-        className="@min-[1000px]/workspace:min-w-56"
+        className="pointer-coarse:min-h-11 pointer-coarse:min-w-11 @min-[1000px]/workspace:min-w-56"
         aria-label={t(($) => $.workspace.searchButtonLabel)}
         onPress={() => setOpen(true)}
       >

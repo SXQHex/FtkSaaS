@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import {
   preparePublicCalendar as prepare,
@@ -14,7 +15,7 @@ test("native discipline filter starts a new cursor chain and preserves the UTC i
   page,
 }) => {
   const state = await prepare(page);
-  await page.getByRole("button", { name: "Daha fazla göster", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Daha fazla göster", exact: true }));
   await expect(page.getByRole("heading", { name: "İkinci program", exact: true })).toBeVisible();
   await page
     .getByRole("combobox", { name: "Ders türü", exact: true })

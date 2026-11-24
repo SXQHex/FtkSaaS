@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { mockSettingsCompletion } from "./settings-native-fixture.js";
 import { at, uid } from "./pro-completion-fixture.js";
@@ -94,7 +95,7 @@ test("owner updates and clears the tax profile and downloads unchanged original 
       body: pdfSelected ? pdf : zip,
     });
   });
-  await page.getByRole("tab", { name: "Plan", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Plan", exact: true }));
   await page.getByRole("combobox", { name: "Ayar kapsamı" }).selectOption("organization");
   const office = page.getByRole("textbox", { name: "Vergi dairesi" });
   const identifier = page.getByRole("textbox", { name: "Vergi kimliği" });
@@ -105,13 +106,13 @@ test("owner updates and clears the tax profile and downloads unchanged original 
   const dialog = page.getByRole("dialog", { name: "Vergi değişikliğini incele" });
   const apply = dialog.getByRole("button", { name: "Onaylanan değişiklikleri uygula" });
   async function applyTax() {
-    await reviewButton.click();
+    await activate(reviewButton);
     await expect(apply).toBeDisabled();
-    await dialog.getByRole("checkbox").press("Space");
-    await apply.click();
+    await activate(dialog.getByRole("checkbox"), "Space");
+    await activate(apply);
   }
   await applyTax();
-  await dialog.getByRole("button", { name: common.finance.readResult, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: common.finance.readResult, exact: true }));
   await expect(dialog.getByRole("status")).toHaveText(common.events.commandStates.saved);
   expect(writes).toHaveLength(1);
   expect(writes[0]).toMatchObject({
@@ -119,7 +120,7 @@ test("owner updates and clears the tax profile and downloads unchanged original 
     tax_office: "Deneme Vergi Dairesi",
     tax_identifier: "SENTETIK-1",
   });
-  await dialog.getByRole("button", { name: "Vazgeç" }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç" }));
   await expect(office).toHaveValue("Deneme Vergi Dairesi");
   await expect(identifier).toHaveValue("SENTETIK-1");
   await office.fill("");
@@ -127,12 +128,14 @@ test("owner updates and clears the tax profile and downloads unchanged original 
   await applyTax();
   await expect(dialog.getByRole("status")).toHaveText(common.events.commandStates.saved);
   expect(writes[1]).toMatchObject({ expected_version: 1, tax_office: null, tax_identifier: null });
-  await dialog.getByRole("button", { name: "Vazgeç" }).click();
-  await page.getByRole("button", { name: "Daha fazla fatura" }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç" }));
+  await activate(page.getByRole("button", { name: "Daha fazla fatura" }));
   for (const [index, bytes] of [pdf, zip].entries()) {
     const row = invoices[index]!;
     const ready = page.waitForEvent("download");
-    await page.getByRole("button", { name: `İndir — ${row.invoice_number}`, exact: true }).click();
+    await activate(
+      page.getByRole("button", { name: `İndir — ${row.invoice_number}`, exact: true }),
+    );
     const download = await ready;
     expect(download.suggestedFilename()).toBe(`invoice-${row.id}.${index === 0 ? "pdf" : "zip"}`);
     const chunks = [];
@@ -140,7 +143,7 @@ test("owner updates and clears the tax profile and downloads unchanged original 
     expect(Buffer.concat(chunks)).toEqual(bytes);
   }
   rejectDownload = true;
-  await page.getByRole("button", { name: "İndir — FTK-2026-001", exact: true }).click();
+  await activate(page.getByRole("button", { name: "İndir — FTK-2026-001", exact: true }));
   await expect(page.getByText("Fatura geçmişi okunamadı.", { exact: true })).toBeVisible();
   await expect(page.getByText("FTK-2026-001", { exact: true })).toHaveCount(0);
 });
@@ -156,7 +159,7 @@ test("organization manager settings do not expose owner invoice data or call own
       ownerCalls.push(op);
     return route.fallback();
   });
-  await page.getByRole("tab", { name: "Plan", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Plan", exact: true }));
   await page.getByRole("combobox", { name: "Ayar kapsamı" }).selectOption("organization");
   await expect(page.getByRole("textbox", { name: "Fatura unvanı" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Vergi profili", exact: true })).toHaveCount(0);

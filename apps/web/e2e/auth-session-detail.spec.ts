@@ -1,3 +1,4 @@
+import { activate, attemptOutsideDismissal } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import { mockSessionDetail, sessionIds as S } from "./session-detail-fixture.js";
@@ -5,22 +6,23 @@ import { studioIds as I } from "./studio-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
 async function booking(page: Page, options: Parameters<typeof mockSessionDetail>[1] = {}) {
   const state = await mockSessionDetail(page, options);
-  await page.getByRole("button", { name: "Katılımcı ekle", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Katılımcı ekle", exact: true }));
   const panel = page.getByRole("dialog");
-  await panel.getByRole("button", { name: "Ara", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Ara", exact: true }));
   await panel.getByLabel("Üye", { exact: true }).selectOption(I.self);
   await expect(panel.getByLabel("Hak kaynağı", { exact: true }).locator("option")).toHaveCount(2);
   await panel.getByLabel("Hak kaynağı", { exact: true }).selectOption(S.sale);
   return { ...state, panel };
 }
 async function approveBooking(panel: ReturnType<Page["getByRole"]>) {
-  await panel
-    .getByRole("checkbox", {
+  await activate(
+    panel.getByRole("checkbox", {
       name: "Seçili kişi, ders ve hak kaynağını kontrol ettim.",
       exact: true,
-    })
-    .press("Space");
-  await panel.getByRole("button", { name: "Rezervasyon oluştur", exact: true }).click();
+    }),
+    "Space",
+  );
+  await activate(panel.getByRole("button", { name: "Rezervasyon oluştur", exact: true }));
 }
 test("mobile session booking keeps explicit sale selection and reads native capacity without a false override grant", async ({
   page,
@@ -43,7 +45,7 @@ test("mobile session booking keeps explicit sale selection and reads native capa
     operation: "reservation_create_v1",
     request: { person_id: I.self, source_sale_id: S.sale, mode: "flexible" },
   });
-  await state.panel.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(state.panel.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(
     page
       .getByRole("grid", { name: "Katılımcılar", exact: true })
@@ -57,9 +59,9 @@ test("booking with no eligible source in the selected session cannot submit or r
   page,
 }) => {
   const state = await mockSessionDetail(page, { noBookingRights: true });
-  await page.getByRole("button", { name: "Katılımcı ekle", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Katılımcı ekle", exact: true }));
   const panel = page.getByRole("dialog");
-  await panel.getByRole("button", { name: "Ara", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Ara", exact: true }));
   const rightsRead = page.waitForResponse((response) =>
     response.url().endsWith("/entitlements_get_v1"),
   );
@@ -82,9 +84,10 @@ test("native capacity override is a separate reasoned command and never silently
   page,
 }) => {
   const state = await booking(page, { full: true });
-  await state.panel
-    .getByRole("checkbox", { name: "Kontenjanı aşarak ekle", exact: true })
-    .press("Space");
+  await activate(
+    state.panel.getByRole("checkbox", { name: "Kontenjanı aşarak ekle", exact: true }),
+    "Space",
+  );
   await state.panel.getByLabel("Gerekçe", { exact: true }).fill("Sentetik kontenjan gerekçesi");
   await approveBooking(state.panel);
   await expect(
@@ -106,10 +109,10 @@ test("unknown booking recovers its exact receipt without a second write", async 
       exact: true,
     }),
   ).toBeVisible();
-  await page.keyboard.press("Escape");
+  await attemptOutsideDismissal(state.panel);
   await expect(state.panel).toBeVisible();
   await expect(state.panel.getByLabel("Üye", { exact: true })).toBeDisabled();
-  await state.panel.getByRole("button", { name: "İşlem sonucunu oku", exact: true }).click();
+  await activate(state.panel.getByRole("button", { name: "İşlem sonucunu oku", exact: true }));
   await expect(
     state.panel.getByText("Rezervasyon kaydedildi; güncel rezervasyon, haklar ve seans okundu.", {
       exact: true,
@@ -132,7 +135,7 @@ test("acknowledged booking with a failed result read permits read recovery only"
   await expect(
     state.panel.getByRole("button", { name: "Aynı isteği tekrar dene", exact: true }),
   ).toHaveCount(0);
-  await state.panel.getByRole("button", { name: "İşlem sonucunu oku", exact: true }).click();
+  await activate(state.panel.getByRole("button", { name: "İşlem sonucunu oku", exact: true }));
   await expect(
     state.panel.getByText("Rezervasyon kaydedildi; güncel rezervasyon, haklar ve seans okundu.", {
       exact: true,
@@ -162,14 +165,14 @@ test("failed upper session read preserves acknowledged booking recovery without 
   ).toHaveCount(0);
   expect(state.writes).toHaveLength(1);
 
-  await recovery.getByRole("button", { name: "İşlem sonucunu oku", exact: true }).click();
+  await activate(recovery.getByRole("button", { name: "İşlem sonucunu oku", exact: true }));
   await expect(
     state.panel.getByText("Rezervasyon kaydedildi; güncel rezervasyon, haklar ve seans okundu.", {
       exact: true,
     }),
   ).toBeVisible();
   expect(state.writes).toHaveLength(1);
-  await state.panel.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(state.panel.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(page.getByRole("heading", { name: "Sentetik seans", exact: true })).toBeVisible();
 });
 test("native attendance uses reservation versions then closes and corrects through explicit preview approval", async ({
@@ -177,23 +180,24 @@ test("native attendance uses reservation versions then closes and corrects throu
 }) => {
   await page.setViewportSize({ width: 320, height: 950 });
   const state = await mockSessionDetail(page, { existing: true, centerManager: true });
-  await page.getByRole("button", { name: "Yoklamayı başlat", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Yoklamayı başlat", exact: true }));
   let dialog = page.getByRole("alertdialog");
   await dialog.getByLabel("Gerekçe", { exact: true }).fill("Seans şimdi başladı");
-  await dialog
-    .getByRole("checkbox", { name: "Seansın şu an başladığını onaylıyorum.", exact: true })
-    .press("Space");
-  await dialog.getByRole("button", { name: "Yoklamayı başlat", exact: true }).click();
+  await activate(
+    dialog.getByRole("checkbox", { name: "Seansın şu an başladığını onaylıyorum.", exact: true }),
+    "Space",
+  );
+  await activate(dialog.getByRole("button", { name: "Yoklamayı başlat", exact: true }));
   await expect(
     dialog.getByText("İşlem kaydedildi; güncel yoklama ve seans okundu.", { exact: true }),
   ).toBeVisible();
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await page.getByRole("tab", { name: "Yoklama", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
+  await activate(page.getByRole("tab", { name: "Yoklama", exact: true }));
   let panel = page.getByRole("tabpanel", { name: "Yoklama", exact: true });
   await panel
     .getByRole("combobox", { name: "Yoklama — Örnek öğrenci", exact: true })
     .selectOption("attended");
-  await panel.getByRole("button", { name: "Kaydet — Örnek öğrenci", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Kaydet — Örnek öğrenci", exact: true }));
   await expect
     .poll(() => state.writes.filter((w) => w.operation === "attendance_mark_v1").length)
     .toBe(1);
@@ -203,42 +207,43 @@ test("native attendance uses reservation versions then closes and corrects throu
   expect(
     state.writes.find((w) => w.operation === "attendance_mark_v1")!.request.expected_version,
   ).toBe(2);
-  await panel.getByRole("button", { name: "Yoklamayı kapat", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Yoklamayı kapat", exact: true }));
   dialog = page.getByRole("alertdialog");
-  await dialog.getByRole("checkbox", { name: "Seans gerçekleşti", exact: true }).press("Space");
-  await dialog.getByRole("checkbox", { name: "Örnek Eğitmen", exact: true }).press("Space");
-  await dialog
-    .getByRole("checkbox", {
+  await activate(dialog.getByRole("checkbox", { name: "Seans gerçekleşti", exact: true }), "Space");
+  await activate(dialog.getByRole("checkbox", { name: "Örnek Eğitmen", exact: true }), "Space");
+  await activate(
+    dialog.getByRole("checkbox", {
       name: "Yoklama sonuçlarını ve gerçekleşen eğitmenleri kontrol ettim.",
       exact: true,
-    })
-    .press("Space");
+    }),
+    "Space",
+  );
   expect((await scanAccessibility(page, "session-attendance-close-review")).violations).toEqual([]);
-  await dialog.getByRole("button", { name: "Yoklamayı kapat", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Yoklamayı kapat", exact: true }));
   await expect(
     dialog.getByText("İşlem kaydedildi; güncel yoklama ve seans okundu.", { exact: true }),
   ).toBeVisible();
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await panel.getByRole("button", { name: "Yoklamayı düzenle", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
+  await activate(panel.getByRole("button", { name: "Yoklamayı düzenle", exact: true }));
   await panel
     .getByRole("combobox", { name: "Yoklama — Örnek öğrenci", exact: true })
     .selectOption("no_show");
   await panel.getByLabel("Düzeltme gerekçesi", { exact: true }).fill("Sentetik yoklama düzeltmesi");
-  await panel.getByRole("button", { name: "Düzeltmeyi incele", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Düzeltmeyi incele", exact: true }));
   const review = page.getByRole("dialog");
   await expect(review.getByText("Serbest bırakma", { exact: true })).toBeVisible();
   expect(state.writes.filter((w) => w.operation === "attendance_correct_apply_v1")).toHaveLength(0);
-  await review.getByRole("checkbox").press("Space");
+  await activate(review.getByRole("checkbox"), "Space");
   expect(
     (await scanAccessibility(page, "session-attendance-correction-review")).violations,
   ).toEqual([]);
-  await review.getByRole("button", { name: "Düzeltmeyi kaydet", exact: true }).click();
+  await activate(review.getByRole("button", { name: "Düzeltmeyi kaydet", exact: true }));
   await expect(
     review.getByText("İşlem kaydedildi; güncel yoklama ve seans okundu.", { exact: true }),
   ).toBeVisible();
   expect(state.attendance.revision).toBe(2);
   expect(state.attendance.entries[0]!.result).toBe("no_show");
-  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(review.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(
     panel.getByRole("combobox", { name: "Yoklama — Örnek öğrenci", exact: true }),
   ).toHaveValue("no_show");
@@ -255,7 +260,7 @@ test("a denied attendance reader preserves the independent native session and pa
   ).toBeVisible();
   await expect(page.getByRole("heading", { name: "Sentetik seans", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Yoklamayı başlat", exact: true })).toBeDisabled();
-  await page.getByRole("tab", { name: "Yoklama", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Yoklama", exact: true }));
   await expect(
     page
       .getByRole("tabpanel", { name: "Yoklama", exact: true })
@@ -292,13 +297,14 @@ test("a changed native session invalidates booking approval before any writer", 
 });
 test("a denied native attendance command leaves the readable session intact", async ({ page }) => {
   const state = await mockSessionDetail(page, { existing: true, writeDenied: true });
-  await page.getByRole("button", { name: "Yoklamayı başlat", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Yoklamayı başlat", exact: true }));
   const dialog = page.getByRole("alertdialog");
   await dialog.getByLabel("Gerekçe", { exact: true }).fill("Seans şimdi başladı");
-  await dialog
-    .getByRole("checkbox", { name: "Seansın şu an başladığını onaylıyorum.", exact: true })
-    .press("Space");
-  await dialog.getByRole("button", { name: "Yoklamayı başlat", exact: true }).click();
+  await activate(
+    dialog.getByRole("checkbox", { name: "Seansın şu an başladığını onaylıyorum.", exact: true }),
+    "Space",
+  );
+  await activate(dialog.getByRole("button", { name: "Yoklamayı başlat", exact: true }));
   await expect(
     dialog.getByText("İşlem reddedildi. Güncel izin, plan ve yoklama koşullarını kontrol et.", {
       exact: true,
@@ -307,7 +313,7 @@ test("a denied native attendance command leaves the readable session intact", as
   expect(state.session.version).toBe(3);
   expect(state.attendance.actual_started_at).toBeNull();
   expect(state.writes).toHaveLength(1);
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(page.getByRole("heading", { name: "Sentetik seans", exact: true })).toBeVisible();
 });
 test("schedule detail opens the protected session route without requiring editing policy", async ({
@@ -316,14 +322,11 @@ test("schedule detail opens the protected session route without requiring editin
   const now = new Date("2026-11-18T09:00:00Z");
   await page.clock.setFixedTime(now);
   const state = await mockSessionDetail(page, { now });
-  await page.getByRole("link", { name: "Ders programı", exact: true }).last().click();
-  await page
-    .getByRole("button", { name: /Sentetik seans/ })
-    .filter({ visible: true })
-    .click();
+  await activate(page.getByRole("link", { name: "Ders programı", exact: true }).last());
+  await activate(page.getByRole("button", { name: /Sentetik seans/ }).filter({ visible: true }));
   const panel = page.getByRole("dialog");
   await expect(panel.getByRole("heading", { name: "Sentetik seans", exact: true })).toBeVisible();
-  await panel.getByRole("button", { name: "Seans sayfasını aç", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Seans sayfasını aç", exact: true }));
   await expect(page).toHaveURL(new RegExp(`/sessions/${S.session}$`));
   await expect(page.getByRole("heading", { name: "Sentetik seans", exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(0);
@@ -338,7 +341,7 @@ for (const [action, trigger, heading] of [
     page,
   }) => {
     const state = await mockSessionDetail(page, { allowEditor: true });
-    await page.getByRole("button", { name: trigger, exact: true }).click();
+    await activate(page.getByRole("button", { name: trigger, exact: true }));
     await expect(page).toHaveURL(new RegExp(`schedule\\?session=${S.session}&action=${action}$`));
     const panel = page.getByRole("dialog");
     await expect(panel.getByRole("heading", { name: heading, exact: true })).toBeVisible();
@@ -354,20 +357,21 @@ test("M01 session mutation resets stale participant cursors", async ({ page }) =
     centerManager: true,
     paginatedParticipants: true,
   });
-  await page.getByRole("tab", { name: "Katılımcılar", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Katılımcılar", exact: true }));
   await expect(page.getByRole("grid", { name: "Katılımcılar", exact: true })).toBeVisible();
   const next = page.getByRole("button", { name: "Sonraki sayfa", exact: true }).first();
-  await next.click();
+  await activate(next);
   const oldReads = () =>
     state.participantReads.filter((read) => read.cursor === "stale-participant").length;
   await expect.poll(oldReads).toBe(1);
-  await page.getByRole("button", { name: "Yoklamayı başlat", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Yoklamayı başlat", exact: true }));
   const dialog = page.getByRole("alertdialog");
   await dialog.getByLabel("Gerekçe", { exact: true }).fill("Seans şimdi başladı");
-  await dialog
-    .getByRole("checkbox", { name: "Seansın şu an başladığını onaylıyorum.", exact: true })
-    .press("Space");
-  await dialog.getByRole("button", { name: "Yoklamayı başlat", exact: true }).click();
+  await activate(
+    dialog.getByRole("checkbox", { name: "Seansın şu an başladığını onaylıyorum.", exact: true }),
+    "Space",
+  );
+  await activate(dialog.getByRole("button", { name: "Yoklamayı başlat", exact: true }));
   await expect(
     dialog.getByText("İşlem kaydedildi; güncel yoklama ve seans okundu.", { exact: true }),
   ).toBeVisible();
@@ -375,10 +379,10 @@ test("M01 session mutation resets stale participant cursors", async ({ page }) =
     (read) => read.cursor === "stale-participant" && read.afterWrite,
   );
   expect(staleAfterWrite).toHaveLength(0);
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
   const previous = page.getByRole("button", { name: "Önceki sayfa", exact: true }).first();
   await expect(previous).toBeDisabled();
-  await next.click();
+  await activate(next);
   const freshReads = () =>
     state.participantReads.filter((read) => read.cursor === "fresh-participant").length;
   await expect.poll(freshReads).toBe(1);

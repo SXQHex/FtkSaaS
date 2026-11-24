@@ -62,7 +62,7 @@
 - [x] **D01.** Özel cache, oturum geçişi ve kapsam yalıtımı.
 - [x] **D02.** Tek native yazma, makbuz ve taze sonuç doğrulaması.
 - [x] **D03.** Aynı adayda unit/MSW, statik kalite kontrolleri ve 12 Desktop Chromium shard.
-- [ ] **D04.** Refactoring tamamlanınca [dört tarayıcı profili](../scripts/browser-profiles.mjs) (Desktop Chromium, Mobile Chromium, Desktop WebKit, Mobile WebKit) bağımsız başarılı kabul edilir; güvenilir workflow değişikliği ancak açık inceleme/politika kurulumuyla yapılır. Yalnız Desktop Chromium başarısı dört profil kabulü değildir.
+- [ ] **D04.** Aynı Playwright envanteri [dört cihaz profilinde](../scripts/browser-profiles.mjs) ayrı başarılı olmalı. Desktop Chromium ve 13,6 inç MacBook Air ekranıyla Desktop WebKit masaüstü girdilerini kullanır. Pixel 7 Mobile Chromium ve iPhone 15 Mobile WebKit dokunma kontrollerini kullanır. Masaüstü klavye erişilebilirliği, mobil dokunma ve kaydırma ile mevcut yetki, yazma ve readback kontrolleri korunur. Güvenilir CI matrisi ancak açık inceleme ve politika kurulumu ile geri getirilir.
 - [x] **D05.** Main kabulü, Cloudflare yayını ve ilgili gerçek sağlayıcı kontrolleri.
 
 [Birleşik regresyon, kaynak ve yayın kanıtı](handover.md#d-birlesik-kabul).

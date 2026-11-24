@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { origin } from "./auth-fixture.js";
 import { mockLeads } from "./leads-fixture.js";
@@ -7,13 +8,13 @@ test("M06: warm Back keeps the CRM hidden until the native center read settles",
   page,
 }) => {
   const state = await mockLeads(page);
-  await page.getByRole("tab", { name: "Liste", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Liste", exact: true }));
   const privateRow = page.getByRole("button", { name: "Aday A", exact: true });
   await expect(privateRow).toBeVisible();
   const privateScreen = page.getByRole("tab", { name: "Liste", exact: true });
 
-  await page.locator('[data-slot="sidebar-footer"]').getByRole("button").click();
-  await page.getByRole("menuitem", { name: "Hesabım", exact: true }).click();
+  await activate(page.locator('[data-slot="sidebar-footer"]').getByRole("button"));
+  await activate(page.getByRole("menuitem", { name: "Hesabım", exact: true }));
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
 
   let release!: () => void;
@@ -52,7 +53,7 @@ test("M06: revoked center access clears live CRM, history and deep-link permissi
   page,
 }) => {
   const state = await mockLeads(page);
-  await page.getByRole("tab", { name: "Liste", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Liste", exact: true }));
   const privateRow = page.getByRole("button", { name: "Aday A", exact: true });
   await expect(privateRow).toBeVisible();
 
@@ -74,7 +75,7 @@ test("M06: revoked center access clears live CRM, history and deep-link permissi
   // After remote revocation the next native feature read must not preserve it.
   revoked = true;
   state.setDenied(true);
-  await page.getByRole("button", { name: "Güncel durumu oku", exact: true }).first().click();
+  await activate(page.getByRole("button", { name: "Güncel durumu oku", exact: true }).first());
   await expect.poll(() => verificationReads).toBeGreaterThan(0);
   await expect(privateRow).toHaveCount(0);
   const add = page.getByRole("button", { name: "Aday ekle", exact: true });
@@ -84,8 +85,8 @@ test("M06: revoked center access clears live CRM, history and deep-link permissi
 
   // A React Router history transition must revalidate native authority before
   // any cached manager content can return.
-  await page.locator('[data-slot="sidebar-footer"]').getByRole("button").click();
-  await page.getByRole("menuitem", { name: "Hesabım", exact: true }).click();
+  await activate(page.locator('[data-slot="sidebar-footer"]').getByRole("button"));
+  await activate(page.getByRole("menuitem", { name: "Hesabım", exact: true }));
   await expect(page).toHaveURL(/\/account/);
   await page.goBack();
   await expect(privateRow).toHaveCount(0);
@@ -103,18 +104,18 @@ test("M06: an independent CRM FORBIDDEN is not a global logout or old-session ca
   page,
 }) => {
   const state = await mockLeads(page);
-  await page.getByRole("tab", { name: "Liste", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Liste", exact: true }));
   await expect(page.getByRole("button", { name: "Aday A", exact: true })).toBeVisible();
 
   state.setDenied(true);
-  await page.getByRole("button", { name: "Güncel durumu oku", exact: true }).first().click();
+  await activate(page.getByRole("button", { name: "Güncel durumu oku", exact: true }).first());
   await expect(page.getByText("Aday kaydı okunamadı.", { exact: false })).toBeVisible();
   await expect(page).toHaveURL(`${origin}/o/${I.org}/c/${I.center}/leads`);
   await expect(page.getByRole("button", { name: "Aday ekle", exact: true })).toBeDisabled();
   expect(state.writes).toHaveLength(0);
 
   state.setDenied(false);
-  await page.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Yeniden dene", exact: true }));
   await expect(page.getByRole("button", { name: "Aday A", exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(0);
 });

@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import { mockSessionDetail, sessionIds as S } from "./session-detail-fixture.js";
@@ -124,7 +125,7 @@ test("overview attendance action opens the existing native attendance tab withou
   page,
 }) => {
   const state = await setup(page);
-  await page.getByRole("button", { name: "Yoklamayı aç", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Yoklamayı aç", exact: true }));
   await expect(page).toHaveURL(new RegExp(`/sessions/${S.session}\\?tab=attendance$`));
   await expect(page.getByRole("tab", { name: "Yoklama", exact: true })).toHaveAttribute(
     "aria-selected",
@@ -135,17 +136,17 @@ test("overview attendance action opens the existing native attendance tab withou
 });
 test("overview add action opens the existing real single-session editor", async ({ page }) => {
   const state = await setup(page);
-  await page.getByRole("button", { name: "Ders ekle", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Ders ekle", exact: true }));
   await expect(page).toHaveURL(new RegExp(`/schedule\\?create=true$`));
   await expect(page.getByRole("dialog", { name: "Tek seans ekle", exact: true })).toBeVisible();
   await expect(page.locator("#schedule-create-class")).toBeVisible();
   expect(state.writes).toHaveLength(0);
-  await page.getByRole("dialog").getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(page.getByRole("dialog").getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(page.getByRole("dialog", { name: "Tek seans ekle", exact: true })).toBeHidden();
 });
 test("overview program and participant actions retain real scoped targets", async ({ page }) => {
   const state = await setup(page);
-  await page.getByRole("button", { name: "Tümünü gör", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Tümünü gör", exact: true }));
   await expect(page).toHaveURL(new RegExp(`/sessions/${S.session}\\?tab=participants$`));
   await expect(page.getByRole("tab", { name: "Katılımcılar", exact: true })).toHaveAttribute(
     "aria-selected",
@@ -167,7 +168,7 @@ test("overview program and participant actions retain real scoped targets", asyn
     .getByRole("progressbar", { name: common.schedule.loading, exact: true })
     .and(page.locator("progress"));
   try {
-    await page.getByRole("button", { name: "Programı aç", exact: true }).click();
+    await activate(page.getByRole("button", { name: "Programı aç", exact: true }));
     await expect(page).toHaveURL(`${origin}/o/${I.org}/c/${I.center}/schedule`);
     await expect(page.getByRole("heading", { name: "Ders programı", exact: true })).toBeVisible();
     await expect(loading).toBeVisible();
@@ -191,7 +192,7 @@ test("overview denied day remains unread and recovers through explicit source re
   ).toBeVisible();
   await expect(page.getByText("Bugün görünür ders yok.", { exact: true })).toHaveCount(0);
   state.setDenied(false);
-  await page.getByRole("button", { name: "Yeniden oku", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Yeniden oku", exact: true }));
   await expect(page.getByRole("button", { name: "Sentetik seans", exact: true })).toBeVisible();
 });
 test("overview actual empty day is distinct from unread and never fabricates a next lesson", async ({
@@ -206,7 +207,7 @@ test("overview keeps the provider planned state after the clock has passed", asy
   await setup(page, "past-planned");
   await expect(page.getByText("Planlandı", { exact: true })).toBeVisible();
   await expect(page.getByText("Tamamlandı", { exact: true })).toHaveCount(0);
-  await page.getByRole("button", { name: "Sentetik seans", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Sentetik seans", exact: true }));
   await expect(page.getByRole("region", { name: "Seçili ders", exact: true })).toContainText(
     "Sentetik seans",
   );

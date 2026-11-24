@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { clickWorkspaceLink } from "./auth-fixture.js";
 import { test, expect } from "./test.js";
 import { mockStudio, openStudio, studioIds as I } from "./studio-fixture.js";
@@ -172,8 +173,8 @@ async function fixture(page: import("@playwright/test").Page) {
   });
   await openStudio(page);
   await clickWorkspaceLink(page, "Ayarlar");
-  await page.getByRole("tab", { name: "Salonlar", exact: true }).click();
-  await page.getByRole("button", { name: "Merkez çalışma saatleri", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Salonlar", exact: true }));
+  await activate(page.getByRole("button", { name: "Merkez çalışma saatleri", exact: true }));
   const sheet = page.getByRole("dialog", { name: "Merkez çalışma saatleri", exact: true });
   await expect(
     sheet.getByRole("checkbox", { name: "Merkez iş takvimi kullan", exact: true }),
@@ -182,24 +183,26 @@ async function fixture(page: import("@playwright/test").Page) {
 }
 async function draft(page: import("@playwright/test").Page) {
   const sheet = page.getByRole("dialog", { name: "Merkez çalışma saatleri", exact: true });
-  await sheet
-    .getByRole("checkbox", { name: "Merkez iş takvimi kullan", exact: true })
-    .press("Space");
-  await sheet.getByRole("button", { name: "Çalışma aralığı ekle", exact: true }).click();
-  await sheet.getByRole("checkbox", { name: "Pazartesi", exact: true }).press("Space");
+  await activate(
+    sheet.getByRole("checkbox", { name: "Merkez iş takvimi kullan", exact: true }),
+    "Space",
+  );
+  await activate(sheet.getByRole("button", { name: "Çalışma aralığı ekle", exact: true }));
+  await activate(sheet.getByRole("checkbox", { name: "Pazartesi", exact: true }), "Space");
   await sheet.getByLabel("Başlangıç saati", { exact: true }).fill("09:00:00");
   await sheet.getByLabel("Bitiş saati", { exact: true }).fill("12:00:00");
   await sheet.getByLabel("Geçerlilik başlangıcı", { exact: true }).fill("2026-11-23");
   return sheet;
 }
 async function review(page: import("@playwright/test").Page) {
-  await page
-    .getByRole("dialog", { name: "Merkez çalışma saatleri", exact: true })
-    .getByRole("button", { name: "Çalışma takvimini incele", exact: true })
-    .click();
+  await activate(
+    page
+      .getByRole("dialog", { name: "Merkez çalışma saatleri", exact: true })
+      .getByRole("button", { name: "Çalışma takvimini incele", exact: true }),
+  );
   const dialog = page.getByRole("dialog", { name: "Çalışma takvimini incele", exact: true });
   await expect(dialog.getByText(/Pazartesi: 09:00:00–12:00:00/)).toBeVisible();
-  await dialog.getByRole("checkbox").press("Space");
+  await activate(dialog.getByRole("checkbox"), "Space");
   return dialog;
 }
 test("work calendar saves only after native impact and explicit review; local dates survive reload", async ({
@@ -214,9 +217,9 @@ test("work calendar saves only after native impact and explicit review; local da
   expect((await scanAccessibility(page, "work-calendar-review-mobile-dark")).violations).toEqual(
     [],
   );
-  await dialog
-    .getByRole("button", { name: "Onaylanan değişiklikleri uygula", exact: true })
-    .click();
+  await activate(
+    dialog.getByRole("button", { name: "Onaylanan değişiklikleri uygula", exact: true }),
+  );
   await expect(dialog.getByRole("status")).toContainText("güncel kayıt okundu");
   expect(f.state.calendar?.rules[0]).toMatchObject({
     weekdays: [1],
@@ -231,18 +234,18 @@ test("work calendar saves only after native impact and explicit review; local da
     expected_version: 1,
   });
   expect(f.studio.writes).toHaveLength(0);
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await f.sheet.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
+  await activate(f.sheet.getByRole("button", { name: "Vazgeç", exact: true }));
   await page.reload();
-  await page.getByRole("tab", { name: "Salonlar", exact: true }).click();
-  await page.getByRole("button", { name: "Merkez çalışma saatleri", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Salonlar", exact: true }));
+  await activate(page.getByRole("button", { name: "Merkez çalışma saatleri", exact: true }));
   await expect(f.sheet.getByLabel("Başlangıç saati", { exact: true })).toHaveValue("09:00:00");
-  await f.sheet.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(f.sheet.getByRole("button", { name: "Vazgeç", exact: true }));
   await page.setViewportSize({ width: 1440, height: 900 });
   await clickWorkspaceLink(page, "Ders programı");
-  await page.getByRole("button", { name: "Seans ekle", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Seans ekle", exact: true }));
   const panel = page.getByRole("dialog");
-  await panel.getByRole("radio", { name: "Haftalık seri", exact: true }).click();
+  await activate(panel.getByRole("radio", { name: "Haftalık seri", exact: true }));
   await panel.locator("#schedule-create-class").selectOption(I.lesson);
   await panel.locator("#schedule-create-instructor").selectOption(I.instructor);
   await panel.locator("#schedule-create-room").selectOption(I.room);
@@ -254,13 +257,13 @@ test("work calendar saves only after native impact and explicit review; local da
     "Dakika. Boş bırakırsanız merkezin program süresi kullanılır.",
   );
   await panel.locator("#schedule-create-weeks").fill("1");
-  await panel.getByRole("button", { name: "Pzt", exact: true }).click();
-  await panel.getByRole("button", { name: "Seansları önizle", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Pzt", exact: true }));
+  await activate(panel.getByRole("button", { name: "Seansları önizle", exact: true }));
   await expect(panel.getByRole("alert")).toContainText("uygunluk kurallarını");
   await expect(panel.getByRole("button", { name: "Seriyi oluştur", exact: true })).toHaveCount(0);
   await panel.locator("#schedule-create-time").fill("11:30");
   await panel.locator("#schedule-create-duration").fill("30");
-  await panel.getByRole("button", { name: "Seansları önizle", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Seansları önizle", exact: true }));
   await expect(panel.getByRole("button", { name: "Seriyi oluştur", exact: true })).toBeEnabled();
   expect(f.state.previews).toBe(2);
   expect(f.studio.writes).toHaveLength(0);
@@ -271,14 +274,14 @@ test("work calendar blocks open-session effects and invalid ranges without a wri
   const f = await fixture(page),
     sheet = await draft(page);
   f.state.impact = 1;
-  await sheet.getByRole("button", { name: "Çalışma takvimini incele", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Çalışma takvimini incele", exact: true }));
   await expect(sheet.getByText(/Değişiklik açık seansları etkiliyor/)).toBeFocused();
   expect(f.state.writes).toHaveLength(0);
   await sheet.getByLabel("Bitiş saati", { exact: true }).fill("08:00:00");
-  await sheet.getByRole("button", { name: "Çalışma takvimini incele", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Çalışma takvimini incele", exact: true }));
   await expect(sheet.getByText(/Gün, saat ve tarih aralıklarını kontrol et/)).toBeFocused();
   expect(f.state.writes).toHaveLength(0);
-  await sheet.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(sheet.getByRole("button", { name: "Vazgeç", exact: true }));
 });
 for (const lost of [true, false])
   test(`work calendar recovery retains one operation when ${lost ? "reply is lost" : "confirmed result read fails"}`, async ({
@@ -289,20 +292,20 @@ for (const lost of [true, false])
     const dialog = await review(page);
     f.state.lost = lost;
     f.state.afterAckFail = !lost;
-    await dialog
-      .getByRole("button", { name: "Onaylanan değişiklikleri uygula", exact: true })
-      .click();
+    await activate(
+      dialog.getByRole("button", { name: "Onaylanan değişiklikleri uygula", exact: true }),
+    );
     const retry = dialog.getByRole("button", {
       name: lost ? "Aynı isteği yeniden dene" : "İşlem sonucunu kontrol et",
       exact: true,
     });
     await expect(retry).toBeVisible();
     await expect(dialog.getByRole("button", { name: "Vazgeç", exact: true })).toBeDisabled();
-    await retry.click();
+    await activate(retry);
     await expect(dialog.getByRole("status")).toContainText("güncel kayıt okundu");
     expect(f.state.effects).toBe(1);
     expect(f.state.writes).toHaveLength(lost ? 2 : 1);
     if (lost) expect(f.state.writes[0]?.operation_key).toBe(f.state.writes[1]?.operation_key);
-    await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
-    await f.sheet.getByRole("button", { name: "Vazgeç", exact: true }).click();
+    await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
+    await activate(f.sheet.getByRole("button", { name: "Vazgeç", exact: true }));
   });

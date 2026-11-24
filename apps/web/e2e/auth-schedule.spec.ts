@@ -1,3 +1,10 @@
+import {
+  activate,
+  attemptOutsideDismissal,
+  hasTouchInput,
+  scrollTouchRegion,
+  closeWithDevice,
+} from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import type {
@@ -497,7 +504,7 @@ async function scheduleFixture(
   await page.goto(`${origin}/login`);
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await Promise.all([
@@ -537,7 +544,7 @@ test("calendar uses a single visible page and reads exact detail when opening a 
   const session = page.getByText("Sentetik program seansı", { exact: true });
   await expect(session).toBeVisible();
   expect(state.reads).toEqual(["calendar_get_v1"]);
-  await session.click();
+  await activate(session);
   await expect(page.getByRole("dialog")).toBeVisible();
   expect(state.reads).toEqual(["calendar_get_v1", "session_get_v1", "editor-policy-rejection"]);
 });
@@ -569,35 +576,41 @@ test("empty mobile week supports native horizontal scrolling and keyboard vertic
   const scroll = page.getByRole("region", { name: "Program günleri", exact: true });
   await expect(scroll).toBeVisible();
   await expect.poll(() => scroll.evaluate((el) => el.scrollTop)).toBeGreaterThan(300);
-  // Enter from the adjacent ready toolbar. Focusing it can naturally reveal the header.
-  await page.getByRole("radio", { name: "Hafta", exact: true }).click();
-  await page.keyboard.press("Tab");
-  await expect(scroll).toBeFocused();
+  await activate(page.getByRole("radio", { name: "Hafta", exact: true }));
+  const touch = hasTouchInput(page);
+  if (!touch) {
+    // Enter from the adjacent ready toolbar with the device's keyboard.
+    await page.keyboard.press("Tab");
+    await expect(scroll).toBeFocused();
+  }
   const before = await scroll.evaluate((el) => ({
     left: el.scrollLeft,
     top: el.scrollTop,
     outline: el.ownerDocument.defaultView!.getComputedStyle(el).outlineStyle,
   }));
-  expect(before.outline).not.toBe("none");
-  // Horizontal overflow is native. On mobile WebKit, ArrowRight does not
-  // consistently map to horizontal scrolling; use native horizontal wheel
-  // input rather than installing an application-specific keyboard handler.
+  if (!touch) {
+    expect(before.outline).not.toBe("none");
+  }
   await expect
     .poll(() => scroll.evaluate((el) => el.scrollWidth - el.clientWidth))
     .toBeGreaterThan(0);
-  // Playwright's iPhone/WebKit device does not support mouse.wheel and does
-  // not expose a native swipe API. Verify the browser's real scroll container
-  // and overflow via its native scrolling API, without synthesizing wheel or
-  // trusted touch events. A physical swipe needs a separate device test.
-  await scroll.evaluate((element) => {
-    element.scrollTo({ left: element.scrollWidth - element.clientWidth, behavior: "instant" });
-  });
+  if (touch) {
+    await scrollTouchRegion(scroll, "right");
+  } else {
+    await scroll.evaluate((element) => {
+      element.scrollTo({ left: element.scrollWidth - element.clientWidth, behavior: "instant" });
+    });
+  }
   await expect.poll(() => scroll.evaluate((el) => el.scrollLeft)).toBeGreaterThan(before.left);
-  await scroll.focus();
-  await page.keyboard.press("PageDown");
+  if (touch) {
+    await scrollTouchRegion(scroll, "down");
+  } else {
+    await scroll.focus();
+    await page.keyboard.press("PageDown");
+  }
   await expect.poll(() => scroll.evaluate((el) => el.scrollTop)).toBeGreaterThan(before.top);
   expect((await scanAccessibility(page, "empty-mobile-week")).violations).toEqual([]);
-  await page.getByRole("radio", { name: "Gün", exact: true }).click();
+  await activate(page.getByRole("radio", { name: "Gün", exact: true }));
   await expect
     .poll(() => scroll.evaluate((el) => el.scrollWidth - el.clientWidth))
     .toBeLessThanOrEqual(1);
@@ -613,13 +626,13 @@ test("calendar distinguishes an event from a session and opens its live detail b
   const eventCard = page.getByRole("button", { name: /Etkinlik Tango atölyesi/ });
   await expect(eventCard).toContainText("Etkinlik");
   await expect(page.getByText("Sentetik program seansı", { exact: true })).toBeVisible();
-  await page.getByRole("radio", { name: "Gün", exact: true }).click();
+  await activate(page.getByRole("radio", { name: "Gün", exact: true }));
   await expect(eventCard).toHaveCount(0);
-  await page.getByRole("button", { name: "Sonraki dönem", exact: true }).click();
-  await page.getByRole("button", { name: "Sonraki dönem", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Sonraki dönem", exact: true }));
+  await activate(page.getByRole("button", { name: "Sonraki dönem", exact: true }));
   await expect(eventCard).toBeVisible();
   await expect(page.getByText("Sentetik program seansı", { exact: true })).toHaveCount(0);
-  await eventCard.press("Enter");
+  await activate(eventCard, "Enter");
   const url = `${origin}/o/${I.org}/c/${I.center}/events/${event.id}`;
   await expect(page).toHaveURL(url);
   await expect(page.getByRole("heading", { name: event.name, exact: true })).toBeVisible();
@@ -632,7 +645,7 @@ test("calendar distinguishes an event from a session and opens its live detail b
   await page.goBack();
   await expect(eventCard).toBeVisible();
   state.denyEvent();
-  await eventCard.press("Enter");
+  await activate(eventCard, "Enter");
   await expect(page).toHaveURL(url);
   await expect(page.getByRole("heading", { name: "Etkinlik detayı", exact: true })).toBeVisible();
   await expect(
@@ -649,7 +662,7 @@ test("missing editor policy keeps session details and independent cancellation a
   page,
 }) => {
   const state = await scheduleFixture(page, true);
-  await page.getByText("Sentetik program seansı", { exact: true }).click();
+  await activate(page.getByText("Sentetik program seansı", { exact: true }));
   const panel = page.getByRole("dialog");
   await expect(
     panel.getByRole("heading", { name: "Sentetik program seansı", exact: true }),
@@ -669,7 +682,7 @@ test("missing editor policy keeps session details and independent cancellation a
   expect((await scanAccessibility(page, "read-only-session-policy-rejection")).violations).toEqual(
     [],
   );
-  await page.keyboard.press("Escape");
+  await closeWithDevice(panel.getByRole("button", { name: /^(Close|Kapat|Vazgeç)$/ }).first());
   await expect(panel).toHaveCount(0);
 });
 
@@ -678,53 +691,56 @@ test("fixed group uses explicit priority sale and lesson, recovers its ACK, and 
 }) => {
   const state = await scheduleFixture(page, true, false, true);
   state.group.paged = true;
-  await page.getByText("Sentetik program seansı", { exact: true }).click();
+  await activate(page.getByText("Sentetik program seansı", { exact: true }));
   const panel = page.getByRole("dialog");
   await expect(panel.getByRole("button", { name: "Seansı düzenle", exact: true })).toBeEnabled();
-  await panel.getByRole("button", { name: "Üyeleri düzenle", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Üyeleri düzenle", exact: true }));
   const nextRosterPage = panel.getByRole("button", { name: "Sonraki", exact: true }).first();
   const previousRosterPage = panel.getByRole("button", { name: "Önceki", exact: true }).first();
-  await nextRosterPage.click();
+  await activate(nextRosterPage);
   await expect
     .poll(() => state.group.rosterReads.at(-1))
     .toEqual({
       cursor: "group-students-next",
       active: false,
     });
-  await previousRosterPage.click();
-  await panel.getByRole("button", { name: "Kişileri ara", exact: true }).click();
+  await activate(previousRosterPage);
+  await activate(panel.getByRole("button", { name: "Kişileri ara", exact: true }));
   await panel.locator("#group-person").selectOption(I.self);
   await panel.locator("#group-sale").selectOption(state.saleId);
   await panel.locator("#group-session").selectOption(state.session!.id);
   const beforeCapacity = { ...state.session!.capacity };
-  await panel.getByRole("button", { name: "Seçilen dersi ve kaynağı incele", exact: true }).click();
+  await activate(
+    panel.getByRole("button", { name: "Seçilen dersi ve kaynağı incele", exact: true }),
+  );
   await expect(panel.getByRole("button", { name: "Üye ekle", exact: true })).toBeDisabled();
   expect(state.group.creates).toHaveLength(0);
-  await panel
-    .getByRole("checkbox", { name: /Bu kişi, satış kaynağı ve somut ders/ })
-    .press("Space");
+  await activate(
+    panel.getByRole("checkbox", { name: /Bu kişi, satış kaynağı ve somut ders/ }),
+    "Space",
+  );
   state.group.lostReply = true;
-  await panel.getByRole("button", { name: "Üye ekle", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Üye ekle", exact: true }));
   await expect(
     panel.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }),
   ).toBeVisible();
-  await page.keyboard.press("Escape");
+  await attemptOutsideDismissal(panel);
   await expect(panel).toBeVisible();
-  await panel.getByRole("button", { name: "Güncel kaydı oku", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Güncel kaydı oku", exact: true }));
   await expect(
     panel.getByText("Öncelikli rezervasyon, güncel haklar ve ders okundu.", { exact: true }),
   ).toBeVisible();
   expect(state.group.creates).toHaveLength(1);
   expect(state.group.effects).toBe(1);
-  await panel.getByRole("button", { name: "Yeni açık işlem", exact: true }).click();
-  await nextRosterPage.click();
+  await activate(panel.getByRole("button", { name: "Yeni açık işlem", exact: true }));
+  await activate(nextRosterPage);
   await expect
     .poll(() => state.group.rosterReads.at(-1))
     .toEqual({
       cursor: "group-students-next",
       active: true,
     });
-  await previousRosterPage.click();
+  await activate(previousRosterPage);
   expect(state.session?.capacity).toMatchObject({
     held: beforeCapacity.held + 1,
     remaining: beforeCapacity.remaining - 1,
@@ -737,10 +753,10 @@ test("fixed group uses explicit priority sale and lesson, recovers its ACK, and 
   expect(
     (await scanAccessibility(page, "fixed-group-priority-recovered-mobile")).violations,
   ).toEqual([]);
-  await panel.getByRole("button", { name: /Bu dersten çıkar — Grup öğrencisi/ }).click();
+  await activate(panel.getByRole("button", { name: /Bu dersten çıkar — Grup öğrencisi/ }));
   const cancel = page.getByRole("alertdialog");
   await cancel.locator("#member-state-reason").fill("Kontrollü ders kaydı iptali");
-  await cancel.getByRole("button", { name: "İptal et", exact: true }).click();
+  await activate(cancel.getByRole("button", { name: "İptal et", exact: true }));
   await expect(
     cancel.getByText("Rezervasyon iptal edildi; güncel rezervasyon, seans ve haklar okundu.", {
       exact: true,
@@ -748,28 +764,28 @@ test("fixed group uses explicit priority sale and lesson, recovers its ACK, and 
   ).toBeVisible();
   expect(state.group.cancels).toHaveLength(1);
   expect(state.group.cancels[0]!.reservation_id).not.toBe(I.self);
-  await cancel.getByRole("button", { name: "Kapat", exact: true }).click();
+  await activate(cancel.getByRole("button", { name: "Kapat", exact: true }));
   await expect(page.getByRole("alertdialog")).toHaveCount(0);
   await expect(panel.getByRole("button", { name: /Bu dersten çıkar —/ })).toHaveCount(0);
-  await panel.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Vazgeç", exact: true }));
 });
 
 test("managed session edits invalidate the old review and apply the newly reviewed capacity", async ({
   page,
 }) => {
   const state = await scheduleFixture(page, true, false, true);
-  await page.getByText("Sentetik program seansı", { exact: true }).click();
+  await activate(page.getByText("Sentetik program seansı", { exact: true }));
   const panel = page.getByRole("dialog");
-  await panel.getByRole("button", { name: "Seansı düzenle", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Seansı düzenle", exact: true }));
   await panel.locator("#schedule-session-capacity").fill("13");
   await panel.locator("#schedule-session-reason").fill("Kontrollü kapasite düzenlemesi");
-  await panel.getByRole("button", { name: "Etkiyi önizle", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Etkiyi önizle", exact: true }));
   await expect(panel.getByRole("button", { name: "Onayla ve uygula", exact: true })).toBeVisible();
   expect(state.changes).toHaveLength(0);
   await panel.locator("#schedule-session-capacity").fill("14");
   await expect(panel.getByRole("button", { name: "Onayla ve uygula", exact: true })).toHaveCount(0);
-  await panel.getByRole("button", { name: "Etkiyi önizle", exact: true }).click();
-  await panel.getByRole("button", { name: "Onayla ve uygula", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Etkiyi önizle", exact: true }));
+  await activate(panel.getByRole("button", { name: "Onayla ve uygula", exact: true }));
   await expect(
     panel.getByText("İşlem kaydedildi ve güncel kaynak okundu.", { exact: true }),
   ).toBeVisible();
@@ -777,25 +793,25 @@ test("managed session edits invalidate the old review and apply the newly review
   expect(state.session!.version).toBe(4);
   expect(state.session!.capacity.total).toBe(14);
   await expect(panel.getByText("2 / 14", { exact: true })).toBeVisible();
-  await panel.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Vazgeç", exact: true }));
 });
 
 test("cancelled session shows its native durable replacement relation", async ({ page }) => {
   const state = await scheduleFixture(page, true, false, true);
   state.session!.state = "cancelled";
-  await page.getByText("Sentetik program seansı", { exact: true }).click();
+  await activate(page.getByText("Sentetik program seansı", { exact: true }));
   const panel = page.getByRole("dialog");
   const history = panel.getByRole("region", { name: "Bağlı telafi seansları", exact: true });
   await expect(history.getByRole("listitem")).toHaveCount(1);
   await expect(history.getByText("Planlandı", { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(0);
-  await panel.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Vazgeç", exact: true }));
   await page.reload();
-  await page.getByText("Sentetik program seansı", { exact: true }).click();
+  await activate(page.getByText("Sentetik program seansı", { exact: true }));
   await expect(
     page.getByRole("region", { name: "Bağlı telafi seansları", exact: true }).getByRole("listitem"),
   ).toHaveCount(1);
-  await page.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Vazgeç", exact: true }));
 });
 
 test("weekly preparation resolves the current scoped template without writing and preserves program preview guards", async ({
@@ -895,16 +911,16 @@ test("weekly preparation resolves the current scoped template without writing an
       },
     });
   });
-  await page.getByRole("button", { name: "Seans ekle", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Seans ekle", exact: true }));
   const panel = page.getByRole("dialog");
-  await panel.getByRole("radio", { name: "Haftalık seri", exact: true }).click();
+  await activate(panel.getByRole("radio", { name: "Haftalık seri", exact: true }));
   const template = panel.getByRole("combobox", { name: "Hazırlık şablonu" });
   await template.selectOption({ label: "Haftalık örnek v1 · Merkez" });
   await expect(panel.getByText("Şablonun güncel sürümü okunamadı.", { exact: true })).toBeVisible();
   await expect(panel.locator("#schedule-create-duration")).toHaveValue("");
-  await panel.getByRole("button", { name: "Güncel verileri yükle", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Güncel verileri yükle", exact: true }));
   await template.selectOption({ label: "Haftalık örnek v2 · Merkez" });
-  await panel.getByRole("button", { name: "Taslağa uygula", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Taslağa uygula", exact: true }));
   await expect(panel.getByText("Şablon taslağa uygulandı.", { exact: true })).toBeVisible();
   expect(previews).toBe(0);
   expect(state.writes).toEqual([]);
@@ -914,7 +930,7 @@ test("weekly preparation resolves the current scoped template without writing an
   await panel.locator("#schedule-create-room").selectOption(I.room);
   await panel.locator("#schedule-create-date").fill("2026-11-17");
   await panel.locator("#schedule-create-weeks").fill("1");
-  await panel.getByRole("button", { name: "Seansları önizle", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Seansları önizle", exact: true }));
   await expect(panel.getByRole("alert")).toHaveText(
     "Seçilen saat, salon veya eğitmen uygunluk kurallarını karşılamıyor ya da başka bir kayıtla çakışıyor.",
   );
@@ -957,11 +973,11 @@ test("a blocked cancellation explains its reason inside the active session sheet
       },
     });
   });
-  await page.getByText("Sentetik program seansı", { exact: true }).click();
+  await activate(page.getByText("Sentetik program seansı", { exact: true }));
   const panel = page.getByRole("dialog");
-  await panel.getByRole("button", { name: "Seansı iptal et", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Seansı iptal et", exact: true }));
   await panel.locator("#schedule-session-reason").fill("Sentetik iptal gerekçesi");
-  await panel.getByRole("button", { name: "Etkiyi önizle", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Etkiyi önizle", exact: true }));
   await expect(panel.getByRole("alert")).toHaveText(
     "Mevcut rezervasyonlar bu değişikliği engelliyor. Güncel etkiyi incele.",
   );
@@ -975,7 +991,7 @@ test("a newer detail version does not borrow resources from a stale calendar row
   const state = await scheduleFixture(page, true);
   expect(state.session).toBeDefined();
   state.session!.version = 4;
-  await page.getByText("Sentetik program seansı", { exact: true }).click();
+  await activate(page.getByText("Sentetik program seansı", { exact: true }));
   const panel = page.getByRole("dialog");
   await expect(
     panel.getByRole("heading", { name: "Sentetik program seansı", exact: true }),
@@ -994,16 +1010,16 @@ test("time and instructor changes apply an explicitly reviewed future scope and 
   const future = f.future!;
   const nextInstructor = "019a7b00-0000-7000-8000-000000000096";
   const preservedAssistant = { person_id: I.self, duty: "assistant" };
-  await page.getByText("Sentetik program seansı", { exact: true }).click();
+  await activate(page.getByText("Sentetik program seansı", { exact: true }));
   let panel = page.getByRole("dialog");
-  await panel.getByRole("button", { name: "Seansı düzenle", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Seansı düzenle", exact: true }));
   await panel.locator("#schedule-session-time").fill("15:20");
   await panel.locator("#schedule-session-duration").fill("45");
-  await panel.locator('input[value="this_and_future"]').press("Space");
+  await activate(panel.locator('input[value="this_and_future"]'), "Space");
   await panel.locator("#schedule-session-reason").fill("Kontrollü ileri oluşum saat düzenlemesi");
-  await panel.getByRole("button", { name: "Etkiyi önizle", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Etkiyi önizle", exact: true }));
   expect(f.changes).toHaveLength(0);
-  await panel.getByRole("button", { name: "Onayla ve uygula", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Onayla ve uygula", exact: true }));
   await expect(
     panel.getByText("İşlem kaydedildi ve güncel kaynak okundu.", { exact: true }),
   ).toBeVisible();
@@ -1016,13 +1032,13 @@ test("time and instructor changes apply an explicitly reviewed future scope and 
   expect(f.session!.version).toBe(4);
   expect(future.version).toBe(4);
   await expect(panel).toContainText("15:20");
-  await panel.getByRole("button", { name: "Eğitmeni değiştir", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Eğitmeni değiştir", exact: true }));
   await panel.locator("#schedule-session-instructor").selectOption(nextInstructor);
-  await panel.locator('input[value="this_and_future"]').press("Space");
+  await activate(panel.locator('input[value="this_and_future"]'), "Space");
   await panel.locator("#schedule-session-reason").fill("Kontrollü ileri oluşum eğitmen değişimi");
-  await panel.getByRole("button", { name: "Etkiyi önizle", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Etkiyi önizle", exact: true }));
   expect(f.changes).toHaveLength(1);
-  await panel.getByRole("button", { name: "Onayla ve uygula", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Onayla ve uygula", exact: true }));
   await expect(
     panel.getByText("İşlem kaydedildi ve güncel kaynak okundu.", { exact: true }),
   ).toBeVisible();
@@ -1038,15 +1054,15 @@ test("time and instructor changes apply an explicitly reviewed future scope and 
     scope: "this_and_future",
     patch: { assignments: [preservedAssistant, { person_id: nextInstructor, duty: "instructor" }] },
   });
-  await panel.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Vazgeç", exact: true }));
   await page.reload();
-  await page.getByText("İleri program seansı", { exact: true }).click();
+  await activate(page.getByText("İleri program seansı", { exact: true }));
   panel = page.getByRole("dialog");
   await expect(panel).toContainText("15:20");
   await expect(panel).toContainText("İkinci sentetik eğitmen");
   expect(f.changes).toHaveLength(2);
   expect(f.writes).toEqual([]);
-  await panel.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Vazgeç", exact: true }));
 });
 
 async function verifyNativeScheduleScope(page: Page, scenario: "single" | "this_and_future") {
@@ -1181,16 +1197,16 @@ async function verifyNativeScheduleScope(page: Page, scenario: "single" | "this_
   async function changeTime(time: string, changeScope: "single" | "this_and_future") {
     reader = undefined;
     await page.goto(`${origin}/o/${I.org}/c/${I.center}/schedule`);
-    await page.getByText(titles[0]!, { exact: true }).click();
+    await activate(page.getByText(titles[0]!, { exact: true }));
     const panel = page.getByRole("dialog");
-    await panel.getByRole("button", { name: "Seansı düzenle", exact: true }).click();
+    await activate(panel.getByRole("button", { name: "Seansı düzenle", exact: true }));
     await panel.locator("#schedule-session-time").fill(time);
-    await panel.locator(`input[value="${changeScope}"]`).press("Space");
+    await activate(panel.locator(`input[value="${changeScope}"]`), "Space");
     await panel.locator("#schedule-session-reason").fill("Sentetik seans saati düzeltmesi");
     const previous = f.changes.length;
-    await panel.getByRole("button", { name: "Etkiyi önizle", exact: true }).click();
+    await activate(panel.getByRole("button", { name: "Etkiyi önizle", exact: true }));
     expect(f.changes).toHaveLength(previous);
-    await panel.getByRole("button", { name: "Onayla ve uygula", exact: true }).click();
+    await activate(panel.getByRole("button", { name: "Onayla ve uygula", exact: true }));
     await expect(
       panel.getByText("İşlem kaydedildi ve güncel kaynak okundu.", { exact: true }),
     ).toBeVisible();
@@ -1203,14 +1219,14 @@ async function verifyNativeScheduleScope(page: Page, scenario: "single" | "this_
     await page.goto(`${origin}/member/classes${scope}`);
     const monday = page.locator(`#member-class-${occurrences[0]!.id}`);
     await expect(monday.locator("xpath=ancestor::*[@role='listitem'][1]")).toContainText(times[0]);
-    await page.getByRole("radio", { name: "17 Kasım 2026 Salı", exact: true }).click();
+    await activate(page.getByRole("radio", { name: "17 Kasım 2026 Salı", exact: true }));
     const tuesday = page.locator(`#member-class-${occurrences[1]!.id}`);
     await expect(tuesday.locator("xpath=ancestor::*[@role='listitem'][1]")).toContainText(times[1]);
 
     reader = "instructor";
     const beforeRead = instructorReads.length;
     await page.goto(`${origin}/instructor/schedule${scope}`);
-    await page.getByRole("radio", { name: "Ajanda", exact: true }).click();
+    await activate(page.getByRole("radio", { name: "Ajanda", exact: true }));
     for (const [index, title] of titles.entries()) {
       const item = page.getByRole("button", { name: new RegExp(title) });
       await expect(item).toHaveCount(1);

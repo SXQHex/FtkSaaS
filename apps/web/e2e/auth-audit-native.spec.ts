@@ -1,3 +1,4 @@
+import { activate, closeWithDevice, hasTouchInput } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { mockCompletion, completionUrl, nativePage, uid, at } from "./pro-completion-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
@@ -78,19 +79,23 @@ test("audit uses native module/search/cursor and escaped source detail, with key
   await page.goto(completionUrl("audit"));
   const row = page.getByRole("row").filter({ hasText: "Sentetik kişi" });
   await expect(row).toBeVisible();
-  await row.focus();
-  await expect(row).toBeFocused();
-  await page.keyboard.press("ArrowRight");
-  await page.keyboard.press("ArrowRight");
-  await page.keyboard.press("ArrowRight");
   const openDetail = row.getByRole("button", { name: "person_update_v1", exact: true });
-  await expect(openDetail).toBeFocused();
-  await page.keyboard.press("Enter");
+  if (hasTouchInput(page)) {
+    await activate(openDetail);
+  } else {
+    await row.focus();
+    await expect(row).toBeFocused();
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("ArrowRight");
+    await expect(openDetail).toBeFocused();
+    await page.keyboard.press("Enter");
+  }
   const detail = page.getByRole("dialog");
   await expect(detail).toContainText("<script>sentetik</script>");
   await expect(detail).toContainText("Kişiler ve üyelik ilişkileri");
   await expect(detail.locator("script")).toHaveCount(0);
-  await page.keyboard.press("Escape");
+  await closeWithDevice(detail.getByRole("button", { name: /^(Close|Kapat|Vazgeç)$/ }).first());
   await page.getByRole("combobox", { name: "Modül", exact: true }).selectOption({
     label: "Kişiler ve üyelik ilişkileri",
   });
@@ -98,7 +103,7 @@ test("audit uses native module/search/cursor and escaped source detail, with key
   await expect
     .poll(() => f.requests.filter((row) => row.op === "audit_list_v1").at(-1)?.r.query)
     .toBe("Sentetik");
-  await page.getByRole("button", { name: "Sonraki sayfa", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Sonraki sayfa", exact: true }));
   await expect(page.getByText("İkinci sentetik kişi", { exact: true })).toBeVisible();
   const last = f.requests.filter((row) => row.op === "audit_list_v1").at(-1)!.r;
   expect(last).toMatchObject({ module: "M03", query: "Sentetik", page: { cursor: "audit-next" } });
@@ -107,13 +112,13 @@ test("audit uses native module/search/cursor and escaped source detail, with key
     name: "Denetim kayıtlarını indir (CSV)",
     exact: true,
   });
-  await exportButton.click();
+  await activate(exportButton);
   await expect(
     page.getByText("Bu kapsamdaki denetim kayıtları indirilemedi.", { exact: true }),
   ).toBeVisible();
   exportDenied = false;
   const download = page.waitForEvent("download");
-  await exportButton.click();
+  await activate(exportButton);
   expect((await download).suggestedFilename()).toBe(`audit-${I.center}.csv`);
   const exported = f.requests.filter((row) => row.op === "audit_center_export_v1").at(-1)!.r;
   expect(exported).toMatchObject({
@@ -153,20 +158,20 @@ test("tracking preserves native global counters, nullable denominator, filters a
       });
   });
   await page.goto(completionUrl("audit"));
-  await page.getByRole("radio", { name: "Tümü", exact: true }).click();
-  await page.getByRole("tab", { name: /^İşlemler/ }).click();
+  await activate(page.getByRole("radio", { name: "Tümü", exact: true }));
+  await activate(page.getByRole("tab", { name: /^İşlemler/ }));
   await expect(page.getByText("report_build_v1", { exact: true })).toBeVisible();
   await expect(page.getByText("3", { exact: true })).toBeVisible();
   await expect(page.getByRole("listitem")).toContainText("Yeniden deneme bekliyor");
   await expect(page.getByRole("listitem")).toContainText("3 kayıt işlendi");
   await expect(page.getByRole("listitem")).toContainText("Sonraki deneme");
   await expect(page.getByRole("progressbar")).toHaveCount(0);
-  await page.getByRole("button", { name: "Sonraki sayfa", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Sonraki sayfa", exact: true }));
   await expect(page.getByRole("listitem")).toContainText("Çalışıyor");
   await expect(page.getByRole("listitem")).toContainText("9 kaydın 3 tanesi işlendi");
   await expect(page.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "3");
   await expect(page.getByRole("progressbar")).toHaveAttribute("aria-valuemax", "9");
-  await page.getByRole("button", { name: "Önceki sayfa", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Önceki sayfa", exact: true }));
   await page.getByRole("combobox", { name: "Kayıt türü", exact: true }).selectOption("job");
   await page
     .getByRole("textbox", { name: "Durum kodu (isteğe bağlı)", exact: true })
@@ -174,7 +179,7 @@ test("tracking preserves native global counters, nullable denominator, filters a
   await expect
     .poll(() => f.requests.filter((row) => row.op === "tracking_directory_get_v1").at(-1)?.r.state)
     .toBe("retry_wait");
-  await page.getByRole("button", { name: "Durumu güncelle", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Durumu güncelle", exact: true }));
   await expect(page.getByRole("listitem")).toContainText("Yeniden deneme bekliyor");
   expect(f.requests.filter((row) => !/(_get_v1|_list_v1)$/.test(row.op))).toEqual([]);
   const native = f.requests.filter((row) => row.op === "tracking_directory_get_v1").at(-1)!.r;
@@ -220,7 +225,7 @@ test("tracking distinguishes definitive partial import counts from worker progre
     }
   });
   await page.goto(completionUrl("audit"));
-  await page.getByRole("tab", { name: /^İşlemler/ }).click();
+  await activate(page.getByRole("tab", { name: /^İşlemler/ }));
   const job = page.getByRole("listitem").filter({ hasText: "import_rows_process_v1" });
   await expect(job).toContainText("Kısmen uygulandı · 9 satır · 2 uygulandı");
   await expect(job).toContainText("4 işlenmedi");

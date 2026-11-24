@@ -1,3 +1,4 @@
+import { activate, closeWithDevice, hasTouchInput } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { mockStudio, openStudio, studioIds as I } from "./studio-fixture.js";
 import { openWorkspaceSearch, origin } from "./auth-fixture.js";
@@ -13,11 +14,15 @@ test("command palette opens the existing invitation form without creating a pers
   const input = page.getByPlaceholder("Sayfa adı ara…");
   await input.fill("Üye davet et");
   await expect(page.getByRole("menuitem", { name: "Üye davet et", exact: true })).toBeVisible();
-  await input.press("ArrowDown");
-  await input.press("Enter");
+  if (hasTouchInput(page)) {
+    await activate(page.getByRole("menuitem", { name: "Üye davet et", exact: true }));
+  } else {
+    await input.press("ArrowDown");
+    await input.press("Enter");
+  }
   const invite = page.getByRole("dialog", { name: "Üye davet et", exact: true });
   await expect(invite.getByRole("textbox", { name: /Ad soyad/ })).toBeFocused();
-  await page.keyboard.press("Escape");
+  await closeWithDevice(invite.getByRole("button", { name: /^(Close|Kapat|Vazgeç)$/ }).first());
   await expect(invite).toHaveCount(0);
   await expect(page).toHaveURL(`${origin}/o/${I.org}/c/${I.center}/people`);
   expect(state.writes).toEqual([]);
@@ -73,8 +78,12 @@ test("command palette searches active members through the selected center and op
   await expect(palette.getByText("Üye araması tamamlanamadı.", { exact: true })).toBeVisible();
   await input.fill("1001");
   await expect(member).toBeVisible();
-  await input.press("ArrowDown");
-  await input.press("Enter");
+  if (hasTouchInput(page)) {
+    await activate(member);
+  } else {
+    await input.press("ArrowDown");
+    await input.press("Enter");
+  }
   await expect(page).toHaveURL(`${origin}/o/${I.org}/c/${I.center}/people/${I.instructor}`);
   await expect(page.locator('[data-slot="dialog-overlay"]')).toHaveCount(0);
   expect(state.writes).toEqual([]);
@@ -106,14 +115,14 @@ test("Members: creation recovers one person, invitation acknowledgement only rer
   });
   await openStudio(page);
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/people`);
-  await page.getByRole("button", { name: "Üye davet et", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Üye davet et", exact: true }));
   const dialog = page.getByRole("dialog");
   await dialog.locator("#people-name").fill("Yeni Fixture Üye");
   await dialog.locator("#people-email").fill("new-member@example.invalid");
   state.nextWrite = "unknown";
-  await dialog.getByRole("button", { name: "Kişiyi oluştur", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Kişiyi oluştur", exact: true }));
   await expect(dialog.getByRole("button", { name: "Vazgeç", exact: true })).toBeDisabled();
-  await dialog.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }));
   await expect(dialog.locator("#people-name")).toHaveAttribute("readonly", "");
   const creates = state.writes.filter((write) => write.operation === "person_create_v1");
   expect(creates).toHaveLength(2);
@@ -122,10 +131,10 @@ test("Members: creation recovers one person, invitation acknowledgement only rer
     1,
   );
   expect(state.effects).toEqual(["person_create_v1"]);
-  await dialog.getByRole("button", { name: "Daveti gönder", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Daveti gönder", exact: true }));
   const refresh = dialog.getByRole("button", { name: "Güncel durumu oku", exact: true });
   await expect(refresh).toBeVisible();
-  await refresh.click();
+  await activate(refresh);
   await expect.poll(() => jobReads).toBe(2);
   expect(state.effects).toEqual(["person_create_v1", "account_access_send_v1"]);
   expect(state.writes.filter((write) => write.operation === "account_access_send_v1")).toHaveLength(
@@ -142,7 +151,7 @@ test("Members: creation recovers one person, invitation acknowledgement only rer
   expect(
     (await scanAccessibility(page, "members-created-invitation-recovery-mobile")).violations,
   ).toEqual([]);
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(dialog).toHaveCount(0);
 });
 
@@ -215,18 +224,18 @@ test("Members: server status/cursor reset and exact scoped summaries, responsive
   ).toBeVisible();
   await expect(table.getByText(/90\.071\.992\.547\.409,93/)).toBeVisible();
   expect((await scanAccessibility(page, "members-summary-desktop")).violations).toEqual([]);
-  await page.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Sonraki", exact: true }));
   await expect(table.getByText("Fixture Page Two", { exact: true })).toBeVisible();
   await page.clock.install();
   await page.getByRole("textbox", { name: "Üye ara", exact: true }).fill(" ");
   await page.clock.runFor(350);
   await expect(table.getByText("Fixture Page Two", { exact: true })).toBeVisible();
   const filter = page.getByRole("radiogroup", { name: "Durum", exact: true });
-  await filter.getByRole("radio", { name: "Aktif", exact: true }).click();
+  await activate(filter.getByRole("radio", { name: "Aktif", exact: true }));
   await expect(table.getByText("Fixture Active", { exact: true })).toBeVisible();
   expect(requests.at(-1)?.student_status).toBe("active");
   expect(requests.at(-1)?.page.cursor).toBeUndefined();
-  await filter.getByRole("radio", { name: "Pasif", exact: true }).click();
+  await activate(filter.getByRole("radio", { name: "Pasif", exact: true }));
   await expect(table.getByText("Fixture Inactive", { exact: true })).toBeVisible();
   expect(requests.at(-1)?.student_status).toBe("inactive");
   expect(requests.at(-1)?.page.cursor).toBeUndefined();

@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { mockPublicCalendar, publicCalendarId } from "./public-calendar-fixture.js";
 const checkAgain = "Yayın durumunu yeniden kontrol et";
@@ -41,10 +42,10 @@ test("source refresh distinguishes an available empty program from a closed publ
   await page.goto("/public/test-studio/unavailable");
   await expect(page.getByRole("heading", { name: closed, exact: true })).toBeVisible();
   f.packet.publication_state = "available";
-  await page.getByRole("button", { name: checkAgain, exact: true }).click();
+  await activate(page.getByRole("button", { name: checkAgain, exact: true }));
   await expect(page.getByRole("heading", { name: "Program yayında.", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: closed, exact: true })).toHaveCount(0);
-  await page.getByRole("main").getByRole("link", { name: "Program", exact: true }).click();
+  await activate(page.getByRole("main").getByRole("link", { name: "Program", exact: true }));
   await expect(page.getByRole("heading", { name: "Ders programı", exact: true })).toBeVisible();
   await expect(
     page.getByText("Bu aralıkta yayınlanan bir içerik yok.", { exact: true }),
@@ -61,10 +62,10 @@ test("transport errors never masquerade as closed publication and retry reads cu
   f.packet.items = [];
   f.packet.next_cursor = null;
   f.packet.publication_state = "unavailable";
-  await page.getByRole("button", { name: checkAgain, exact: true }).click();
+  await activate(page.getByRole("button", { name: checkAgain, exact: true }));
   await expect(page.getByRole("heading", { name: closed, exact: true })).toBeVisible();
   f.setFailure(true);
-  await page.getByRole("button", { name: checkAgain, exact: true }).click();
+  await activate(page.getByRole("button", { name: checkAgain, exact: true }));
   await expect(page.getByText("Yayın durumu okunamadı.", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: closed, exact: true })).toHaveCount(0);
 });

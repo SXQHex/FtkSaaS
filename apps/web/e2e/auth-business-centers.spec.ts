@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { closeWorkspaceNavigation, openWorkspaceNavigation } from "./auth-fixture.js";
 import type { Page } from "@playwright/test";
 import { test, expect } from "./test.js";
@@ -519,10 +520,10 @@ async function confirm(page: Page, title: string) {
   const dialog = page.getByRole("dialog", { name: title, exact: true });
   const apply = dialog.getByRole("button", { name: common.settings.applyReview, exact: true });
   await expect(apply).toBeDisabled();
-  await dialog.getByRole("checkbox").press("Space");
-  await apply.click();
+  await activate(dialog.getByRole("checkbox"), "Space");
+  await activate(apply);
   await expect(dialog.getByRole("status")).toHaveText(common.events.commandStates.saved);
-  await dialog.getByRole("button", { name: common.settings.discard, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: common.settings.discard, exact: true }));
 }
 
 async function reviewSettlement(page: Page) {
@@ -530,10 +531,11 @@ async function reviewSettlement(page: Page) {
   await page.getByLabel(text.settlement.debit, { exact: true }).selectOption(movement);
   await page.getByLabel(text.settlement.minor, { exact: true }).fill("12000");
   await page.getByLabel(text.settlement.occurred, { exact: true }).fill("2026-01-10T10:00");
-  await page
-    .getByRole("form", { name: text.settlement.submit, exact: true })
-    .getByRole("button", { name: text.review, exact: true })
-    .click();
+  await activate(
+    page
+      .getByRole("form", { name: text.settlement.submit, exact: true })
+      .getByRole("button", { name: text.review, exact: true }),
+  );
 }
 
 function settlementMovementRow(page: Page, name: string) {
@@ -557,21 +559,21 @@ test("Business owner manages centers, reads native center resources, routes an a
     body: await page.screenshot({ fullPage: true }),
     contentType: "image/png",
   });
-  await page.getByRole("button", { name: text.add, exact: true }).click();
+  await activate(page.getByRole("button", { name: text.add, exact: true }));
   const form = page.getByRole("form", { name: text.add, exact: true });
   await form.getByLabel(text.center, { exact: true }).fill("Sentetik Merkez C");
   await form.getByLabel(text.timezone, { exact: true }).selectOption("Europe/Istanbul");
-  await form.getByRole("button", { name: text.review, exact: true }).click();
+  await activate(form.getByRole("button", { name: text.review, exact: true }));
   await confirm(page, text.add);
   await expect(grid.getByText("Sentetik Merkez C", { exact: true })).toBeVisible();
   await expect(page.getByText("3 / 5 aktif merkez kullanılıyor.", { exact: true })).toBeVisible();
-  await page.getByRole("tab", { name: text.tabs.managers, exact: true }).click();
+  await activate(page.getByRole("tab", { name: text.tabs.managers, exact: true }));
   await expect(page.getByText("Sentetik yönetici", { exact: true })).toBeVisible();
-  await page.getByRole("tab", { name: text.tabs.policies, exact: true }).click();
+  await activate(page.getByRole("tab", { name: text.tabs.policies, exact: true }));
   await expect(
     page.getByText(common.settings.nativePolicies.keys.reservation_window, { exact: true }),
   ).toBeVisible();
-  await page.getByRole("tab", { name: text.tabs.disciplines, exact: true }).click();
+  await activate(page.getByRole("tab", { name: text.tabs.disciplines, exact: true }));
   await expect(
     page
       .getByRole("tabpanel", { name: text.tabs.disciplines })
@@ -579,16 +581,16 @@ test("Business owner manages centers, reads native center resources, routes an a
       .filter({ hasText: "Tango" })
       .getByText(text.active, { exact: true }),
   ).toBeVisible();
-  await page.getByRole("tab", { name: text.tabs.people, exact: true }).click();
+  await activate(page.getByRole("tab", { name: text.tabs.people, exact: true }));
   await expect(
     page.getByRole("grid", { name: text.tabs.people }).getByText("Sentetik hesap", { exact: true }),
   ).toBeVisible();
-  await page.getByRole("tab", { name: text.tabs.applications, exact: true }).click();
+  await activate(page.getByRole("tab", { name: text.tabs.applications, exact: true }));
   await page.getByLabel(text.destination, { exact: true }).selectOption(second);
-  await page.getByRole("button", { name: text.route, exact: true }).click();
+  await activate(page.getByRole("button", { name: text.route, exact: true }));
   await confirm(page, text.route);
   await expect(page.getByText("Sentetik Merkez B", { exact: true })).toBeVisible();
-  await page.getByRole("tab", { name: text.tabs.reports, exact: true }).click();
+  await activate(page.getByRole("tab", { name: text.tabs.reports, exact: true }));
   const report = page.getByRole("grid", { name: text.tabs.reports });
   await expect(
     report.getByText("Sentetik Merkez B merkezine kullanım", { exact: true }),
@@ -649,7 +651,7 @@ test("Business keeps the open balance until B approves, retries a lost response 
   const f = await businessFixture(page, "center_manager");
   await page.goto(centerUrl());
   const openLedger = () =>
-    page.getByRole("tab", { name: text.tabs.settlement, exact: true }).click();
+    activate(page.getByRole("tab", { name: text.tabs.settlement, exact: true }));
   const openBalance = settlementMovementRow(page, text.settlement.movementsState.accrual)
     .getByRole("gridcell")
     .last();
@@ -665,15 +667,15 @@ test("Business keeps the open balance until B approves, retries a lost response 
   await openLedger();
   await expect(openBalance).toHaveText("₺120,00");
   await page.getByLabel(common.platform.reason, { exact: true }).fill("Yetkili B kararı");
-  await page.getByRole("button", { name: text.settlement.approve, exact: true }).click();
+  await activate(page.getByRole("button", { name: text.settlement.approve, exact: true }));
   const dialog = page.getByRole("dialog", { name: text.settlement.approve, exact: true });
-  await dialog.getByRole("checkbox").press("Space");
+  await activate(dialog.getByRole("checkbox"), "Space");
   f.loseNextDecisionResponse();
-  await dialog.getByRole("button", { name: common.settings.applyReview, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: common.settings.applyReview, exact: true }));
   await expect(dialog.getByRole("status")).toHaveText(common.events.commandStates.unknown);
-  await dialog.getByRole("button", { name: common.studio.retrySameRequest }).click();
+  await activate(dialog.getByRole("button", { name: common.studio.retrySameRequest }));
   await expect(dialog.getByRole("status")).toHaveText(common.events.commandStates.saved);
-  await dialog.getByRole("button", { name: common.settings.discard, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: common.settings.discard, exact: true }));
   await expect(
     page.getByText(text.settlement.requestState.approved, { exact: true }),
   ).toBeVisible();
@@ -705,7 +707,7 @@ test("Business confirms the submitted request when B decides before the first re
 }) => {
   const f = await businessFixture(page, "center_manager");
   await page.goto(centerUrl());
-  await page.getByRole("tab", { name: text.tabs.settlement, exact: true }).click();
+  await activate(page.getByRole("tab", { name: text.tabs.settlement, exact: true }));
   await reviewSettlement(page);
   f.approveBeforeFirstRead();
   await confirm(page, text.settlement.submit);
@@ -720,7 +722,7 @@ test("Business removes the pending request when B's delegated settlement grant i
 }) => {
   const f = await businessFixture(page, "center_manager");
   const openLedger = () =>
-    page.getByRole("tab", { name: text.tabs.settlement, exact: true }).click();
+    activate(page.getByRole("tab", { name: text.tabs.settlement, exact: true }));
   await page.goto(centerUrl());
   await openLedger();
   await reviewSettlement(page);
@@ -731,7 +733,7 @@ test("Business removes the pending request when B's delegated settlement grant i
   await expect(approve).toBeEnabled();
 
   f.revoke();
-  await page.getByRole("tab", { name: text.tabs.centers, exact: true }).click();
+  await activate(page.getByRole("tab", { name: text.tabs.centers, exact: true }));
   await openLedger();
   await expect(page.getByText(text.settlement.unauthorized, { exact: true })).toBeVisible();
   await expect(approve).toHaveCount(0);
@@ -747,7 +749,7 @@ test("Business refreshes a revoked center in the same document and preserves A's
   const f = await businessFixture(page, "center_manager");
   await page.clock.install();
   const openLedger = () =>
-    page.getByRole("tab", { name: text.tabs.settlement, exact: true }).click();
+    activate(page.getByRole("tab", { name: text.tabs.settlement, exact: true }));
   await page.goto(centerUrl());
   await openLedger();
   await reviewSettlement(page);
@@ -781,7 +783,7 @@ for (const [action, outcome, decidingCenter] of [
   }) => {
     const f = await businessFixture(page, "center_manager");
     const openLedger = () =>
-      page.getByRole("tab", { name: text.tabs.settlement, exact: true }).click();
+      activate(page.getByRole("tab", { name: text.tabs.settlement, exact: true }));
     await page.goto(centerUrl());
     await openLedger();
     await reviewSettlement(page);
@@ -792,7 +794,7 @@ for (const [action, outcome, decidingCenter] of [
     }
     const reason = "Sentetik gerekçeli kapanış";
     await page.getByLabel(common.platform.reason, { exact: true }).fill(reason);
-    await page.getByRole("button", { name: text.settlement[action], exact: true }).click();
+    await activate(page.getByRole("button", { name: text.settlement[action], exact: true }));
     await confirm(page, text.settlement[action]);
 
     const expectClosedUnpaid = async () => {
@@ -836,11 +838,11 @@ test("a Business organization manager can create a center without opening the ow
 }) => {
   const f = await businessFixture(page, "org_manager");
   await page.goto(centerUrl());
-  await page.getByRole("button", { name: text.add, exact: true }).click();
+  await activate(page.getByRole("button", { name: text.add, exact: true }));
   const form = page.getByRole("form", { name: text.add, exact: true });
   await form.getByLabel(text.center, { exact: true }).fill("Yöneticinin yeni merkezi");
   await form.getByLabel(text.timezone, { exact: true }).selectOption("Europe/Istanbul");
-  await form.getByRole("button", { name: text.review, exact: true }).click();
+  await activate(form.getByRole("button", { name: text.review, exact: true }));
   await confirm(page, text.add);
   await expect(
     page
@@ -853,7 +855,7 @@ test("a Business organization manager can create a center without opening the ow
   expect(
     f.calls.slice(writeAt + 1).filter(({ op }) => op === "organizations_list_v1"),
   ).toHaveLength(1);
-  await page.getByRole("tab", { name: text.tabs.people, exact: true }).click();
+  await activate(page.getByRole("tab", { name: text.tabs.people, exact: true }));
   await expect(page.getByRole("grid", { name: text.tabs.people })).toBeVisible();
   await expect(page.getByRole("heading", { name: text.mergeSuggestions.title })).toHaveCount(0);
   expect(
@@ -870,10 +872,10 @@ test("a Business owner sees why adding a sixth active center is unavailable", as
   await page.goto(centerUrl());
   const add = page.getByRole("button", { name: text.add, exact: true });
   const form = page.getByRole("form", { name: text.add, exact: true });
-  await add.press("Enter");
+  await activate(add, "Enter");
   await form.getByLabel(text.center, { exact: true }).fill("Beşinci merkez");
   await form.getByLabel(text.timezone, { exact: true }).selectOption("Europe/Istanbul");
-  await form.getByRole("button", { name: text.review, exact: true }).press("Enter");
+  await activate(form.getByRole("button", { name: text.review, exact: true }), "Enter");
   await confirm(page, text.add);
 
   const grid = page.getByRole("grid", { name: text.title });
@@ -882,7 +884,7 @@ test("a Business owner sees why adding a sixth active center is unavailable", as
   await expect(page.getByText("5 / 5 aktif merkez kullanılıyor.", { exact: true })).toBeVisible();
   await expect(add).toBeDisabled();
   await expect(add).toHaveAccessibleDescription(text.quotaReached);
-  await add.press("Enter");
+  await activate(add, "Enter");
   await expect(add).toBeFocused();
   await expect(form).toHaveCount(0);
   expect(f.calls.filter(({ op }) => op === "center_create_v1")).toHaveLength(1);
@@ -940,7 +942,7 @@ test("Business center switching keeps resource and policy reads scoped to the se
     });
   });
   await page.goto(centerUrl());
-  const selectTab = (name: string) => page.getByRole("tab", { name, exact: true }).click();
+  const selectTab = (name: string) => activate(page.getByRole("tab", { name, exact: true }));
   await selectTab(text.tabs.managers);
   await expect(page.getByText("Sentetik yönetici", { exact: true })).toBeVisible();
   await page.getByLabel(text.center, { exact: true }).selectOption(second);
@@ -984,7 +986,7 @@ test("Business center switching keeps resource and policy reads scoped to the se
     { center: second, include: true },
   ]);
 
-  await page.getByRole("link", { name: text.edit, exact: true }).click();
+  await activate(page.getByRole("link", { name: text.edit, exact: true }));
   await expect(page).toHaveURL(new RegExp(`/c/${second}/settings\\?section=salonlar`));
   await expect(page.getByText("Sentetik B salonu", { exact: true })).toBeVisible();
   await expect
@@ -1007,19 +1009,19 @@ test("Business center switching keeps resource and policy reads scoped to the se
   await expect(editPolicy(common.settings.nativePolicies.keys.reservation_window)).toBeEnabled();
   expect(f.calls.some(({ op }) => op === "policy_publish_v1")).toBe(false);
 
-  await editPolicy(common.settings.nativePolicies.keys.reservation_window).click();
+  await activate(editPolicy(common.settings.nativePolicies.keys.reservation_window));
   const editor = page.getByRole("dialog");
   await editor.getByRole("spinbutton", { name: "Kapanış (dakika önce)", exact: true }).fill("120");
   await editor.locator('input[type="datetime-local"]').fill("2026-11-18T15:00");
   await editor
     .getByRole("textbox", { name: "Değişiklik gerekçesi", exact: true })
     .fill("Sentetik B rezervasyon penceresi");
-  await editor.getByRole("button", { name: "Yayın önizlemesine geç", exact: true }).click();
+  await activate(editor.getByRole("button", { name: "Yayın önizlemesine geç", exact: true }));
   const apply = editor.getByRole("button", { name: common.settings.applyReview, exact: true });
   await expect(apply).toBeDisabled();
   expect(f.calls.filter(({ op }) => op === "policy_publish_v1")).toEqual([]);
-  await editor.getByRole("checkbox").press("Space");
-  await apply.click();
+  await activate(editor.getByRole("checkbox"), "Space");
+  await activate(apply);
   await expect(editor.getByRole("status")).toHaveText(common.events.commandStates.saved);
   const writes = f.calls.filter(({ op }) => op === "policy_publish_v1");
   expect(writes).toHaveLength(1);
@@ -1044,18 +1046,18 @@ test("Business center switching keeps resource and policy reads scoped to the se
 test("a Business organization manager sees the native sixth-center rejection", async ({ page }) => {
   const f = await businessFixture(page, "org_manager", "business", 4);
   await page.goto(centerUrl());
-  await page.getByRole("button", { name: text.add, exact: true }).click();
+  await activate(page.getByRole("button", { name: text.add, exact: true }));
   const form = page.getByRole("form", { name: text.add, exact: true });
   await form.getByLabel(text.center, { exact: true }).fill("Altıncı merkez");
   await form.getByLabel(text.timezone, { exact: true }).selectOption("Europe/Istanbul");
-  await form.getByRole("button", { name: text.review, exact: true }).click();
+  await activate(form.getByRole("button", { name: text.review, exact: true }));
 
   const dialog = page.getByRole("dialog", { name: text.add, exact: true });
-  await dialog.getByRole("checkbox").press("Space");
+  await activate(dialog.getByRole("checkbox"), "Space");
   f.addConcurrentCenter();
-  await dialog.getByRole("button", { name: common.settings.applyReview, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: common.settings.applyReview, exact: true }));
   await expect(dialog.getByRole("status")).toHaveText(text.quotaReached);
-  await dialog.getByRole("button", { name: common.settings.discard, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: common.settings.discard, exact: true }));
   const grid = page.getByRole("grid", { name: text.title });
   await expect(grid.getByText("Başka oturumun merkezi", { exact: true })).toBeVisible();
   await expect(grid.getByRole("row")).toHaveCount(6);
@@ -1069,13 +1071,13 @@ test("a center manager sees scoped duplicate suggestions and opens the native me
 }) => {
   const fixture = await businessFixture(page, "center_manager");
   await page.goto(centerUrl());
-  await page.getByRole("tab", { name: text.tabs.people, exact: true }).click();
+  await activate(page.getByRole("tab", { name: text.tabs.people, exact: true }));
   await expect(page.getByRole("heading", { name: text.mergeSuggestions.title })).toBeVisible();
   await expect(
     page.getByText("Sentetik birinci kişi · Sentetik ikinci kişi", { exact: true }),
   ).toBeVisible();
   await expect(page.getByText(text.mergeSuggestions.matches.email, { exact: true })).toBeVisible();
-  await page.getByRole("link", { name: text.mergeSuggestions.open }).click();
+  await activate(page.getByRole("link", { name: text.mergeSuggestions.open }));
   await expect(page).toHaveURL(new RegExp(`/c/${I.center}/people/merge$`));
   expect(
     fixture.calls.find(
@@ -1092,7 +1094,6 @@ test("a center manager sees scoped duplicate suggestions and opens the native me
 for (const role of ["center_manager", "staff"] as const) {
   test(`Business direct person, CRM and finance links stay in scope for ${role}`, async ({
     page,
-    hasTouch,
   }) => {
     const f = await businessFixture(page, role);
     f.restrictSecondCenter();
@@ -1120,7 +1121,7 @@ for (const role of ["center_manager", "staff"] as const) {
           f.calls.some(({ op, request }) => op === operation && request.center_id === I.center),
         )
         .toBe(true);
-      await openWorkspaceNavigation(page, hasTouch ? "tap" : "click");
+      await openWorkspaceNavigation(page);
       await expect(page.getByRole("button", { name: /Sentetik Merkez A/ })).toBeVisible();
       await closeWorkspaceNavigation(page);
     }

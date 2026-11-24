@@ -1,3 +1,4 @@
+import { activate, attemptOutsideDismissal } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { mockOwnReservations } from "./member-reservations-fixture.js";
 const saved = "Rezervasyon iptal edildi; güncel rezervasyon, seans ve haklar okundu.";
@@ -45,7 +46,7 @@ test("student own reservations keep separate native cursors, source package and 
     include_source_summary: true,
     page: { sort: "starts_at_asc" },
   });
-  await page.getByRole("button", { name: "Sonraki", exact: true }).first().click();
+  await activate(page.getByRole("button", { name: "Sonraki", exact: true }).first());
   await expect
     .poll(() => state.reads.filter((row) => row.operation === "reservation_list_v1").length)
     .toBe(3);
@@ -60,20 +61,20 @@ test("student cancellation validates reason and rereads the actual cancelled res
 }) => {
   await page.setViewportSize({ width: 320, height: 600 });
   const state = await mockOwnReservations(page);
-  await page.getByRole("button", { name: /^İptal et —/ }).click();
+  await activate(page.getByRole("button", { name: /^İptal et —/ }));
   const dialog = page.getByRole("alertdialog");
   await expect(dialog.getByRole("button", { name: "Vazgeç", exact: true })).toBeFocused();
-  await dialog.getByRole("button", { name: "İptal et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "İptal et", exact: true }));
   await expect(dialog.getByLabel("Gerekçe", { exact: true })).toHaveAttribute(
     "aria-invalid",
     "true",
   );
   expect(state.writes).toHaveLength(0);
   await dialog.getByLabel("Gerekçe", { exact: true }).fill("Katılamayacağım");
-  await dialog.getByRole("button", { name: "İptal et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "İptal et", exact: true }));
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(1);
-  await dialog.getByRole("button", { name: "Kapat", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Kapat", exact: true }));
   await expect(page.getByRole("button", { name: /^İptal et —/ })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Yeniden oku", exact: true })).toBeFocused();
 });
@@ -81,13 +82,13 @@ test("Starter student keeps their own cancellable reservation after role plan de
   page,
 }) => {
   const state = await mockOwnReservations(page, { starter: true });
-  await page.getByRole("button", { name: /^İptal et —/ }).click();
+  await activate(page.getByRole("button", { name: /^İptal et —/ }));
   const dialog = page.getByRole("alertdialog");
   await dialog.getByLabel("Gerekçe", { exact: true }).fill("Katılamayacağım");
-  await dialog.getByRole("button", { name: "İptal et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "İptal et", exact: true }));
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(1);
-  await dialog.getByRole("button", { name: "Kapat", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Kapat", exact: true }));
   await expect(page.getByRole("button", { name: /^İptal et —/ })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Stüdyo", exact: true })).toHaveCount(0);
 });
@@ -95,35 +96,35 @@ test("student cancellation unknown outcome reads receipt without a second writer
   page,
 }) => {
   const state = await mockOwnReservations(page, { unknown: true });
-  await page.getByRole("button", { name: /^İptal et —/ }).click();
+  await activate(page.getByRole("button", { name: /^İptal et —/ }));
   const dialog = page.getByRole("alertdialog");
   await dialog.getByLabel("Gerekçe", { exact: true }).fill("Katılamayacağım");
-  await dialog.getByRole("button", { name: "İptal et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "İptal et", exact: true }));
   await expect(
     dialog.getByText("Sonuç henüz doğrulanamadı. Aynı işlemle devam et.", {
       exact: true,
     }),
   ).toBeVisible();
-  await page.keyboard.press("Escape");
+  await attemptOutsideDismissal(dialog);
   await expect(dialog).toBeVisible();
-  await dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(1);
-  await dialog.getByRole("button", { name: "Kapat", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Kapat", exact: true }));
 });
 test("student cancellation ACK recovery repeats only result reads", async ({ page }) => {
   const state = await mockOwnReservations(page, { ackUnread: true });
-  await page.getByRole("button", { name: /^İptal et —/ }).click();
+  await activate(page.getByRole("button", { name: /^İptal et —/ }));
   const dialog = page.getByRole("alertdialog");
   await dialog.getByLabel("Gerekçe", { exact: true }).fill("Katılamayacağım");
-  await dialog.getByRole("button", { name: "İptal et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "İptal et", exact: true }));
   await expect(
     dialog.getByText("İptal alındı; güncel kayıtlar henüz okunamadı.", { exact: true }),
   ).toBeVisible();
-  await dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(1);
-  await dialog.getByRole("button", { name: "Kapat", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Kapat", exact: true }));
 });
 test("a denied own list is unknown until retry and unrelated roles do not grant student scope", async ({
   page,
@@ -132,7 +133,7 @@ test("a denied own list is unknown until retry and unrelated roles do not grant 
   await expect(page.getByText("Yaklaşan rezervasyonlar okunamadı.", { exact: true })).toBeVisible();
   await expect(page.getByText("Yaklaşan rezervasyonun yok.", { exact: true })).toHaveCount(0);
   state.setDenied(false);
-  await page.getByRole("button", { name: "Yeniden oku", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Yeniden oku", exact: true }));
   await expect(page.getByText("Sentetik gelecek ders", { exact: true })).toBeVisible();
 });
 test("nonstudent cannot read personal reservations even with a valid native account", async ({
@@ -148,7 +149,7 @@ test("student cancellation action denial leaves the readable reservation intact"
   page,
 }) => {
   const state = await mockOwnReservations(page, { cancelDenied: true });
-  await page.getByRole("button", { name: /^İptal et —/ }).click();
+  await activate(page.getByRole("button", { name: /^İptal et —/ }));
   const dialog = page.getByRole("alertdialog");
   await expect(
     dialog.getByText("Bu rezervasyon için iptal yetkisi veya güncel kaynak doğrulanamadı.", {
@@ -156,7 +157,7 @@ test("student cancellation action denial leaves the readable reservation intact"
     }),
   ).toBeVisible();
   await expect(dialog.getByRole("button", { name: "İptal et", exact: true })).toBeDisabled();
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(page.getByText("Sentetik gelecek ders", { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(0);
 });

@@ -1,3 +1,4 @@
+import { activate, attemptOutsideDismissal } from "./device-input.js";
 import { test, expect } from "./test.js";
 import common from "../src/locales/tr/common.json" with { type: "json" };
 const copy = common.finance;
@@ -125,22 +126,25 @@ async function setup(
   });
   if (options.prefillPage2) {
     const grid = page.getByRole("grid", { name: "Hareketler", exact: true });
-    await page.getByRole("button", { name: "Sonraki sayfa", exact: true }).click();
+    await activate(page.getByRole("button", { name: "Sonraki sayfa", exact: true }));
     await expect(grid.getByText("İkinci sayfa üyesi", { exact: true })).toBeVisible();
-    await page.getByRole("button", { name: "Önceki sayfa", exact: true }).click();
+    await activate(page.getByRole("button", { name: "Önceki sayfa", exact: true }));
     await expect(grid.getByText("8 derslik paket", { exact: true })).toBeVisible();
   }
-  await page.getByRole("button", { name: "Satışı iade et", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Satışı iade et", exact: true }));
   const panel = page.getByRole("dialog", { name: "Satışı iade et", exact: true });
   await panel.getByLabel("Gerekçe", { exact: true }).fill("Sentetik satış iadesi");
   return { ...state, writes, previews, receipts, panel };
 }
 async function prepare(state: Awaited<ReturnType<typeof setup>>) {
-  await state.panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await activate(state.panel.getByRole("button", { name: "Etkiyi incele", exact: true }));
 }
 async function approve(state: Awaited<ReturnType<typeof setup>>) {
-  await state.panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
-  await state.panel.getByRole("button", { name: "İadeyi uygula", exact: true }).click();
+  await activate(
+    state.panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }),
+    "Space",
+  );
+  await activate(state.panel.getByRole("button", { name: "İadeyi uygula", exact: true }));
 }
 test("mobile sale refund uses the actual sale and provider amount, then reads finance without fabricating cash or rights", async ({
   page,
@@ -166,7 +170,7 @@ test("mobile sale refund uses the actual sale and provider amount, then reads fi
   expect(state.writes).toHaveLength(1);
   expect(state.previews).toHaveLength(1);
   expect(await page.evaluate("document.documentElement.scrollWidth>innerWidth")).toBe(false);
-  await state.panel.getByRole("button", { name: copy.close, exact: true }).click();
+  await activate(state.panel.getByRole("button", { name: copy.close, exact: true }));
   await expect(page.getByText("TRY ₺500,00 · EUR €100,00", { exact: true })).toBeVisible();
   await expect(
     page
@@ -196,11 +200,11 @@ test("unknown sale refund preserves its capability and key after receipt failure
       exact: true,
     }),
   ).toBeVisible();
-  await page.keyboard.press("Escape");
+  await attemptOutsideDismissal(state.panel);
   await expect(state.panel).toBeVisible();
-  await state.panel.getByRole("button", { name: copy.readResult, exact: true }).click();
+  await activate(state.panel.getByRole("button", { name: copy.readResult, exact: true }));
   await expect.poll(() => state.receipts.length).toBe(1);
-  await state.panel.getByRole("button", { name: copy.retrySame, exact: true }).click();
+  await activate(state.panel.getByRole("button", { name: copy.retrySame, exact: true }));
   await expect(
     state.panel.getByText("İade komutu alındı; güncel finans okundu.", { exact: true }),
   ).toBeVisible();
@@ -223,7 +227,7 @@ test("acknowledged sale refund permits read recovery only after finance reading 
   await expect(state.panel.getByRole("button", { name: copy.retrySame, exact: true })).toHaveCount(
     0,
   );
-  await state.panel.getByRole("button", { name: copy.readResult, exact: true }).click();
+  await activate(state.panel.getByRole("button", { name: copy.readResult, exact: true }));
   await expect(
     state.panel.getByText("İade komutu alındı; güncel finans okundu.", { exact: true }),
   ).toBeVisible();
@@ -247,9 +251,9 @@ test("M05 sale refund reads current first page, then reopens an old cursor witho
   expect(duringRefresh.filter((row) => row.page.cursor)).toHaveLength(0);
   expect(duringRefresh.filter((row) => row.view === "movements")).toHaveLength(1);
   expect(state.writes).toHaveLength(1);
-  await state.panel.getByRole("button", { name: copy.close, exact: true }).click();
+  await activate(state.panel.getByRole("button", { name: copy.close, exact: true }));
   await expect(page.getByText("TRY ₺500,00 · EUR €100,00", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Sonraki sayfa", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Sonraki sayfa", exact: true }));
   await expect(
     page.getByRole("grid", { name: "Hareketler", exact: true }).getByText("İkinci sayfa üyesi", {
       exact: true,

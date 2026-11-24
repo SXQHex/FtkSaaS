@@ -1,6 +1,9 @@
-import { defineConfig, devices } from "@playwright/test";
+import { defineConfig } from "@playwright/test";
+import { activeBrowserProfile } from "./playwright-device.js";
 
 const baseURL = "http://127.0.0.1:4175";
+
+const { device } = activeBrowserProfile();
 
 export default defineConfig({
   testDir: "./e2e-external",
@@ -10,7 +13,7 @@ export default defineConfig({
   workers: process.env.CI ? 2 : 1,
   outputDir: "./test-results/external",
   reporter: [["list"], ["json", { outputFile: "test-reports/external-playwright.json" }]],
-  use: { ...devices["Desktop Chrome"], baseURL, locale: "tr-TR", serviceWorkers: "block" },
+  use: { ...device, baseURL, locale: "tr-TR", serviceWorkers: "block" },
   webServer: {
     command: "pnpm dev --host 127.0.0.1 --port 4175 --strictPort --mode e2e",
     url: baseURL,

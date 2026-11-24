@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import type { SessionView } from "@ftksaas/api-contracts";
@@ -163,7 +164,7 @@ async function fixture(
   await page.goto(`${origin}/login`);
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await page.goto(`${origin}/instructor/today?org=${I.org}&center=${I.center}`);
@@ -181,9 +182,9 @@ test("instructor agenda replaces moved session dates and keeps a closed roll cal
 }) => {
   const { reads, sessions } = await fixture(page);
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.getByRole("button", { name: "Haftalık programım", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Haftalık programım", exact: true }));
   const views = page.getByRole("radiogroup", { name: "Takvim görünümü", exact: true });
-  await views.getByRole("radio", { name: /ajanda/i }).click();
+  await activate(views.getByRole("radio", { name: /ajanda/i }));
   const agenda = page.getByRole("region", { name: "Atanmış haftalık program", exact: true });
   const session = (index: number) =>
     agenda.getByRole("button", { name: new RegExp(`Sentetik atanmış ${index} ·`) });
@@ -193,7 +194,7 @@ test("instructor agenda replaces moved session dates and keeps a closed roll cal
   const reread = page.getByRole("button", { name: "Yeniden oku", exact: true });
   sessions[1]!.starts_at = "2026-11-17T16:00:00Z";
   sessions[1]!.ends_at = "2026-11-17T17:00:00Z";
-  await reread.click();
+  await activate(reread);
   await expect(
     agenda
       .getByRole("listitem", { name: "17 Kasım 2026", exact: true })
@@ -207,12 +208,12 @@ test("instructor agenda replaces moved session dates and keeps a closed roll cal
     sessions[index]!.starts_at = `2026-11-${day}T17:00:00Z`;
     sessions[index]!.ends_at = `2026-11-${day}T18:00:00Z`;
   }
-  await reread.click();
+  await activate(reread);
   for (const index of [2, 3]) {
     await expect(session(index)).toHaveCount(1);
     await expect(session(index)).toContainText("20:00");
   }
-  await session(1).press("Enter");
+  await activate(session(1), "Enter");
   await expect(page).toHaveURL(
     `${origin}/instructor/sessions/${sessions[0]!.id}?org=${I.org}&center=${I.center}`,
   );
@@ -299,6 +300,6 @@ test("denied assigned calendar does not become an empty day", async ({ page }) =
   await expect(page.getByRole("progressbar", { name: "Atanmış program okunuyor…" })).toHaveCount(0);
   await expect(page.getByText("Bugün seansın yok.", { exact: true })).toHaveCount(0);
   permitCalendar();
-  await page.getByRole("button", { name: "Yeniden oku", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Yeniden oku", exact: true }));
   await expect(page.getByText("Sentetik atanmış 1", { exact: true })).toBeVisible();
 });

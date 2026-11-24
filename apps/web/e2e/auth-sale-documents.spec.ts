@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { mockMemberLifecycle, lifecycleIds as R } from "./member-lifecycle-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
@@ -96,12 +97,12 @@ async function setup(page: import("@playwright/test").Page) {
     }
     return route.fallback();
   });
-  await page.getByRole("button", { name: "Paket / hak tahsis et", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Paket / hak tahsis et", exact: true }));
   const panel = page.getByRole("dialog");
-  await panel.getByRole("radio", { name: "Yeni 8 ders", exact: true }).press("Space");
+  await activate(panel.getByRole("radio", { name: "Yeni 8 ders", exact: true }), "Space");
   await panel.getByLabel("Başlangıç", { exact: true }).fill("2026-11-15");
   await panel.getByLabel("Bitiş", { exact: true }).fill("2026-11-22");
-  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Etkiyi incele", exact: true }));
   await expect(
     panel.getByText(common.memberProfile.saleDocumentRequired, { exact: true }),
   ).toBeVisible();
@@ -114,9 +115,9 @@ test("document review resumes the original purchase across repeated checks and r
   const first = id(801);
   expect(f.previews[0]).not.toHaveProperty("document_purchase_id");
   await expect(f.panel.getByRole("button", { name: "Uygula", exact: true })).toBeDisabled();
-  await f.panel
-    .getByRole("button", { name: common.memberProfile.saleRecheckDocuments, exact: true })
-    .click();
+  await activate(
+    f.panel.getByRole("button", { name: common.memberProfile.saleRecheckDocuments, exact: true }),
+  );
   await expect.poll(() => f.previews.length).toBe(2);
   await expect(
     f.panel.getByText(common.memberProfile.saleDocumentRequired, { exact: true }),
@@ -126,9 +127,9 @@ test("document review resumes the original purchase across repeated checks and r
   // Models the member's separately scoped native document acceptance. The member UI
   // and real actor/purchase isolation have their own document-context/native suites.
   f.state.acceptedPurchase = first;
-  await f.panel
-    .getByRole("button", { name: common.memberProfile.saleRecheckDocuments, exact: true })
-    .click();
+  await activate(
+    f.panel.getByRole("button", { name: common.memberProfile.saleRecheckDocuments, exact: true }),
+  );
   await expect.poll(() => f.previews.length).toBe(3);
   await expect(
     f.panel.getByText(common.memberProfile.saleDocumentRequired, { exact: true }),
@@ -138,8 +139,8 @@ test("document review resumes the original purchase across repeated checks and r
   await expect(consent).not.toBeChecked();
   await expect(f.panel.getByRole("button", { name: "Uygula", exact: true })).toBeDisabled();
   expect(f.writes).toHaveLength(0);
-  await consent.press("Space");
-  await f.panel.getByRole("button", { name: "Uygula", exact: true }).click();
+  await activate(consent, "Space");
+  await activate(f.panel.getByRole("button", { name: "Uygula", exact: true }));
   await expect(
     f.panel.getByText("Satış ve güncel hak/finans doğrulandı.", { exact: true }),
   ).toBeVisible();
@@ -152,9 +153,9 @@ test("editing a purchase never carries another date's document acceptance into t
 }) => {
   const f = await setup(page);
   f.state.acceptedPurchase = id(801);
-  await f.panel.getByRole("button", { name: "Geri", exact: true }).click();
+  await activate(f.panel.getByRole("button", { name: "Geri", exact: true }));
   await f.panel.getByLabel("Bitiş", { exact: true }).fill("2026-11-23");
-  await f.panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await activate(f.panel.getByRole("button", { name: "Etkiyi incele", exact: true }));
   await expect(
     f.panel.getByText(common.memberProfile.saleDocumentRequired, { exact: true }),
   ).toBeVisible();
@@ -169,9 +170,9 @@ test("a failed document recheck discards the old sale review and cannot expose a
 }) => {
   const f = await setup(page);
   f.state.failRecheck = true;
-  await f.panel
-    .getByRole("button", { name: common.memberProfile.saleRecheckDocuments, exact: true })
-    .click();
+  await activate(
+    f.panel.getByRole("button", { name: common.memberProfile.saleRecheckDocuments, exact: true }),
+  );
   await expect(
     f.panel.getByText(common.memberProfile.saleAuthorityUnavailable, { exact: true }),
   ).toBeVisible();

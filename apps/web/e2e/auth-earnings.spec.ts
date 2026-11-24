@@ -1,3 +1,4 @@
+import { activate, attemptOutsideDismissal, hasTouchInput } from "./device-input.js";
 import { checkLockedWorkspaceScope } from "./auth-fixture.js";
 import { test, expect } from "./test.js";
 import { mockEarnings, fillEarningsPayment, earningsIds } from "./earnings-fixture.js";
@@ -19,19 +20,23 @@ test("manager native directory preserves global currency totals, historical agre
   });
   expect(instructorReads[0]).not.toHaveProperty("person_id");
   await expect(page.getByText("₺1.000,00 · €50,00", { exact: true }).first()).toBeVisible();
-  await page.getByRole("tab", { name: "Eğitmenler", exact: true }).focus();
-  await page.keyboard.press("ArrowRight");
-  await expect(page.getByRole("tab", { name: "Satırlar", exact: true })).toBeFocused();
-  await page.keyboard.press("Enter");
+  if (hasTouchInput(page)) {
+    await activate(page.getByRole("tab", { name: "Satırlar", exact: true }));
+  } else {
+    await page.getByRole("tab", { name: "Eğitmenler", exact: true }).focus();
+    await page.keyboard.press("ArrowRight");
+    await expect(page.getByRole("tab", { name: "Satırlar", exact: true })).toBeFocused();
+    await page.keyboard.press("Enter");
+  }
   await expect(page.getByText("Tango başlangıç", { exact: true })).toBeVisible();
   await expect(page.getByText("Ders anlaşması · Anlaşma v1", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Sonraki sayfa", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Sonraki sayfa", exact: true }));
   await expect(page.getByText("Etkinlik hakedişi", { exact: true })).toBeVisible();
   expect(f.reads.at(-1)).toMatchObject({ view: "earnings", page: { cursor: "native-next" } });
   await page.getByRole("combobox", { name: "Eğitmen", exact: true }).selectOption(I.instructor);
   await expect(page.getByText("Tango başlangıç", { exact: true })).toBeVisible();
   expect(f.reads.at(-1)?.page.cursor).toBeUndefined();
-  await page.getByRole("tab", { name: "Ödemeler", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Ödemeler", exact: true }));
   await expect(page.getByText("Nakit", { exact: true })).toBeVisible();
 });
 test("payment refreshes historical period and person cursor pages after native readback", async ({
@@ -41,17 +46,16 @@ test("payment refreshes historical period and person cursor pages after native r
   // Historical earning and payment occur in different months. The backend owns
   // period filtering, so both old cursor pages must be read with the old interval.
   f.earning.earning.created_at = "2026-10-10T12:00:00Z";
-  await page
-    .getByRole("radiogroup", { name: "Dönem", exact: true })
-    .getByRole("radio", {
+  await activate(
+    page.getByRole("radiogroup", { name: "Dönem", exact: true }).getByRole("radio", {
       name: "Ekim 2026",
       exact: true,
-    })
-    .click();
+    }),
+  );
   await page.getByRole("combobox", { name: "Eğitmen", exact: true }).selectOption(I.instructor);
-  await page.getByRole("tab", { name: "Satırlar", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Satırlar", exact: true }));
   await expect(page.getByText("Tango başlangıç", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Sonraki sayfa", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Sonraki sayfa", exact: true }));
   await expect(page.getByText("Etkinlik hakedişi", { exact: true })).toBeVisible();
   const oldPeriodReads = () =>
     f.reads.filter(
@@ -64,9 +68,9 @@ test("payment refreshes historical period and person cursor pages after native r
   expect(oldPeriodReads()).toHaveLength(1);
   const historicalInterval = oldPeriodReads()[0]!.interval;
 
-  await page.getByRole("tab", { name: "Eğitmenler", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Eğitmenler", exact: true }));
   const dialog = await fillEarningsPayment(page);
-  await dialog.getByRole("button", { name: "Ödemeyi kaydet", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Ödemeyi kaydet", exact: true }));
   await expect(dialog).toHaveCount(0);
   await expect(
     page.getByText("Ödeme ve güncel hakediş doğrulandı.", { exact: true }),
@@ -74,9 +78,9 @@ test("payment refreshes historical period and person cursor pages after native r
   expect(f.writes).toHaveLength(1);
   await expect(page.getByText("₺300,00 · €0,00", { exact: true }).first()).toBeVisible();
 
-  await page.getByRole("tab", { name: "Satırlar", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Satırlar", exact: true }));
   await expect(page.getByText("Tango başlangıç", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Sonraki sayfa", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Sonraki sayfa", exact: true }));
   await expect(page.getByText("Etkinlik hakedişi", { exact: true })).toBeVisible();
   await expect.poll(() => oldPeriodReads().length).toBe(2);
   expect(oldPeriodReads()[1]!.interval).toEqual(historicalInterval);
@@ -86,7 +90,7 @@ test("record payment requires explicit native earning, currency, real reference 
 }) => {
   const f = await mockEarnings(page);
   const dialog = await fillEarningsPayment(page);
-  await dialog.getByRole("button", { name: "Ödemeyi kaydet", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Ödemeyi kaydet", exact: true }));
   await expect(dialog).toHaveCount(0);
   expect(f.writes).toHaveLength(1);
   expect(f.writes[0]).toMatchObject({
@@ -107,7 +111,7 @@ test("unknown payment freezes the draft and scope and same-key retry creates one
 }) => {
   const f = await mockEarnings(page, { unknown: true });
   const dialog = await fillEarningsPayment(page);
-  await dialog.getByRole("button", { name: "Ödemeyi kaydet", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Ödemeyi kaydet", exact: true }));
   await expect(
     dialog.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }),
   ).toBeVisible();
@@ -115,9 +119,9 @@ test("unknown payment freezes the draft and scope and same-key retry creates one
   await checkLockedWorkspaceScope(page, async () => {
     await expect(page.locator("[data-workspace-logo]").locator("..")).toBeDisabled();
   });
-  await page.keyboard.press("Escape");
+  await attemptOutsideDismissal(dialog);
   await expect(dialog).toBeVisible();
-  await dialog.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }));
   await expect(dialog).toHaveCount(0);
   expect(f.writes).toHaveLength(2);
   expect(f.writes[1]!.operation_key).toBe(f.writes[0]!.operation_key);
@@ -129,11 +133,11 @@ test("an ACK with unavailable readback stays saved-unread and only rereads after
 }) => {
   const f = await mockEarnings(page, { ackUnread: true });
   const dialog = await fillEarningsPayment(page);
-  await dialog.getByRole("button", { name: "Ödemeyi kaydet", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Ödemeyi kaydet", exact: true }));
   await expect(
     dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }),
   ).toBeVisible();
-  await dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
   await expect(dialog).toHaveCount(0);
   expect(f.writes).toHaveLength(1);
   expect(f.receipts).toHaveLength(0);
@@ -143,14 +147,14 @@ test("confirmed earnings payment remains saved-unread when mandatory first-page 
 }) => {
   const f = await mockEarnings(page, { pageUnread: true });
   const dialog = await fillEarningsPayment(page);
-  await dialog.getByRole("button", { name: "Ödemeyi kaydet", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Ödemeyi kaydet", exact: true }));
   await expect(
     dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }),
   ).toBeVisible();
   expect(f.writes).toHaveLength(1);
   expect(f.committed.size).toBe(1);
 
-  await dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
   await expect(dialog).toHaveCount(0);
   await expect(
     page.getByText("Ödeme ve güncel hakediş doğrulandı.", { exact: true }),
@@ -161,15 +165,15 @@ test("correction preserves original payment, uses actual aggregate root version 
   page,
 }) => {
   const f = await mockEarnings(page);
-  await page.getByRole("tab", { name: "Ödemeler", exact: true }).click();
-  await page.getByRole("button", { name: "Düzelt", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Ödemeler", exact: true }));
+  await activate(page.getByRole("button", { name: "Düzelt", exact: true }));
   const dialog = page.getByRole("dialog");
   await expect(
     dialog.getByRole("button", { name: "Düzeltmeyi kaydet", exact: true }),
   ).toBeEnabled();
   await dialog.getByLabel("Fark · TRY", { exact: true }).fill("10,00");
   await dialog.getByLabel("Gerekçe", { exact: true }).fill("Yanlış tutarı düzelt");
-  await dialog.getByRole("button", { name: "Düzeltmeyi kaydet", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Düzeltmeyi kaydet", exact: true }));
   await expect(dialog).toHaveCount(0);
   expect(f.writes[0]).toMatchObject({
     payment_id: earningsIds.payment,
@@ -195,20 +199,20 @@ test("agreement action reuses the existing native editor for the selected real p
   page,
 }) => {
   const f = await mockEarnings(page);
-  await page.getByRole("button", { name: "1 etkin anlaşma", exact: true }).click();
+  await activate(page.getByRole("button", { name: "1 etkin anlaşma", exact: true }));
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
   await expect(dialog.getByRole("combobox", { name: "Eğitmen", exact: true })).toHaveValue(
     I.instructor,
   );
   expect(f.studio.reads).toContain("instructor_agreements_list_v1");
-  await dialog.getByRole("button", { name: "Kapat", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Kapat", exact: true }));
 });
 test("toolbar starts with an editable instructor choice while financial inputs await native context", async ({
   page,
 }) => {
   const f = await mockEarnings(page);
-  await page.getByRole("button", { name: "Ödeme kaydet", exact: true }).first().click();
+  await activate(page.getByRole("button", { name: "Ödeme kaydet", exact: true }).first());
   const dialog = page.getByRole("dialog");
   const person = dialog.getByRole("combobox", { name: "Eğitmen", exact: true });
   await expect(person).toBeEnabled();
@@ -217,49 +221,49 @@ test("toolbar starts with an editable instructor choice while financial inputs a
   await expect(dialog.getByRole("combobox", { name: "Para birimi", exact: true })).toBeEnabled();
   await dialog.getByRole("combobox", { name: "Para birimi", exact: true }).selectOption("TRY");
   await expect(dialog.getByRole("button", { name: "Ödemeyi kaydet", exact: true })).toBeEnabled();
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
   expect(f.writes).toHaveLength(0);
 });
 test("a visible instructor outside the first selector page stays explicitly selected in the payment panel", async ({
   page,
 }) => {
   const f = await mockEarnings(page, { peoplePagination: true });
-  await page.getByRole("button", { name: "Sonraki sayfa", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Sonraki sayfa", exact: true }));
   const row = page.getByRole("row").filter({ hasText: "İkinci eğitmen" });
-  await row.getByRole("button", { name: "Ödeme kaydet", exact: true }).click();
+  await activate(row.getByRole("button", { name: "Ödeme kaydet", exact: true }));
   const dialog = page.getByRole("dialog");
   await expect(dialog.getByRole("combobox", { name: "Eğitmen", exact: true })).toHaveValue(
     "019a7b00-0000-7000-8000-000000000999",
   );
   await expect(dialog.getByRole("option", { name: "İkinci eğitmen", exact: true })).toHaveCount(1);
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
   expect(f.writes).toHaveLength(0);
 });
 test("stale root correction requires a fresh native chain and a new key before the next explicit write", async ({
   page,
 }) => {
   const f = await mockEarnings(page, { staleCorrect: true });
-  await page.getByRole("tab", { name: "Ödemeler", exact: true }).click();
-  await page.getByRole("button", { name: "Düzelt", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Ödemeler", exact: true }));
+  await activate(page.getByRole("button", { name: "Düzelt", exact: true }));
   const dialog = page.getByRole("dialog");
   await expect(
     dialog.getByRole("button", { name: "Düzeltmeyi kaydet", exact: true }),
   ).toBeEnabled();
   await dialog.getByLabel("Fark · TRY", { exact: true }).fill("10,00");
   await dialog.getByLabel("Gerekçe", { exact: true }).fill("Güncel sürümü düzelt");
-  await dialog.getByRole("button", { name: "Düzeltmeyi kaydet", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Düzeltmeyi kaydet", exact: true }));
   await expect(
     dialog.getByRole("button", { name: "Güncel verileri yükle", exact: true }),
   ).toBeVisible();
   await expect(
     dialog.getByRole("button", { name: "Düzeltmeyi kaydet", exact: true }),
   ).toBeDisabled();
-  await dialog.getByRole("button", { name: "Güncel verileri yükle", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Güncel verileri yükle", exact: true }));
   await expect(dialog.getByText("Başka işlem", { exact: true })).toBeVisible();
   await expect(
     dialog.getByRole("button", { name: "Düzeltmeyi kaydet", exact: true }),
   ).toBeEnabled();
-  await dialog.getByRole("button", { name: "Düzeltmeyi kaydet", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Düzeltmeyi kaydet", exact: true }));
   await expect(dialog).toHaveCount(0);
   expect(f.writes).toHaveLength(2);
   expect(f.writes[0]!.expected_version).toBe(1);
@@ -272,7 +276,7 @@ test("write authority loss ends the pending editor, hides financial context and 
 }) => {
   const f = await mockEarnings(page, { denyWrite: true });
   const dialog = await fillEarningsPayment(page);
-  await dialog.getByRole("button", { name: "Ödemeyi kaydet", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Ödemeyi kaydet", exact: true }));
   await expect(dialog).toHaveCount(0);
   await expect(page.getByText("Finans kayıtları alınamadı.", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Ödeme kaydet", exact: true })).toBeDisabled();
@@ -288,7 +292,7 @@ test("invalid overpayment preserves a fully accessible dark mobile payment form 
   const f = await mockEarnings(page);
   const dialog = await fillEarningsPayment(page);
   await dialog.getByLabel("Tutar · TRY", { exact: true }).fill("800.01");
-  await dialog.getByRole("button", { name: "Ödemeyi kaydet", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Ödemeyi kaydet", exact: true }));
   await expect(
     dialog.getByText(
       "Tutarı, para birimini, tarih/saatini, hakediş seçimini ve ödeme referansını kontrol et.",
@@ -353,32 +357,32 @@ test("manager reads agreement evidence on demand and clears stale status on deni
   await expect(row).toHaveAttribute("tabindex", "0");
   await open.focus();
   await expect(open).toBeFocused();
-  await page.keyboard.press("Enter");
+  await activate(open, "Enter");
   await expect(row.getByRole("status")).toHaveText("Anlaşma v1 · Anlaşma metni yayımlanmadı");
   await expect(refresh).toBeFocused();
 
   view.rendered_document = rendered;
   view.document_error = null;
-  await refresh.click();
+  await activate(refresh);
   await expect(row.getByRole("status")).toHaveText("Anlaşma v1 · Metin kabulü bekleniyor");
 
   view.acceptance = { ...accepted, content_hash: "previous-body" };
-  await refresh.click();
+  await activate(refresh);
   await expect(row.getByRole("status")).toHaveText(
     "Anlaşma v1 · Metni yeniden kabul etmesi gerekiyor",
   );
 
   view.acceptance = { ...accepted, person_id: earningsIds.correction };
-  await refresh.click();
+  await activate(refresh);
   await expect(row.getByRole("status")).toHaveText("Metin kabul durumu doğrulanamadı.");
 
   view.acceptance = accepted;
-  await refresh.click();
+  await activate(refresh);
   await expect(row.getByRole("status")).toHaveText("Anlaşma v1 · Metin kabul edildi");
   expect((await scanAccessibility(page, "manager-agreement-acceptance")).violations).toEqual([]);
 
   denied = true;
-  await refresh.click();
+  await activate(refresh);
   await expect(row.getByRole("status")).toHaveText("Metin kabul durumu doğrulanamadı.");
   expect(fixture.agreementReads).toEqual(Array.from({ length: 6 }, () => I.agreement));
 });

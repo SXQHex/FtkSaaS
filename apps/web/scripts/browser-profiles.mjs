@@ -1,8 +1,13 @@
 export const browserProfiles = {
   chromium: { device: "Desktop Chrome", engine: "chromium" },
   "mobile-chromium": { device: "Pixel 7", engine: "chromium" },
-  "mobile-webkit": { device: "iPhone 14", engine: "webkit" },
-  webkit: { device: "Desktop Safari", engine: "webkit" },
+  "mobile-webkit": { device: "iPhone 15", engine: "webkit" },
+  webkit: {
+    device: "Desktop Safari",
+    engine: "webkit",
+    // 13.6-inch MacBook Air Retina screen in CSS pixels at DPR 2.
+    screen: { width: 1280, height: 832 },
+  },
 };
 
 export const browserShards = [1, 2, 3];

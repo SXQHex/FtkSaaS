@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { prepareApplication, fillApplication } from "./public-application-fixture.js";
 import { publicCalendarId, publicForm } from "./public-calendar-fixture.js";
@@ -13,29 +14,29 @@ test("public event application keeps the exact publication address and recovers 
     { ...f.packet.items[0]!, publication_id: event, kind: "event", title: "Örnek atölye" },
   ];
   await page.goto(`/public/test-studio/calendar?center_id=${publicCalendarId}`);
-  await page.getByRole("link", { name: "Örnek atölye için başvur", exact: true }).click();
+  await activate(page.getByRole("link", { name: "Örnek atölye için başvur", exact: true }));
   const application = page.getByRole("form", { name: "Örnek atölye" });
   const email = application.getByLabel("E-posta (zorunlu)");
   await expect(application).toBeVisible();
   await expect(page).toHaveURL(
     new RegExp(`/apply\\?center_id=${publicCalendarId}&event=${event}$`),
   );
-  await application.getByRole("button", { name: submit, exact: true }).click();
+  await activate(application.getByRole("button", { name: submit, exact: true }));
   await expect(email).toBeFocused();
   expect(f.mutations).toHaveLength(0);
   f.setResponse("abort");
   await email.fill("visitor@example.test");
-  await application.getByRole("button", { name: "Test doğrulamasını tamamla" }).click();
-  await application.getByRole("button", { name: submit, exact: true }).click();
+  await activate(application.getByRole("button", { name: "Test doğrulamasını tamamla" }));
+  await activate(application.getByRole("button", { name: submit, exact: true }));
   await expect(email).toBeDisabled();
   f.setResponse("unavailable");
-  await application.getByRole("button", { name: "Test doğrulamasını tamamla" }).click();
-  await page.getByRole("button", { name: "Aynı başvuruyu yeniden dene" }).click();
+  await activate(application.getByRole("button", { name: "Test doğrulamasını tamamla" }));
+  await activate(page.getByRole("button", { name: "Aynı başvuruyu yeniden dene" }));
   await expect(email).toBeDisabled();
   await expect.poll(() => f.mutations.length).toBe(2);
   f.setResponse("success");
-  await application.getByRole("button", { name: "Test doğrulamasını tamamla" }).click();
-  await page.getByRole("button", { name: "Aynı başvuruyu yeniden dene" }).click();
+  await activate(application.getByRole("button", { name: "Test doğrulamasını tamamla" }));
+  await activate(page.getByRole("button", { name: "Aynı başvuruyu yeniden dene" }));
   await expect(
     page.getByRole("heading", { name: "Etkinlik başvurun inceleme bekliyor." }),
   ).toBeVisible();
@@ -68,7 +69,7 @@ test("open bound form displays actual source, follows native contact rules, send
   await page.goto(`/public/test-studio/apply?center_id=${publicForm.form_id}`);
   await expect(page.getByText("Yayımlanmış örnek koşullar.", { exact: true })).toBeVisible();
   await fillApplication(page);
-  await page.getByRole("button", { name: submit, exact: true }).click();
+  await activate(page.getByRole("button", { name: submit, exact: true }));
   await expect(
     page.getByRole("heading", { name: "Başvurun iletildi.", exact: true }),
   ).toBeVisible();
@@ -86,7 +87,7 @@ test("open bound form displays actual source, follows native contact rules, send
   expect(f.mutations[0]).not.toHaveProperty("publication_id");
   expect(f.mutations[0]).not.toHaveProperty("contact");
   expect(f.mutations[0]).not.toHaveProperty("intake");
-  await page.getByRole("button", { name: "Yeni başvuru", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Yeni başvuru", exact: true }));
   await expect(page.getByLabel("Ad soyad (zorunlu)", { exact: true })).toHaveValue("");
   await expect(page.getByRole("link", { name: "Program", exact: true })).toHaveAttribute(
     "href",
@@ -99,19 +100,19 @@ test("invalid native fields and missing contact or proof never dispatch; errors 
   const f = await prepareApplication(page);
   await page.goto("/public/test-studio/apply");
   await expect(page.locator('[aria-invalid="true"]')).toHaveCount(0);
-  await page.getByRole("button", { name: submit, exact: true }).click();
+  await activate(page.getByRole("button", { name: submit, exact: true }));
   await expect(page.getByLabel("Ad soyad (zorunlu)", { exact: true })).toBeFocused();
   expect(f.mutations).toHaveLength(0);
   await fillApplication(page);
   await page.getByLabel("E-posta", { exact: true }).fill("");
-  await page.getByRole("button", { name: submit, exact: true }).click();
+  await activate(page.getByRole("button", { name: submit, exact: true }));
   await expect(
     page.getByText("E-posta veya telefondan en az birini gir.", { exact: true }),
   ).toBeVisible();
   expect(f.mutations).toHaveLength(0);
   await page.getByLabel("E-posta", { exact: true }).fill("candidate@example.test");
-  await page.getByRole("button", { name: "Doğrulamayı yenile", exact: true }).click();
-  await page.getByRole("button", { name: submit, exact: true }).click();
+  await activate(page.getByRole("button", { name: "Doğrulamayı yenile", exact: true }));
+  await activate(page.getByRole("button", { name: submit, exact: true }));
   await expect(page.getByText("Güvenlik doğrulamasını tamamla.", { exact: true })).toBeVisible();
   expect(f.mutations).toHaveLength(0);
 });
@@ -122,13 +123,13 @@ test("timeout freezes the submitted intent and retries same key, payload and con
   f.setResponse("abort");
   await page.goto("/public/test-studio/apply");
   await fillApplication(page);
-  await page.getByRole("button", { name: submit, exact: true }).click();
+  await activate(page.getByRole("button", { name: submit, exact: true }));
   await expect(
     page.getByRole("button", { name: "Aynı başvuruyu yeniden dene", exact: true }),
   ).toBeVisible();
   await expect(page.getByLabel("Ad soyad (zorunlu)", { exact: true })).toBeDisabled();
-  await page.getByRole("button", { name: "Test doğrulamasını tamamla", exact: true }).click();
-  await page.getByRole("button", { name: "Aynı başvuruyu yeniden dene", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Test doğrulamasını tamamla", exact: true }));
+  await activate(page.getByRole("button", { name: "Aynı başvuruyu yeniden dene", exact: true }));
   await expect(
     page.getByRole("heading", { name: "Başvurun iletildi.", exact: true }),
   ).toBeVisible();
@@ -145,7 +146,7 @@ test("expired operation receipt stays uncertain instead of allowing a fresh dupl
   f.setResponse("expired");
   await page.goto("/public/test-studio/apply");
   await fillApplication(page);
-  await page.getByRole("button", { name: submit, exact: true }).click();
+  await activate(page.getByRole("button", { name: submit, exact: true }));
   await expect(
     page.getByRole("button", { name: "Aynı başvuruyu yeniden dene", exact: true }),
   ).toBeVisible();
@@ -181,7 +182,7 @@ test("real source required extras and phone-only requirement are represented wit
   await page.getByLabel("Ders biçimi (zorunlu)", { exact: true }).fill("Özel ders");
   await page.getByLabel("Seviye (zorunlu)", { exact: true }).fill("Başlangıç");
   await page.getByLabel("Mesaj", { exact: true }).fill("Başlangıç grubu");
-  await page.getByRole("button", { name: submit, exact: true }).click();
+  await activate(page.getByRole("button", { name: submit, exact: true }));
   await expect(
     page.getByRole("heading", { name: "Başvurun iletildi.", exact: true }),
   ).toBeVisible();
@@ -214,7 +215,7 @@ test("provider error and expiry clear proof; official widget is compact and uses
     const w = globalThis as unknown as { __widget: Record<string, () => void> };
     w.__widget["expired-callback"]!();
   });
-  await page.getByRole("button", { name: submit, exact: true }).click();
+  await activate(page.getByRole("button", { name: submit, exact: true }));
   await expect(page.getByText("Güvenlik doğrulamasını tamamla.", { exact: true })).toBeVisible();
   expect(f.mutations).toHaveLength(0);
 });
@@ -268,7 +269,7 @@ test("provider rejection keeps false success hidden and reopens only a freshly r
   f.setResponse("bot");
   await page.goto("/public/test-studio/apply");
   await fillApplication(page);
-  await page.getByRole("button", { name: submit, exact: true }).click();
+  await activate(page.getByRole("button", { name: submit, exact: true }));
   await expect(
     page.getByText(
       "Başvuru kabul edilmedi. Formu yeniden yükleyip güncel koşullarla tekrar dene.",
@@ -279,7 +280,7 @@ test("provider rejection keeps false success hidden and reopens only a freshly r
     0,
   );
   f.packet.application = { state: "closed", form: null };
-  await page.getByRole("button", { name: "Yeniden yükle", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Yeniden yükle", exact: true }));
   await expect(page.getByText("Başvurular şu an kapalı.", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: submit, exact: true })).toBeDisabled();
   expect(f.mutations).toHaveLength(1);

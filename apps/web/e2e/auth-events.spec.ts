@@ -1,3 +1,4 @@
+import { activate, attemptOutsideDismissal } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { mockEvents, openEvent, product, reviewEvent } from "./events-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
@@ -26,15 +27,15 @@ test("event edit requires review and confirms the exact draft without publishing
   await dialog.getByLabel("Başlık", { exact: true }).fill("Yeni atölye");
   await expect(dialog.getByRole("button", { name: "Taslak kaydet", exact: true })).toBeDisabled();
   await reviewEvent(page);
-  await dialog.getByRole("button", { name: "Taslak kaydet", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Taslak kaydet", exact: true }));
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   expect(state.effects).toBe(1);
   expect(state.writes[0]).toMatchObject({ expected_version: 1, name: "Yeni atölye" });
   expect(state.events[0]!.state).toBe("draft");
   await expect(dialog.getByLabel("Başlık", { exact: true })).toBeDisabled();
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(page.getByRole("heading", { name: "Yeni atölye", exact: true })).toBeVisible();
-  await page.getByRole("main").getByRole("link", { name: "Etkinlikler", exact: true }).click();
+  await activate(page.getByRole("main").getByRole("link", { name: "Etkinlikler", exact: true }));
   await expect(page.getByRole("row", { name: /Yeni atölye/ })).toBeVisible();
 });
 test("invalid event capacity focuses the error summary and never reaches a writer", async ({
@@ -44,7 +45,7 @@ test("invalid event capacity focuses the error summary and never reaches a write
     dialog = await openEvent(page);
   await dialog.getByLabel("En yüksek kontenjan", { exact: true }).fill("9");
   await reviewEvent(page);
-  await dialog.getByRole("button", { name: "Taslak kaydet", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Taslak kaydet", exact: true }));
   await expect(dialog.locator('[role="alert"][tabindex="-1"]')).toBeFocused();
   expect(state.writes).toHaveLength(0);
 });
@@ -55,12 +56,12 @@ test("unknown event reply freezes the form and recovers the receipt with one wri
     dialog = await openEvent(page);
   await dialog.getByLabel("Başlık", { exact: true }).fill("Kurtarılan atölye");
   await reviewEvent(page);
-  await dialog.getByRole("button", { name: "Taslak kaydet", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Taslak kaydet", exact: true }));
   await expect(dialog.getByText(/Sonuç bilinmiyor/)).toBeVisible();
   await expect(dialog.getByRole("button", { name: "Vazgeç", exact: true })).toBeDisabled();
-  await page.keyboard.press("Escape");
+  await attemptOutsideDismissal(dialog);
   await expect(dialog).toBeVisible();
-  await dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(1);
   expect(state.effects).toBe(1);
@@ -70,9 +71,9 @@ test("acknowledged event result failure only rereads the native result", async (
     dialog = await openEvent(page);
   await dialog.getByLabel("Başlık", { exact: true }).fill("Okunan atölye");
   await reviewEvent(page);
-  await dialog.getByRole("button", { name: "Taslak kaydet", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Taslak kaydet", exact: true }));
   await expect(dialog.getByText(/güncel sonuç henüz okunamadı/)).toBeVisible();
-  await dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(1);
 });
@@ -84,17 +85,17 @@ test("stale event preflight reloads the current version before a new reviewed wr
   state.events[0]!.version = 2;
   await dialog.getByLabel("Başlık", { exact: true }).fill("Yeni sürüm");
   await reviewEvent(page);
-  await dialog.getByRole("button", { name: "Taslak kaydet", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Taslak kaydet", exact: true }));
   await expect(
     dialog.getByText("Kaynak sürümü değişti. Güncel kaydı oku, şartları yeniden incele.", {
       exact: true,
     }),
   ).toBeVisible();
   expect(state.writes).toHaveLength(0);
-  await dialog.getByRole("button", { name: "Güncel verileri yükle", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Güncel verileri yükle", exact: true }));
   await dialog.getByLabel("Başlık", { exact: true }).fill("Güncel sürüm");
   await reviewEvent(page);
-  await dialog.getByRole("button", { name: "Taslak kaydet", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Taslak kaydet", exact: true }));
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   expect(state.writes[0]!.expected_version).toBe(2);
 });
@@ -171,22 +172,22 @@ test("new package practice draft uses an external unlimited venue and never cons
     });
   });
   await page.setViewportSize({ width: 320, height: 750 });
-  await page.getByRole("button", { name: "Etkinlik ekle", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Etkinlik ekle", exact: true }));
   const dialog = page.getByRole("dialog");
   await dialog
     .getByRole("combobox", { name: "Hazırlık şablonu" })
     .selectOption({ label: "Paketli Pratik · Merkez" });
-  await dialog.getByRole("button", { name: "Taslağa uygula", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Taslağa uygula", exact: true }));
   expect(state.writes).toHaveLength(0);
   await dialog.getByLabel("Başlık", { exact: true }).fill("Pratik gecesi");
   await expect(dialog.getByRole("radio", { name: "Paketli Pratik", exact: true })).toBeChecked();
   await dialog.getByLabel("Başlangıç tarihi ve saati", { exact: true }).fill("2026-11-20T20:00");
   await dialog.getByLabel("Bitiş tarihi ve saati", { exact: true }).fill("2026-11-20T23:00");
-  await dialog.getByRole("radio", { name: "Dış mekân", exact: true }).click();
+  await activate(dialog.getByRole("radio", { name: "Dış mekân", exact: true }));
   await dialog.getByLabel("Mekân adı", { exact: true }).fill("Açık alan");
   await dialog.getByLabel("Adres", { exact: true }).fill("Açık adres");
   await reviewEvent(page);
-  await dialog.getByRole("button", { name: "Taslak kaydet", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Taslak kaydet", exact: true }));
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   expect(state.writes[0]).toMatchObject({
     ...defaults,
@@ -212,11 +213,11 @@ test("event directory uses server filters and independent summaries while resett
   await expect(metric("Bekleyen ödeme")).toContainText("900,00");
   await expect(metric("Bekleyen ödeme")).toContainText("200,00");
   await expect(page.getByRole("row", { name: /Tango 0 Atölye/ })).toContainText("2 / 16");
-  await page.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Sonraki", exact: true }));
   await expect(page.getByRole("row", { name: /Tango 20 Atölye/ })).toBeVisible();
   expect(state.reads.at(-1)!.page).toMatchObject({ cursor: "directory-next" });
   await expect(metric("Yayında")).toHaveText("11");
-  await page.getByRole("radio", { name: "Yayında", exact: true }).click();
+  await activate(page.getByRole("radio", { name: "Yayında", exact: true }));
   await expect.poll(() => state.reads.at(-1)!.status).toBe("published");
   expect(state.reads.at(-1)!.page).not.toHaveProperty("cursor");
   await expect(metric("Taslak")).toHaveText("10");
@@ -252,7 +253,7 @@ test("limited event reader retains native filters without requesting manager sum
   await expect(page.getByRole("row", { name: /Tango 0 Atölye/ })).toBeVisible();
   expect(state.reads[0]).not.toHaveProperty("include_summary");
   await expect(page.getByRole("row", { name: /Tango 0 Atölye/ })).toContainText("— / 16");
-  await page.getByRole("radio", { name: "Yayında", exact: true }).click();
+  await activate(page.getByRole("radio", { name: "Yayında", exact: true }));
   await expect.poll(() => state.reads.at(-1)!.status).toBe("published");
   expect(state.reads.at(-1)!).not.toHaveProperty("include_summary");
 });

@@ -1,3 +1,4 @@
+import { activate, attemptOutsideDismissal } from "./device-input.js";
 import { checkLockedWorkspaceScope } from "./auth-fixture.js";
 import { test, expect } from "./test.js";
 import { mockMemberLifecycle } from "./member-lifecycle-fixture.js";
@@ -103,7 +104,7 @@ async function setup(
     return route.fallback();
   });
   if (options.existing) await page.reload();
-  await page.getByRole("button", { name: text.title, exact: true }).click();
+  await activate(page.getByRole("button", { name: text.title, exact: true }));
   const panel = page.getByRole("dialog", { name: text.title, exact: true });
   return { ...f, writes, receipts, committed, unrelated, panel };
 }
@@ -114,15 +115,16 @@ async function review(
 ) {
   await panel.getByLabel(text.discipline, { exact: true }).selectOption(I.discipline);
   if (inactive)
-    await panel
-      .getByRole("radio", { name: common.people.states.inactive, exact: true })
-      .press("Space");
-  await panel.getByRole("button", { name: text.review, exact: true }).click();
+    await activate(
+      panel.getByRole("radio", { name: common.people.states.inactive, exact: true }),
+      "Space",
+    );
+  await activate(panel.getByRole("button", { name: text.review, exact: true }));
   return page.getByRole("dialog", { name: text.review, exact: true });
 }
 async function apply(dialog: import("@playwright/test").Locator) {
-  await dialog.getByRole("checkbox").press("Space");
-  await dialog.getByRole("button", { name: text.apply, exact: true }).click();
+  await activate(dialog.getByRole("checkbox"), "Space");
+  await activate(dialog.getByRole("button", { name: text.apply, exact: true }));
 }
 test("student discipline requires an explicit choice/review and rereads a new native link without changing student or instructor roles", async ({
   page,
@@ -131,7 +133,7 @@ test("student discipline requires an explicit choice/review and rereads a new na
     field = f.panel.getByLabel(text.discipline, { exact: true });
   await expect(field).toHaveValue("");
   await expect(field).toHaveAttribute("aria-invalid", "false");
-  await f.panel.getByRole("button", { name: text.review, exact: true }).click();
+  await activate(f.panel.getByRole("button", { name: text.review, exact: true }));
   await expect(field).toHaveAttribute("aria-invalid", "true");
   await expect(field).toBeFocused();
   expect(f.writes).toHaveLength(0);
@@ -144,12 +146,12 @@ test("student discipline requires an explicit choice/review and rereads a new na
   expect(f.person.discipline_relationships.filter((row) => row.kind !== "student")).toEqual(
     f.unrelated,
   );
-  await dialog.getByRole("button", { name: common.settings.discard, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: common.settings.discard, exact: true }));
   await page.reload();
-  await page.getByRole("button", { name: text.title, exact: true }).click();
+  await activate(page.getByRole("button", { name: text.title, exact: true }));
   const editor = page.getByRole("dialog", { name: text.title, exact: true });
   await editor.getByLabel(text.discipline, { exact: true }).selectOption(I.discipline);
-  await editor.getByRole("button", { name: text.review, exact: true }).click();
+  await activate(editor.getByRole("button", { name: text.review, exact: true }));
   await expect(editor.getByRole("alert")).toContainText(text.same);
   expect(f.writes).toHaveLength(1);
 });
@@ -164,14 +166,14 @@ for (const recovery of ["retry", "receipt"] as const)
     await checkLockedWorkspaceScope(page, async () => {
       await expect(page.locator("[data-workspace-logo]").locator("..")).toBeDisabled();
     });
-    await page.keyboard.press("Escape");
+    await attemptOutsideDismissal(dialog);
     await expect(dialog).toBeVisible();
-    await dialog
-      .getByRole("button", {
+    await activate(
+      dialog.getByRole("button", {
         name: recovery === "retry" ? common.finance.retrySame : common.finance.readResult,
         exact: true,
-      })
-      .click();
+      }),
+    );
     await expect(dialog.getByRole("status")).toContainText(text.states.saved);
     expect(f.committed.size).toBe(1);
     expect(f.writes).toHaveLength(recovery === "retry" ? 2 : 1);
@@ -196,7 +198,7 @@ test("student discipline ACK recovery only rereads the person, without dispatchi
   await expect(
     dialog.getByRole("button", { name: common.finance.retrySame, exact: true }),
   ).toHaveCount(0);
-  await dialog.getByRole("button", { name: common.finance.readResult, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: common.finance.readResult, exact: true }));
   await expect(dialog.getByRole("status")).toContainText(text.states.saved);
   expect(f.writes).toHaveLength(1);
   expect(f.receipts).toHaveLength(0);
@@ -209,7 +211,7 @@ test("a changed student discipline version requires fresh review and explicit ap
   await apply(dialog);
   await expect(dialog.getByRole("status")).toContainText(text.states.stale);
   await expect(dialog.getByRole("button", { name: text.apply, exact: true })).toBeDisabled();
-  await dialog.getByRole("button", { name: common.settings.discard, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: common.settings.discard, exact: true }));
   dialog = await review(page, f.panel, true);
   await expect(dialog.getByRole("checkbox")).not.toBeChecked();
   await apply(dialog);

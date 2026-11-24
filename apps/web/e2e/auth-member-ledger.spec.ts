@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import type {
@@ -107,7 +108,7 @@ async function setup(
   await page.goto(origin + "/login");
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(origin + "/account");
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/people/${I.instructor}`);
@@ -129,12 +130,12 @@ test("mobile profile reads canonical membership date and only explicitly selecte
     .getByRole("combobox", { name: common.memberProfile.ledgerSale, exact: true })
     .selectOption(sale);
   expect(state.reads).toHaveLength(0);
-  await state.panel
-    .getByRole("button", { name: common.memberProfile.readLedger, exact: true })
-    .click();
+  await activate(
+    state.panel.getByRole("button", { name: common.memberProfile.readLedger, exact: true }),
+  );
   await expect(state.panel.getByText("Miktar 8 · Bakiye farkı +8", { exact: true })).toBeVisible();
   await expect(state.panel.getByText(`Kaynak: Satış · ${sale}`, { exact: true })).toBeVisible();
-  await state.panel.getByRole("button", { name: common.finance.next, exact: true }).click();
+  await activate(state.panel.getByRole("button", { name: common.finance.next, exact: true }));
   await expect(state.panel.getByText("Miktar 1 · Bakiye farkı 0", { exact: true })).toBeVisible();
   await expect(state.panel.getByText("16.11.2026 02:30", { exact: true })).toBeVisible();
   await expect(
@@ -146,9 +147,9 @@ test("mobile profile reads canonical membership date and only explicitly selecte
     .selectOption(secondSale);
   await expect(state.panel.getByText("Miktar 1 · Bakiye farkı 0", { exact: true })).toHaveCount(0);
   expect(state.reads.at(-1)?.ledger_sale_id).toBe(sale);
-  await state.panel
-    .getByRole("button", { name: common.memberProfile.readLedger, exact: true })
-    .click();
+  await activate(
+    state.panel.getByRole("button", { name: common.memberProfile.readLedger, exact: true }),
+  );
   await expect.poll(() => state.reads.at(-1)?.ledger_sale_id).toBe(secondSale);
   expect(state.reads.at(-1)?.ledger_page.cursor).toBeUndefined();
   expect(state.studio.writes).toHaveLength(0);
@@ -162,9 +163,9 @@ test("ledger permission denial preserves independently readable profile and neve
   await state.panel
     .getByRole("combobox", { name: common.memberProfile.ledgerSale, exact: true })
     .selectOption(sale);
-  await state.panel
-    .getByRole("button", { name: common.memberProfile.readLedger, exact: true })
-    .click();
+  await activate(
+    state.panel.getByRole("button", { name: common.memberProfile.readLedger, exact: true }),
+  );
   await expect(
     state.panel.getByText(common.memberProfile.ledgerError, { exact: true }),
   ).toBeVisible();
@@ -182,9 +183,9 @@ test("null membership does not use account or creation date, while a successful 
   await state.panel
     .getByRole("combobox", { name: common.memberProfile.ledgerSale, exact: true })
     .selectOption(sale);
-  await state.panel
-    .getByRole("button", { name: common.memberProfile.readLedger, exact: true })
-    .click();
+  await activate(
+    state.panel.getByRole("button", { name: common.memberProfile.readLedger, exact: true }),
+  );
   await expect(
     state.panel.getByText(common.memberProfile.noRecords, { exact: true }),
   ).toBeVisible();

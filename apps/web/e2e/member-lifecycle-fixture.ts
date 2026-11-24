@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { expect, type Page } from "@playwright/test";
 import type {
   EntitlementView,
@@ -496,7 +497,7 @@ export async function mockMemberLifecycle(
   await page.goto(origin + "/login");
   await page.getByLabel("E-posta", { exact: true }).fill("synthetic@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("synthetic-password");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(origin + "/account");
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/people/${I.instructor}`);

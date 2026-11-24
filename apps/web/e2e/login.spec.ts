@@ -1,3 +1,4 @@
+import { hasTouchInput, activate, submitWithDevice } from "./device-input.js";
 import { expect, test } from "./test.js";
 import { scanAccessibility } from "./accessibility.js";
 
@@ -21,12 +22,19 @@ for (const viewport of [
       await page.goto("/login");
       await expect(page.getByRole("heading", { name: "Hesabına giriş yap" })).toBeVisible();
       expect(await page.evaluate("document.documentElement.scrollWidth > innerWidth")).toBe(false);
-      await page.getByLabel("E-posta").focus();
-      await page.keyboard.press("Tab");
-      await expect(page.getByRole("link", { name: "Parolamı unuttum" })).toBeFocused();
-      await page.keyboard.press("Tab");
-      await expect(page.getByLabel("Parola", { exact: true })).toBeFocused();
-      await page.keyboard.press("Enter");
+      if (hasTouchInput(page)) {
+        await activate(page.getByLabel("E-posta", { exact: true }));
+        const password = page.getByLabel("Parola", { exact: true });
+        await activate(password);
+        await expect(password).toBeFocused();
+      } else {
+        await page.getByLabel("E-posta").focus();
+        await page.keyboard.press("Tab");
+        await expect(page.getByRole("link", { name: "Parolamı unuttum" })).toBeFocused();
+        await page.keyboard.press("Tab");
+        await expect(page.getByLabel("Parola", { exact: true })).toBeFocused();
+      }
+      await submitWithDevice(page.getByRole("button", { name: "Giriş yap", exact: true }));
       await expect(page.getByLabel("E-posta")).toHaveAttribute("aria-invalid", "true");
       await expect(page.getByText("Geçerli bir e-posta adresi gir.")).toBeVisible();
       const results = await scanAccessibility(page);
@@ -76,10 +84,15 @@ for (const colorScheme of ["light", "dark"] as const) {
       page.getByRole("button", { name: "Google ile devam et" }),
       page.getByRole("link", { name: "Kayıt ol" }),
     ];
-    await controls[0]!.focus();
+    const touch = hasTouchInput(page);
+    if (!touch) await controls[0]!.focus();
     for (const [index, control] of controls.entries()) {
-      if (index > 0) await page.keyboard.press("Tab");
-      await expect(control).toBeFocused();
+      if (touch) {
+        await control.scrollIntoViewIfNeeded();
+      } else {
+        if (index > 0) await page.keyboard.press("Tab");
+        await expect(control).toBeFocused();
+      }
       await expect(control).toBeInViewport({ ratio: 1 });
       const box = await control.boundingBox();
       expect(box).not.toBeNull();
@@ -88,10 +101,12 @@ for (const colorScheme of ["light", "dark"] as const) {
       expect(box!.y + box!.height).toBeLessThanOrEqual(901);
       expect(box!.x + box!.width).toBeLessThanOrEqual(641);
     }
-    for (const control of controls.slice(0, -1).reverse()) {
-      await page.keyboard.press("Shift+Tab");
-      await expect(control).toBeFocused();
-      await expect(control).toBeInViewport({ ratio: 1 });
+    if (!touch) {
+      for (const control of controls.slice(0, -1).reverse()) {
+        await page.keyboard.press("Shift+Tab");
+        await expect(control).toBeFocused();
+        await expect(control).toBeInViewport({ ratio: 1 });
+      }
     }
     expect(await page.evaluate("document.documentElement.scrollWidth > innerWidth")).toBe(false);
     const results = await scanAccessibility(page, "login-200-percent-text-spacing");

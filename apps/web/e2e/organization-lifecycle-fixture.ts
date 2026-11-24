@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import type { Page } from "@playwright/test";
 import type {
   OrganizationView,
@@ -166,6 +167,6 @@ export async function mockOrganizationLifecycle(
   await page
     .getByRole("combobox", { name: "Ayar kapsamı", exact: true })
     .selectOption("organization");
-  await page.getByRole("tab", { name: "Plan", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Plan", exact: true }));
   return { settings, writes, requests, organization, job, effects: () => effects };
 }

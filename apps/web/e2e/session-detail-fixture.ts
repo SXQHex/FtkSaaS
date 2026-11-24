@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { expect, type Page } from "@playwright/test";
 import type {
   SessionView,
@@ -500,7 +501,7 @@ export async function mockSessionDetail(
     await page.goto(`${appOrigin}/login`);
     await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
     await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-    await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+    await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
     await expect(page).toHaveURL(`${appOrigin}/account`);
     await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   }
