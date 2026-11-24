@@ -5,6 +5,8 @@ import { BackendError } from "../../lib/backend";
 import { capturePrivateReadback } from "../../lib/cache-invalidation";
 import type { Mutation, OperationStatusView } from "@ftksaas/api-contracts";
 
+type CommandAcknowledgment = Pick<Mutation, "primary_id"> & Partial<Pick<Mutation, "related">>;
+
 export function useMemberCommand<Intent, Result>({
   write,
   readReceipt,
@@ -12,10 +14,10 @@ export function useMemberCommand<Intent, Result>({
   onRefresh,
   onAccessLost,
 }: {
-  // Some native operations acknowledge with a typed domain view. Adapters only extract its real primary ID.
-  write: (intent: Intent) => Promise<Pick<Mutation, "primary_id">>;
+  // Domain view adapters can supply just the native primary ID.
+  write: (intent: Intent) => Promise<CommandAcknowledgment>;
   readReceipt?: (intent: Intent) => Promise<OperationStatusView>;
-  readResult: (intent: Intent, id?: string) => Promise<Result>;
+  readResult: (intent: Intent, id?: string, related?: Mutation["related"]) => Promise<Result>;
   onRefresh?: (result: Result, assertCurrent: () => void) => Promise<void>;
   onAccessLost: (error: unknown) => boolean;
 }) {
@@ -27,7 +29,7 @@ export function useMemberCommand<Intent, Result>({
     [unavailable, setUnavailable] = useState(false);
   const intent = useRef<Intent | undefined>(undefined),
     acknowledged = useRef(false),
-    primary = useRef<string | undefined>(undefined),
+    acknowledgment = useRef<Partial<CommandAcknowledgment>>({}),
     executing = useRef(false),
     mounted = useRef(true),
     terminal = useRef(false);
@@ -49,7 +51,7 @@ export function useMemberCommand<Intent, Result>({
   function abandon() {
     terminal.current = true;
     intent.current = undefined;
-    primary.current = undefined;
+    acknowledgment.current = {};
     acknowledged.current = false;
     setUnavailable(true);
     setState("rejected");
@@ -58,7 +60,8 @@ export function useMemberCommand<Intent, Result>({
     if (!intent.current || !acknowledged.current) return;
     const assertCurrent = capturePrivateReadback(queries);
     try {
-      const result = await readResult(intent.current, primary.current);
+      const { primary_id, related } = acknowledgment.current;
+      const result = await readResult(intent.current, primary_id, related);
       if (!mounted.current || terminal.current) return;
       assertCurrent();
       await onRefresh?.(result, assertCurrent);
@@ -112,7 +115,7 @@ export function useMemberCommand<Intent, Result>({
           assertCurrent();
           throw error;
         });
-        primary.current = result.primary_id;
+        acknowledgment.current = { primary_id: result.primary_id, related: result.related };
         acknowledged.current = true;
       }
       if (!mounted.current || terminal.current) return;
@@ -129,7 +132,7 @@ export function useMemberCommand<Intent, Result>({
     if (!mounted.current || terminal.current || executing.current || intent.current) return;
     intent.current = structuredClone(next);
     acknowledged.current = false;
-    primary.current = undefined;
+    acknowledgment.current = {};
     await execute();
   }
   async function recoverReceipt() {
@@ -152,7 +155,7 @@ export function useMemberCommand<Intent, Result>({
         assertCurrent();
         if (receipt.status === "succeeded" || receipt.status === "result_expired") {
           acknowledged.current = true;
-          primary.current = receipt.result_reference?.id;
+          acknowledgment.current = { primary_id: receipt.result_reference?.id };
         } else if (receipt.status === "failed_final") {
           intent.current = undefined;
           setState("rejected");
@@ -178,7 +181,7 @@ export function useMemberCommand<Intent, Result>({
   function reset() {
     if (terminal.current || executing.current || locked) return;
     intent.current = undefined;
-    primary.current = undefined;
+    acknowledgment.current = {};
     acknowledged.current = false;
     setState("ready");
   }

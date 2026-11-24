@@ -85,32 +85,33 @@ export function LessonRequestEditor({
     refetchOnReconnect: false,
   });
   const current = source.isError ? undefined : source.data;
+  const unresolved = current?.state === "pending" || current?.state === "alternative_offered";
   const instructors = useQuery({
     queryKey: [...prefix, "instructors", current?.person_id],
     queryFn: (readContext) => readRequestInstructors(scope, current!.person_id, readContext),
     enabled: Boolean(
-      current && (stage === "alternative" || (stage === "approve" && draft.mode === "create")),
+      unresolved && (stage === "alternative" || (stage === "approve" && draft.mode === "create")),
     ),
     retry: false,
   });
   const rooms = useQuery({
     ...studioRoomsQuery(scope),
-    enabled: Boolean(current && stage === "approve" && draft.mode === "create"),
+    enabled: unresolved && stage === "approve" && draft.mode === "create",
   });
   const sessions = useQuery({
     queryKey: [...prefix, "sessions", current?.version],
     queryFn: (readContext) => readRequestSessions(scope, current!, readContext),
-    enabled: Boolean(current && stage === "approve" && draft.mode === "existing"),
+    enabled: unresolved && stage === "approve" && draft.mode === "existing",
     retry: false,
   });
   const command = useMemberCommand({
     write: writeRequest,
     readReceipt: readRequestReceipt,
-    readResult: (intent, id) =>
+    readResult: (intent, id, related) =>
       readIntoCurrentQuery(
         queries,
         sourceKey,
-        () => readRequestResult(intent, id),
+        () => readRequestResult(intent, id, related),
         (result) => result.request,
       ),
     onAccessLost,
@@ -250,11 +251,7 @@ export function LessonRequestEditor({
       timeStyle: "short",
       timeZone: timezone,
     });
-  const available =
-    current &&
-    ["pending", "alternative_offered"].includes(current.state) &&
-    command.state !== "saved" &&
-    !command.unavailable;
+  const available = current && unresolved && command.state !== "saved" && !command.unavailable;
   const eligible: { id: string; label: string; value: string }[] = [
     {
       id: "native",
