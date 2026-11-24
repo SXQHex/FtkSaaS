@@ -1,3 +1,4 @@
+import { readTurnstileSiteKey } from "../../lib/public-config";
 import { useEffect, useRef, useState, type FormEventHandler } from "react";
 import { getRouteApi } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -110,7 +111,7 @@ export function PublicApplicationPage({
     !!(eventId ? event : form) &&
     !discovery.isError &&
     !discovery.isFetching &&
-    !!import.meta.env.VITE_TURNSTILE_SITE_KEY?.trim();
+    !!readTurnstileSiteKey();
   async function send(prepared: Attempt) {
     if (busy.current) return;
     if (!proof) {

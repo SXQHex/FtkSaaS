@@ -1,3 +1,4 @@
+import { requireSupabasePublishableKey, requireSupabaseUrl } from "../../lib/public-config";
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { scopedUploadUrl, sha256Hex } from "../../lib/document-upload";
@@ -67,7 +68,7 @@ export async function uploadPlatformInvoice(intent: InvoiceUploadIntent) {
   const id = z.uuid().parse(upload.invoice_id);
   if (upload.upload_url !== null) {
     const url = scopedUploadUrl(
-      import.meta.env.VITE_SUPABASE_URL,
+      requireSupabaseUrl(),
       upload.upload_url,
       "ftksaas-invoices",
       intent.scope.orgId,
@@ -80,7 +81,7 @@ export async function uploadPlatformInvoice(intent: InvoiceUploadIntent) {
       redirect: "error",
       referrerPolicy: "no-referrer",
       headers: {
-        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        apikey: requireSupabasePublishableKey(),
         "content-type": intent.mime,
       },
       body: intent.body,

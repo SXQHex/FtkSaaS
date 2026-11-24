@@ -1,10 +1,7 @@
+import { readPublicGatewayUrl } from "../../lib/public-config";
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
-import type {
-  Interval,
-  RequestPublicCalendarGet,
-  SuccessPublicCalendarGet,
-} from "@ftksaas/api-contracts";
+import type { Interval, RequestPublicCalendarGet } from "@ftksaas/api-contracts";
 import { publicApplicationDiscovery } from "./public-discovery";
 import { readEnvelope } from "../../lib/backend";
 import { getTemporal } from "../../lib/temporal";
@@ -73,7 +70,7 @@ export async function readPublicCalendar(
   },
   signal?: AbortSignal,
 ) {
-  const base = import.meta.env.VITE_PUBLIC_GATEWAY_URL?.trim();
+  const base = readPublicGatewayUrl();
   if (!base) throw new Error("Public gateway yapılandırması eksik.");
   const request: RequestPublicCalendarGet = {
     client_api_version: 1,
@@ -90,7 +87,7 @@ export async function readPublicCalendar(
     include_details: true,
     ...(input.disciplineId ? { discipline_id: z.uuid().parse(input.disciplineId) } : {}),
   };
-  const response = await fetch(`${base.replace(/\/$/, "")}/api/public/calendar`, {
+  const response = await fetch(`${base}/api/public/calendar`, {
     method: "POST",
     credentials: "omit",
     cache: "no-store",
@@ -98,7 +95,7 @@ export async function readPublicCalendar(
     headers: { "content-type": "application/json" },
     body: JSON.stringify(request),
   });
-  const data = calendar.parse(await readEnvelope<SuccessPublicCalendarGet>(response, signal));
+  const data = calendar.parse(await readEnvelope(response, signal));
   const ids = new Set<string>();
   const T = await getTemporal();
   let previous: string | undefined;

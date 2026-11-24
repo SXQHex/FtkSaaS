@@ -39,12 +39,19 @@ export async function fetchBackendOperation(
   }
   if (response.ok) return response;
 
-  const result = await response
+  const result: unknown = await response
     .clone()
     .json()
     .catch(() => null);
   // Edge owns gateway/auth errors and keeps clients compatible with older deployments.
-  if (response.status === 401 || response.status === 403 || typeof result?.ok !== "boolean")
+  if (
+    response.status === 401 ||
+    response.status === 403 ||
+    !result ||
+    typeof result !== "object" ||
+    !("ok" in result) ||
+    typeof result.ok !== "boolean"
+  )
     return edge();
   return response;
 }

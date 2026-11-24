@@ -1,17 +1,23 @@
+import { readPublicGatewayUrl } from "./public-config";
 import { v7 as uuidv7 } from "uuid";
-import type { RequestAccountSignupCheck, SuccessAccountSignupCheck } from "@ftksaas/api-contracts";
+import { z } from "zod";
+import type { RequestAccountSignupCheck } from "@ftksaas/api-contracts";
 import { readEnvelope } from "./backend";
 
+const signupCheckResult = z.object({ status: z.enum(["account_exists", "available"]) });
+
 export async function checkSignup(email: string) {
-  const baseUrl = import.meta.env.VITE_PUBLIC_GATEWAY_URL?.trim();
+  const baseUrl = readPublicGatewayUrl();
   if (!baseUrl) throw new Error("Public gateway yapılandırması eksik.");
   const request: RequestAccountSignupCheck = { client_api_version: 1, request_id: uuidv7(), email };
-  const response = await fetch(`${baseUrl.replace(/\/$/, "")}/api/auth/signup-check`, {
+  const response = await fetch(`${baseUrl}/api/auth/signup-check`, {
     method: "POST",
     credentials: "omit",
     cache: "no-store",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(request),
   });
-  return readEnvelope<SuccessAccountSignupCheck>(response);
+  const result = signupCheckResult.safeParse(await readEnvelope(response));
+  if (!result.success) throw new Error("SIGNUP_CHECK_INVALID");
+  return result.data;
 }
