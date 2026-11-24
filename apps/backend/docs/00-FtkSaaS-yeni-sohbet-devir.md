@@ -107,7 +107,7 @@ Aynı main SHA için [Supabase development teslimi](https://github.com/SXQHex/Ft
 
 ### XREQ-073 — Takip adayının kaynak doğrulaması
 
-İzole PostgreSQL 17 üzerinde 224 migration boş veritabanına uygulandı. Sentetik Auth kimliğiyle service-role RPC ve üretilmiş DTO doğrulayıcılarından takvim kesişimi, seans/yoklama projeksiyonu, kendi rezervasyon özeti, iki kaynaklı uygunluk/kapanış, iki sınıflı program, çoklu kişi anlaşması ve etkinliğin aktif oda etiketi sınandı. Kaynağın normal Auth ve Edge zincirindeki kabulü aday CI’da bekliyor. [Takip işi](remaining-work.md#xreq-073-takip).
+İzole PostgreSQL 17 üzerinde 224 migration boş veritabanına uygulandı. Sentetik Auth kimliğiyle service-role RPC ve üretilmiş DTO doğrulayıcılarından takvim kesişimi, seans/yoklama projeksiyonu, kendi rezervasyon özeti, iki kaynaklı uygunluk/kapanış, iki sınıflı program, çoklu kişi anlaşması ve etkinliğin aktif oda etiketi sınandı. [İlk aday CI](https://github.com/SXQHex/FtkSaaS/actions/runs/45428620160) core doğrulamasında `Edge bundle drift` ile durdu. Geçici çalışma ağacındaki sözleşme paketinin bağlantısı başka checkout’a çözülmüş ve eski doğrulayıcılar Edge bundle’ına girmişti. Bağlantı aday kaynağına alındı ve izlenen `backend-v1/index.js` yeniden üretildi. Eski bundle ile istek `400` ve yanıt `500` yeniden görüldü. Yeni bundle sentetik Auth ve gerçek loopback PostgreSQL RPC’siyle dokuz isteği kabul etti ve geçersiz isteği reddetti. Normal Auth ve Edge zinciri yeni aday CI’da doğrulanır. [Takip işi](remaining-work.md#xreq-073-takip).
 
 <a id="xreq-073-development-worker"></a>
 ### XREQ-073 — Public development Worker
