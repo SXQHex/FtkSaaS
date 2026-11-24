@@ -423,9 +423,7 @@ function StudioContent({
               }}
               onClose={onClose}
               onLockChange={publishLock}
-              onRefresh={async () => {
-                await refreshStudio();
-              }}
+              onRefresh={async () => (await refreshStudio()).data}
             />
           );
         if (selection.kind === "closure" && selection.id) {

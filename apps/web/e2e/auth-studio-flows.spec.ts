@@ -3,6 +3,7 @@ import { test, expect } from "./test.js";
 import { scanAccessibility } from "./accessibility.js";
 import { reviewStudioAccessibility } from "./studio-accessibility-review.js";
 import { writeFile } from "node:fs/promises";
+import { request_management_state_get_v1 } from "@ftksaas/api-contracts/validators";
 import { mockStudio, mockStudioCalendar, openStudio, studioIds } from "./studio-fixture.js";
 import common from "../src/locales/tr/common.json" with { type: "json" };
 
@@ -10,6 +11,29 @@ async function newRoom(page: import("@playwright/test").Page) {
   await page.getByRole("tab", { name: "Dersler ve salonlar", exact: true }).click();
   await page.getByRole("button", { name: "Salon ekle", exact: true }).click();
   return page.getByRole("dialog");
+}
+
+async function newRoomClosure(page: import("@playwright/test").Page) {
+  await page.getByRole("tab", { name: "Kapanışlar", exact: true }).click();
+  await page.getByRole("button", { name: "Kapanış ekle", exact: true }).click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog.getByText(/Europe\/Istanbul merkez saat dilimine/)).toBeVisible();
+  await dialog.locator('[name="target"]').selectOption(studioIds.room);
+  await dialog.locator('[name="from"]').fill("2030-06-01");
+  await dialog.locator('[name="to"]').fill("2030-06-02");
+  await dialog.locator('[name="reason"]').selectOption({ label: "Bakım ya da tadilat" });
+  return dialog;
+}
+
+function isRoomClosureRead(payload: unknown) {
+  return (
+    request_management_state_get_v1(payload) &&
+    payload.org_id === studioIds.org &&
+    payload.center_id === studioIds.center &&
+    payload.selector.operation === "availability_exception_save_v1" &&
+    payload.selector.key.resource?.kind === "room" &&
+    payload.selector.key.resource.id === studioIds.room
+  );
 }
 
 test("Studio flow: unknown room result replays its key once and preserves zero capacity", async ({
@@ -119,14 +143,12 @@ test("Studio flow: closure appends using the center version and inclusive local 
 }) => {
   const state = await mockStudio(page);
   await openStudio(page);
-  await page.getByRole("tab", { name: "Kapanışlar", exact: true }).click();
-  await page.getByRole("button", { name: "Kapanış ekle", exact: true }).click();
-  const dialog = page.getByRole("dialog");
-  await expect(dialog.getByText(/Europe\/Istanbul merkez saat dilimine/)).toBeVisible();
-  await dialog.locator('[name="target"]').selectOption(studioIds.room);
-  await dialog.locator('[name="from"]').fill("2030-06-01");
-  await dialog.locator('[name="to"]').fill("2030-06-02");
-  await dialog.locator('[name="reason"]').selectOption({ label: "Bakım ya da tadilat" });
+  const dialog = await newRoomClosure(page);
+  let roomClosureReads = 0;
+  page.on("request", (request) => {
+    if (!request.url().endsWith("/backend-v1/management_state_get_v1")) return;
+    if (isRoomClosureRead(request.postDataJSON())) roomClosureReads++;
+  });
   await dialog.getByRole("button", { name: "Kapanışı kaydet", exact: true }).click();
   await expect(dialog).toHaveCount(0);
   expect(state.writes).toHaveLength(1);
@@ -136,6 +158,38 @@ test("Studio flow: closure appends using the center version and inclusive local 
     interval: { starts_at: "2030-05-31T21:00:00Z", ends_at: "2030-06-02T21:00:00Z" },
   });
   expect(state.closures).toHaveLength(1);
+  expect(state.effects).toEqual(["availability_exception_save_v1"]);
+  expect(roomClosureReads).toBe(1);
+});
+
+test("Studio flow: an acknowledged closure missing from the fresh source only retries reads", async ({
+  page,
+}) => {
+  const state = await mockStudio(page);
+  await openStudio(page);
+  const dialog = await newRoomClosure(page);
+  let roomClosureReads = 0;
+  await page.route("**/functions/v1/backend-v1/management_state_get_v1", (route) => {
+    if (!isRoomClosureRead(route.request().postDataJSON())) return route.fallback();
+    roomClosureReads++;
+    if (roomClosureReads > 1) return route.fallback();
+    return route.fulfill({
+      json: {
+        ok: true,
+        trace_id: studioIds.role,
+        data: { items: [], next_cursor: null, as_of: "2026-11-18T12:00:00Z" },
+      },
+    });
+  });
+  await dialog.getByRole("button", { name: "Kapanışı kaydet", exact: true }).click();
+  await expect(dialog.getByRole("status")).toContainText(common.studio.closureSavedUnread);
+  const retry = dialog.getByRole("button", { name: common.studio.retryRead, exact: true });
+  await expect(retry).toBeEnabled();
+  expect(roomClosureReads).toBe(1);
+  await retry.click();
+  await expect(dialog).toHaveCount(0);
+  expect(roomClosureReads).toBe(2);
+  expect(state.writes).toHaveLength(1);
   expect(state.effects).toEqual(["availability_exception_save_v1"]);
 });
 

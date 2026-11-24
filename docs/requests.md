@@ -1031,6 +1031,8 @@ Frontend [M09 taraması](../apps/web/docs/remaining-work.md#router-query-birlesi
 
 **Kabul.** Aynı aktör, native oturum, organizasyon, merkez, plan, canonical veri sahibi ve alan görünürlüğü korunur. Sonuç kümesi görünür kayıt ve seçili dönemle sınırlanır. İzin reddi, kaynak yokluğu, boş sonuç ve sıfır ayrı kalır. Cursor tüm seçicilere bağlanır. İlgili pozitif ve negatif native testler, önce/sonra istek ve satır sayısı, aynı fixture'da gecikme ve ayrı hosted ölçümle doğrulanır. Komut hazırlığı, idempotent yazma ve taze sonuç okuması kendi native kontrolünde kalır.
 
+**Frontend ortam gözlemi · C-ortak.** Development Edge, Stüdyo ve Üyeler’in salt okumalarında HTTP 503 / `TEMPORARY_FAILURE` döndürdü. Backend log korelasyonu için UTC, seçici, API trace, Supabase istek ve Edge yürütme kimlikleri [frontend tanı kaydında](../apps/web/docs/handover.md#c-common-development-503).
+
 <a id="xreq-073-backend-degerlendirmesi"></a>
 ### Uygulama öncesi backend değerlendirmesi · 24 Kasım 2026
 

@@ -45,18 +45,12 @@ export async function readStudioSetup(
   const [center, products, plan] = await Promise.all([
     readable(async () => {
       const [centers, catalog, settings] = await Promise.all([
-        studioPages((cursor) =>
-          backend
-            .call("centers_list_v1", {
-              client_api_version: 1,
-              request_id: uuidv7(),
-              org_id: scope.orgId,
-              center_id: scope.centerId,
-              include_setup_status: true,
-              page: { limit: 50, ...(cursor ? { cursor } : {}) },
-            })
-            .then((page) => ({ items: page.items, next_cursor: page.next_cursor ?? null })),
-        ),
+        backend.call("centers_list_v1", {
+          ...common,
+          request_id: uuidv7(),
+          include_setup_status: true,
+          page: { limit: 1 },
+        }),
         backend.call("settings_catalog_get_v1", {
           ...common,
           request_id: uuidv7(),
@@ -64,11 +58,17 @@ export async function readStudioSetup(
         }),
         backend.call("settings_get_v1", { ...common, request_id: uuidv7(), scope: "center" }),
       ]);
-      const matches = centers.filter((item) => item.id === scope.centerId && item.accessible);
-      if (matches.length !== 1 || catalog.scope !== "center" || settings.scope !== "center")
+      const [selected] = centers.items;
+      if (
+        centers.items.length !== 1 ||
+        centers.next_cursor ||
+        selected?.id !== scope.centerId ||
+        !selected.accessible ||
+        catalog.scope !== "center" ||
+        settings.scope !== "center"
+      )
         throw new Error("STUDIO_UNAVAILABLE");
       const temporal = await getTemporal();
-      const selected = matches[0]!;
       const today = temporal.Instant.from(settings.as_of)
         .toZonedDateTimeISO(selected.timezone)
         .toPlainDate()

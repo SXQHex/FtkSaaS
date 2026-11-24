@@ -63,6 +63,7 @@ export async function readStudioSnapshot(
     agreementsPlanBlocked,
     agreements: agreementsPlanBlocked ? [] : agreements.flat(),
     programs,
+    closureResources,
     closures: closures.flat(),
   };
 }
