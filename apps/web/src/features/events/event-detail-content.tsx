@@ -1,12 +1,11 @@
 import { useWorkspaceQuery } from "../workspace/workspace-query";
-import { useCallback, useEffect, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { capturePrivateReadback } from "../../lib/cache-invalidation";
 import { useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { v7 as uuidv7 } from "uuid";
-import { BackendError, queryBackendRead } from "../../lib/backend";
-import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
+import { BackendError } from "../../lib/backend";
+import type { ClientScope } from "../../lib/scoped-backend";
 import type { EventView } from "@ftksaas/api-contracts";
 import { getTemporal } from "../../lib/temporal";
 import { formatMinorAmount } from "../../lib/money";
@@ -19,7 +18,12 @@ import { EventActionController, type EventActionSelection } from "./event-action
 import { EventEditor } from "./event-editor";
 import { studioRoomQuery } from "../studio/studio-rooms-query";
 import { EventRegistrationController } from "./event-registration-controller";
-import { eventDetailQuery, invalidateEventViews, type EventWriteEffects } from "./event-query";
+import {
+  eventDetailQuery,
+  eventDutyNameQuery,
+  invalidateEventViews,
+  type EventWriteEffects,
+} from "./event-query";
 
 export function EventDetailContent({
   scope,
@@ -65,77 +69,66 @@ export function EventDetailContent({
     ...studioRoomQuery(queries, scope, roomId),
     enabled: !!roomId,
   });
-  const scopeIds = [scope.accountId, scope.orgId, scope.centerId] as const;
-  const dutyIds = [...new Set((event?.duties ?? []).map((row) => row.person_id))].sort();
-  const dutyNames = useQuery({
-    queryKey: ["event-duty-persons", ...scopeIds, eventId, dutyIds],
-    enabled: dutyIds.length > 0,
-    retry: false,
-    queryFn: async (readContext) => {
-      const names = new Map<string, string>();
-      const backend = await scopedBackend(scope, undefined, readContext);
-      // Only the event's known duty subjects, never the complete organization directory.
-      for (let index = 0; index < dutyIds.length; index += 4)
-        await Promise.all(
-          dutyIds.slice(index, index + 4).map(async (id) => {
-            try {
-              const person = await queryBackendRead(
-                backend,
-                "person_get_v1",
-                {
-                  client_api_version: 1,
-                  request_id: uuidv7(),
-                  org_id: scope.orgId,
-                  person_id: id,
-                },
-                readContext.signal,
-              );
-              if (person.id !== id) throw new Error("EVENT_PERSON_UNAVAILABLE");
-              names.set(id, person.display_name);
-            } catch (cause) {
-              if (
-                !(cause instanceof BackendError && ["FORBIDDEN", "NOT_FOUND"].includes(cause.code))
-              )
-                throw cause;
-            }
-          }),
-        );
-      return names;
-    },
+  const duties = event?.duties;
+  const dutyIds = useMemo(() => [...new Set(duties?.map((duty) => duty.person_id))], [duties]);
+  const dutyNames = useQueries({
+    queries: dutyIds.map((id) => eventDutyNameQuery(scope, id)),
+    combine: (results) => ({
+      names: Object.fromEntries(
+        dutyIds.map((id, index) => [
+          id,
+          results[index]?.isError ? undefined : results[index]?.data,
+        ]),
+      ),
+      errors: results.flatMap(({ error }) => (error ? [error] : [])),
+    }),
   });
-  const presentation = useQuery({
-    queryKey: [
-      "event-times",
-      ...scopeIds,
-      eventId,
-      event?.timezone,
-      event?.interval.starts_at,
-      event?.interval.ends_at,
-      event?.actual_started_at,
-    ],
-    enabled: !!event,
-    retry: false,
-    queryFn: async () => {
-      const T = await getTemporal(),
-        value = event!;
-      const fmt = new Intl.DateTimeFormat("tr-TR", {
+
+  const startsAt = event?.interval.starts_at;
+  const endsAt = event?.interval.ends_at;
+  const timezone = event?.timezone;
+  const actualStartedAt = event?.actual_started_at;
+  const times = useMemo(() => {
+    if (!startsAt || !endsAt || !timezone) return {};
+    try {
+      const format = new Intl.DateTimeFormat("tr-TR", {
         dateStyle: "medium",
         timeStyle: "short",
-        timeZone: value.timezone,
+        timeZone: timezone,
       });
-      return {
-        planned: fmt.format(new Date(value.interval.starts_at)),
-        end: fmt.format(new Date(value.interval.ends_at)),
-        actual: value.actual_started_at
-          ? T.Instant.from(value.actual_started_at)
-              .toZonedDateTimeISO(value.timezone)
-              .toPlainDateTime()
-              .toString({ smallestUnit: "minute" })
-          : "",
-      };
+      return { planned: format.format(new Date(startsAt)), end: format.format(new Date(endsAt)) };
+    } catch (error) {
+      return { error };
+    }
+  }, [startsAt, endsAt, timezone]);
+  const actualTime = useQuery({
+    queryKey: [
+      "event-actual-start-time",
+      scope.accountId,
+      scope.orgId,
+      scope.centerId,
+      eventId,
+      timezone,
+      actualStartedAt,
+    ],
+    enabled: !!actualStartedAt && !!timezone && !times.error,
+    retry: false,
+    gcTime: 0,
+    queryFn: async ({ signal }) => {
+      const T = await getTemporal();
+      signal.throwIfAborted();
+      return T.Instant.from(actualStartedAt!)
+        .toZonedDateTimeISO(timezone!)
+        .toPlainDateTime()
+        .toString({ smallestUnit: "minute" });
     },
   });
-  const info = presentation.isError ? undefined : presentation.data;
+  const presentationError = Boolean(times.error) || actualTime.isError;
+  const actual = actualStartedAt ? actualTime.data : "";
+  const info =
+    times.planned && actual !== undefined && !presentationError
+      ? { planned: times.planned, end: times.end, actual }
+      : undefined;
   const draft = attendanceDraft?.version === event?.version ? attendanceDraft : undefined;
   const accessLost = useCallback(
     (cause: unknown) => {
@@ -145,6 +138,7 @@ export function EventDetailContent({
         (cause instanceof Error && ["AUTH_REQUIRED", "ACCOUNT_CHANGED"].includes(cause.message))
       ) {
         queries.removeQueries({ queryKey: ["event-detail", scope.accountId] });
+        queries.removeQueries({ queryKey: ["event-duty-persons", scope.accountId] });
         void router.invalidate();
         return true;
       }
@@ -153,9 +147,9 @@ export function EventDetailContent({
     [queries, router, scope.accountId],
   );
   useEffect(() => {
-    for (const cause of [workspace.error, source.error, room.error, dutyNames.error])
+    for (const cause of [workspace.error, source.error, room.error, ...dutyNames.errors])
       if (cause) accessLost(cause);
-  }, [workspace.error, source.error, room.error, dutyNames.error, accessLost]);
+  }, [workspace.error, source.error, room.error, dutyNames.errors, accessLost]);
   const setPending = useCallback(
     (value: boolean) => {
       setLocked(value);
@@ -220,7 +214,7 @@ export function EventDetailContent({
         ...(event.attendance_state === "closed" ? (["correct_attendance"] as const) : []),
       ];
   function renderDetail(event: EventView) {
-    const pendingTime = presentation.isError ? unknown : t(($) => $.studio.loading);
+    const pendingTime = presentationError ? unknown : t(($) => $.studio.loading);
     const enabledActions: EventDetailAction[] = [
       "edit",
       ...(event.state === "draft" ? (["publish"] as const) : []),
@@ -239,8 +233,8 @@ export function EventDetailContent({
             : t(($) => $.events.editor.workshop)
         }
         facts={[
-          { label: t(($) => $.eventDetail.planned), value: info?.planned ?? pendingTime },
-          { label: t(($) => $.events.editor.ends), value: info?.end ?? pendingTime },
+          { label: t(($) => $.eventDetail.planned), value: times.planned ?? pendingTime },
+          { label: t(($) => $.events.editor.ends), value: times.end ?? pendingTime },
           {
             label: t(($) => $.events.editor.venue),
             value:
@@ -288,7 +282,7 @@ export function EventDetailContent({
         duties={
           event.duties?.map((row) => ({
             id: row.id,
-            name: (!dutyNames.isError ? dutyNames.data?.get(row.person_id) : undefined) ?? unknown,
+            name: dutyNames.names[row.person_id] ?? unknown,
             duty:
               row.duty === "instructor"
                 ? t(($) => $.events.editor.instructor)
@@ -354,7 +348,7 @@ export function EventDetailContent({
         }
         attendance={
           <EventAttendanceView
-            planned={info?.planned ?? pendingTime}
+            planned={times.planned ?? pendingTime}
             actual={draft?.actual ?? info?.actual ?? ""}
             onActual={(value) =>
               setAttendanceDraft({ ...draft, version: event.version, actual: value })
@@ -389,11 +383,14 @@ export function EventDetailContent({
         locked={locked}
         notice={
           <>
-            {presentation.isError && (
+            {presentationError && (
               <Alert variant="destructive">
                 <AlertDescription>
                   {t(($) => $.events.sourceError)}
-                  <Button variant="outline" onPress={() => void presentation.refetch()}>
+                  <Button
+                    variant="outline"
+                    onPress={() => void (times.error ? source.refetch() : actualTime.refetch())}
+                  >
                     {t(($) => $.events.reload)}
                   </Button>
                 </AlertDescription>
@@ -414,9 +411,9 @@ export function EventDetailContent({
       ) : (
         <div className="flex flex-col gap-4">
           <h1 className="text-2xl font-semibold">{t(($) => $.eventDetail.title)}</h1>
-          <Alert variant={source.isError || presentation.isError ? "destructive" : "default"}>
+          <Alert variant={source.isError || presentationError ? "destructive" : "default"}>
             <AlertDescription>
-              {source.isError || presentation.isError
+              {source.isError || presentationError
                 ? t(($) => $.events.sourceError)
                 : t(($) => $.studio.loading)}
             </AlertDescription>

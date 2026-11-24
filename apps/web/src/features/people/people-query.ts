@@ -27,7 +27,6 @@ const personDirectories = new Set([
   "access-accounts",
   "access-invitations",
   "event-detail",
-  "event-duty-persons",
   "overview-labels",
   "overview-participants",
   "instructor-session",
@@ -53,7 +52,11 @@ export function isPersonInfiniteDirectory(key: QueryKey) {
 export function readsPersonIdentity(key: QueryKey, scope: ClientScope, personId?: string) {
   const [family, accountOrScope, org, , subject] = key;
   if (accountOrScope === scope.accountId && org === scope.orgId) {
-    if (family === "profile-person" || family === "person-editor")
+    if (
+      family === "profile-person" ||
+      family === "person-editor" ||
+      family === "event-duty-persons"
+    )
       return !personId || subject === personId;
     if (family === "product-history") return key[5] === "sales";
     if (family === "event-choices") return subject === "people";
