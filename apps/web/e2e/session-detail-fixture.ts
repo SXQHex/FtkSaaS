@@ -19,6 +19,7 @@ export async function mockSessionDetail(
   options: {
     existing?: boolean;
     openDetail?: boolean;
+    signIn?: boolean;
     unknown?: boolean;
     ackUnread?: boolean;
     full?: boolean;
@@ -50,6 +51,7 @@ export async function mockSessionDetail(
       { operation: string; type: "sessions" | "reservations"; id: string }
     >();
   const calendarReads: Record<string, unknown>[] = [];
+  const calendarDiscoveryReads: Record<string, unknown>[] = [];
   const participantReads: { cursor?: string; afterWrite: boolean }[] = [];
   const start = (options.now?.getTime() ?? Date.now()) + (options.existing ? -20 : 60) * 60000;
   const session: SessionView = options.source?.session ?? {
@@ -167,12 +169,14 @@ export async function mockSessionDetail(
       });
     if (operation === "session_get_v1") {
       expect(req.session_id).toBe(S.session);
+      if (req.include_center_id === true) calendarDiscoveryReads.push(req);
       if (attendanceUnread) {
         attendanceUnread = false;
         return route.abort();
       }
       return send({
         ...session,
+        ...(req.include_center_id === true ? { center_id: I.center } : {}),
         ...(req.include_room_labels
           ? { room_labels: [{ room_id: I.room, name: "Atanmış salon" }] }
           : {}),
@@ -492,12 +496,14 @@ export async function mockSessionDetail(
     }
     return route.fallback();
   });
-  await page.goto(`${appOrigin}/login`);
-  await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
-  await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
-  await expect(page).toHaveURL(`${appOrigin}/account`);
-  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
+  if (options.signIn !== false) {
+    await page.goto(`${appOrigin}/login`);
+    await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
+    await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
+    await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+    await expect(page).toHaveURL(`${appOrigin}/account`);
+    await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
+  }
   if (options.openDetail !== false) {
     await page.goto(
       options.instructor
@@ -513,6 +519,7 @@ export async function mockSessionDetail(
     writes,
     reads,
     calendarReads,
+    calendarDiscoveryReads,
     participantReads,
     get reservation() {
       return reservation;

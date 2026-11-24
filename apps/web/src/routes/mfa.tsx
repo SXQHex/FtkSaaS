@@ -3,14 +3,17 @@ import { MfaPage, MfaErrorPage } from "../features/auth/mfa-page";
 import { getSupabaseClient } from "../lib/supabase";
 import { readTotpFactors } from "../features/auth/mfa";
 import { hasRecoverySession } from "../features/auth/password-recovery";
+import { calendarSessionSearch } from "../features/auth/calendar-session-return";
+import { hasDeletionReceipt } from "../features/account/deletion";
 import {
   hasPendingPasswordReplacement,
   retirePreviousPasswordSession,
 } from "../features/account/fresh-session";
 export const Route = createFileRoute("/mfa")({
-  beforeLoad: async () => {
+  validateSearch: calendarSessionSearch,
+  beforeLoad: async ({ search: { next } }) => {
     const { data, error } = await getSupabaseClient().auth.getSession();
-    if (error || !data.session) throw redirect({ to: "/login" });
+    if (error || !data.session) throw redirect({ to: "/login", search: { next } });
     const assurance = await getSupabaseClient().auth.mfa.getAuthenticatorAssuranceLevel(
       hasPendingPasswordReplacement(data.session) ? data.session.access_token : undefined,
     );
@@ -18,7 +21,10 @@ export const Route = createFileRoute("/mfa")({
     if (assurance.data.currentLevel === "aal2" || assurance.data.nextLevel !== "aal2") {
       // The native verifier may have saved AAL2 before a reload interrupted continuation.
       if (assurance.data.currentLevel === "aal2") await retirePreviousPasswordSession(data.session);
-      throw redirect({ to: (await hasRecoverySession()) ? "/reset-password" : "/account" });
+      if (await hasRecoverySession()) throw redirect({ to: "/reset-password" });
+      if (next && !hasDeletionReceipt(data.session.user.id))
+        throw redirect({ href: next, replace: true });
+      throw redirect({ to: "/account" });
     }
   },
   loader: readTotpFactors,

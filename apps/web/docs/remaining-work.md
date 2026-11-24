@@ -85,4 +85,4 @@
 ## Bağımsız eski teslim kontrolleri (açık)
 
 - [x] **MONO-01 · Eski kabulün sonlandırılması.** Taşıma adayının ortak CI kabulü ve yayımlı sürümü aynı Git ağacına bağlandı. [Kaynak ve Cloudflare kanıtı](handover.md#monorepo-teslim-kabulu)
-- [ ] **MONO-02 · Kişisel ICS derin linkleri.** Eski org + seans bağlantısı, girişten sonra gerçek merkez ve canlı rolle eşleşen öğrenci/eğitmen ekranına ulaşmalı. Kesin merkez keşfi [XREQ-074](../../../docs/requests.md#xreq-074) önkoşuludur. [İstemci protokolü](../../../docs/client-integration.md#statik-spa-transportu)
+- [ ] **MONO-02 · Kişisel ICS derin linkleri.** Eski org + seans rotasının frontend uygulaması ve regresyonları hazır. Kapanış için aday CI ve yayımlı SPA'da gerçek ICS bağlantısından giriş yaparak öğrenci ve eğitmen ekranlarında canlı merkez ve rol eşleşmesi doğrulanır. [Kaynak ve ortam](handover.md#mono-02-kaynak-ve-ortam) · [İstemci protokolü](../../../docs/client-integration.md#statik-spa-transportu)

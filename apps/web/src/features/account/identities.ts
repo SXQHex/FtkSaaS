@@ -1,6 +1,7 @@
 import { requireAppOrigin } from "../../lib/public-config";
 import type { UserIdentity } from "@supabase/supabase-js";
 import { getSupabaseClient } from "../../lib/supabase";
+import { storeGoogleCalendarReturn } from "../auth/calendar-session-return";
 
 export async function readIdentities() {
   const { data, error } = await getSupabaseClient().auth.getUserIdentities();
@@ -9,6 +10,7 @@ export async function readIdentities() {
 }
 export async function linkGoogle() {
   const origin = requireAppOrigin();
+  storeGoogleCalendarReturn();
   const { error } = await getSupabaseClient().auth.linkIdentity({
     provider: "google",
     options: { redirectTo: `${origin}/auth/callback` },

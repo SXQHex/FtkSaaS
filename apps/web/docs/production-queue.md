@@ -20,7 +20,7 @@ Her teslim ayrı branch ve Draft PR ile başlar. Kod, test ve kabul aynı kaynak
 
 ## Paralel, bağımsız teslim açıkları
 
-[MONO-02](remaining-work.md#monorepo-geçişi) için kesin native merkez okuması yayımlandığında bağlantı çözümlemesi ve kaynak bağlı öğrenci/eğitmen kabulü yapılır.
+[MONO-02](remaining-work.md#monorepo-geçişi) frontend PR’ının kaynak kontrolleri ve yayımlı SPA kabulü sıradadır.
 
 ## Son kontrol
 

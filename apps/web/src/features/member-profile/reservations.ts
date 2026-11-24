@@ -84,7 +84,7 @@ export async function readMemberReservations(
     sort?: "created_at_desc" | "starts_at_asc";
     includeSourceSummary?: boolean;
     includeSelfSummary?: boolean;
-    includeAttendance?: boolean;
+    includeAttendance?: boolean | "past";
     sessionId?: string;
   } = {},
   readContext?: AccountReadContext,
@@ -168,7 +168,11 @@ export async function readMemberReservations(
           sessions.set(id, {});
           return;
         }
-        if (options.includeAttendance === false) {
+        if (
+          options.includeAttendance === false ||
+          (options.includeAttendance === "past" &&
+            Date.parse(session.starts_at) >= Date.parse(page.as_of))
+        ) {
           sessions.set(id, { session });
           return;
         }

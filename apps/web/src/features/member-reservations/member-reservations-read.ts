@@ -2,16 +2,21 @@ import type { MemberLessonCancellation } from "@ftksaas/api-contracts";
 import { readMemberClasses } from "../member-classes/member-classes-read";
 import type { ClientScope, AccountReadContext } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
-import { readMemberReservations } from "../member-profile/reservations";
+import { readMemberReservations, type MemberReservation } from "../member-profile/reservations";
 import { readSessionHeader } from "../session-detail/session-detail-read";
+export function reservationIsUpcoming(row: MemberReservation, asOf: string) {
+  return Boolean(row.session && Date.parse(row.session.starts_at) >= Date.parse(asOf));
+}
+
 export async function readOwnReservations(
   scope: ClientScope,
   personId: string,
-  filter: "upcoming" | "past",
+  filter: "upcoming" | "past" | "all",
   cursor?: string,
   sessionId?: string,
   readContext?: AccountReadContext,
 ) {
+  if (filter === "all" && !sessionId) throw new Error("OWN_RESERVATION_SESSION_REQUIRED");
   const page = await readMemberReservations(
     scope,
     personId,
@@ -22,6 +27,7 @@ export async function readOwnReservations(
       includeSourceSummary: true,
       includeSelfSummary: true,
       ...(filter === "upcoming" ? { includeAttendance: false } : {}),
+      ...(filter === "all" ? { includeAttendance: "past" } : {}),
       sessionId,
     },
     ...(readContext ? ([readContext] as const) : []),
@@ -37,7 +43,10 @@ export async function readOwnReservations(
     string,
     { instructors: string[]; rooms: string[]; cancellation: MemberLessonCancellation }
   >();
-  for (const { reservation, session } of page.items) {
+  const isUpcoming = (row: MemberReservation) =>
+    filter === "upcoming" || (filter === "all" && reservationIsUpcoming(row, page.asOf));
+  for (const row of page.items) {
+    const { reservation, session } = row;
     const summary = reservation.self_summary;
     if (
       reservation.person_id !== personId ||
@@ -50,13 +59,13 @@ export async function readOwnReservations(
       continue;
     if (
       summary.session_version === undefined
-        ? filter === "upcoming"
+        ? isUpcoming(row)
         : summary.session_version !== session.version
     )
       continue;
     titles.set(session.id, summary.title);
     if (
-      filter === "upcoming" &&
+      isUpcoming(row) &&
       session.state === "planned" &&
       summary.cancellation?.source === "reservation_policy" &&
       Array.isArray(summary.instructor_labels) &&
@@ -73,7 +82,11 @@ export async function readOwnReservations(
     await Promise.all(
       unresolved.slice(index, index + 4).map(async (session) => {
         try {
-          if (filter === "upcoming" && session.state === "planned") {
+          if (
+            session.state === "planned" &&
+            (filter === "upcoming" ||
+              (filter === "all" && Date.parse(session.starts_at) >= Date.parse(page.asOf)))
+          ) {
             const interval = { starts_at: session.starts_at, ends_at: session.ends_at };
             const intervalKey = interval.starts_at + "/" + interval.ends_at;
             let read = discoveryReads.get(intervalKey);

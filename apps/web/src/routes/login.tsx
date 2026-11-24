@@ -1,3 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { LoginPage } from "../features/auth/login-page";
-export const Route = createFileRoute("/login")({ component: LoginPage });
+import { calendarSessionSearch } from "../features/auth/calendar-session-return";
+export const Route = createFileRoute("/login")({
+  validateSearch: calendarSessionSearch,
+  component: LoginPage,
+});

@@ -11,6 +11,7 @@ import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Outlet, useRouter, useRouterState } from "@tanstack/react-router";
 import { useAuthSession } from "../features/auth/use-auth-session";
+import { calendarSessionReturn } from "../features/auth/calendar-session-return";
 import { PrivateSessionRevision } from "../features/auth/private-session-revision";
 import { observeQueryAccessFailures } from "../features/auth/query-access-recovery";
 import { RoutePendingPage } from "../features/states/route-state-pages";
@@ -57,7 +58,14 @@ export function RootLayout() {
     return observeQueryAccessFailures(queries, {
       onChecking: setCheckingAccess,
       invalidateRoute: () => router.invalidate({ sync: true }),
-      showLogin: () => router.navigate({ to: "/login", replace: true }),
+      showLogin: () => {
+        const next = calendarSessionReturn(router.latestLocation.pathname);
+        return router.navigate({
+          to: "/login",
+          ...(next ? { search: { next } } : {}),
+          replace: true,
+        });
+      },
     });
   }, [unscopedRoute, queries, router]);
   const privateAuthPending = !authReady && !unscopedRoute;
