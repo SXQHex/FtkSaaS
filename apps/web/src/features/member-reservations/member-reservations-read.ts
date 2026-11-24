@@ -20,7 +20,7 @@ export async function readOwnReservations(
     {
       sort: filter === "upcoming" ? "starts_at_asc" : "created_at_desc",
       includeSourceSummary: true,
-      ...(filter === "upcoming" ? { includeAttendance: false } : {}),
+      ...(filter === "upcoming" ? { includeAttendance: false } : { includeSelfSummary: true }),
       sessionId,
     },
     ...(readContext ? ([readContext] as const) : []),
@@ -36,9 +36,24 @@ export async function readOwnReservations(
     string,
     { instructors: string[]; rooms: string[]; cancellation: MemberLessonCancellation }
   >();
-  for (let index = 0; index < sessions.length; index += 4)
+  if (filter === "past") {
+    for (const { reservation, session } of page.items) {
+      const summary = reservation.self_summary;
+      if (
+        reservation.person_id === personId &&
+        session?.id === reservation.session_id &&
+        typeof summary?.title === "string" &&
+        summary.title.length > 0 &&
+        Date.parse(summary.starts_at) === Date.parse(session.starts_at) &&
+        Date.parse(summary.ends_at) === Date.parse(session.ends_at)
+      )
+        titles.set(session.id, summary.title);
+    }
+  }
+  const unresolved = sessions.filter((session) => !titles.has(session.id));
+  for (let index = 0; index < unresolved.length; index += 4)
     await Promise.all(
-      sessions.slice(index, index + 4).map(async (session) => {
+      unresolved.slice(index, index + 4).map(async (session) => {
         try {
           if (filter === "upcoming" && session.state === "planned") {
             const interval = { starts_at: session.starts_at, ends_at: session.ends_at };

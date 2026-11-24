@@ -37,6 +37,7 @@ export async function readMemberReservations(
   options: {
     sort?: "created_at_desc" | "starts_at_asc";
     includeSourceSummary?: boolean;
+    includeSelfSummary?: boolean;
     includeAttendance?: boolean;
     sessionId?: string;
   } = {},
@@ -56,6 +57,7 @@ export async function readMemberReservations(
       ...(options.sessionId ? { session_id: options.sessionId } : {}),
       time_filter: timeFilter,
       ...(options.includeSourceSummary ? { include_source_summary: true } : {}),
+      ...(options.includeSelfSummary ? { include_self_summary: true } : {}),
       page: { limit: 20, sort: options.sort ?? "created_at_desc", ...(cursor ? { cursor } : {}) },
     },
     readContext?.signal,

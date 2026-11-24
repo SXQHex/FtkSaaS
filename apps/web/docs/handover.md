@@ -59,9 +59,11 @@
 
 M09 adayında kapanış yazması sonrası aynı salon için kapanış okuması 2’den 1’e indi. Güncel Stüdyo okumasında hedef kaynak varsa makbuz kimliği o kaynaktaki satırdan doğrulanır. Hedefin doğrulanamaması yalnız okumanın yeniden denenmesine izin verir. Stüdyo kurulum özeti tek merkez ister ve beklenmeyen devam cursor’ını doğrulanmamış sonuç olarak gösterir. [Kapanış regresyonu](../e2e/auth-studio-flows.spec.ts) · [Kesin kurulum okuması](../src/features/studio/setup-enrollment.test.ts)
 
-### M09 takvim özeti
+### M09 okuma ölçümü
 
 WF03’te tam özet içeren doğrudan eğitmen ataması ve uygun özel ders adayı için aynı fixture sonucu `calendar_get_v1` + `session_get_v1` yerine tek `calendar_get_v1` ile alındı. İki senaryoda da dönen üst düzey kayıt 2’den 1’e indi. Sınıf ataması, eksik özet ve talep onayından sonra makbuzla bağlı kesin seans için `session_get_v1` sürüyor. Ders talebi seçicisinde merkez, saat, disiplin, eğitmen ve açık yoklama kontrolleri korunuyor. Bu istek ve satır sayıları yerel regresyona dayanıyor. [Eğitmen regresyonu](../src/features/instructor/instructor-read.test.ts) · [Ders talebi regresyonu](../src/features/lesson-requests/lesson-request-session-selection.test.ts) · [WF03](../../../docs/workflows.md#wf03)
+
+WF04’te bir geçmiş üye rezervasyonunun başlığı kendi `reservation_list_v1` satırından alındı. Yerel fixture’da seans başlığı için ayrı takvim çağrısı ve onun tek satırı kaldırıldı. Aynı üye/saat eşleşmesi doğrulandı. Eksik veya uyuşmayan özet kesin başlık okuyucusuna dönüyor. Seans sürümü, yoklama ve yaklaşan dersin dondurulmuş iptal kaynağı kendi native doğrulamalarını sürdürüyor. [Üye geçmişi regresyonu](../src/features/member-reservations/member-reservations-read.test.ts) · [Sayfa seçicisi regresyonu](../src/features/member-profile/reservations.test.ts) · [WF04](../../../docs/workflows.md#wf04)
 
 <a id="c-common-development-503"></a>
 
