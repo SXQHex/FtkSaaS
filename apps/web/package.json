@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "pnpm typecheck && vite build && pnpm check:bundle",
-    "lint": "oxlint --config ../../.oxlintrc.json --type-aware . && pnpm format:check",
+    "lint": "oxlint --config ../../.oxlintrc.json --type-aware -D typescript/no-explicit-any . && pnpm lint:production-types && pnpm format:check",
+    "lint:production-types": "oxlint --config ../../.oxlintrc.json --type-aware --ignore-pattern \"**/*.test.{ts,tsx}\" --ignore-pattern \"src/test/**\" -D typescript/no-unsafe-argument -D typescript/no-unsafe-assignment -D typescript/no-unsafe-call -D typescript/no-unsafe-member-access -D typescript/no-unsafe-return src",
     "preview": "vite preview",
     "format": "oxfmt --config ../../.oxfmtrc.json .",
     "format:check": "oxfmt --config ../../.oxfmtrc.json --check .",
