@@ -3,6 +3,7 @@ import type { RuntimeOperationName } from "@ftksaas/api-contracts/runtime";
 import type { SafeError } from "@ftksaas/api-contracts";
 import { getSupabaseClient } from "./supabase";
 import { fetchBackendOperation } from "./backend-read-transport";
+import { requireSupabasePublishableKey, requireSupabaseUrl } from "./public-config";
 
 export class BackendError extends Error {
   readonly code: SafeError["code"] | "TRANSPORT_ERROR";
@@ -43,6 +44,19 @@ export function createBackend(config: {
       },
     });
   }
+  async function readOperation<K extends keyof Operations & RuntimeOperationName>(
+    operation: K,
+    request: Operations[K]["request"],
+    signal?: AbortSignal,
+  ): Promise<Operations[K]["response"]["data"]> {
+    const data = await readEnvelope(
+      await post(operation, request, signal ? { signal } : undefined),
+      signal,
+    );
+    // The published contract provides the type for generic calls. Consumers of
+    // critical data validate the fields they rely on at their feature boundary.
+    return data as Operations[K]["response"]["data"];
+  }
   return {
     // Only opt-in query readers take an AbortSignal. Native writes and operation
     // receipts still use call() and preserve their idempotency/recovery rules.
@@ -51,16 +65,13 @@ export function createBackend(config: {
       request: Operations[K]["request"],
       signal?: AbortSignal,
     ): Promise<Operations[K]["response"]["data"]> {
-      return readEnvelope<Operations[K]["response"]>(
-        await post(operation, request, { signal }),
-        signal,
-      );
+      return readOperation(operation, request, signal);
     },
     async call<K extends keyof Operations & RuntimeOperationName>(
       operation: K,
       request: Operations[K]["request"],
     ): Promise<Operations[K]["response"]["data"]> {
-      return readEnvelope<Operations[K]["response"]>(await post(operation, request));
+      return readOperation(operation, request);
     },
     downloadInvoice(request: Operations["organization_invoice_file_get_v1"]["request"]) {
       return post("organization_invoice_file_get_v1?download=original", request, {
@@ -86,10 +97,10 @@ export function queryBackendRead<K extends keyof Operations & RuntimeOperationNa
 
 export function getBackend(accessToken?: string) {
   return createBackend({
-    functionsUrl: `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/backend-v1`,
-    publishableKey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+    functionsUrl: `${requireSupabaseUrl()}/functions/v1/backend-v1`,
+    publishableKey: requireSupabasePublishableKey(),
     getAccessToken: async () => {
-      if (accessToken) return accessToken;
+      if (accessToken !== undefined) return accessToken;
       const { data, error } = await getSupabaseClient().auth.getSession();
       if (error) throw error;
       return data.session?.access_token ?? null;
@@ -97,10 +108,7 @@ export function getBackend(accessToken?: string) {
   });
 }
 
-export async function readEnvelope<T extends { data: unknown }>(
-  response: Response,
-  signal?: AbortSignal,
-): Promise<T["data"]> {
+export async function readEnvelope(response: Response, signal?: AbortSignal): Promise<unknown> {
   signal?.throwIfAborted();
   let result: unknown;
   try {
@@ -129,9 +137,11 @@ export async function readEnvelope<T extends { data: unknown }>(
     !response.ok ||
     result.ok !== true ||
     !("data" in result) ||
+    result.data === null ||
+    typeof result.data !== "object" ||
     !("trace_id" in result) ||
     typeof result.trace_id !== "string"
   )
     throw new BackendError();
-  return result.data as T["data"];
+  return result.data;
 }

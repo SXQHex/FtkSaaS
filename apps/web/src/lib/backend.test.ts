@@ -1,7 +1,8 @@
 import { http, HttpResponse } from "msw";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { server } from "../test/server";
 import { createBackend, BackendError } from "./backend";
+import { readAccount } from "./account";
 
 const url = "https://backend.invalid/functions/v1/backend-v1";
 const backend = createBackend({
@@ -156,9 +157,35 @@ describe("backend transport", () => {
       retryable: false,
     });
   });
+
+  it.each([
+    { id: 14, state: "active", display_name: "Fixture" },
+    { id: request.request_id, state: "unknown", display_name: "Fixture" },
+    {
+      id: request.request_id,
+      state: "active",
+      display_name: "Fixture",
+      platform_scope: { owner_manage: "true" },
+    },
+  ])("rejects a malformed account projection before it can grant frontend access", async (data) => {
+    vi.stubEnv("VITE_SUPABASE_URL", new URL(url).origin);
+    vi.stubEnv("VITE_SUPABASE_PUBLISHABLE_KEY", "public-test-key");
+    server.use(
+      http.post(`${url}/account_get_v1`, () =>
+        HttpResponse.json({ ok: true, data, trace_id: request.request_id }),
+      ),
+    );
+    try {
+      await expect(readAccount(true, "test-token")).rejects.toThrow("ACCOUNT_PROJECTION_INVALID");
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
   it.each([
     [502, "not-json"],
     [200, { ok: true }],
+    [200, { ok: true, data: null, trace_id: request.request_id }],
+    [200, { ok: true, data: false, trace_id: request.request_id }],
     [503, { ok: true, data: {} }],
     [200, { ok: false, error: "unsafe-provider-detail" }],
   ])("rejects malformed or failed transport %s", async (status, body) => {

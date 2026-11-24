@@ -1,6 +1,6 @@
 import { v7 as uuidv7 } from "uuid";
 import type { Session } from "@supabase/supabase-js";
-import { BackendError, createBackend } from "../../lib/backend";
+import { BackendError, getBackend } from "../../lib/backend";
 import { getSupabaseClient } from "../../lib/supabase";
 import { sameNativeSession } from "../auth/native-session-id";
 import type { OrganizationView, CenterView, RoleView } from "@ftksaas/api-contracts";
@@ -23,11 +23,7 @@ export async function readWorkspace(
   if (error) throw error;
   if (!data.session) throw new Error("AUTH_REQUIRED");
   const token = data.session.access_token;
-  const backend = createBackend({
-    functionsUrl: `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/backend-v1`,
-    publishableKey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-    getAccessToken: async () => token,
-  });
+  const backend = getBackend(token);
   // Standalone operations still validate with the pinned native bearer.
   // Router/Query callers may reuse this actor's verified account projection.
   const account = readVerifiedAccount
@@ -64,7 +60,7 @@ export async function readWorkspace(
 }
 
 async function readWorkspaceProjection(
-  backend: ReturnType<typeof createBackend>,
+  backend: ReturnType<typeof getBackend>,
   organizationId?: string,
   signal?: AbortSignal,
 ) {

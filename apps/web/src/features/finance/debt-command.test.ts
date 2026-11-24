@@ -112,6 +112,8 @@ it("checks the receipt fact type for each operation rather than expecting a cash
     call.mockResolvedValue({
       operation: intent.operation,
       key: intent.request.operation_key,
+      status: "succeeded",
+      result_available: true,
       result_reference: {
         type: action === "offset" ? "student_credit_movements" : "debt_adjustments",
         id: fact,
@@ -121,6 +123,8 @@ it("checks the receipt fact type for each operation rather than expecting a cash
     call.mockResolvedValue({
       operation: intent.operation,
       key: intent.request.operation_key,
+      status: "succeeded",
+      result_available: true,
       result_reference: { type: "cash_movements", id: fact },
     });
     await expect(readDebtReceipt(intent)).rejects.toThrow("FINANCE_RECEIPT_UNAVAILABLE");

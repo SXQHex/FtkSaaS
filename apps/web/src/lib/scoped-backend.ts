@@ -2,7 +2,7 @@ import { v7 as uuidv7 } from "uuid";
 import type { QueryFunctionContext } from "@tanstack/react-query";
 import { verifiedAccountForId } from "../features/auth/account-query";
 import { sameNativeSession } from "../features/auth/native-session-id";
-import { createBackend } from "./backend";
+import { getBackend } from "./backend";
 import { getSupabaseClient } from "./supabase";
 
 export interface ClientScope {
@@ -28,11 +28,7 @@ export async function scopedBackend(
   if (error) throw error;
   if (!data.session) throw new Error("AUTH_REQUIRED");
   const bearer = data.session.access_token;
-  const backend = createBackend({
-    functionsUrl: `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/backend-v1`,
-    publishableKey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-    getAccessToken: async () => bearer,
-  });
+  const backend = getBackend(bearer);
   const request = { client_api_version: 1 as const, request_id: uuidv7() };
   // Callers opt in to cancellation only for reads.
   const account = context
