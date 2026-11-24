@@ -667,6 +667,10 @@ test("platform creates a queued studio and a direct organization with a publishe
     const list = (items: unknown[]) => send({ items, next_cursor: null, as_of: paymentTime });
     if (operation === "studio_setup_list_v1" && request.platform_queue) {
       if (created.length) return list([]);
+      if (request.setup_request_id !== undefined) {
+        expect(request.page).toEqual({ limit: 1 });
+        return list(request.setup_request_id === queued.id ? [queued] : []);
+      }
       const cursor = request.page.cursor;
       if (cursor === "studio-third-page") return list([queued]);
       const second = cursor === "studio-second-page";
@@ -747,7 +751,7 @@ test("platform creates a queued studio and a direct organization with a publishe
   const renderReads = operations.slice(renderStart);
   const queueReads = renderReads.filter((operation) => operation === "studio_setup_list_v1");
   const accountReads = renderReads.filter((operation) => operation === "account_get_v1");
-  expect(queueReads).toHaveLength(3);
+  expect(queueReads).toHaveLength(1);
   expect(accountReads).toHaveLength(0);
   await testInfo.attach("E50 Organizasyon oluşturma", {
     body: await page.screenshot({ fullPage: true }),
@@ -766,8 +770,8 @@ test("platform creates a queued studio and a direct organization with a publishe
   expect(writes).toHaveLength(1);
   const writePosition = operations.indexOf("organization_create_v1", commandStart);
   const preflight = operations.slice(commandStart, writePosition);
-  expect(preflight.filter((operation) => operation === "studio_setup_list_v1")).toHaveLength(3);
-  expect(preflight.filter((operation) => operation === "account_get_v1")).toHaveLength(5);
+  expect(preflight.filter((operation) => operation === "studio_setup_list_v1")).toHaveLength(1);
+  expect(preflight.filter((operation) => operation === "account_get_v1")).toHaveLength(3);
   await expect(page.getByRole("heading", { name: queued.name })).toBeVisible();
   await expect(activityLog(page).getByRole("listitem")).toContainText(activity.actions.created);
   await expect(activityLog(page).getByRole("listitem")).toContainText(queued.name);

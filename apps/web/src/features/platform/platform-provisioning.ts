@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
 import { scopedBackend, type AccountReadContext } from "../../lib/scoped-backend";
-import { readPlatformStudioQueue } from "../workspace/studio-setup-request";
+import { readPlatformStudioRequest } from "../workspace/studio-setup-request";
 import { platformRequest, readDirectory, readPlatformOrganization } from "./platform-directory";
 
 type Backend = Awaited<ReturnType<typeof scopedBackend>>;
@@ -22,7 +22,7 @@ const operator = z.object({
 const verifiedAccount = z.object({ kind: z.literal("verified_account"), account_id: z.uuid() });
 export const platformEmail = z.string().trim().pipe(z.email());
 export const platformOperatorKey = (accountId: string) => ["platform-operators", accountId];
-export type StudioRequest = Awaited<ReturnType<typeof readPlatformStudioQueue>>["items"][number];
+export type StudioRequest = NonNullable<Awaited<ReturnType<typeof readPlatformStudioRequest>>>;
 export type ProvisioningIntent = {
   accountId: string;
   key: string;
@@ -98,17 +98,7 @@ export async function findStudioRequest(
   requestId: string,
   readContext?: AccountReadContext,
 ) {
-  const cursors = new Set<string>();
-  let cursor: string | undefined;
-  do {
-    const page = await readPlatformStudioQueue(accountId, cursor, readContext);
-    const row = page.items.find((candidate) => candidate.id === requestId);
-    if (row) return row;
-    cursor = page.next_cursor ?? undefined;
-    if (cursor && cursors.has(cursor)) throw Error("PLATFORM_DIRECTORY_CURSOR_REPEATED");
-    if (cursor) cursors.add(cursor);
-  } while (cursor);
-  return null;
+  return readPlatformStudioRequest(accountId, requestId, readContext);
 }
 
 export async function confirmProvision(intent: ProvisioningIntent) {

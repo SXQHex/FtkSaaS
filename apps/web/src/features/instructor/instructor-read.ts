@@ -4,7 +4,7 @@ import type { ClientScope, AccountReadContext } from "../../lib/scoped-backend";
 import { scopedBackend } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
 import { getTemporal } from "../../lib/temporal";
-import type { CalendarItem, EarningView, Interval, SessionView } from "@ftksaas/api-contracts";
+import type { CalendarItem, Interval, SessionView } from "@ftksaas/api-contracts";
 import { readScheduleSession } from "../schedule/schedule-read";
 import { readSessionAttendance } from "../session-detail/session-detail-read";
 
@@ -143,58 +143,42 @@ export async function readInstructorAttendance(
     return { status: instructorReadStatus(error) };
   }
 }
+const earningPeriodTotals = z.array(
+  z.object({
+    currency: z.string().regex(/^[A-Z]{3}$/),
+    net_minor: z.string().regex(/^(0|-?[1-9][0-9]*)$/),
+  }),
+);
+
 export async function readInstructorEarnings(
   scope: ClientScope,
   personId: string,
   interval: Interval,
   readContext?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope, undefined, readContext),
-    seen = new Set<string>(),
-    ids = new Set<string>();
-  const items: EarningView[] = [];
-  let cursor: string | undefined;
-  do {
-    const page = await backend.call("earnings_list_v1", {
-      client_api_version: 1,
-      request_id: uuidv7(),
-      org_id: scope.orgId,
-      center_id: scope.centerId,
-      person_id: personId,
-      interval,
-      page: { limit: 50, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
-    });
-    if (page.items.length > 50) throw new Error("INSTRUCTOR_EARNINGS_UNAVAILABLE");
-    for (const item of page.items) {
-      if (
-        item.person_id !== personId ||
-        item.center_id !== scope.centerId ||
-        ids.has(item.id) ||
-        !/^[A-Z]{3}$/.test(item.currency) ||
-        !/^\d+$/.test(item.amount_minor) ||
-        !["add", "subtract"].includes(item.direction) ||
-        !Number.isFinite(Date.parse(item.created_at)) ||
-        Date.parse(item.created_at) < Date.parse(interval.starts_at) ||
-        Date.parse(item.created_at) >= Date.parse(interval.ends_at)
-      )
-        throw new Error("INSTRUCTOR_EARNINGS_UNAVAILABLE");
-      ids.add(z.uuid().parse(item.id));
-      items.push(item);
-    }
-    cursor = page.next_cursor ?? undefined;
-    if (cursor && seen.has(cursor)) throw new Error("INSTRUCTOR_EARNINGS_UNAVAILABLE");
-    if (cursor) seen.add(cursor);
-  } while (cursor);
-  const totals = new Map<string, bigint>();
-  for (const item of items)
-    totals.set(
-      item.currency,
-      (totals.get(item.currency) ?? 0n) +
-        BigInt(item.amount_minor) * (item.direction === "subtract" ? -1n : 1n),
-    );
-  return [...totals]
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([currency, amount]) => ({ currency, amount: amount.toString() }));
+  z.uuid().parse(personId);
+  const time = z.iso.datetime({ offset: true });
+  if (Date.parse(time.parse(interval.starts_at)) >= Date.parse(time.parse(interval.ends_at)))
+    throw Error("INSTRUCTOR_EARNINGS_UNAVAILABLE");
+  const backend = await scopedBackend(scope, undefined, readContext);
+  const page = await backend.call("earnings_list_v1", {
+    client_api_version: 1,
+    request_id: uuidv7(),
+    org_id: scope.orgId,
+    center_id: scope.centerId,
+    person_id: personId,
+    interval,
+    summary_only: true,
+    page: { limit: 1 },
+  });
+  if (page.items.length || page.next_cursor) throw Error("INSTRUCTOR_EARNINGS_UNAVAILABLE");
+  time.parse(page.as_of);
+  const totals = earningPeriodTotals.parse(page.period_totals);
+  if (new Set(totals.map((row) => row.currency)).size !== totals.length)
+    throw Error("INSTRUCTOR_EARNINGS_UNAVAILABLE");
+  return totals
+    .sort((a, b) => a.currency.localeCompare(b.currency))
+    .map((row) => ({ currency: row.currency, amount: row.net_minor }));
 }
 
 export async function readInstructorSession(
