@@ -70,7 +70,14 @@ export function EventDetailContent({
     enabled: !!roomId,
   });
   const duties = event?.duties;
-  const dutyIds = useMemo(() => [...new Set(duties?.map((duty) => duty.person_id))], [duties]);
+  const dutyIds = useMemo(
+    () => [
+      ...new Set(
+        duties?.flatMap((duty) => (duty.person_display_name === undefined ? [duty.person_id] : [])),
+      ),
+    ],
+    [duties],
+  );
   const dutyNames = useQueries({
     queries: dutyIds.map((id) => eventDutyNameQuery(scope, id)),
     combine: (results) => ({
@@ -282,7 +289,7 @@ export function EventDetailContent({
         duties={
           event.duties?.map((row) => ({
             id: row.id,
-            name: dutyNames.names[row.person_id] ?? unknown,
+            name: row.person_display_name ?? dutyNames.names[row.person_id] ?? unknown,
             duty:
               row.duty === "instructor"
                 ? t(($) => $.events.editor.instructor)

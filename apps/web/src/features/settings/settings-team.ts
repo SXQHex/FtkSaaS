@@ -2,6 +2,7 @@ import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import type { ClientScope, AccountReadContext } from "../../lib/scoped-backend";
 import { scopedBackend } from "../../lib/scoped-backend";
+import { queryBackendRead } from "../../lib/backend";
 import type {
   InstructorRevocationPreview,
   ManagementSelectorPermissionSetV1,
@@ -51,13 +52,20 @@ export async function readTeamPage(
 ) {
   const backend = await scopedBackend(scope, undefined, readContext);
   const organization = level === "organization" || role === "org_manager";
-  const page = await backend.call("roles_list_v1", {
-    ...(organization ? organizationCommon(scope) : common(scope)),
-    request_id: uuidv7(),
-    role,
-    state,
-    page: { limit: 20, ...(cursor ? { cursor } : {}) },
-  });
+  const requestScope = organization ? organizationCommon(scope) : common(scope);
+  const page = await queryBackendRead(
+    backend,
+    "roles_list_v1",
+    {
+      ...requestScope,
+      request_id: uuidv7(),
+      role,
+      state,
+      include_person_display_names: true,
+      page: { limit: 20, ...(cursor ? { cursor } : {}) },
+    },
+    readContext?.signal,
+  );
   if (
     page.items.length > 20 ||
     (cursor && page.next_cursor === cursor) ||
@@ -82,18 +90,22 @@ export async function readTeamPage(
       state: row.state,
       version: z.number().int().positive().safe().parse(row.version),
       bound: row.account_access_granted ?? null,
+      name: row.person_display_name,
     };
   });
   const people = new Map<string, Awaited<ReturnType<typeof backend.call<"person_get_v1">>>>();
-  const ids = [...new Set(records.map((row) => row.personId))];
+  const ids = [
+    ...new Set(records.filter((row) => row.name === undefined).map((row) => row.personId)),
+  ];
   for (let start = 0; start < ids.length; start += 4)
     await Promise.all(
       ids.slice(start, start + 4).map(async (id) => {
-        const person = await backend.call("person_get_v1", {
-          ...(organization ? organizationCommon(scope) : common(scope)),
-          request_id: uuidv7(),
-          person_id: id,
-        });
+        const person = await queryBackendRead(
+          backend,
+          "person_get_v1",
+          { ...requestScope, request_id: uuidv7(), person_id: id },
+          readContext?.signal,
+        );
         if (person.id !== id && !person.linked_person_ids?.includes(id))
           throw Error("TEAM_SOURCE_INVALID");
         people.set(id, person);
@@ -101,7 +113,10 @@ export async function readTeamPage(
     );
   return {
     ...page,
-    records: records.map((row) => ({ ...row, person: people.get(row.personId)! })),
+    records: records.map((row) => {
+      const person = people.get(row.personId);
+      return { ...row, name: row.name ?? person!.display_name, person };
+    }),
   };
 }
 export async function readTeamPeople(
@@ -118,12 +133,22 @@ export async function readTeamPeople(
     page: { limit: 20, ...(cursor ? { cursor } : {}) },
   });
 }
-export async function readTeamPerson(scope: ClientScope, id: string, manager?: ManagerRole) {
-  return (await scopedBackend(scope)).call("person_get_v1", {
-    ...(manager ? organizationCommon(scope) : common(scope)),
-    request_id: uuidv7(),
-    person_id: z.uuid().parse(id),
-  });
+export async function readTeamPerson(
+  scope: ClientScope,
+  id: string,
+  manager?: ManagerRole,
+  signal?: AbortSignal,
+) {
+  return queryBackendRead(
+    await scopedBackend(scope, signal),
+    "person_get_v1",
+    {
+      ...(manager ? organizationCommon(scope) : common(scope)),
+      request_id: uuidv7(),
+      person_id: z.uuid().parse(id),
+    },
+    signal,
+  );
 }
 export async function readTeamPersonRoles(
   scope: ClientScope,

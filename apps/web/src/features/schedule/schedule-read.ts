@@ -29,7 +29,7 @@ export async function scheduleLocalDate(instant: string, timezone: string) {
   const temporal = await getTemporal();
   return temporal.Instant.from(instant).toZonedDateTimeISO(timezone).toPlainDate().toString();
 }
-function sessionIdentity(session: SessionView, id: string) {
+function sessionIdentity<T extends ScheduleRangeSession>(session: T, id: string) {
   if (
     session.id !== id ||
     !Number.isSafeInteger(session.version) ||
@@ -66,9 +66,40 @@ export async function readScheduleSession(
     id,
   );
 }
+type ScheduleRangeSession = Pick<
+  SessionView,
+  | "id"
+  | "starts_at"
+  | "ends_at"
+  | "class_id"
+  | "version"
+  | "state"
+  | "capacity"
+  | "assignments"
+  | "room_labels"
+>;
 export type ScheduleReadItem =
-  | { type: "session"; item: CalendarItem; session: SessionView }
+  | { type: "session"; item: CalendarItem; session: ScheduleRangeSession }
   | { type: "event"; item: CalendarItem };
+
+function calendarSession(item: CalendarItem): ScheduleRangeSession | undefined {
+  const { id, starts_at, ends_at, session_summary, capacity, room_labels } = item;
+  if (!session_summary || !capacity || !("held" in capacity)) return;
+  return sessionIdentity(
+    {
+      id,
+      starts_at,
+      ends_at,
+      class_id: session_summary.class_id,
+      version: session_summary.version,
+      state: session_summary.state,
+      assignments: session_summary.assignments,
+      capacity,
+      room_labels,
+    },
+    id,
+  );
+}
 
 // Exhaust only the visible UTC interval, never all people or session history.
 // Both filters are native resource reads: intersect their complete result sets,
@@ -89,6 +120,11 @@ export async function readScheduleRange(
     end = temporal.Instant.from(interval.ends_at);
   if (temporal.Instant.compare(start, end) >= 0) throw new Error("SCHEDULE_RANGE_INVALID");
   const backend = await scopedBackend(scope, signal, readContext);
+  const resources: (ResourceRef | null)[] = [
+    ...(filters.roomId ? [{ kind: "room" as const, id: filters.roomId }] : []),
+    ...(filters.instructorId ? [{ kind: "person" as const, id: filters.instructorId }] : []),
+  ];
+  const singleSource = resources.length <= 1;
   async function calendar(resource: ResourceRef | null) {
     const items: CalendarItem[] = [],
       asOf: string[] = [];
@@ -106,6 +142,7 @@ export async function readScheduleRange(
           center_id: scope.centerId,
           interval: { ...interval },
           ...(resource ? { resource } : {}),
+          ...(singleSource ? { include_session_summary: true } : {}),
           page: { limit: 50, sort: "starts_at_asc", ...(cursor ? { cursor } : {}) },
         },
         signal,
@@ -135,10 +172,6 @@ export async function readScheduleRange(
     } while (cursor);
     return { items, resource, asOf };
   }
-  const resources: (ResourceRef | null)[] = [
-    ...(filters.roomId ? [{ kind: "room" as const, id: filters.roomId }] : []),
-    ...(filters.instructorId ? [{ kind: "person" as const, id: filters.instructorId }] : []),
-  ];
   const pages = await Promise.all((resources.length ? resources : [null]).map(calendar));
   const first = pages[0]!;
   const secondIds = pages[1]
@@ -152,13 +185,16 @@ export async function readScheduleRange(
     );
   });
   const entries: ScheduleReadItem[] = [];
-  // CalendarItem intentionally has no lifecycle state. Hydrate real sessions in
-  // bounded batches instead of guessing planned state or current assignments.
+  // The optional summary is authorized on the same page as the session capacity.
+  // The exact reader still resolves rows without the projection and intersections
+  // built from two separately read resource pages.
   for (let index = 0; index < items.length; index += 4) {
     entries.push(
       ...(await Promise.all(
         items.slice(index, index + 4).map(async (item): Promise<ScheduleReadItem> => {
           if (item.type === "event") return { type: "event", item };
+          const summary = singleSource ? calendarSession(item) : undefined;
+          if (summary) return { type: "session", item, session: summary };
           const session = sessionIdentity(
             await queryBackendRead(
               backend,

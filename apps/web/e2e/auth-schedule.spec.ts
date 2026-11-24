@@ -199,34 +199,34 @@ async function scheduleFixture(
           starts_at: new Date(Date.parse(session.starts_at) + 86400000).toISOString(),
           ends_at: new Date(Date.parse(session.ends_at) + 86400000).toISOString(),
         };
+      function occurrence(row: SessionView, title: string): CalendarItem {
+        return {
+          id: row.id,
+          type: "session",
+          center_id: I.center,
+          starts_at: row.starts_at,
+          ends_at: row.ends_at,
+          title,
+          resources: [{ kind: "room", id: I.room }],
+          capacity: row.capacity,
+          ...(request.include_session_summary === true
+            ? {
+                session_summary: {
+                  state: row.state,
+                  attendance_state: row.attendance_state,
+                  version: row.version,
+                  format: row.format,
+                  class_id: row.class_id,
+                  assignments: row.assignments.map(({ person_id, duty }) => ({ person_id, duty })),
+                },
+              }
+            : {}),
+        };
+      }
       return send({
         items: [
-          ...(session
-            ? [
-                {
-                  id: session.id,
-                  type: "session",
-                  center_id: I.center,
-                  starts_at: session.starts_at,
-                  ends_at: session.ends_at,
-                  title: "Sentetik program seansı",
-                  resources: [{ kind: "room", id: I.room }],
-                },
-                ...(future
-                  ? [
-                      {
-                        id: future.id,
-                        type: "session",
-                        center_id: I.center,
-                        starts_at: future.starts_at,
-                        ends_at: future.ends_at,
-                        title: "İleri program seansı",
-                        resources: [{ kind: "room", id: I.room }],
-                      },
-                    ]
-                  : []),
-              ]
-            : []),
+          ...(session ? [occurrence(session, "Sentetik program seansı")] : []),
+          ...(future ? [occurrence(future, "İleri program seansı")] : []),
           ...(withEvent
             ? [
                 {
@@ -528,6 +528,19 @@ async function scheduleFixture(
     },
   };
 }
+
+test("calendar uses a single visible page and reads exact detail when opening a session", async ({
+  page,
+}) => {
+  await page.clock.setFixedTime(new Date("2026-11-18T12:00:00Z"));
+  const state = await scheduleFixture(page, true);
+  const session = page.getByText("Sentetik program seansı", { exact: true });
+  await expect(session).toBeVisible();
+  expect(state.reads).toEqual(["calendar_get_v1"]);
+  await session.click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  expect(state.reads).toEqual(["calendar_get_v1", "session_get_v1", "editor-policy-rejection"]);
+});
 
 test("management calendar reads the Sunday week selected in account settings", async ({ page }) => {
   await page.clock.setFixedTime(new Date("2026-11-18T12:00:00Z"));

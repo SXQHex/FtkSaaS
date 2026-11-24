@@ -127,7 +127,7 @@ function Managers({ scope, organization }: { scope: ClientScope; organization: b
         <ul className="grid gap-2 sm:grid-cols-2">
           {rows.map((row) => (
             <li key={row.id} className="rounded-md border p-3 wrap-anywhere">
-              {row.person.display_name}
+              {row.name}
             </li>
           ))}
         </ul>

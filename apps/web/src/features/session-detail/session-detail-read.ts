@@ -2,7 +2,7 @@ import { v7 as uuidv7 } from "uuid";
 import { readScheduleSession } from "../schedule/schedule-read";
 import { z } from "zod";
 import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
-import { BackendError } from "../../lib/backend";
+import { BackendError, queryBackendRead } from "../../lib/backend";
 import type {
   AttendanceView,
   PersonView,
@@ -86,14 +86,20 @@ export async function readSessionParticipants(
   z.uuid().parse(sessionId);
   if (personId) z.uuid().parse(personId);
   const backend = await scopedBackend(scope, undefined, readContext);
-  const page = await backend.call("reservation_list_v1", {
-    ...common(scope),
-    request_id: uuidv7(),
-    session_id: sessionId,
-    include_source_summary: true,
-    ...(personId ? { person_id: personId } : {}),
-    page: { limit: 20, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
-  });
+  const page = await queryBackendRead(
+    backend,
+    "reservation_list_v1",
+    {
+      ...common(scope),
+      request_id: uuidv7(),
+      session_id: sessionId,
+      include_source_summary: true,
+      ...(!select ? { include_person_display_names: true } : {}),
+      ...(personId ? { person_id: personId } : {}),
+      page: { limit: 20, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
+    },
+    readContext?.signal,
+  );
   checkedPage(page, cursor);
   instant.parse(page.as_of);
   const ids = new Set<string>();
@@ -108,8 +114,22 @@ export async function readSessionParticipants(
       throw new Error("SESSION_DETAIL_RESERVATIONS_UNAVAILABLE");
     ids.add(row.id);
   }
+  if (!select) {
+    return {
+      items: page.items.map((reservation) => ({
+        reservation,
+        person:
+          reservation.person_display_name === undefined
+            ? undefined
+            : { display_name: reservation.person_display_name },
+      })),
+      next_cursor: page.next_cursor,
+      as_of: page.as_of,
+    };
+  }
+  // The overview selects at most three eligible rows before requesting any names.
   const people = new Map<string, PersonView | undefined>();
-  const reservations = select ? select(page.items) : page.items;
+  const reservations = select(page.items);
   const personIds = [...new Set(reservations.map((row) => row.person_id))];
   for (let i = 0; i < personIds.length; i += 4)
     await Promise.all(

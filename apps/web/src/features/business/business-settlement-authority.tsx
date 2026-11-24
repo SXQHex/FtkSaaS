@@ -180,7 +180,7 @@ export function BusinessSettlementAuthority({
               </NativeSelectOption>
               {managers.map((row) => (
                 <NativeSelectOption key={row.id} value={row.personId}>
-                  {row.person.display_name}
+                  {row.name}
                 </NativeSelectOption>
               ))}
             </NativeSelect>
@@ -239,7 +239,7 @@ export function BusinessSettlementAuthority({
               : $.businessCenters.settlement.revoke,
           )}
           description={t(($) => $.businessCenters.settlement.authorityEffect)}
-          rows={[{ id: intent.target, title: person.person.display_name, detail: intent.reason }]}
+          rows={[{ id: intent.target, title: person.name, detail: intent.reason }]}
           accepted={accepted}
           onAccepted={setAccepted}
           onClose={close}

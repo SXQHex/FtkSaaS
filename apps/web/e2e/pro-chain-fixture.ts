@@ -269,6 +269,9 @@ export async function mockStudioChain(page: Page, plan: "pro" | "starter") {
             ? [
                 {
                   ...f.reservation,
+                  ...(r.include_person_display_names
+                    ? { person_display_name: person.display_name }
+                    : {}),
                   ...(r.include_source_summary
                     ? {
                         source_summary: {

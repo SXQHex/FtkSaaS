@@ -236,6 +236,10 @@ export async function mockSessionDetail(
     }
     if (operation === "reservation_list_v1") {
       expect(req.session_id).toBe(S.session);
+      const row = reservation && {
+        ...reservation,
+        ...(req.include_person_display_names ? { person_display_name: person.display_name } : {}),
+      };
       if (options.paginatedParticipants && !req.person_id) {
         const cursor = req.page.cursor as string | undefined;
         participantReads.push({ cursor, afterWrite: writes.length > 0 });
@@ -248,7 +252,7 @@ export async function mockSessionDetail(
           nextCursor = writes.length > 0 ? "fresh-participant" : "stale-participant";
         }
         return send({
-          items: cursor || !reservation ? [] : [reservation],
+          items: cursor || !row ? [] : [row],
           next_cursor: nextCursor,
           as_of: new Date().toISOString(),
         });
@@ -258,10 +262,10 @@ export async function mockSessionDetail(
         return reject("TEMPORARY_FAILURE");
       }
       return send({
-        items: reservation
+        items: row
           ? [
               {
-                ...reservation,
+                ...row,
                 ...(req.include_source_summary
                   ? {
                       source_summary: {

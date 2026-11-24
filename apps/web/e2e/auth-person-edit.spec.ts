@@ -244,6 +244,7 @@ test("native write denial never reports saved person details or creates relation
   const name = f.person.display_name;
   const dialog = await review(page, f.panel);
   await dialog.getByRole("button", { name: text.apply, exact: true }).click();
+  await expect(dialog.getByRole("status")).toContainText(text.states.rejected);
   await expect(page.getByText(text.states.saved, { exact: true })).toHaveCount(0);
   expect(f.writes).toHaveLength(1);
   expect(f.committed.size).toBe(0);

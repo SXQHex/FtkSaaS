@@ -150,7 +150,7 @@ export async function readEventsPage(
 export async function readEvent(
   scope: ClientScope,
   id: string,
-  includePaymentSummary = false,
+  include: { paymentSummary?: boolean; managementLabels?: boolean } = {},
   readContext?: AccountReadContext,
 ) {
   z.uuid().parse(id);
@@ -160,7 +160,8 @@ export async function readEvent(
       ...common(scope),
       request_id: uuidv7(),
       event_id: id,
-      ...(includePaymentSummary ? { include_payment_summary: true } : {}),
+      ...(include.paymentSummary ? { include_payment_summary: true } : {}),
+      ...(include.managementLabels ? { include_management_labels: true } : {}),
     }),
     scope,
     id,
