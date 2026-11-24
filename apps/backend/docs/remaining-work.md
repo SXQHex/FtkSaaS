@@ -899,7 +899,7 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 
 **Hosted profil dilimi:** Gerçek native Cron, geçmiş review tarihli hold altında durma→hold kaldırma→normal retry ile profil satırı temizliğini doğruladı; hedefte avatar/export baytı yoktu. Bu sonuç Auth/Storage/organizasyon veya bütün DB imhasını kapatmaz. Public self status yeniden giriş kabulü yapılmadı; [kanıt ve sınır](00-FtkSaaS-yeni-sohbet-devir.md#pro-hosted-profil-ve-export-kabulü).
 
-**Native principal alt aşaması:** Scoped worker hazırlığı, provider transaction'ında canlı hold/lease fence, official hard delete, cascade sonrası commit proof ve404/readback PR267 aday/main/development ve gerçek native kabulüyle kaynak teslimini geçti. Canlı migration141 ve ertelenmiş trigger doğrulandı; target binding/proof0 olduğundan hosted fiziksel imha yapılmış sayılmaz. Provider audit/diğer Auth yüzeyleri, karma geçmiş minimizasyonu ve O04 bütünü açık kalır.
+**Native principal alt aşaması:** Scoped worker hazırlığı, provider transaction'ında canlı hold/lease fence, official hard delete, cascade sonrası commit proof ve 404 readback PR267 aday/main/development ve native kabulüyle kaynak teslimini geçti. [Ayrı hosted hedefte sentetik principal imhası](00-FtkSaaS-yeni-sohbet-devir.md#o04-hosted-sentetik-auth-imhasi) da doğrulandı. Sağlayıcı log ve kopyaları, diğer Auth yüzeyleri, karma geçmiş minimizasyonu ve O04 bütünü açık.
 
 **Seçili Auth kalıntıları:** Mevcut imha yolu hedef flow/orphan refresh satırlarını ve native audit’te hedefe ait bilinen kişisel alanları işler. Karma hesap flow’u ve yanlış refresh/session sahipliği işlemi durdurur. [Kaynak ve kabul](00-FtkSaaS-yeni-sohbet-devir.md#auth-kalıntı-ve-yöntem-paketi). Kalan iş, sağlayıcının dış log/kopyaları ve diğer Auth yüzeyleri için saklama ve imha kanıtı ile DB’deki karma geçmiş ve organizasyon kapsamının doğrulanmasıdır.
 
@@ -918,7 +918,7 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 
 **Hosted expiry dilimi:** Gerçek API ile üretilip indirilen dolu CSV, test-owned erken expiry/hold enjeksiyonu sonrası native Cron ile fiziksel olarak temizlendi; ayrı kontrol dosyası korundu. Bu doğal yedi günlük süre veya dolu hesap-silme export kabulü değildir; [sonuç ve açık kapsam](00-FtkSaaS-yeni-sohbet-devir.md#pro-hosted-profil-ve-export-kabulü).
 
-**Native Storage dilimi:** [İzole nesne silme tatbikatı](00-FtkSaaS-yeni-sohbet-devir.md#o03-o10-guncel-isletim-kontrolleri) geçti. Privacy işinde Storage hold ve geçici kopyaların imhası açık.
+**Native Storage dilimi:** [Yerel disk baytı](00-FtkSaaS-yeni-sohbet-devir.md#o03-o10-guncel-isletim-kontrolleri) ve [ayrı hosted hedefte eski imzalı URL ile yönetici okumasının reddi](00-FtkSaaS-yeni-sohbet-devir.md#o08-hosted-sentetik-restore) doğrulandı. Privacy işinde Storage hold ve geçici kopyaların imhası açık.
 
 <a id="o06"></a>
 ### O06 — Bağımsız imha sicili
@@ -934,7 +934,7 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 <a id="o07"></a>
 ### O07 — Guard ile gerçek restore yükleyicisi
 
-- [ ] **Durum:** İzole PostgreSQL satır yükleyicisi geçti, O06 bekleniyor · **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
+- [ ] **Durum:** İzole PostgreSQL satır yükleyicisi ve [hosted sentetik rollback probu](00-FtkSaaS-yeni-sohbet-devir.md#o08-hosted-sentetik-restore) geçti, O06 bekleniyor · **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
 - **Bağımlılık:** O06
 - **Kabul:** Guard reddi yüklemeyi, loader hatası hizmete erişim açılmasını engeller.
 - **Sınır/olumsuz durum:** Kod rollback DB restore değildir; production reset/seed yok.
@@ -947,13 +947,13 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 <a id="o08"></a>
 ### O08 — DB/Auth/Storage tam geri dönüş
 
-- [ ] **Durum:** [Yerel tatbikat geçti](00-FtkSaaS-yeni-sohbet-devir.md#o08-yerel-restore-kabulu), [ayrı hosted hedef hazır](00-FtkSaaS-yeni-sohbet-devir.md#o03-o10-guncel-isletim-kontrolleri), geri yükleme açık · **Tür:** H · **Plan:** Tümü · **Özellik:** F33,F30
+- [ ] **Durum:** [Yerel tatbikat](00-FtkSaaS-yeni-sohbet-devir.md#o08-yerel-restore-kabulu) ve [ayrı hosted hedefte sentetik mantıksal geri yükleme](00-FtkSaaS-yeni-sohbet-devir.md#o08-hosted-sentetik-restore) geçti, tam yapılandırma kabulü açık · **Tür:** H · **Plan:** Tümü · **Özellik:** F33,F30
 - **Bağımlılık:** O07
 - **Kabul:** DB/migration/ACL/RLS, Auth UUID/giriş ve Storage bayt/izinleri aynı snapshotla geri döner.
 - **Sınır/olumsuz durum:** Tek SQL veya dosya restore bütün kabul değildir; kaynak hedef ayrıdır.
 - **Doğrulama senaryosu:** DB mutabakatı, gerçek giriş, Storage checksum; Edge/config/secret envanteri ve worker binding doğrulaması.
 - **Kaynak alanı:** restore runbook ve mevcut araçlar
-- **Kalan:** Aynı kurtarma noktasına ait managed DB ve Storage yedeğini ayrı ve izole hosted Supabase hedefinde [tam restore prosedürüyle](remote-backend-setup.md#managed-restore-prosedürünün-sınırı) geri yükle. Dış sağlayıcı yapılandırmasını ve gereken sırların hedefte yeniden sağlandığını doğrula.
+- **Kalan:** [Tam restore prosedüründe](remote-backend-setup.md#managed-restore-prosedürünün-sınırı) öngörülen dış sağlayıcı yapılandırmasını, gereken sırların hedefte yeniden sağlanmasını ve bu ayarlara bağlı işlevleri doğrula.
 
 <a id="o09"></a>
 ### O09 — Backup non-resurrection kabulü
@@ -969,7 +969,7 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 <a id="o10"></a>
 ### O10 — Yük ve kurtarma hedeflerini ölç
 
-- [ ] **Durum:** Pilot hedefleri kayıtlı, ölçüm bekleniyor · **Tür:** D/H · **Plan:** Tümü · **Özellik:** F01,F08,F19,F28,F33
+- [ ] **Durum:** [Yerel Business ön ölçümü](00-FtkSaaS-yeni-sohbet-devir.md#o10-yerel-business-on-olcum) gecikme hedeflerini aştı, hosted pilot kabulü açık · **Tür:** D/H · **Plan:** Tümü · **Özellik:** F01,F08,F19,F28,F33
 - **Bağımlılık:** O02,O08
 - **Kabul:** Ayrı altyapı projesinde belirlenecek veri hacmi ve iş karışımıyla gecikme/queue/finans doğruluğu ve kurtarma hedefleri ölçülür. G02/G01/G03 için plan başına ayrı işletim kabulü oluşturmaz.
 - **Sınır/olumsuz durum:** Öğrenci sayısı eşzamanlı kullanıcı sayısı değildir; onaylanmamış SLA/eşik uydurulmaz.
