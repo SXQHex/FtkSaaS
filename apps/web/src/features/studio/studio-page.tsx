@@ -266,6 +266,7 @@ function StudioContent({
   // Failed live reads do not render cached private lists as current authority.
   const snapshot = query.isError ? undefined : query.data;
   const mapped = snapshot ? studioViewData(snapshot, t, observedInstructors) : empty;
+  const routes: readonly unknown[] = Object.values(router.routesById);
   const data = {
     ...mapped,
     setup: mapped.setup.map((item) => ({
@@ -273,7 +274,13 @@ function StudioContent({
       available:
         item.available !== false &&
         (!item.route ||
-          Object.values(router.routesById).some((route) => route.fullPath === item.route)),
+          routes.some(
+            (route) =>
+              !!route &&
+              typeof route === "object" &&
+              "fullPath" in route &&
+              route.fullPath === item.route,
+          )),
     })),
   };
   const base = `/o/${encodeURIComponent(scope.orgId)}/c/${encodeURIComponent(scope.centerId)}`;

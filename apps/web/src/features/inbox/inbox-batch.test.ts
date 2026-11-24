@@ -75,6 +75,10 @@ it("uses native search/work/options and accepts authoritative counts beyond the 
   await expect(readInbox(scope, false, undefined, { query: "", workState: "all" })).rejects.toThrow(
     "INBOX_SUMMARY_UNAVAILABLE",
   );
+  call.mockResolvedValue({ ...page, summary: { ...page.summary, unread: undefined } });
+  await expect(readInbox(scope, false, undefined, { query: "", workState: "all" })).rejects.toThrow(
+    "INBOX_SUMMARY_UNAVAILABLE",
+  );
 });
 it("reads each selected version with current:null and restores request order from native sort", async () => {
   call.mockResolvedValue(states());

@@ -83,7 +83,8 @@ export function availabilityIntent(
   const selected = base.records.filter((item) => availabilityPeriod(item) === period);
   if (period !== "new" && !selected.length) throw new Error("AVAILABILITY_CHANGED");
   const existing = new Map(selected.map((item) => [item.id, item]));
-  const groups = new Map<string, Map<string, number[]>>();
+  type AvailabilityTimes = { from: string; to: string; weekdays: [number, ...number[]] };
+  const groups = new Map<string, Map<string, AvailabilityTimes>>();
   for (const [index, day] of parsed.data.days.entries()) {
     if (!day.enabled) continue;
     if (!day.intervals.length) throw new Error("AVAILABILITY_INVALID");
@@ -96,9 +97,11 @@ export function availabilityIntent(
       const from = canonicalTime(interval.from),
         to = canonicalTime(interval.to);
       if (from >= to) throw new Error("AVAILABILITY_INVALID");
-      const pair = JSON.stringify([from, to]);
-      const times = groups.get(id) ?? new Map<string, number[]>();
-      times.set(pair, [...(times.get(pair) ?? []), index + 1]);
+      const pair = `${from}/${to}`;
+      const times = groups.get(id) ?? new Map<string, AvailabilityTimes>();
+      const existingTime = times.get(pair);
+      if (existingTime) existingTime.weekdays.push(index + 1);
+      else times.set(pair, { from, to, weekdays: [index + 1] });
       groups.set(id, times);
     }
   }
@@ -110,20 +113,16 @@ export function availabilityIntent(
   for (const [id, times] of groups) {
     const original = existing.get(id);
     const originalPair = original
-      ? JSON.stringify([
-          canonicalTime(original.rule.local_start),
-          canonicalTime(original.rule.local_end),
-        ])
+      ? `${canonicalTime(original.rule.local_start)}/${canonicalTime(original.rule.local_end)}`
       : undefined;
     // Preserve the original ID for its unchanged time, and create separate
     // rules when only some weekdays have moved. Never overwrite another day.
     const entries = [...times.entries()].sort(
       ([left], [right]) => Number(right === originalPair) - Number(left === originalPair),
     );
-    entries.forEach(([pair, weekdays], index) => {
-      const [from, to] = JSON.parse(pair) as [string, string];
+    entries.forEach(([, { from, to, weekdays }], index) => {
       const rule: AvailabilityRule = {
-        weekdays: weekdays as [number, ...number[]],
+        weekdays,
         local_start: from,
         local_end: to,
         valid_from: parsed.data.validFrom,

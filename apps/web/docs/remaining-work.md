@@ -101,6 +101,8 @@
 
 **İnceleme şartı:** Her değişiklik doğruluk, okunabilirlik, mimari sahiplik, güvenlik ve performans üzerinden kontrol edilir; yeni doğrudan runtime işlevi eklenmediği sürece ADR açılmaz. Aynı modülde mevcut kaynak kontrollü doğrulama varken ikinci yol oluşturulmaz. Kapanış yalnız tip kontrolü değil, ilgili olumsuz test + lint/format/build/quality + aynı aday kaynak CI kanıtıyla yapılır.
 
+**TS05 regresyonu.** [Bildirim özeti testi](../src/features/inbox/inbox-batch.test.ts) eksik sayaçları açık hata olarak doğrular.
+
 <a id="monorepo-geçişi"></a>
 
 ## Bağımsız eski teslim kontrolleri (açık)
