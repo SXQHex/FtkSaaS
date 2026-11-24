@@ -27,8 +27,8 @@ test('Export expiry and account purge preserve holds, provenance, leases and ten
  const count=async(table,where,args)=>Number((await q('select count(*) n from '+table+' where '+where,args))[0].n);
  const exists=id=>count('private.p06_export_files','file_id=$1',[id]);
  const expire=async file=>{await db.query("update core.files set expires_at=clock_timestamp()-interval '1 second' where id=$1",[file.id]);await db.query("update core.report_jobs set expires_at=clock_timestamp()-interval '1 second' where id=$1",[file.job]);};
- const setHold=async(table,id,scope=org)=>db.query("insert into core.retention_holds(id,org_id,subject_table,subject_id,reason,authority_reference,review_at) values($1,$2,$3,$4,'Synthetic export hold','native acceptance',clock_timestamp()-interval '1 day')",[hold,scope,table,id]);
- const releaseHold=()=>db.query('delete from core.retention_holds where id=$1',[hold]);
+ const setHold=async(table,id,scope=org,holdId=hold,connection=db)=>connection.query("insert into core.retention_holds(id,org_id,subject_table,subject_id,reason,authority_reference,review_at) values($1,$2,$3,$4,'Synthetic export hold','native acceptance',clock_timestamp()-interval '1 day')",[holdId,scope,table,id]);
+ const releaseHold=(holdId=hold)=>db.query('delete from core.retention_holds where id=$1',[holdId]);
  const claim=()=>worker.query('select private.p06_jobs_claim($1,$2,1)',[org,bank()]);
  let command;
  const renew=async()=>{
@@ -66,6 +66,69 @@ test('Export expiry and account purge preserve holds, provenance, leases and ten
    assert.deepEqual(proof,[{reason:'expired',removed_bytes:String(body.length),checksum,request_id:null}]);
    await claim();assert.equal(await count('private.p06_export_purges','file_id=$1',[first.id]),1);
    await assert.rejects(db.query('delete from private.p06_export_purges where file_id=$1',[first.id]),/INTEGRITY_VIOLATION/);
+  });
+  await t.test('expired tracking copies keep exact, account and organization holds while unrelated copies expire',async()=>{
+   const contextHold=key();
+   const tracking=async(accountId,orgId,age)=>{
+    const preview=key(),receipt=key(),hash=receipt.replaceAll('-','').repeat(2);
+    await db.query("insert into core.previews(id,org_id,actor_account_id,operation,scope_hash,dependencies,result,state) values($1,$2,$3,'import_apply_v1',$4,'{}','{}','current')",[preview,orgId,accountId,hash]);
+    await db.query("insert into core.operation_receipts(id,org_id,actor_account_id,actor_fingerprint,operation,key_hash,payload_hash,state,result_expires_at) values($1,$2,$3,$4,'import_preview_v1',$5,$5,'succeeded',clock_timestamp()+$6::interval)",[receipt,orgId,accountId,accountId,hash,age]);
+    await db.query("insert into private.p06_previews values($1,$2,$3,'import_preview_v1','{}','{}',clock_timestamp()+$4::interval)",[preview,orgId,accountId,age]);
+    await db.query("insert into private.p06_contexts values($1,$2,$3,'import_preview_v1','{}','import_jobs')",[receipt,orgId,accountId]);
+    return {preview,receipt};
+   };
+   const copies=async item=>[
+    await count('private.p06_previews','preview_id=$1',[item.preview]),
+    await count('private.p06_contexts','receipt_id=$1',[item.receipt])
+   ];
+   const target=await tracking(account.id,org,'-1 hour');
+   const expired=await tracking(other.id,org,'-1 hour');
+   const live=await tracking(other.id,org,'1 hour');
+   const outside=await tracking(other.id,holdOrg,'-1 hour');
+   try{
+    const holdWriter=new pg.Client({connectionString:context().env.DB_URL,statement_timeout:10000});
+    await holdWriter.connect();
+    try{
+     await holdWriter.query('begin');
+     await setHold('core.previews',target.preview,org,hold,holdWriter);
+     await setHold('private.p06_contexts',target.receipt,org,contextHold,holdWriter);
+     const workerPid=(await worker.query('select pg_backend_pid() pid')).rows[0].pid;
+     const pending=claim();
+     try{
+      await waitLock(workerPid,'relation');
+      await holdWriter.query('commit');
+      await pending;
+     }finally{
+      await holdWriter.query('rollback');
+      await pending.catch(()=>{});
+     }
+    }finally{await holdWriter.end();}
+    assert.deepEqual(await copies(target),[1,1]);
+    assert.deepEqual(await copies(expired),[0,0]);
+    await releaseHold();
+    await releaseHold(contextHold);
+
+    await setHold('accounts',account.id,holdOrg);
+    await claim();
+    assert.deepEqual(await copies(target),[1,1]);
+    await releaseHold();
+
+    await setHold('core.organizations',org);
+    await claim();
+    assert.deepEqual(await copies(target),[1,1]);
+    await releaseHold();
+
+    await claim();
+    await claim();
+    assert.deepEqual(await copies(target),[0,0]);
+    assert.deepEqual(await copies(live),[1,1]);
+    assert.deepEqual(await copies(outside),[1,1]);
+    assert.equal(await count('core.previews','id=$1',[target.preview]),1);
+    assert.equal(await count('core.operation_receipts','id=$1',[target.receipt]),1);
+   }finally{
+    await releaseHold();
+    await releaseHold(contextHold);
+   }
   });
   await db.query("update core.accounts set state='deletion_pending' where id=$1",[account.id]);
   await db.query("update core.account_links set state='revoked' where account_id=$1",[account.id]);

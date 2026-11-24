@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "325b69e2ba83eae744bebd6e6d937f554e1f2b856a045808ae73b66c854b04b4",
-        "reason": "Main’de onaylanan M09 test beklentileri ile O04 migration geçmişi ve P07 test envanteri birlikte doğrulandı."
+        "fingerprint": "89515273bcd0aa0925f081bf3180186fcfda733b1905fb397b60a672d6bdfc34",
+        "reason": "Migration sayısı ve sabit geçmiş güncellendi, P06 test kaynağı mevcut CI işine bağlı."
       }
     },
     {
@@ -1353,6 +1353,7 @@
         "apps/backend/supabase/migrations/20261103141306_commercial_plan_limits.sql",
         "apps/backend/database/account-export-erasure.sql",
         "apps/backend/supabase/migrations/20261108211924_account_export_erasure.sql",
+        "apps/backend/supabase/migrations/20261124214437_p06_tracking_retention_holds.sql",
         "apps/backend/database/crm-legacy-import.sql",
         "apps/backend/supabase/migrations/20261105080000_crm_legacy_import.sql",
         "apps/backend/database/crm-import-email-warnings.sql",
@@ -1381,8 +1382,8 @@
         "import_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "f799a5c54a40014648bfca2398fd34167fd6551dd5019c0e324c0dad3e01a8bd",
-        "reason": "XREQ-073 paylaşılan sözleşme ve test kaynağı incelendi. Bu akışın komutları, mevcut alanları ve yetki koşulları aynı."
+        "fingerprint": "3a303e05e62498fcd0ba433cce254e9f1aae4637b5b63a3bb3cd384cd2da7f32",
+        "reason": "P06 claim süresi dolan önizleme ve bağlam kopyaları için kayıt, hesap ve organizasyon blokajını uygular."
       }
     },
     {
@@ -2040,8 +2041,8 @@
         "platform_operator_access_set_v1"
       ],
       "review": {
-        "fingerprint": "181325381386d19c05a00d61fe119b6ebc6363b19d5c86babc7f8d28673d73c0",
-        "reason": "Native hard delete hedef tek kullanımlık token blokajını ve commit anındaki yokluk kontrolünü kapsar."
+        "fingerprint": "c76aff265ad4975994e6766863f2501f467e607d9f765e74ebbe3cdc00ef33e8",
+        "reason": "Paylaşılan test P06 takip kopyalarının olağan expiry temizliğini ayrıca doğrular."
       }
     },
     {
@@ -2208,6 +2209,7 @@
         "apps/backend/supabase/migrations/20261124211200_account_native_retention_hold.sql",
         "apps/backend/database/account-export-erasure.sql",
         "apps/backend/supabase/migrations/20261108211924_account_export_erasure.sql",
+        "apps/backend/supabase/migrations/20261124214437_p06_tracking_retention_holds.sql",
         "apps/backend/database/settings-offer-duration-required.sql",
         "apps/backend/supabase/migrations/20261112093024_s10_offer_duration_required.sql",
         "apps/backend/scripts/ops-monitor.mjs",
@@ -2241,8 +2243,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "980afc747adfc81fc14a7bf78cfcb301fc036e05269146c072e602ffc0772d6b",
-        "reason": "Mevcut scoped worker izni ve geç blokaj aynı native hazırlık sınırında doğrulandı."
+        "fingerprint": "3cbffca4f315a3dd3cca1fb731719e8ee9aa4d7e8c397698744b32b4f4038434",
+        "reason": "P06 claim ve export expiry organizasyon yazıcılarını sıralar ve eşzamanlı blokajın yabancı anahtar kontrolüne izin verir."
       }
     }
   ]
