@@ -24,7 +24,7 @@ const financeView = z.looseObject({
       id: z.uuid(),
       due_at: instant,
       remaining_minor: money,
-      center_id: z.uuid().optional(),
+      center_id: z.guid().optional(),
       version,
       net_minor: money.optional(),
       paid_minor: money.optional(),
@@ -39,9 +39,9 @@ const financeView = z.looseObject({
         amount_minor: money,
         currency,
         occurred_at: instant,
-        center_id: z.uuid().optional(),
+        center_id: z.guid().optional(),
         version,
-        previous_id: z.uuid().nullish(),
+        previous_id: z.guid().nullish(),
         payment: z
           .looseObject({
             method: z.enum(["cash", "bank_transfer", "card_pos"]),

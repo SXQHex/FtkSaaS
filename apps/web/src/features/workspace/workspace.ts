@@ -7,16 +7,17 @@ import { sameNativeSession } from "../auth/native-session-id";
 import type { OrganizationView, CenterView, RoleView } from "@ftksaas/api-contracts";
 
 const organizationAuthority = z.object({
-  id: z.uuid(),
+  id: z.guid(),
+  access_mode: z.enum(["bootstrap", "normal", "grace", "closed"]),
   self_context: z
     .object({
-      person_id: z.uuid(),
+      person_id: z.guid(),
       centers: z.array(
         z.object({
-          center_id: z.uuid(),
-          instructor: z.boolean().optional(),
-          student: z.boolean().optional(),
-          assistant: z.boolean().optional(),
+          center_id: z.guid(),
+          instructor: z.boolean(),
+          student: z.boolean(),
+          assistant: z.boolean(),
         }),
       ),
     })
@@ -25,14 +26,14 @@ const organizationAuthority = z.object({
     .object({
       owner: z.boolean(),
       org_manager: z.boolean(),
-      managed_center_ids: z.array(z.uuid()),
+      managed_center_ids: z.array(z.guid()),
     })
     .nullish(),
 });
-const centerAuthority = z.object({ id: z.uuid(), accessible: z.boolean() });
+const centerAuthority = z.object({ id: z.guid(), accessible: z.boolean() });
 const roleAuthority = z.object({
-  person_id: z.uuid(),
-  scope_center_id: z.uuid().nullable(),
+  person_id: z.guid(),
+  scope_center_id: z.guid().nullable(),
   role: z.enum([
     "owner",
     "org_manager",
@@ -45,8 +46,9 @@ const roleAuthority = z.object({
   account_access_granted: z.boolean().optional(),
 });
 
-function nextWorkspaceCursor(next: string | null | undefined, seen: Set<string>) {
-  if (!next) return undefined;
+function nextWorkspaceCursor(next: unknown, seen: Set<string>) {
+  if (next === null || next === undefined) return undefined;
+  if (typeof next !== "string" || !next) throw new Error("WORKSPACE_PROJECTION_INVALID");
   if (seen.has(next)) throw new Error("WORKSPACE_CURSOR_REPEATED");
   seen.add(next);
   return next;

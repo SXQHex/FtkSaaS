@@ -38,7 +38,7 @@ export async function readFinanceOperationReceipt(intent: {
       status: z.enum(["in_progress", "succeeded", "failed_final", "result_expired"]),
       result_available: z.boolean(),
       result_reference: z
-        .object({ type: z.literal(resultTypes[operation]), id: z.uuid() })
+        .object({ type: z.literal(resultTypes[operation]), id: z.guid() })
         .nullable(),
     })
     .safeParse(native);

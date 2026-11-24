@@ -156,6 +156,7 @@ afterEach(() => {
   vi.unstubAllEnvs();
 });
 it.each([
+  ["organizations_list_v1", { id: orgId, access_mode: true }],
   ["centers_list_v1", { id: centerId, accessible: "false" }],
   [
     "roles_list_v1",
@@ -174,6 +175,35 @@ it.each([
     ),
   );
   await expect(readWorkspace(accountId)).rejects.toThrow("WORKSPACE_PROJECTION_INVALID");
+});
+it("preserves UUIDs accepted by the native contract for legacy organizations", async () => {
+  const legacyId = "00000000-0000-0000-0000-000000000001";
+  server.use(
+    http.post("https://backend.invalid/functions/v1/backend-v1/organizations_list_v1", () =>
+      HttpResponse.json({
+        ok: true,
+        data: { items: [{ id: legacyId, access_mode: "normal" }], next_cursor: null },
+        trace_id: accountId,
+      }),
+    ),
+  );
+  await expect(readWorkspace(accountId, legacyId)).resolves.toMatchObject({
+    selected: { id: legacyId },
+  });
+});
+it("rejects a non-string workspace cursor before requesting another page", async () => {
+  const read = vi.fn(() =>
+    HttpResponse.json({
+      ok: true,
+      data: { items: [], next_cursor: { opaque: "bad" } },
+      trace_id: accountId,
+    }),
+  );
+  server.use(
+    http.post("https://backend.invalid/functions/v1/backend-v1/organizations_list_v1", read),
+  );
+  await expect(readWorkspace(accountId)).rejects.toThrow("WORKSPACE_PROJECTION_INVALID");
+  expect(read).toHaveBeenCalledTimes(1);
 });
 it.each(["organizations_list_v1", "centers_list_v1", "roles_list_v1"])(
   "stops a repeated %s cursor after the second response",

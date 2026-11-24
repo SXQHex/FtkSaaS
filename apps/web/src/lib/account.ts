@@ -27,7 +27,7 @@ const identity = z.object({
 });
 
 const actor = z.object({
-  id: z.uuid(),
+  id: z.guid(),
   state: z.enum(["active", "pending", "deletion_pending", "deleted"]),
   display_name: z.string(),
   identity: identity.optional(),
