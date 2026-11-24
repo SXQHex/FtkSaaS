@@ -317,8 +317,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "0b8cfb750a2cd2f8aa4f3345103aa6db2a8dfdc5480f0093ac1a2a1c2f01feeb",
-        "reason": "XREQ-073 eşleşen istek ve yanıt doğrulayıcıları, ortak UUID referansları ve dar native okumaların test envanteri incelendi."
+        "fingerprint": "8b4608a70a84594ece2d7050584226f1497061798f68d77b7be7f235fbd9acb9",
+        "reason": "XREQ-073 API kabul envanteri, güncel merkez okuyucusunun RLS ve SQL rol kontrollerini doğrular."
       }
     },
     {
@@ -546,8 +546,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "1de5904cae3b326868f9e583cf60062e5aa18d1f4be966ee03ebe7be8e04a471",
-        "reason": "XREQ-073 kesin merkez seçicisi, personel override özeti ve sınıf atama testleri mevcut role ve yazma sürümüne göre incelendi."
+        "fingerprint": "e32dc84766b4430eb1ec97ec758162cde9fc766df92d09e14ae8da336fdb0f56",
+        "reason": "XREQ-073 merkez kabulü, seçicisiz iki merkezi ve seçicili tek merkezi doğrular. Data API SQL yetki kontrolü güncel projeksiyona bağlıdır."
       }
     },
     {

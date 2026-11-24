@@ -94,7 +94,8 @@ test('Centers Data API preserves the plain list contract and live authorization'
   has_function_privilege('anon','api_read.centers_list_v1(jsonb)','execute') as anon_rpc,
   has_any_column_privilege('authenticated','core.centers','select') as core_columns,
   has_function_privilege('authenticated','api_v1.centers_list_v1(jsonb,uuid,uuid,uuid[],jsonb)','execute') as service_rpc,
-  has_function_privilege('authenticated','private.centers_read_rows(uuid,uuid,boolean)','execute') as projection,
+  has_function_privilege('anon','private.centers_read_rows(uuid,uuid,boolean,uuid)','execute') as anon_projection,
+  has_function_privilege('authenticated','private.centers_read_rows(uuid,uuid,boolean,uuid)','execute') as authenticated_projection,
   (select rolbypassrls from pg_roles where rolname='ftk_centers_read') as bypass_rls`);
  assert(Object.values(grants).every(value=>value===false),JSON.stringify(grants));
 
@@ -114,8 +115,14 @@ test('Center setup summaries expose only scoped publication and provider handoff
  const status=async(c=center)=>{const page=await read(c);assert.equal(page.items.length,1);assert.equal(page.items[0].id,c);const s=page.items[0].setup_status;assert.deepEqual(Object.keys(s).sort(),['as_of','document_published','member_invitation_sent']);assert(Number.isFinite(Date.parse(s.as_of)));return s;};
  const assertStatus=async(c,document,invitation)=>{const s=await status(c);assert.equal(s.document_published,document);assert.equal(s.member_invitation_sent,invitation);};
  await t.test('opt in is explicit, center bounded, permission checked and read only',async()=>{
+  const api=(operation,body)=>f.api(operation,{center_id:null,...body});
   const baseline=await api('centers_list_v1',{page:{}});assert.equal(baseline.items.length,2);assert(baseline.items.every(x=>!Object.hasOwn(x,'setup_status')));
+  assert.deepEqual(baseline.items.map(x=>x.id).sort(),[center,other].sort());
   const disabled=await api('centers_list_v1',{page:{},include_setup_status:false});assert(disabled.items.every(x=>!Object.hasOwn(x,'setup_status')));
+  assert.deepEqual(disabled.items.map(x=>x.id).sort(),[center,other].sort());
+  const exact=await api('centers_list_v1',{center_id:center,page:{},include_setup_status:false});
+  assert.deepEqual(exact.items.map(x=>x.id),[center]);
+  assert(!Object.hasOwn(exact.items[0],'setup_status'));
   const before=await counts();await assertStatus(center,false,false);await assertStatus(other,false,false);assert.equal(await counts(),before);
   await fail('centers_list_v1',{center_id:null,include_setup_status:true,page:{}},'VALIDATION_FAILED');
   await fail('centers_list_v1',{include_setup_status:true,page:{}},'NOT_FOUND',stranger);
