@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { readStudioSetup } from "./setup";
+import { readClosureContext } from "./closure";
 import { enrollmentIntent, readInstructorEnrollment } from "./instructor-enrollment";
 import type { InstructorRecord } from "./studio-reads";
 import type { StudioResources } from "./studio";
@@ -88,6 +89,38 @@ describe("scoped setup evidence", () => {
       expect(result.invitations).toBeNull();
     },
   );
+});
+describe("closure center selection", () => {
+  const center = { id: scope.centerId, accessible: true, version: 7, timezone: "Europe/Istanbul" };
+  const other = { ...center, id: "other-center" };
+
+  it("reads the single selected center from the normal reader", async () => {
+    mocks.call.mockImplementationOnce(async (_operation, request) => ({
+      items: request.center_id ? [center] : [other, center],
+      next_cursor: null,
+    }));
+    await expect(readClosureContext(scope)).resolves.toEqual({ scope, center });
+    expect(mocks.call).toHaveBeenCalledExactlyOnceWith(
+      "centers_list_v1",
+      expect.objectContaining({
+        org_id: scope.orgId,
+        center_id: scope.centerId,
+        page: { limit: 1 },
+      }),
+    );
+    expect(mocks.call.mock.calls[0]?.[1]).not.toHaveProperty("include_setup_status");
+  });
+
+  it.each([
+    { items: [other], next_cursor: null },
+    { items: [{ ...center, accessible: false }], next_cursor: null },
+    { items: [center, other], next_cursor: null },
+    { items: [center], next_cursor: "unexpected" },
+  ])("rejects a center response outside the exact read contract %#", async (page) => {
+    mocks.call.mockResolvedValueOnce(page);
+    await expect(readClosureContext(scope)).rejects.toThrow("STUDIO_UNAVAILABLE");
+    expect(mocks.call).toHaveBeenCalledTimes(1);
+  });
 });
 describe("verified assignment binding", () => {
   it.each([true, false, null])(
