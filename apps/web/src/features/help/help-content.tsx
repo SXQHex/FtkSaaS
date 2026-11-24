@@ -20,7 +20,9 @@ export function HelpContent() {
   const groups: HelpGroup[] = Object.entries(content).map(([id, group]) => ({
     id,
     title: group.title,
-    questions: Object.entries(group.questions).map(([id, row]) => ({ id, ...row })),
+    questions: Object.entries<Omit<HelpGroup["questions"][number], "id">>(group.questions).map(
+      ([id, row]) => ({ id, ...row }),
+    ),
   }));
   const support = t(($) => $.help.contact, { returnObjects: true });
   async function copy() {

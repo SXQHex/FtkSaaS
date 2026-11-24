@@ -43,10 +43,12 @@ export function SettingsPolicyEditor({
   const { t } = useTranslation();
   const initial: Record<string, string> = {};
   if (before.value.kind !== "documents") {
-    for (const [key, value] of Object.entries(before.value)) {
+    const entries: [string, unknown][] = Object.entries(before.value);
+    for (const [key, value] of entries) {
       if (key === "kind") continue;
       if (key === "terms" && typeof value === "object" && value) {
-        for (const [part, entry] of Object.entries(value)) {
+        const terms: [string, unknown][] = Object.entries(value);
+        for (const [part, entry] of terms) {
           if (entry === null) initial[part] = "";
           else if (
             typeof entry === "string" ||

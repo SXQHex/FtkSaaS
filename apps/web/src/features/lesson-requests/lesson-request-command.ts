@@ -245,9 +245,9 @@ export async function readRequestResult(
     request.person_id,
     reservationId,
     sessionId,
-  ).catch((error) => ({ status: visibility(error) }));
+  ).catch((error: unknown) => ({ status: visibility(error) }));
   const rights = await readProfileRights(intent.scope, request.person_id)
     .then((items) => ({ status: "available" as const, items }))
-    .catch((error) => ({ status: visibility(error) }));
+    .catch((error: unknown) => ({ status: visibility(error) }));
   return { request, reservation, rights };
 }
