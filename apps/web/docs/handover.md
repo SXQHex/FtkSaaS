@@ -19,7 +19,7 @@
 
 ### C-ortak ölçümü
 
-`48ad4019d3f9391c3afc0eba257329c2e1e0ee61` ve `1bbb5d61e3d0b0f13c6ad4d6d33e7e87d1eeffe2` aynı merkez yöneticisi fixture'ında, 1280×720 Desktop Chromium'da birer işçi ve beşer tekrarla ölçüldü. Sayaçlar Edge ve doğrudan RPC okumalarını içerir. Satırlar sayfa öğeleri, rapor satırları ve tekil DTO'lar üzerinden sayıldı. Süre, kullanıcı adımından ilgili okuma ve görünürlük kontrollerinin bitimine kadar geçen yerel p50'dir. [Ölçüm senaryosu](../e2e/auth-c-common-read-cost.spec.ts)
+`48ad4019d3f9391c3afc0eba257329c2e1e0ee61` ve `1bbb5d61e3d0b0f13c6ad4d6d33e7e87d1eeffe2` aynı merkez yöneticisi fixture'ında, 1280×720 Desktop Chromium'da birer işçi ve beşer tekrarla ölçüldü. Rapor, API sözleşmesinde `R` olarak tanımlanan Edge ve doğrudan RPC okumalarını `reads` alanında toplar. Sayfa öğeleri, rapor satırları ve tekil DTO'lar bu alanda sayılır. Yazma işlemleri `commands` alanında kaydedilir. Yerel p50, kaydetme dahil her adımın başlamasından görünürlük ve sonuç kontrollerinin bitimine kadar geçen süredir. [Ölçüm senaryosu](../e2e/auth-c-common-read-cost.spec.ts)
 
 | Adım                            |         Okuma |         Satır |          p50 (ms) |
 | ------------------------------- | ------------: | ------------: | ----------------: |

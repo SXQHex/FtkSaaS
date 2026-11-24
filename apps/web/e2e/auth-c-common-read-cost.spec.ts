@@ -1,16 +1,40 @@
 import type { Page, Request, Response, Route } from "@playwright/test";
 import type { CalendarItem, SuccessPeopleList } from "@ftksaas/api-contracts";
+import contract from "@ftksaas/api-contracts/schema" with { type: "json" };
 import { clickWorkspaceLink } from "./auth-fixture.js";
 import { mockSessionDetail } from "./session-detail-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 import { expect, test } from "./test.js";
+
+const readOperations = new Set<string>(
+  contract["x-contract"].operations
+    .filter(({ transport }) => transport === "R")
+    .map(({ name }) => name),
+);
+
+type BackendCallResult = { operation: string; durationMs: number; ok: boolean };
+type BackendReadResult = BackendCallResult & { rows: number };
+
+function countReadRows(data: unknown) {
+  const payload = data && typeof data === "object" && "rows" in data ? data.rows : data;
+  if (Array.isArray(payload)) return payload.length;
+  if (
+    payload &&
+    typeof payload === "object" &&
+    "items" in payload &&
+    Array.isArray(payload.items)
+  ) {
+    return payload.items.length;
+  }
+  return payload == null ? 0 : 1;
+}
 
 function recordBackendReads(page: Page) {
   const active = new Map<Request, { operation: string; startedAt: number }>();
   const phases: {
     name: string;
     durationMs: number;
-    operations: { operation: string; rows: number; durationMs: number; ok: boolean }[];
+    operations: (BackendCallResult | BackendReadResult)[];
   }[] = [];
   let records: (typeof phases)[number]["operations"] = [];
   let startedAt = performance.now();
@@ -29,34 +53,28 @@ function recordBackendReads(page: Page) {
     const call = active.get(request);
     if (!call) return;
     const durationMs = performance.now() - call.startedAt;
+    let envelope: unknown;
     try {
-      const envelope: unknown = response ? await response.json() : undefined;
-      const ok = Boolean(
-        response?.ok() &&
-        envelope &&
-        typeof envelope === "object" &&
-        "ok" in envelope &&
-        envelope.ok === true,
-      );
+      envelope = response ? await response.json() : undefined;
+    } catch {
+      envelope = undefined;
+    }
+    const ok = Boolean(
+      response?.ok() &&
+      envelope &&
+      typeof envelope === "object" &&
+      "ok" in envelope &&
+      envelope.ok === true,
+    );
+    const result = { operation: call.operation, durationMs, ok };
+    if (readOperations.has(call.operation)) {
       const data =
         ok && envelope && typeof envelope === "object" && "data" in envelope ? envelope.data : null;
-      const payload = data && typeof data === "object" && "rows" in data ? data.rows : data;
-      const rows = Array.isArray(payload)
-        ? payload.length
-        : payload &&
-            typeof payload === "object" &&
-            "items" in payload &&
-            Array.isArray(payload.items)
-          ? payload.items.length
-          : payload == null
-            ? 0
-            : 1;
-      records.push({ operation: call.operation, rows, durationMs, ok });
-    } catch {
-      records.push({ operation: call.operation, rows: 0, durationMs, ok: false });
-    } finally {
-      active.delete(request);
+      records.push({ ...result, rows: countReadRows(data) });
+    } else {
+      records.push(result);
     }
+    active.delete(request);
   }
   page.on("requestfinished", async (request) => {
     await complete(request, await request.response());
@@ -305,10 +323,22 @@ test("C-ortak measures scoped SPA reads, cursor and single-write readback", asyn
   expect(studio.writes).toHaveLength(1);
   expect(studio.writes[0]?.payload).toMatchObject({ class_id: I.lesson, expected_version: 4 });
   expect(await page.evaluate(() => performance.timeOrigin)).toBe(lifetime);
+  const reportPhases = measure.phases.map(({ operations, ...phase }) => ({
+    ...phase,
+    reads: operations.filter((operation) => "rows" in operation),
+    commands: operations.filter((operation) => !("rows" in operation)),
+  }));
   await info.attach("c-common-read-cost", {
-    body: JSON.stringify({ viewport: page.viewportSize(), phases: measure.phases }),
+    body: JSON.stringify({ viewport: page.viewportSize(), phases: reportPhases }),
     contentType: "application/json",
   });
+  expect(reportPhases.at(-1)).toMatchObject({
+    name: "class-write-and-readback",
+    commands: [{ operation: "class_save_v1", ok: true }],
+  });
+  expect(reportPhases.flatMap(({ commands }) => commands)).toEqual([
+    { operation: "class_save_v1", durationMs: expect.any(Number), ok: true },
+  ]);
   expect(measure.phases.flatMap(({ operations }) => operations.filter(({ ok }) => !ok))).toEqual(
     [],
   );
