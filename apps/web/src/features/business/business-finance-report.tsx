@@ -10,16 +10,24 @@ import {
   TableHeader,
   TableRow,
 } from "@ftksaas/ui/components/table";
-import type { CenterView, Interval, ReportTotal } from "@ftksaas/api-contracts";
+import type {
+  CenterView,
+  Interval,
+  ReportFilters,
+  ReportRow,
+  ReportTotal,
+} from "@ftksaas/api-contracts";
 import { formatMinorAmount } from "../../lib/money";
 import type { ClientScope, AccountReadContext } from "../../lib/scoped-backend";
-import { readScopedReport, reportInterval } from "../reports/reports-read";
+import { readScopedReport, reportInterval, reportRowKey } from "../reports/reports-read";
 
 const metrics = ["sales", "collections", "debt"] as const;
 type Amounts = Map<string, bigint>;
 type Finance = Record<(typeof metrics)[number], Amounts>;
 
-function groupAmounts(rows: ReportTotal[]) {
+type ReportAmount = Pick<ReportTotal, "group_key" | "currency" | "amount_minor">;
+
+function groupAmounts(rows: ReportAmount[]) {
   const result: Amounts = new Map();
   for (const row of rows) {
     if (!row.currency || row.amount_minor == null) throw Error("BUSINESS_FINANCE_TOTAL_INVALID");
@@ -28,23 +36,58 @@ function groupAmounts(rows: ReportTotal[]) {
   return result;
 }
 
-async function readFinance(
-  scope: ClientScope,
-  centerIds: string[],
-  interval: Interval,
-  aggregate: boolean,
-  readContext?: AccountReadContext,
-): Promise<Finance> {
-  const filters = { interval, center_ids: centerIds };
-  const [sales, receivables] = await Promise.all([
-    readScopedReport(scope, "sales", filters, { aggregate, limit: 1 }, readContext),
-    readScopedReport(scope, "collections_debts", filters, { aggregate, limit: 1 }, readContext),
-  ]);
+function financeAmounts(sales: ReportAmount[], receivables: ReportAmount[]): Finance {
   return {
-    sales: groupAmounts(sales.totals.filter((row) => row.group_key?.startsWith("gross_sales:"))),
-    collections: groupAmounts(receivables.totals.filter((row) => row.group_key === "collections")),
-    debt: groupAmounts(receivables.totals.filter((row) => row.group_key === "outstanding_debt")),
+    sales: groupAmounts(sales.filter((row) => row.group_key?.startsWith("gross_sales:"))),
+    collections: groupAmounts(receivables.filter((row) => row.group_key === "collections")),
+    debt: groupAmounts(receivables.filter((row) => row.group_key === "outstanding_debt")),
   };
+}
+
+async function readCenterFinance(
+  scope: ClientScope,
+  interval: Interval,
+  readContext: AccountReadContext,
+) {
+  const filters = { interval, center_ids: [scope.centerId] };
+  const [sales, receivables] = await Promise.all([
+    readScopedReport(scope, "sales", filters, { limit: 1 }, readContext),
+    readScopedReport(scope, "collections_debts", filters, { limit: 1 }, readContext),
+  ]);
+  return financeAmounts(sales.totals, receivables.totals);
+}
+
+async function readGroupedFinance(
+  scope: ClientScope,
+  report: "sales" | "collections_debts",
+  filters: ReportFilters,
+  readContext: AccountReadContext,
+) {
+  const cursors = new Set<string>();
+  const keys = new Set<string>();
+  const byCenter = new Map<string, ReportRow[]>();
+  const options = {
+    aggregate: true,
+    limit: 200,
+    groupBy: report === "collections_debts" ? ("center" as const) : undefined,
+  };
+  const first = await readScopedReport(scope, report, filters, options, readContext);
+  let page = first;
+  while (true) {
+    for (const row of page.rows.items) {
+      if (!row.center_id || row.person_id || keys.has(reportRowKey(row)))
+        throw Error("BUSINESS_FINANCE_SOURCE_INVALID");
+      keys.add(reportRowKey(row));
+      const rows = byCenter.get(row.center_id);
+      if (rows) rows.push(row);
+      else byCenter.set(row.center_id, [row]);
+    }
+    const cursor = page.rows.next_cursor;
+    if (!cursor) return { byCenter, totals: first.totals };
+    if (cursors.has(cursor)) throw Error("BUSINESS_FINANCE_SOURCE_INVALID");
+    cursors.add(cursor);
+    page = await readScopedReport(scope, report, filters, { ...options, cursor }, readContext);
+  }
 }
 
 function formatAmounts(values: Amounts) {
@@ -77,19 +120,32 @@ export function BusinessFinanceReport({
     queryFn: async (context) => {
       const { signal } = context;
       const interval = await reportInterval(timezone, range, "", "", anchor);
+      if (aggregate) {
+        const filters = { interval, center_ids: centerIds };
+        const [sales, receivables] = await Promise.all([
+          readGroupedFinance(scope, "sales", filters, context),
+          readGroupedFinance(scope, "collections_debts", filters, context),
+        ]);
+        return {
+          rows: centerIds.map((id) => ({
+            id,
+            amounts: financeAmounts(
+              sales.byCenter.get(id) ?? [],
+              receivables.byCenter.get(id) ?? [],
+            ),
+          })),
+          total: financeAmounts(sales.totals, receivables.totals),
+        };
+      }
       const rows = [];
       for (const centerId of centerIds) {
         signal.throwIfAborted();
         rows.push({
           id: centerId,
-          amounts: await readFinance({ ...scope, centerId }, [centerId], interval, false, context),
+          amounts: await readCenterFinance({ ...scope, centerId }, interval, context),
         });
       }
-      signal.throwIfAborted();
-      const total = aggregate
-        ? await readFinance(scope, centerIds, interval, true, context)
-        : undefined;
-      return { rows, total };
+      return { rows, total: undefined };
     },
     retry: false,
     gcTime: 0,

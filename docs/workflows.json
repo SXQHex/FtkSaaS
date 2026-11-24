@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "53590365591065e9c166ae9cb31ac93cd9c637e8025032bd40c955a7912b1045",
-        "reason": "Ortak DTO oluşturucuları yeni salt-okunur seçicileri ve isteğe bağlı alanları doğrular. Native kimlik, hata zarfı ve transport kuralları korunur."
+        "fingerprint": "37bc1b21ecbac6855d37d0c972d2558812b06706f9103ce2e1c467aa1743e976",
+        "reason": "Yalnız Platform, Business ve Eğitmen Bugün kesin okuma beklentilerinin kaynak bağlı kalite kayıtları incelendi. Mevcut tenant, yetki, filtre, toplam ve zorunlu yeniden okuma kontrolleri korunur."
       }
     },
     {
