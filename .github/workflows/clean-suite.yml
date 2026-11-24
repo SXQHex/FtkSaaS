@@ -32,8 +32,19 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         if: fromJSON(inputs.binding).kind != 'manual-full'
         with:
-          ref: ${{ inputs.tested_sha }}
+          # The checkout default uses the PR event merge, including on re-runs.
           persist-credentials: false
+      - name: Verify tested merge
+        if: fromJSON(inputs.binding).kind != 'manual-full'
+        env:
+          EXPECTED: ${{ inputs.tested_sha }}
+          BINDING: ${{ inputs.binding }}
+        run: |
+          test "$GITHUB_EVENT_NAME" = pull_request
+          test "$GITHUB_SHA" = "$EXPECTED"
+          test "$(git rev-parse HEAD)" = "$EXPECTED"
+          test "$(jq -er '.merge' <<< "$BINDING")" = "$EXPECTED"
+          test "$(git rev-parse 'HEAD^{tree}')" = "$(jq -er '.tree' <<< "$BINDING")"
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         if: fromJSON(inputs.binding).kind != 'manual-full'
         with:
@@ -41,10 +52,7 @@ jobs:
       - name: Build and verify native runtime
         if: fromJSON(inputs.binding).kind != 'manual-full'
         id: build
-        env:
-          EXPECTED: ${{ inputs.tested_sha }}
         run: |
-          test "$(git rev-parse HEAD)" = "$EXPECTED"
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends libopenblas-dev
           rustup toolchain install 1.98.0 --profile minimal
