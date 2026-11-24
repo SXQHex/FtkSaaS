@@ -15,13 +15,12 @@ Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin te
 <a id="xreq-073"></a>
 ## XREQ-073 — M09 native okuma kapsamı
 
-**Kapalı — backend teslimi.** PR #412 ve #419 için kaynak, native CI, main ve development teslimi doğrulandı. Yerel karşılaştırma ve development ölçümünün kapsamı [kabul kaydında](00-FtkSaaS-yeni-sohbet-devir.md#xreq-073-backend-kabulu) yer alır. Kullanıcı kararıyla bu başlık altında ek canlı kabul koşusu planlanmaz. [Frontend M09](../../web/docs/remaining-work.md#router-query-birlesik) kendi kabul kaydında izlenir.
+**Kapalı — backend teslimi.** İlk paketler ve PR #439 takip paketi için kaynak, native CI, main ve development kabulü tamamlandı. [Backend takip kabulü](00-FtkSaaS-yeni-sohbet-devir.md#xreq-073-takip-kabulu).
 
 <a id="xreq-073-takip"></a>
 ### XREQ-073 — Frontend tüketim takibi
 
-- [x] Public development Worker’da kaynak şemasının dört okuma kipini kabul ettiğini ve geçersiz alanı reddettiğini doğrula. [Worker kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#xreq-073-development-worker).
-- [ ] [Takip adayının](../../../docs/requests.md#xreq-073-backend-takip) çıktı eşitliğini, farklı rol/plan/merkez retlerini, tekil seçicilerin uyumluluğunu ve cursor bağını aday native CI ve development üzerinde doğrula. Aynı fixture ile istek, satır ve gecikme karşılaştırmasını tüketici kabulünde kullan.
+Frontend ekran entegrasyonu, istek ve dönen satır sayısı ile gecikme karşılaştırması [M09 kabulünde](../../web/docs/remaining-work.md#router-query-birlesik) izlenir.
 
 <a id="ci503-native-baslangic"></a>
 ## CI503 — Native worker başlangıcı ve ödeme yanıtı teşhisi
