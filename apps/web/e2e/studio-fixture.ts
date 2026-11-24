@@ -161,6 +161,7 @@ export async function mockStudio(page: Page, origins?: Parameters<typeof mockNat
     nextWrite: "normal" as "normal" | "unknown" | "conflict",
     failedReads: new Set<string>(),
     reads: [] as string[],
+    classReads: [] as { operation: string; key: Record<string, unknown> }[],
   };
   let serial = 100;
   const receipts = new Map<
@@ -341,6 +342,8 @@ export async function mockStudio(page: Page, origins?: Parameters<typeof mockNat
     if (op === "management_state_get_v1") {
       const selector = r.selector as { key: Record<string, unknown> };
       const k = selector.key;
+      if (r.operation === "class_save_v1" || r.operation === "class_assignment_set_v1")
+        state.classReads.push({ operation: r.operation, key: k });
       if (r.operation === "room_save_v1")
         return send(
           route,
@@ -366,8 +369,13 @@ export async function mockStudio(page: Page, origins?: Parameters<typeof mockNat
           list(
             state.lessons
               .filter((lesson) => !k.class_id || k.class_id === lesson.id)
-              .map((lesson) =>
-                item("classes", lesson.id, lesson.version, lesson.active, {
+              .filter((lesson) => !k.class_assignment_instructor_id || lesson.active)
+              .map((lesson) => {
+                const personId = k.class_assignment_instructor_id;
+                const assignment = state.assignments.find(
+                  (row) => row.classId === lesson.id && row.personId === personId,
+                );
+                return item("classes", lesson.id, lesson.version, lesson.active, {
                   operation: "class_save_v1",
                   values: {
                     class_id: lesson.id,
@@ -375,9 +383,19 @@ export async function mockStudio(page: Page, origins?: Parameters<typeof mockNat
                     discipline_id: lesson.disciplineId,
                     external_open: lesson.externalOpen,
                     waitlist_enabled: lesson.waitlist,
+                    ...(typeof personId === "string"
+                      ? {
+                          instructor_assignment: {
+                            person_id: personId,
+                            id: assignment?.id ?? null,
+                            state: assignment ? (assignment.active ? "active" : "inactive") : null,
+                            version: assignment?.version ?? null,
+                          },
+                        }
+                      : {}),
                   },
-                }),
-              ),
+                });
+              }),
           ),
         );
       if (r.operation === "role_assign_v1")

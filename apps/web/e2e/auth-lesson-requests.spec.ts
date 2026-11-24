@@ -30,6 +30,7 @@ async function fixture(
   const writes: Record<string, unknown>[] = [],
     reads: Record<string, unknown>[] = [];
   const resultReads: { operation: string; rows: number }[] = [];
+  const reservationSources: Record<string, unknown>[] = [];
   const changedKeys = new Set<string>();
   const session: SessionView = {
     id: I.lesson,
@@ -216,12 +217,17 @@ async function fixture(
         items: detail.state === "approved" ? [{ ...row, id: neighboringSessionId }, row] : [row],
       });
     }
-    if (op === "reservation_list_v1")
+    if (op === "reservation_list_v1") {
+      if (detail.state === "approved") reservationSources.push(req);
       return send({
         as_of: detail.created_at,
         next_cursor: null,
         items:
-          detail.reservation_id && req.session_id === session.id
+          detail.reservation_id &&
+          (req.reservation_id
+            ? req.reservation_id === detail.reservation_id
+            : req.session_id === session.id) &&
+          (!req.session_id || req.session_id === session.id)
             ? [
                 {
                   id: detail.reservation_id,
@@ -234,6 +240,7 @@ async function fixture(
               ]
             : [],
       });
+    }
     if (op === "entitlements_get_v1")
       return route.fulfill({
         status: 403,
@@ -302,7 +309,7 @@ async function fixture(
   await expect(
     page.getByRole("heading", { name: "Özel ders talepleri", exact: true }),
   ).toBeVisible();
-  return { writes, reads, detail, resultReads };
+  return { writes, reads, detail, resultReads, reservationSources };
 }
 async function open(page: Page) {
   await page.getByRole("row", { name: /Sentetik Talep Üyesi/ }).click();
@@ -499,17 +506,22 @@ for (const mode of ["existing", "create", "create-lost-ack", "create-mismatched-
       sheet.getByText("Güncel rezervasyon ve seans okundu.", { exact: true }),
     ).toBeVisible();
     await expect(sheet.getByText("Bu ayrıntıyı görme yetkisi yok.", { exact: true })).toBeVisible();
+    const hasSessionHint = mode === "create" || mode === "existing";
+    const exactSession = { operation: "session_get_v1", rows: 1 };
+    const exactReservation = { operation: "reservation_list_v1", rows: 1 };
     expect(state.resultReads).toEqual([
-      ...(mode === "create-lost-ack" || mode === "create-mismatched-ack"
-        ? [
-            { operation: "calendar_get_v1", rows: 2 },
-            { operation: "session_get_v1", rows: 1 },
-            { operation: "session_get_v1", rows: 1 },
-            { operation: "reservation_list_v1", rows: 0 },
-          ]
-        : [{ operation: "session_get_v1", rows: 1 }]),
-      { operation: "reservation_list_v1", rows: 1 },
+      ...(hasSessionHint ? [exactSession, exactReservation] : [exactReservation, exactSession]),
     ]);
+    expect(state.reservationSources).toHaveLength(1);
+    expect(state.reservationSources[0]).toMatchObject({
+      org_id: I.org,
+      center_id: I.center,
+      person_id: I.self,
+      reservation_id: state.detail.reservation_id,
+      page: { limit: 1 },
+    });
+    if (hasSessionHint) expect(state.reservationSources[0]?.session_id).toBe(I.lesson);
+    else expect(state.reservationSources[0]).not.toHaveProperty("session_id");
   });
 }
 

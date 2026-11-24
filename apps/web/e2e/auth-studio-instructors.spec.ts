@@ -34,7 +34,14 @@ test("Studio instructor: acknowledged contact edit is not replayed when class gr
     },
   ];
   await openStudio(page);
+  const classReadStart = state.classReads.length;
   const dialog = await openInstructor(page);
+  expect(state.classReads.slice(classReadStart)).toEqual([
+    {
+      operation: "class_save_v1",
+      key: { include_waitlist: true, class_assignment_instructor_id: studioIds.instructor },
+    },
+  ]);
   await dialog.locator("#instructor-email").fill("changed@example.invalid");
   const lesson = dialog.getByRole("checkbox", { name: "Başlangıç grubu", exact: true });
   await lesson.focus();
@@ -88,6 +95,41 @@ test("Studio instructor: acknowledged contact edit is not replayed when class gr
       version: 1,
     }),
   ]);
+});
+
+test("Studio keeps the inactive instructor's profile editable without a class assignment read", async ({
+  page,
+}) => {
+  const state = await mockStudio(page);
+  state.roles[0]!.active = false;
+  state.people[0]!.relationships = [
+    { center_id: studioIds.center, kind: "student", state: "active" },
+  ];
+  state.lessons.length = 0;
+  let deniedReads = 0;
+  await page.route("**/functions/v1/backend-v1/management_state_get_v1", (route) => {
+    const request = route.request().postDataJSON();
+    if (request.selector?.key?.class_assignment_instructor_id !== studioIds.instructor)
+      return route.fallback();
+    deniedReads++;
+    return route.fulfill({
+      status: 403,
+      json: {
+        ok: false,
+        error: {
+          code: "PLAN_FEATURE_UNAVAILABLE",
+          retryable: false,
+          trace_id: studioIds.role,
+        },
+      },
+    });
+  });
+  await openStudio(page);
+  const dialog = await openInstructor(page);
+  await expect(
+    dialog.getByText("Bu görünümde sınıf görevlendirmeleri gösterilemiyor."),
+  ).toBeVisible();
+  expect(deniedReads).toBe(0);
 });
 
 test("Studio instructor: revocation keeps its preview and key through an unknown result", async ({

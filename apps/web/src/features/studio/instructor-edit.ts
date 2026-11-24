@@ -1,7 +1,7 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { readInstructorEditor, type InstructorEditorState } from "./instructor-editor-state";
-import { readStudioClasses, studioBackend, type ClassRecord, type StudioScope } from "./studio";
+import { studioBackend, type StudioScope } from "./studio";
 import {
   instructorEmailContact,
   instructorEmailIndex,
@@ -19,7 +19,6 @@ export interface InstructorEditDraft {
 }
 export type InstructorEditState = InstructorEditorState & {
   scope: StudioScope;
-  classes: ClassRecord[];
 };
 type InstructorEditStep =
   | { kind: "profile"; key: string; version: number; patch: PersonPatch }
@@ -37,9 +36,8 @@ export async function loadInstructorEditor(
   personId: string,
   signal?: AbortSignal,
 ): Promise<InstructorEditState> {
-  const classes = await readStudioClasses(scope, signal);
-  const state = await readInstructorEditor(scope, personId, classes, signal);
-  return { ...state, scope: { ...scope }, classes };
+  const state = await readInstructorEditor(scope, personId, signal);
+  return { ...state, scope: { ...scope } };
 }
 
 export function instructorEditDraft(

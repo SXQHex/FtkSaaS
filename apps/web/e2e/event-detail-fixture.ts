@@ -345,8 +345,18 @@ export async function mockEventDetail(
         expires_at: "2099-11-16T12:00:00Z",
       });
     }
-    if (op === "event_payment_get_v1")
-      return state.payment ? send(state.payment) : reject("NOT_FOUND");
+    if (op === "event_payment_get_v1") {
+      const payment = state.payment;
+      if (!payment) return reject("NOT_FOUND");
+      const selected = r.selection;
+      const matches = selected
+        ? selected.event_id === payment.event_id &&
+          selected.person_id === payment.person_id &&
+          (selected.registration_id ?? null) === payment.registration_id &&
+          (selected.registration_id || payment.state === "prepared")
+        : r.preparation_id === payment.id;
+      return matches ? send(payment) : reject("NOT_FOUND");
+    }
     if (op === "finance_get_v1" && state.cash)
       return send({
         person_id: r.person_id,

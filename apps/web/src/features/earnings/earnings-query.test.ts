@@ -32,7 +32,7 @@ it("M04 stales historical periods, people and cursors without crossing tenants",
   const paymentOld = payments(scope, "person-b", "cursor-3");
   const tenant = [scope.accountId, scope.orgId, scope.centerId];
   const affected = [
-    [...earningsKeys.visibleCounts(scope), "2026-09"],
+    directory(scope, "2026-08"),
     [...earningsKeys.paymentChain(scope), "payment-a"],
     ["earnings-agreement-status", scope, "person-a", ["agreement-a"]],
     ["instructor-earning-page", ...tenant, "person-a", "2026-09", "cursor-2"],

@@ -116,7 +116,14 @@ beforeEach(() => {
   payment = structuredClone(paymentInitial);
   mock.call.mockImplementation(async (op, request) => {
     if (op === "event_get_v1") return structuredClone(event);
-    if (op === "event_payment_get_v1") return structuredClone(payment);
+    if (op === "event_payment_get_v1") {
+      if (
+        request.selection &&
+        (request.selection.registration_id ?? null) !== payment.registration_id
+      )
+        throw new BackendError({ code: "NOT_FOUND", retryable: false, trace_id: id(99) });
+      return structuredClone(payment);
+    }
     if (op === "management_state_get_v1") {
       const key = request.selector.key;
       const type = key.assignment_id
@@ -421,6 +428,24 @@ it("uses only the real preparation ID and native typed payment view as its ackno
   await expect(writeEventPreparation(intent)).resolves.toEqual({ primary_id: id(9) });
   mock.call.mockResolvedValueOnce({ ...payment, event_id: id(99) });
   await expect(writeEventPreparation(intent)).rejects.toThrow();
+});
+it("discovers an open event payment in one exact native read and rejects a mismatched result", async () => {
+  await expect(readRegistrationPayment(scope, event.id, payment.person_id)).resolves.toEqual({
+    kind: "available",
+    value: payment,
+  });
+  expect(mock.call).toHaveBeenCalledExactlyOnceWith(
+    "event_payment_get_v1",
+    expect.objectContaining({
+      org_id: scope.orgId,
+      center_id: scope.centerId,
+      selection: { event_id: event.id, person_id: payment.person_id },
+    }),
+  );
+  mock.call.mockResolvedValueOnce({ ...payment, person_id: id(99) });
+  await expect(readRegistrationPayment(scope, event.id, payment.person_id)).rejects.toThrow(
+    "EVENT_PAYMENT_UNAVAILABLE",
+  );
 });
 it("does not create a debt to discover payment and preserves restricted/absent reads", async () => {
   await expect(readRegistrationPayment(scope, event.id, id(6), id(5))).resolves.toMatchObject({
