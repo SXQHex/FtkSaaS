@@ -619,9 +619,13 @@ Organizasyon silme talebinde exact organizasyona bağlı P07 worker, bağımsız
 
 Organizasyona bağlı operasyonel imha aşaması, sona ermiş davetin terminal teslim işinden alıcı ve şifreli gönderim alanlarını kaldırır. CRM iletişim ve takip geçmişinden serbest notu temizler. Devam eden işler, yapılandırılmış sonuçlar ve davet–iş bağlantısı korunur. Eksik veya karma sahiplik işlemi durdurur. `database.organization_operational` ve değişmez makbuz azaltılan kayıt grubunu sayar.
 
+Organizasyon imhası, doğrulanmış ortak hesap bağlantısı ve sahiplik haritasıyla eşleşen tenant iletişim kopyasını haritasıyla birlikte kaldırabilir. Hesap kimliği ve diğer tenant kopyası korunur. Eşzamanlı kimlik güncellemesi ve saklama blokajı canlı denetlenir. `database.organization_contact_projections` bu aşamanın ilerlemesini bildirir.
+
 Hesap veya organizasyon imhasında süresi dolmuş, tamamlanmamış import yüklemeleri ayrı Storage adımından geçer. Yürütücü yalnız bağlı dosyanın yetkili Storage okumasıyla boyut ve SHA-256 eşliğini doğrular. Native silme işlemi güncel lease ve saklama blokajını yeniden denetler. Ayrı bağlı attestor, başarılı Storage silme cevabı ve nesneye özgü yokluk okuması sonrası makbuzu yazar. Silme cevabı kaybolduğunda tek başına sonraki yokluk okuması makbuz üretmez. Genel Storage kapsamı beklemede kalır.
 
 Organizasyonun tüm veri silme talebi, iş veya belge bağlantısı bulunmayan hazır import yüklemesini aynı native Storage yoluyla işler. Ayrı yetkili DB export aşaması, aynı talebe bağlı geçici rapor baytlarını süre dolmadan işleyebilir. Mevcut dosya ve rapor sahipliği, boyut, SHA-256 ve saklama blokajı denetlenir. Kaynakla ilişkili dosyalar, somut blokajlı baytlar ve raporun gerekli metadata’sı korunur. Doğrulanmış imha alt aşaması ana talebin durumunu tek başına değiştirmez.
+
+Terminal importun ham satır, özel önizleme ve geçici takip kopyalarını ayrı P07 aşaması işler. Uygulanan satır için kalıcı kaynak parmak izi ve sonuç bağı doğrulanır. Belirsiz kaynak bağı, somut blokaj veya açık iş ilgili kopyaları korur. İç manifestin `exports.import_processing_copies` alanı geçici kopya imhasını gösterir. Kalıcı sonuç referansı ve özgün Storage kaynağı saklama kapsamıyla değerlendirilir.
 
 Sicil checkpoint’i, yetkili yayın sırasında önceki imzalı makbuzlar korunarak ilerler. Yeni anahtar, önceki anahtarın aynı geçişi yetkilendirdiği imzayı gerektirir. Gerçek yükleyici bağımsız checkpoint’i yeniden okur ve eski arşiv başını reddeder. [İşletim ve erişim kapısı](../apps/backend/docs/remote-backend-setup.md#restore-ve-yeniden-canlanma-engeli).
 
