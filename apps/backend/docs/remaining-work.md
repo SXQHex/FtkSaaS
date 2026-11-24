@@ -6,7 +6,7 @@ Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin te
 ## Hosted API gecikmesi
 
 - [x] Canlı RPC gecikmesini ve kişi listesi organizasyon kilidi bekleyişini ölç. İncelenen okumalarda paylaşımlı satır kilidini ve yazma/okuma çakışmasını izole PostgreSQL'de doğrula. [Ölçüm ve kaynak kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#hosted-api-gecikmesi).
-- [ ] Aday native CI ve development teslimi sonrası aynı istemci akışlarının canlı gecikmesini yeniden ölç. Organizasyon kapsamı dışındaki `account_get_v1` gecikmesi için PostgREST bekleme süresi ile PostgreSQL çalışma süresini aynı isteklerle eşleştir.
+**Backend takibi kapalı.** Development yeniden ölçümü ve istek bazında eşleştirme sınırı [gecikme kaydındadır](00-FtkSaaS-yeni-sohbet-devir.md#hosted-api-gecikmesi). Kullanıcı kararıyla ek tanı koşusu bu başlıktan çıkarıldı.
 
 <a id="xreq-073"></a>
 ## XREQ-073 — M09 native okuma kapsamı
@@ -16,7 +16,7 @@ Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin te
 <a id="ci503-native-baslangic"></a>
 ## CI503 — Native worker başlangıcı ve ödeme yanıtı teşhisi
 
-**Durum.** API11 fixture zamanlaması düzeltildi. Native runtime düzeltmesinin [kurulum ve CI kabulü](00-FtkSaaS-yeni-sohbet-devir.md#xreq-072-runtime-adayi) tamamlandı ve [XREQ-072](../../../docs/requests.md#xreq-072) kapandı. Özgün 503'ün kesin tetikleyicisi ve [XREQ-071 ödeme ölçümü](../../../docs/requests.md#xreq-071) açık.
+**Durum.** API11 fixture zamanlaması düzeltildi. Native runtime düzeltmesinin [kurulum ve CI kabulü](00-FtkSaaS-yeni-sohbet-devir.md#xreq-072-runtime-adayi) tamamlandı ve [XREQ-072](../../../docs/requests.md#xreq-072) kapandı. Özgün 503’ün kesin tetikleyicisi açık. [XREQ-071 ödeme ekranı ölçümü](../../../docs/requests.md#xreq-071) frontend takibindedir.
 
 - [x] Başarısız koşuyu kaynak ve test adımına bağla; test fixture hatası, uygulama JSON hatası ve runtime bağlantı iptalini ayır. Kanıtlanmayan son tetikleyiciyi açık bırak.
 - [x] Aynı backend baytlarıyla `.ts`/`.js` native worker başlangıcını karşılaştır; CPU süresi ile toplam süreyi ve hosted hazır ESZIP yolunu ayır.
@@ -28,7 +28,7 @@ Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin te
 - [ ] Özgün 503'ün nedenini gerçek runtime kaydı veya aynı kaynağa bağlı tekrar üretimle belirle; yalnız başarılı tekrar/uzantı değişikliğiyle kök neden kapatılmaz.
 - [x] XREQ-072 native adayında normal yanıtın aktarımı, iki istemci iptali, worker kapanışları ve kaynak limitleri gerçek binary ile doğrulandı.
 - [x] XREQ-072 paketi kaynak ve ELF özeti doğrulanarak native kurulum hattına alındı. Paket yayını, tam CI ve `main` kabulü doğrulandı.
-- [ ] Hosted ödeme akışında Auth/RPC/başlangıç ve istemcinin ACK/readback sürelerini ayrı doğrula. İstemci seri çağrı talebi [XREQ-071](../../../docs/requests.md#xreq-071); frontend kabulü ayrı sahibindedir.
+[XREQ-071 backend incelemesi](00-FtkSaaS-yeni-sohbet-devir.md#xreq-071-backend-kapanisi) kapalı. Son onaydan ACK’ye ve doğrulanmış ekran sonucuna kadar ölçüm [frontend talebinde](../../../docs/requests.md#xreq-071) izlenir.
 
 Bu dar hata/gecikme incelemesi, ertelenmiş O10 yük/kapasite projesini veya ticari SLA'yı kendiliğinden etkinleştirmez. Merge, deployment ve canlı kabul ayrı kanıt ister.
 

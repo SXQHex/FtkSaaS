@@ -49,7 +49,28 @@ Migration, kişi, rol ve merkez listeleri ile abonelik özeti, etkin ayar ve aya
 
 Supabase'in sabitlenmiş PostgreSQL 17.11 dağıtımında 217 taban migration uygulandı. Aynı sentetik kişi listesi isteği dört dönüşümlü blokta, koşul ve sürüm başına 20 kez ölçüldü. Başka bir okuma organizasyon satırını 200 ms tuttuğunda SQL RPC medyanı 211,78 → 9,33 ms, p95 233,45 → 11,22 ms oldu. Eşzamanlı işlem yokken medyan 10,31 → 10,70 ms oldu. Altı RPC'nin yedi istek biçiminde yanıttaki iş verileri eşleşti ve çağrıya özgü ölçüm zamanlarının geçerliliği doğrulandı. Kapsam dışı kullanıcı reddi ve yazmanın okuma tamamlanmadan özel kilit alamaması doğrulandı. Ölçüm izole SQL RPC yolunu kapsar.
 
-Backend `verify` 467 + 150 + 10 testte sıfır hata ve atlama ile geçti. Yerel kalite kontrolü 10/10 ve sıfır bulgu verdi. CLI için sabit PostgreSQL paketi alternatif sağlayıcı yolları denendikten sonra SHA256 doğrulamasıyla alındı. Yerel Supabase stack'i Unix socket bind sırasında `Operation not permitted` nedeniyle başlamadı. İzole SQL deneyi döngü adresinden TCP kullandı. Aday native CI, dağıtım ve aynı canlı akışın tekrar ölçümü [kalan kabulde](remaining-work.md#hosted-api-gecikmesi) izlenir.
+Backend `verify` 467 + 150 + 10 testte sıfır hata ve atlama ile geçti. Yerel kalite kontrolü 10/10 ve sıfır bulgu verdi. CLI için sabit PostgreSQL paketi alternatif sağlayıcı yolları denendikten sonra SHA256 doğrulamasıyla alındı. Yerel Supabase stack'i Unix socket bind sırasında `Operation not permitted` nedeniyle başlamadı. İzole SQL deneyi döngü adresinden TCP kullandı. Native CI ve development teslimi [PR #419 kaydında](#xreq-073-backend-kabulu) doğrulandı.
+
+### 24 Kasım development yeniden ölçümü
+
+Frankfurt Edge v114 üzerinde bir Pro test hesabıyla sıralı salt okunur istekler çalıştırıldı. İstemci süreleri istek başlangıcından JSON yanıtının okunmasına kadardır.
+
+| İşlem | Başarılı örnek | p50 (ms) | p95 (ms) |
+|---|---:|---:|---:|
+| `account_get_v1` | 30 | 215 | 531 |
+| `people_list_v1` | 8 | 1.344 | 2.034 |
+| `subscription_get_v1` | 8 | 497 | 873 |
+| `settings_get_v1` | 8 | 269 | 924 |
+| `settings_catalog_get_v1` | 8 | 256 | 331 |
+
+30 hesap isteğinin tamamı yanıt istek kimliğiyle Edge günlüklerine bağlandı. Edge p50 195 ms ve p95 514 ms idi. Aynı 11 saniyelik pencerede 30 hesap RPC’si görüldü. PostgREST upstream p50 77 ms ve p95 285 ms idi. İç RPC ve PostgreSQL çalışma süresini dış isteğe tekil olarak bağlayan kayıt bulunamadı. Hesap çağrısındaki önceki 10 saniyelik beklemenin kaynağı belirlenemedi. Ayrı Türkiye tarayıcı örnekleminde kişi dizini için 5.743 ms ve abonelik için 445 ms süren birer çağrı vardı. Bu örnek sayıları eski tarayıcı dağılımıyla performans karşılaştırması yapmaya yetmez.
+
+Kullanıcı kararıyla [bağımsız backend gecikme takibi](remaining-work.md#hosted-api-gecikmesi) kapatıldı. Ölçümlerde görülen kişi dizini gecikmesi ve hesap çağrısındaki eski bekleme kayıtta durur.
+
+<a id="xreq-071-backend-kapanisi"></a>
+### XREQ-071 — Ödeme onayı backend incelemesi
+
+24 Kasım development kontrolünde son 24 saatin Edge ve PostgreSQL günlüklerinde `saas_payment_verify_v1` örneği bulunmadı. Kullanılan Pro test hesabı ödeme doğrulama yetkisine sahip değildi. Yeni ödeme onayı ve ekran zaman çizelgesi ölçülmedi. Önceki kaynak incelemesinde onay, güncel kaynak okuması ve doğrulanmış sonuç okuması ayrı istemci adımlarıydı. Kullanıcı kararıyla backend inceleme takibi kapatıldı. Son onay → ACK ve son onay → doğrulanmış ekran sonucu ölçütleri [XREQ-071 frontend talebinde](../../../docs/requests.md#xreq-071) durur.
 
 <a id="ci503-native-baslangic"></a>
 ## CI503 — Boş runtime yanıtı ve native başlangıç maliyeti
