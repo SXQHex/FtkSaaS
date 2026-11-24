@@ -317,7 +317,7 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "8b4608a70a84594ece2d7050584226f1497061798f68d77b7be7f235fbd9acb9",
+        "fingerprint": "173445ad4f0933c5d52e8e626dada3d3dba91673e6074253e4dbc19940cd5235",
         "reason": "XREQ-073 API kabul envanteri, güncel merkez okuyucusunun RLS ve SQL rol kontrollerini doğrular."
       }
     },
@@ -546,8 +546,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "e32dc84766b4430eb1ec97ec758162cde9fc766df92d09e14ae8da336fdb0f56",
-        "reason": "XREQ-073 merkez kabulü, seçicisiz iki merkezi ve seçicili tek merkezi doğrular. Data API SQL yetki kontrolü güncel projeksiyona bağlıdır."
+        "fingerprint": "7fc2dc31f556f508692f0be0f07678f4d41f9f47eb4cd6f77bb0d3e89b1d1d7b",
+        "reason": "XREQ-073 merkez kabulü seçicili ve seçicisiz okumayı doğrular. Canlı rol iptali yalnız seçili merkezi etkiler ve yeniden atama erişimi geri getirir."
       }
     },
     {
