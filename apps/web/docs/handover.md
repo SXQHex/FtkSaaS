@@ -21,9 +21,11 @@
 
 <a id="ts02-ts03-kaynak-ve-ortam-kabulu"></a>
 
-### TS02–TS03 kaynak ve ortam kabulü
+### TS02, TS03 ve TS05 kaynak ve ortam kabulü
 
 [PR #438](https://github.com/SXQHex/FtkSaaS/pull/438) head `e5ff56bda3011f6b99e90d03c3d1f0939a2211bf`, main `b1cdf3550aabbbff0f155d53eb5bc2a07d03c25f`. [Frontend Checks](https://github.com/SXQHex/FtkSaaS/actions/runs/45427691146) kontrolleri ve 12 Desktop Chromium shard, aynı main SHA'sındaki [Main acceptance](https://github.com/SXQHex/FtkSaaS/actions/runs/45429583483) ile [Cloudflare build ve dağıtımı](https://github.com/SXQHex/FtkSaaS/actions/runs/45429780907) başarılı.
+
+[PR #440](https://github.com/SXQHex/FtkSaaS/pull/440) head `4963c92a3ff91cdb3af1ce05b3346116ce5e978c`, main `c30e088695c3eee0df7979abe9a918c009fb8af7`. [Frontend Checks](https://github.com/SXQHex/FtkSaaS/actions/runs/45429678908) kontrolleri ve 12 Desktop Chromium shard, aynı main SHA'sındaki [Main acceptance](https://github.com/SXQHex/FtkSaaS/actions/runs/45432274535) ve [Cloudflare delivery](https://github.com/SXQHex/FtkSaaS/actions/runs/45432410312) başarılı.
 
 ### C-ortak ölçümü
 
