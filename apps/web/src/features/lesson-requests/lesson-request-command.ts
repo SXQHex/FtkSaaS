@@ -4,6 +4,7 @@ import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import { BackendError } from "../../lib/backend";
 import type {
   LessonRequestView,
+  Mutation,
   RequestLessonRequestReject,
   RequestLessonRequestOfferAlternative,
   RequestLessonRequestApprove,
@@ -154,13 +155,25 @@ function visibility(error: unknown) {
     return "not_enabled" as const;
   throw error;
 }
-async function approvedReservation(intent: RequestIntent, request: LessonRequestView) {
-  const sessionId =
-    intent.operation === "lesson_request_approve_v1"
-      ? (intent.request.session_id ?? undefined)
-      : undefined;
-  const sessions = await readRequestSessions(intent.scope, intent.before, undefined, sessionId),
-    backend = await scopedBackend(intent.scope);
+const approvalReferences = z.array(z.object({ type: z.string(), id: z.uuid() }));
+
+function acknowledgedSessionId(related: Mutation["related"] | undefined, reservationId: string) {
+  const references = approvalReferences.safeParse(related);
+  if (!references.success) return;
+  const sessions = references.data.filter((reference) => reference.type === "sessions");
+  const reservations = references.data.filter((reference) => reference.type === "reservations");
+  if (sessions.length === 1 && reservations.length === 1 && reservations[0]?.id === reservationId)
+    return sessions[0]?.id;
+}
+
+async function approvedReservation(
+  intent: RequestIntent,
+  request: LessonRequestView,
+  sessionId?: string,
+) {
+  const sessions = await readRequestSessions(intent.scope, intent.before, undefined, sessionId);
+  if (!sessions.length) throw new Error("LESSON_REQUEST_RESULT_UNAVAILABLE");
+  const backend = await scopedBackend(intent.scope);
   for (const session of sessions) {
     const seen = new Set<string>();
     let cursor: string | undefined;
@@ -193,7 +206,11 @@ async function approvedReservation(intent: RequestIntent, request: LessonRequest
   }
   throw new Error("LESSON_REQUEST_RESULT_UNAVAILABLE");
 }
-export async function readRequestResult(intent: RequestIntent, id?: string) {
+export async function readRequestResult(
+  intent: RequestIntent,
+  id?: string,
+  related?: Mutation["related"],
+) {
   if (id && id !== intent.before.id) throw new Error("LESSON_REQUEST_RESULT_UNAVAILABLE");
   const request = await readLessonRequest(intent.scope, intent.before.id);
   const state =
@@ -223,8 +240,10 @@ export async function readRequestResult(intent: RequestIntent, id?: string) {
     }
   }
   if (intent.operation !== "lesson_request_approve_v1") return { request };
-  z.uuid().parse(request.reservation_id);
-  const reservation = await approvedReservation(intent, request).catch((error) => ({
+  const reservationId = z.uuid().parse(request.reservation_id);
+  // An ACK can narrow discovery after the fresh request confirms the reservation identity.
+  const sessionId = intent.request.session_id ?? acknowledgedSessionId(related, reservationId);
+  const reservation = await approvedReservation(intent, request, sessionId).catch((error) => ({
     status: visibility(error),
   }));
   const rights = await readProfileRights(intent.scope, request.person_id)

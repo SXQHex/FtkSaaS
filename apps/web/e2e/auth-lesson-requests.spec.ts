@@ -4,7 +4,12 @@ import type { LessonRequestView, ManagementStateView, SessionView } from "@ftksa
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
 const requestId = "019a7b00-0000-7000-8000-000000000070";
-async function fixture(page: Page, mode: "normal" | "unknown" | "denied" | "directory" = "normal") {
+const neighboringSessionId = "019a7b00-0000-7000-8000-000000000071";
+const neighboringInstructorId = "019a7b00-0000-7000-8000-000000000072";
+async function fixture(
+  page: Page,
+  mode: "normal" | "unknown" | "denied" | "directory" | "mismatched-approval-ack" = "normal",
+) {
   await mockStudio(page);
   const detail: LessonRequestView = {
     id: requestId,
@@ -24,6 +29,7 @@ async function fixture(page: Page, mode: "normal" | "unknown" | "denied" | "dire
   };
   const writes: Record<string, unknown>[] = [],
     reads: Record<string, unknown>[] = [];
+  const resultReads: { operation: string; rows: number }[] = [];
   const changedKeys = new Set<string>();
   const session: SessionView = {
     id: I.lesson,
@@ -49,7 +55,16 @@ async function fixture(page: Page, mode: "normal" | "unknown" | "denied" | "dire
   await page.route("**/functions/v1/backend-v1/*", async (route) => {
     const op = new URL(route.request().url()).pathname.split("/").at(-1);
     const req = route.request().postDataJSON();
-    const send = (data: unknown) => route.fulfill({ json: { ok: true, data, trace_id: I.role } });
+    const send = (data: unknown) => {
+      if (
+        detail.state === "approved" &&
+        (op === "calendar_get_v1" || op === "session_get_v1" || op === "reservation_list_v1")
+      ) {
+        const page = data as { items?: unknown[] };
+        resultReads.push({ operation: op, rows: page.items?.length ?? 1 });
+      }
+      return route.fulfill({ json: { ok: true, data, trace_id: I.role } });
+    };
     if (op === "management_state_get_v1" && String(req.operation).startsWith("lesson_request_")) {
       reads.push(req);
       if (mode === "denied")
@@ -176,38 +191,48 @@ async function fixture(page: Page, mode: "normal" | "unknown" | "denied" | "dire
           next_lesson: { status: "restricted" },
         },
       });
-    if (op === "session_get_v1") return send(session);
-    if (op === "calendar_get_v1")
+    if (op === "session_get_v1")
+      return send(
+        req.session_id === neighboringSessionId
+          ? {
+              ...session,
+              id: neighboringSessionId,
+              assignments: [{ person_id: neighboringInstructorId, duty: "instructor" }],
+            }
+          : session,
+      );
+    if (op === "calendar_get_v1") {
+      const row = {
+        id: session.id,
+        type: "session",
+        center_id: I.center,
+        starts_at: session.starts_at,
+        ends_at: session.ends_at,
+        title: "Sentetik özel ders",
+      };
       return send({
         as_of: detail.created_at,
         next_cursor: null,
-        items: [
-          {
-            id: session.id,
-            type: "session",
-            center_id: I.center,
-            starts_at: session.starts_at,
-            ends_at: session.ends_at,
-            title: "Sentetik özel ders",
-          },
-        ],
+        items: detail.state === "approved" ? [{ ...row, id: neighboringSessionId }, row] : [row],
       });
+    }
     if (op === "reservation_list_v1")
       return send({
         as_of: detail.created_at,
         next_cursor: null,
-        items: detail.reservation_id
-          ? [
-              {
-                id: detail.reservation_id,
-                session_id: session.id,
-                person_id: I.self,
-                version: 1,
-                state: "active",
-                mode: "flexible",
-              },
-            ]
-          : [],
+        items:
+          detail.reservation_id && req.session_id === session.id
+            ? [
+                {
+                  id: detail.reservation_id,
+                  session_id: session.id,
+                  person_id: I.self,
+                  version: 1,
+                  state: "active",
+                  mode: "flexible",
+                },
+              ]
+            : [],
       });
     if (op === "entitlements_get_v1")
       return route.fulfill({
@@ -221,7 +246,18 @@ async function fixture(page: Page, mode: "normal" | "unknown" | "denied" | "dire
       detail.state = "approved";
       detail.version++;
       detail.reservation_id = I.role;
-      return send({ primary_id: detail.id, changed: [], jobs: [] });
+      if (mode === "unknown") return route.abort();
+      const mismatched = mode === "mismatched-approval-ack";
+      return send({
+        operation_id: I.role,
+        primary_id: detail.id,
+        version: detail.version,
+        replayed: false,
+        related: [
+          { type: "sessions", id: mismatched ? neighboringSessionId : session.id },
+          { type: "reservations", id: mismatched ? requestId : detail.reservation_id },
+        ],
+      });
     }
     if (op === "lesson_request_reject_v1" || op === "lesson_request_offer_alternative_v1") {
       writes.push(req);
@@ -266,7 +302,7 @@ async function fixture(page: Page, mode: "normal" | "unknown" | "denied" | "dire
   await expect(
     page.getByRole("heading", { name: "Özel ders talepleri", exact: true }),
   ).toBeVisible();
-  return { writes, reads, detail };
+  return { writes, reads, detail, resultReads };
 }
 async function open(page: Page) {
   await page.getByRole("row", { name: /Sentetik Talep Üyesi/ }).click();
@@ -383,11 +419,18 @@ test("forbidden request directory stays unread instead of claiming empty success
   ).toBeEnabled();
 });
 
-for (const mode of ["existing", "create"] as const) {
+for (const mode of ["existing", "create", "create-lost-ack", "create-mismatched-ack"] as const) {
   test(`request approval ${mode} requires review and confirms native reservation without inventing rights`, async ({
     page,
-  }) => {
-    const state = await fixture(page);
+  }, info) => {
+    const state = await fixture(
+      page,
+      mode === "create-lost-ack"
+        ? "unknown"
+        : mode === "create-mismatched-ack"
+          ? "mismatched-approval-ack"
+          : "normal",
+    );
     const sheet = await open(page);
     await sheet.getByRole("button", { name: "Onayla", exact: true }).click();
     const submit = sheet.getByRole("button", {
@@ -418,10 +461,25 @@ for (const mode of ["existing", "create"] as const) {
         exact: true,
       })
       .press("Space");
+    const submittedAt = performance.now();
     await submit.click();
+    if (mode === "create-lost-ack") {
+      await expect(
+        sheet.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }),
+      ).toBeVisible();
+      expect(state.resultReads).toHaveLength(0);
+      await sheet.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+    }
     await expect(
       sheet.getByText("İşlem kaydedildi ve güncel talep okundu.", { exact: true }),
     ).toBeVisible();
+    await info.attach("approval-readback-measurement", {
+      body: JSON.stringify({
+        reads: state.resultReads,
+        durationMs: performance.now() - submittedAt,
+      }),
+      contentType: "application/json",
+    });
     expect(state.writes).toHaveLength(1);
     expect(state.writes[0]).toMatchObject(
       mode === "existing"
@@ -441,6 +499,17 @@ for (const mode of ["existing", "create"] as const) {
       sheet.getByText("Güncel rezervasyon ve seans okundu.", { exact: true }),
     ).toBeVisible();
     await expect(sheet.getByText("Bu ayrıntıyı görme yetkisi yok.", { exact: true })).toBeVisible();
+    expect(state.resultReads).toEqual([
+      ...(mode === "create-lost-ack" || mode === "create-mismatched-ack"
+        ? [
+            { operation: "calendar_get_v1", rows: 2 },
+            { operation: "session_get_v1", rows: 1 },
+            { operation: "session_get_v1", rows: 1 },
+            { operation: "reservation_list_v1", rows: 0 },
+          ]
+        : [{ operation: "session_get_v1", rows: 1 }]),
+      { operation: "reservation_list_v1", rows: 1 },
+    ]);
   });
 }
 
