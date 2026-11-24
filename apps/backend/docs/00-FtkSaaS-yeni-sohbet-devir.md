@@ -9,7 +9,16 @@ Aday head `10b9b928bf55cc4ca1eb401757e481b2f6fe8314`, base `48ad4019d3f9391c3afc
 
 Aynı main SHA için [Supabase development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/45303465801) başarılı. Kaynak, hosted backend ve dağıtılan şema doğrulamaları geçti.
 
-İkinci paket [PR #419](https://github.com/SXQHex/FtkSaaS/pull/419) ile main `afd68aaa5c162ec9a231a654134ae1ca0b0e4703` oldu. [Son aday full clean](https://github.com/SXQHex/FtkSaaS/actions/runs/45361151692) attempt 1, head `2d93692cb45cd757281aacbc516f513828772162`, base `bc87c0fdaebb0af837cf972655c9f54e33981a62` ve aday merge `4616730de58cd35c2e7324610d7e7f69c1c0cdd7` için başarılıdır. Test edilen ve birleşen ağaç `8879faf349addb07b933ffd68c0e0db3c5b3e382` aynıdır. [Main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/45362046711), [merge kanıtı](https://github.com/SXQHex/FtkSaaS/actions/runs/45362046743) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/45362141552) geçti. Development makbuzu 221 migration, Edge v114 ve 26 başarılı kontrolü içeriyor. Hosted eşdeğerlik ve gecikme ölçümü ile [kalan kapsam](remaining-work.md#xreq-073) açık. [Uygulanan native okuyucular ve yerel ölçüm](../../../docs/requests.md#xreq-073-backend-uygulamasi).
+İkinci paket [PR #419](https://github.com/SXQHex/FtkSaaS/pull/419) ile main `afd68aaa5c162ec9a231a654134ae1ca0b0e4703` oldu. [Son aday full clean](https://github.com/SXQHex/FtkSaaS/actions/runs/45361151692) attempt 1, head `2d93692cb45cd757281aacbc516f513828772162`, base `bc87c0fdaebb0af837cf972655c9f54e33981a62` ve aday merge `4616730de58cd35c2e7324610d7e7f69c1c0cdd7` için başarılıdır. Test edilen ve birleşen ağaç `8879faf349addb07b933ffd68c0e0db3c5b3e382` aynıdır. [Main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/45362046711), [merge kanıtı](https://github.com/SXQHex/FtkSaaS/actions/runs/45362046743) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/45362141552) geçti. Development makbuzu 221 migration, Edge v114 ve 26 başarılı kontrolü içeriyor. [Backend teslim takibi](remaining-work.md#xreq-073) kullanıcı kararıyla kapatıldı. [Uygulanan native okuyucular ve yerel ölçüm](../../../docs/requests.md#xreq-073-backend-uygulamasi).
+
+24 Kasım development ölçümünde bir Pro sahibi aynı merkezdeki yedi rol satırını native Auth → Edge ile okudu. Mevcut ayrı kişi okumaları ve birleştirilmiş projeksiyon 12 dönüşümlü eşleştirmede aynı yedi adı ve aynı satırları döndürdü. İstek sayısı 8 → 1, API yanıtlarındaki kayıt sayısı 14 → 7, istemci toplam p50 936 → 202 ms ve p95 4.801 → 1.962 ms oldu. Kesin merkez seçicisi aynı aktörün görünür listesindeki tek merkezle eşleşti. Aynı merkezde takvimdeki dört seansın durumu, yoklama durumu, sürümü, formatı ve sınıf kimliği 12 eşleştirmede mevcut seans detaylarıyla aynıydı. Dört seans ve bir etkinlik için 5 → 1 istek ve 9 → 5 kayıt ölçüldü. İstemci toplam p50 513 → 235 ms, p95 1.401 → 853 ms oldu. Ölçümler tek merkez ve tek test hesabı kapsamındadır. Diğer XREQ-073 akışları için ek canlı ölçüm veya geniş Stüdyo projeksiyonu yürütülmedi.
+
+<a id="web1-backend-canli-takip-kapanisi"></a>
+## Web1 — Backend canlı tekrar kapanışı
+
+24 Kasım 2026 kullanıcı kararıyla W1-BE-03, W1-BE-07–18 ve W1-BE-36 için ek development tekrarları backend listesinden çıkarıldı. Kaynak, native test ve dağıtım kanıtları kendi teslim kayıtlarında durur. Bu kapanışta yeni canlı tekrarı yapılmayan senaryolar, planlı dondurma iptali dahil W1-BE geliştirme senaryoları ve W1-BE-36 için yeni callback’te posta teslimi, PKCE ve doğal süre dolumudur. [Önceki S08 gerçek sağlayıcı kabulü](#s08-dogal-sure-kabulu) ve [W1-BE-36 kaynak teslimi](#web1-recovery-callback-acceptance) kendi kapsamlarında geçerlidir.
+
+Aynı Pro oturumunda W1-BE-03 kapsamındaki merkez kişi dizini tek Edge çağrısında 64 satır ve boş devam cursor’ı döndürdü. Büyük dizin ve diğer rol/plan/merkez varyantları bu koşuda ölçülmedi.
 
 <a id="g03-business-kabulu"></a>
 ## G03 — Business backend kabulü · 24 Kasım 2026
@@ -40,7 +49,28 @@ Migration, kişi, rol ve merkez listeleri ile abonelik özeti, etkin ayar ve aya
 
 Supabase'in sabitlenmiş PostgreSQL 17.11 dağıtımında 217 taban migration uygulandı. Aynı sentetik kişi listesi isteği dört dönüşümlü blokta, koşul ve sürüm başına 20 kez ölçüldü. Başka bir okuma organizasyon satırını 200 ms tuttuğunda SQL RPC medyanı 211,78 → 9,33 ms, p95 233,45 → 11,22 ms oldu. Eşzamanlı işlem yokken medyan 10,31 → 10,70 ms oldu. Altı RPC'nin yedi istek biçiminde yanıttaki iş verileri eşleşti ve çağrıya özgü ölçüm zamanlarının geçerliliği doğrulandı. Kapsam dışı kullanıcı reddi ve yazmanın okuma tamamlanmadan özel kilit alamaması doğrulandı. Ölçüm izole SQL RPC yolunu kapsar.
 
-Backend `verify` 467 + 150 + 10 testte sıfır hata ve atlama ile geçti. Yerel kalite kontrolü 10/10 ve sıfır bulgu verdi. CLI için sabit PostgreSQL paketi alternatif sağlayıcı yolları denendikten sonra SHA256 doğrulamasıyla alındı. Yerel Supabase stack'i Unix socket bind sırasında `Operation not permitted` nedeniyle başlamadı. İzole SQL deneyi döngü adresinden TCP kullandı. Aday native CI, dağıtım ve aynı canlı akışın tekrar ölçümü [kalan kabulde](remaining-work.md#hosted-api-gecikmesi) izlenir.
+Backend `verify` 467 + 150 + 10 testte sıfır hata ve atlama ile geçti. Yerel kalite kontrolü 10/10 ve sıfır bulgu verdi. CLI için sabit PostgreSQL paketi alternatif sağlayıcı yolları denendikten sonra SHA256 doğrulamasıyla alındı. Yerel Supabase stack'i Unix socket bind sırasında `Operation not permitted` nedeniyle başlamadı. İzole SQL deneyi döngü adresinden TCP kullandı. Native CI ve development teslimi [PR #419 kaydında](#xreq-073-backend-kabulu) doğrulandı.
+
+### 24 Kasım development yeniden ölçümü
+
+Frankfurt Edge v114 üzerinde bir Pro test hesabıyla sıralı salt okunur istekler çalıştırıldı. İstemci süreleri istek başlangıcından JSON yanıtının okunmasına kadardır.
+
+| İşlem | Başarılı örnek | p50 (ms) | p95 (ms) |
+|---|---:|---:|---:|
+| `account_get_v1` | 30 | 215 | 531 |
+| `people_list_v1` | 8 | 1.344 | 2.034 |
+| `subscription_get_v1` | 8 | 497 | 873 |
+| `settings_get_v1` | 8 | 269 | 924 |
+| `settings_catalog_get_v1` | 8 | 256 | 331 |
+
+30 hesap isteğinin tamamı yanıt istek kimliğiyle Edge günlüklerine bağlandı. Edge p50 195 ms ve p95 514 ms idi. Aynı 11 saniyelik pencerede 30 hesap RPC’si görüldü. PostgREST upstream p50 77 ms ve p95 285 ms idi. İç RPC ve PostgreSQL çalışma süresini dış isteğe tekil olarak bağlayan kayıt bulunamadı. Hesap çağrısındaki önceki 10 saniyelik beklemenin kaynağı belirlenemedi. Ayrı Türkiye tarayıcı örnekleminde kişi dizini için 5.743 ms ve abonelik için 445 ms süren birer çağrı vardı. Bu örnek sayıları eski tarayıcı dağılımıyla performans karşılaştırması yapmaya yetmez.
+
+Kullanıcı kararıyla [bağımsız backend gecikme takibi](remaining-work.md#hosted-api-gecikmesi) kapatıldı. Ölçümlerde görülen kişi dizini gecikmesi ve hesap çağrısındaki eski bekleme kayıtta durur.
+
+<a id="xreq-071-backend-kapanisi"></a>
+### XREQ-071 — Ödeme onayı backend incelemesi
+
+24 Kasım development kontrolünde son 24 saatin Edge ve PostgreSQL günlüklerinde `saas_payment_verify_v1` örneği bulunmadı. Kullanılan Pro test hesabı ödeme doğrulama yetkisine sahip değildi. Yeni ödeme onayı ve ekran zaman çizelgesi ölçülmedi. Önceki kaynak incelemesinde onay, güncel kaynak okuması ve doğrulanmış sonuç okuması ayrı istemci adımlarıydı. Kullanıcı kararıyla backend inceleme takibi kapatıldı. Son onay → ACK ve son onay → doğrulanmış ekran sonucu ölçütleri [XREQ-071 frontend talebinde](../../../docs/requests.md#xreq-071) durur.
 
 <a id="ci503-native-baslangic"></a>
 ## CI503 — Boş runtime yanıtı ve native başlangıç maliyeti
@@ -299,7 +329,7 @@ PR #329’un kabul edilmiş kaynağındaki [native parola güvenliği aracı](re
 <a id="web1-recovery-callback-acceptance"></a>
 ## Web1 recovery kabul callback kaynağı — 17 Kasım2026
 
-**Teslim güncellemesi.** [PR #328](https://github.com/SXQHex/FtkSaaS/pull/328) main `b219f2be822338b40460f1bb981e00d07b6be70e` olarak birleşti. [Main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44192177548) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44192271441) başarılı. Yeni callback için gerçek teslim, PKCE ve doğal süre dolumu kabulü açık.
+**Teslim güncellemesi.** [PR #328](https://github.com/SXQHex/FtkSaaS/pull/328) main `b219f2be822338b40460f1bb981e00d07b6be70e` olarak birleşti. [Main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44192177548) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/44192271441) başarılı. Yeni callback senaryoları için [ek canlı tekrar takibi](#web1-backend-canli-takip-kapanisi) kapatıldı.
 
 Kullanıcının W1-BE-36 talebi mevcut backend development kabul aracının callback girdisini düzeltir; P01/G-PRO gerçek sağlayıcı alt kontrolüdür, kapanmış frontend sayfaları yeniden açılmaz. Ayrı dal `codex/web1-recovery-callback-acceptance`, başlangıç main `3b4eaf28f469eef3f66be82aaa3dc65759313ac7`; aynı SHA main/merge/development başarıları aşağıdaki PR327 kaydında canlı doğrulandı. Çağrı/operatör rehberi remote-backend-setup, native sözleşme WF01, backend değerlendirmesi XREQ-070 sahibindedir. Frontend dosyaları salt okunur; merge yetkisi yoktur.
 
@@ -402,7 +432,7 @@ PR318 head `5d4370775ac1473f73436c6b4627a517c636b2e6`, [aday full clean439509300
 <a id="atanmis-seans-salon"></a>
 ## Atanmış seans salon etiketi — 16 Kasım 2026
 
-**Teslim güncellemesi.** [PR #317](https://github.com/SXQHex/FtkSaaS/pull/317), W1-BE-17 özel ders durum/özeti ile W1-BE-18 salon etiketini main `39b78852b711449c64ec559dfcaea2ed385e9e14` üzerinde birlikte teslim etti. [Main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/43934986183) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/43935127207) başarılı. Gerekli hosted backend tekrarları açık.
+**Teslim güncellemesi.** [PR #317](https://github.com/SXQHex/FtkSaaS/pull/317), W1-BE-17 özel ders durum/özeti ile W1-BE-18 salon etiketini main `39b78852b711449c64ec559dfcaea2ed385e9e14` üzerinde birlikte teslim etti. [Main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/43934986183) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/43935127207) başarılı. Hosted tekrarların kapsamı [Web1 kapanışında](#web1-backend-canli-takip-kapanisi) kayıtlıdır.
 
 Başlangıç main `1df2e01c40fd625b0def974fe3347da65032fcfd`; PR315'in aynı kaynağındaki aday [43859496954](https://github.com/SXQHex/FtkSaaS/actions/runs/43859496954), main [43863721918](https://github.com/SXQHex/FtkSaaS/actions/runs/43863721918), merge [43863721867](https://github.com/SXQHex/FtkSaaS/actions/runs/43863721867) ve development [43863802374](https://github.com/SXQHex/FtkSaaS/actions/runs/43863802374) success doğrulandı. Güncel main `7831ebe31b8b1912ba5370ef81e40ced8c97dec2` ile PR317 senkronizasyonunda W1-BE-17 kaynağı birlikte korunur. Aynı main kaynağının [main kabulü43922098495](https://github.com/SXQHex/FtkSaaS/actions/runs/43922098495), [merge kanıtı43922098694](https://github.com/SXQHex/FtkSaaS/actions/runs/43922098694) ve [development43922226819](https://github.com/SXQHex/FtkSaaS/actions/runs/43922226819) success doğrulandı. Kullanıcı açıkça W1-BE-18'e başlamamızı istedi. Dal `feature/backend-assigned-session-room-labels`; kapsam [backlog](remaining-work.md#w1-be-18--atanmış-seansın-salon-etiketi) ve frontend tüketim cevabı `apps/web1/tasks/request.md` W1-BE-18 bölümündedir. Frontend kodu/todo/kabul değişmedi.
 
@@ -424,7 +454,7 @@ Başlangıç main b586bfe212905b9009804b26f58ab25f41b921ee; PR314 birleşmesi ve
 <a id="uye-profili-zaman-iptal"></a>
 ## Üye profili zaman filtresi ve planlı iptal — 16 Kasım 2026
 
-**Teslim güncellemesi.** [PR #314](https://github.com/SXQHex/FtkSaaS/pull/314) main `b586bfe212905b9009804b26f58ab25f41b921ee` oldu. [Aday CI](https://github.com/SXQHex/FtkSaaS/actions/runs/43790807612), [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/43793133914) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/43793205419) başarılı. Yeni hosted backend kabulü açık.
+**Teslim güncellemesi.** [PR #314](https://github.com/SXQHex/FtkSaaS/pull/314) main `b586bfe212905b9009804b26f58ab25f41b921ee` oldu. [Aday CI](https://github.com/SXQHex/FtkSaaS/actions/runs/43790807612), [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/43793133914) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/43793205419) başarılı. Yeni hosted tekrarın kapsamı [Web1 kapanışında](#web1-backend-canli-takip-kapanisi) kayıtlıdır.
 
 Başlangıç main `158feaeeb3edadb3ab78c2c89d74c02d8d1f1dfb`; PR313 birleşmiş, aynı kaynağın [main43777853831](https://github.com/SXQHex/FtkSaaS/actions/runs/43777853831), [merge43777853818](https://github.com/SXQHex/FtkSaaS/actions/runs/43777853818) ve [development43777896779](https://github.com/SXQHex/FtkSaaS/actions/runs/43777896779) attempt1/success ayrı okunarak doğrulandı. Bu kanıt yeni adaya aktarılmaz. Aktif dal `feature/backend-member-time-freeze`; kullanıcı W1-BE-13/14 önerilerini uygulamamızı onayladı. Görev kabulü [backlog](remaining-work.md#w1-be-1314--üye-profili-zaman-filtresi-ve-planlı-dondurma-iptali), kesin tüketim WF05/WF06 sahibindedir. Frontend kodu/kabul kaydı değiştirilmedi.
 
