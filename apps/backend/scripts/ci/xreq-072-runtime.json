@@ -1,0 +1,16 @@
+{
+  "release_tag": "ftk-edge-runtime-v1.77.9-xreq072.1",
+  "upstream_commit": "0dd15ef2281b60ea03413ef5d2a60ebb25b0e21d",
+  "run_id": 45294540002,
+  "artifact_id": 14875733001,
+  "elf": "714b23da5b048bf6530f716e6df1c846ab503fbf81564d031c4bfe82b86ced3a",
+  "inputs": {
+    "apps/backend/scripts/ci/build-xreq-072-runtime.sh": "de0de41be115ece435e82321bedace47c2c32af64e4ba5a50164be49605656f4",
+    "apps/backend/scripts/acceptance/xreq-072-edge-runtime.patch": "f9eaafb77992facc4be62af4b265c38bd5564b45fdf6e42539e67975afe5c92c",
+    "apps/backend/scripts/acceptance/edge-response-lifecycle.mjs": "222b2ef800a3f491b9da1077cd970f865b5f74c39f99848b390351ffcd856e8a"
+  },
+  "assets": {
+    "edge-runtime-v1.77.9-r0-linux-amd64.tar.zst": "c1e387d0805327bc96b3a6f80ac18aaf8a80e558243258cfb18085e6254736be",
+    "edge-runtime-v1.77.9-r0-linux-amd64.manifest.json": "be1700ff6af990e19dc5de26bab3b10b598f2f5d1071b903638f3ceb7bd3ab1a"
+  }
+}

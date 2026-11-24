@@ -135,6 +135,7 @@
         "apps/backend/scripts/ci/timing-reporter.mjs",
         "apps/backend/scripts/ci/timings.mjs",
         "apps/backend/scripts/ci/with-xreq-072-runtime.mjs",
+        "apps/backend/scripts/ci/xreq-072-runtime.json",
         "apps/backend/scripts/acceptance/edge-response-lifecycle.mjs",
         "apps/backend/scripts/acceptance/xreq-072-edge-runtime.patch",
         "apps/backend/scripts/db.mjs",
@@ -319,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "e20639c6b1466c415d18939579690a58d18fc11b37efbd0d8ac4cb23e57d979b",
-        "reason": "XREQ-072 paket üretimi, native CLI paket doğrulaması ve aynı binary ile core/API kabul akışı incelendi."
+        "fingerprint": "0981d8a26230c80c388ca6506237ac0d6d52041755d08ab7979d9103dece0992",
+        "reason": "Runtime paketinin kaynak ve özet sabitlemesi, GitHub yayını ve native CLI kabul zinciri incelendi."
       }
     },
     {
