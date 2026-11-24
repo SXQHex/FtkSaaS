@@ -38,6 +38,8 @@
 
 Development'ta önceden ayrılmış sentetik test sahibiyle güncel kaynak beş ekranı, geri/ileriyi, 20 öğelik ikinci üye sayfasını ve üye özetini tamamladı. Başlangıç kaynağında `people_list_v1`, her iki kaynakta Stüdyo açılışındaki bazı okumalar `503 TEMPORARY_FAILURE` döndürdü. Canlı süreler için sağlıklı önce/sonra çifti bekleniyor. Tek yazma ve sonuç okuması yerel fixture'da çalıştırıldı. [C-ortak kabulü](remaining-work.md#router-query-birlesik)
 
+Üyeler araması, uygulanan arama metni değiştiğinde ilk cursor'a döner. İlk açılış ve yalnız boşluk değişiklikleri mevcut sayfayı ve seçimi korur. [WF04 tarayıcı regresyonu](../e2e/auth-people-summary.spec.ts)
+
 ## Devam
 
 Kaynak değiştiyse `main` ve aktif dalın tam farkını incele. [İlk açık ve önkoşulu karşılanan iş](production-queue.md#aktif-sıra) ile devam et. Aynı SHA'nın unit/MSW, tarayıcı, kalite, merge/main ve gerekli hosted kanıtlarını birbirinden ayır. Başarısız test için assertion/timeout/politika gevşetme; bilinmeyen ACK için ikinci native writer açma. Yalnız gerçek yeni kaynak veya ortam kanıtıyla kayıt güncelle; mikro adım günlükleri ve tekrar eden kabul metni üretme.
