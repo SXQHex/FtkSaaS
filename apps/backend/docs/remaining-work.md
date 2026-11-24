@@ -830,7 +830,7 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 
 ## Ortak üretim işletimi
 
-Bu teslimin ortak işletim işleri O01, O02 ve [O11 asgari veri güvenliği kontrolüdür](#o11). [Ürün teslim sınırı](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md#bu-teslimin-veri-güvenliği-sınırı) uyarınca O03–O10 Business sonrası ayrı altyapı projesine ertelenmiştir; G02/G01/G03 bağımlılığı değildir ve tamamlandı sayılmaz. Aynı uygulama için plan başına ayrı işletim kabulü yapılmaz. Mevcut hesap silme, erişim engelleme, dosya temizliği ve bütün mevcut testler korunur; yeni genişletme bu teslimin şartı değildir.
+Bu teslimin ortak işletim işleri O01, O02 ve [O11 asgari veri güvenliği kontrolüdür](#o11). [Ürün teslim sınırı](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md#bu-teslimin-veri-güvenliği-sınırı) uyarınca [O03–O10](#business-sonrası-ayrı-altyapı-projesi) Business sonrası ayrı altyapı projesinde, planlar için ortak yürütülür.
 
 <a id="o01"></a>
 ### O01 — Gerçek worker işi ve tekrar güvenliği
@@ -872,22 +872,23 @@ Bu teslimin ortak işletim işleri O01, O02 ve [O11 asgari veri güvenliği kont
 
 ## Business sonrası ayrı altyapı projesi
 
-Aşağıdaki O03–O10 görevleri ertelenmiştir. Mevcut kaynak ve kabul izleri korunur; bunlar mevcut plan tesliminin engeli veya plan başına yeni işletim kabulü değildir.
+G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#o03-o10-isletim-kaniti) ile [geliştirme sırası](production-queue.md#ortak-işletim-hattı) ayrı sahiplerinde tutulur.
 
 <a id="o03"></a>
 ### O03 — Saklama ve imha kapsamı
 
-- [ ] **Durum:** Business sonrası erteli · **Tür:** D/K · **Plan:** Tümü · **Özellik:** F33
+- [x] **Durum:** Envanter kabulü tamamlandı · **Tür:** D/K · **Plan:** Tümü · **Özellik:** F33
 - **Bağımlılık:** A03
 - **Kabul:** DB/Auth/Storage/export/geçici kopya ve backup kapsamı, hold ve korunan iş kayıtları eşlenir.
 - **Sınır/olumsuz durum:** Salt manifest fiziksel imha değildir; kabul edilmemiş süre/hukuki taahhüt uydurulmaz.
 - **Doğrulama senaryosu:** Her veri yüzeyi için sahip/retention/hold/imha kanıtı; eksik config açık blocker kaydı.
 - **Kaynak alanı:** privacy/retention/hold model; runbook; test
+- **Kapanış kanıtı:** [İşletim envanteri](remote-backend-setup.md#o03-saklama-ve-imha-envanteri) her yüzeyi sahibi, mevcut saklama sınıfı, hold, yöntem ve doğrulamasıyla eşler. Eksik uygulama ve ortam kanıtları kendi O04–O09 kayıtlarındadır.
 
 <a id="o04"></a>
 ### O04 — DB ve Auth fiziksel imha
 
-- [ ] **Durum:** Business sonrası erteli · **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
+- [ ] **Durum:** Kısmi kabul · **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
 - **Bağımlılık:** O03
 - **Kabul:** Yetkili imha gerçek profil/Auth yüzeyini hedef sırada kaldırır.
 - **Sınır/olumsuz durum:** Hold/korunan finans verisi keyfî silinmez; yarım iş completed olmaz.
@@ -900,17 +901,18 @@ Aşağıdaki O03–O10 görevleri ertelenmiştir. Mevcut kaynak ve kabul izleri 
 
 **Native principal alt aşaması:** Scoped worker hazırlığı, provider transaction'ında canlı hold/lease fence, official hard delete, cascade sonrası commit proof ve404/readback PR267 aday/main/development ve gerçek native kabulüyle kaynak teslimini geçti. Canlı migration141 ve ertelenmiş trigger doğrulandı; target binding/proof0 olduğundan hosted fiziksel imha yapılmış sayılmaz. Provider audit/diğer Auth yüzeyleri, karma geçmiş minimizasyonu ve O04 bütünü açık kalır.
 
-**Seçili Auth kalıntıları:** Hedef flow/orphan refresh satır silme ve native audit'teki hedefe ait bilinen kişisel alanların kaldırılması, aynı scope/hold/lease ve atomic proof sınırında geliştirilir. Karma hesap flow'u ve yanlış refresh/session ownership fail-closed; başka aktör/subject ve stable kanıt korunur. UUID ile bağlı kalan kayıt anonim sayılmaz. Native/hosted kabul ve provider dış logları/diğer Auth yüzeyleri açıkken O04 kapanmaz; [aktif kaynak/kanıt](00-FtkSaaS-yeni-sohbet-devir.md#auth-kalıntı-ve-yöntem-paketi).
+**Seçili Auth kalıntıları:** Mevcut imha yolu hedef flow/orphan refresh satırlarını ve native audit’te hedefe ait bilinen kişisel alanları işler. Karma hesap flow’u ve yanlış refresh/session sahipliği işlemi durdurur. [Kaynak ve kabul](00-FtkSaaS-yeni-sohbet-devir.md#auth-kalıntı-ve-yöntem-paketi). Kalan iş, sağlayıcının dış log/kopyaları ve diğer Auth yüzeyleri için saklama ve imha kanıtı ile DB’deki karma geçmiş ve organizasyon kapsamının doğrulanmasıdır.
 
 <a id="o05"></a>
 ### O05 — Storage ve export fiziksel imha
 
-- [ ] **Durum:** Business sonrası erteli · **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F30,F28,F33
+- [ ] **Durum:** Kısmi kabul · **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F30,F28,F33
 - **Bağımlılık:** O03
 - **Kabul:** Hedef baytlar ve geçici/export kopyaları gerçekten kaldırılır.
 - **Sınır/olumsuz durum:** Metadata silmek bayt silmek değildir; izinli hold ve retry sınırları korunur.
 - **Doğrulama senaryosu:** Dosya/download kalıntısı, kesinti/retry ve expiry; checksum/envanter ile kanıt.
 - **Kaynak alanı:** Storage/export/temp executor; ilgili acceptance
+- **Kalan:** Dolu Storage nesnesi ve işleme/aktarım geçici kopyaları için hold, kesinti ve yeniden başlatma sonrası byte/download yokluğu.
 
 **DB export dilimi:** Hesap silme talebinde exact rol/hesap bağlantısı, tam report/job/file sahipliği, hold ve canlı lease kontrolüyle yalnız geçici DB export baytları kaldırılır. Olağan expiry de aynı hold/proof yolunu bounded100 dosyalık adımlarda kullanır; gerçek boyut/hash ve değişmez minimal kanıt atomiktir. Kaynak import dosyaları, tenant belge/kişi/finans ve rapor metadata'sı korunur. Bu alt aşama genel exports/Storage/backup veya privacy tamamlandı anlamına gelmez. Kaynak/native/CI/hosted ayrımı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#pro-export-saklama-ve-imha-paketi) tutulur.
 
@@ -919,17 +921,18 @@ Aşağıdaki O03–O10 görevleri ertelenmiştir. Mevcut kaynak ve kabul izleri 
 <a id="o06"></a>
 ### O06 — Bağımsız imha sicili
 
-- [ ] **Durum:** Business sonrası erteli · **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
+- [ ] **Durum:** Kaynak ve yerel test hazır · **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
 - **Bağımlılık:** O04,O05
 - **Kabul:** İmzalı sicil gerçek imha sonucuna ve bağımsız güncel checkpoint/trust kaynağına bağlıdır.
 - **Sınır/olumsuz durum:** Sicil ve trust aynı eski backup ile geriye alınamaz; tamamlanmamış imha başarı yazmaz.
 - **Doğrulama senaryosu:** Eski/eksik/sahte kayıt ve replay; anahtar erişim/rotasyon/kalıcılık işletim kanıtı.
 - **Kaynak alanı:** erasure-register/guard kaynakları; restore test
+- **Kalan:** O04/O05’in gerçek imha makbuzunu bağımsız kalıcı sicile bağla. Aynı yedekle geriye alınamayan checkpoint kaynağını, yazma yetkisini ve anahtar rotasyonunu kabulde doğrula.
 
 <a id="o07"></a>
 ### O07 — Guard ile gerçek restore yükleyicisi
 
-- [ ] **Durum:** Business sonrası erteli · **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
+- [ ] **Durum:** İzole PostgreSQL satır yükleyicisi geçti, O06 bekleniyor · **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
 - **Bağımlılık:** O06
 - **Kabul:** Guard reddi yüklemeyi, loader hatası hizmete erişim açılmasını engeller.
 - **Sınır/olumsuz durum:** Kod rollback DB restore değildir; production reset/seed yok.
@@ -942,32 +945,35 @@ Aşağıdaki O03–O10 görevleri ertelenmiştir. Mevcut kaynak ve kabul izleri 
 <a id="o08"></a>
 ### O08 — DB/Auth/Storage tam geri dönüş
 
-- [ ] **Durum:** Business sonrası erteli · **Tür:** H · **Plan:** Tümü · **Özellik:** F33,F30
+- [ ] **Durum:** Tam geri yükleme hedefi bekleniyor · **Tür:** H · **Plan:** Tümü · **Özellik:** F33,F30
 - **Bağımlılık:** O07
 - **Kabul:** DB/migration/ACL/RLS, Auth UUID/giriş ve Storage bayt/izinleri aynı snapshotla geri döner.
 - **Sınır/olumsuz durum:** Tek SQL veya dosya restore bütün kabul değildir; kaynak hedef ayrıdır.
 - **Doğrulama senaryosu:** DB mutabakatı, gerçek giriş, Storage checksum; Edge/config/secret envanteri ve worker binding doğrulaması.
 - **Kaynak alanı:** restore runbook ve mevcut araçlar
+- **Kalan:** Aynı kurtarma noktasından DB ve Storage yedeği ile izole ayrı Supabase hedefinde [tam restore prosedürünü](remote-backend-setup.md#managed-restore-prosedürünün-sınırı) yürüt.
 
 <a id="o09"></a>
 ### O09 — Backup non-resurrection kabulü
 
-- [ ] **Durum:** Business sonrası erteli · **Tür:** H · **Plan:** Tümü · **Özellik:** F33
+- [ ] **Durum:** Guard reddi testli, tam restore sonrası replay açık · **Tür:** H · **Plan:** Tümü · **Özellik:** F33
 - **Bağımlılık:** O08
 - **Kabul:** Silme öncesi backup restore edilince silinmiş kişi/org erişime dönmez.
 - **Sınır/olumsuz durum:** Eski trust+ledger veya eksik sicil erişim açamaz.
 - **Doğrulama senaryosu:** Güncel bağımsız sicille olumlu/olumsuz restore; veri erişimi açılmadan imha tekrar uygulanır.
 - **Kaynak alanı:** restore/erasure entegrasyon kabulü
+- **Kalan:** O08 hedefi kapalıyken gerçek silme öncesi yedekle yeniden imhayı ve güncel sicille güvenli açılışı doğrula.
 
 <a id="o10"></a>
 ### O10 — Yük ve kurtarma hedeflerini ölç
 
-- [ ] **Durum:** Business sonrası erteli · **Tür:** D/H · **Plan:** Tümü · **Özellik:** F01,F08,F19,F28,F33
+- [ ] **Durum:** Pilot hedefleri kayıtlı, ölçüm bekleniyor · **Tür:** D/H · **Plan:** Tümü · **Özellik:** F01,F08,F19,F28,F33
 - **Bağımlılık:** O02,O08
 - **Kabul:** Ayrı altyapı projesinde belirlenecek veri hacmi ve iş karışımıyla gecikme/queue/finans doğruluğu ve kurtarma hedefleri ölçülür. G02/G01/G03 için plan başına ayrı işletim kabulü oluşturmaz.
 - **Sınır/olumsuz durum:** Öğrenci sayısı eşzamanlı kullanıcı sayısı değildir; onaylanmamış SLA/eşik uydurulmaz.
 - **Doğrulama senaryosu:** Yük profili ve eşikler koşudan önce kaydedilir; pilot RPO≤24saat/RTO≤8saat hedefleri ölçülür, ticari SLA sayılmaz.
 - **Kaynak alanı:** yük senaryoları; query/worker ölçümleri; runbook
+- **Ölçüm tabanı:** [Pilot performans hedefleri](../../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md#performans--business-sonrası-ölçüm-hedefleri) 10 organizasyon × 500 aktif öğrenci ve 50 eşzamanlı kullanıcı tanımlar. Backend p95 hedefi liste/detay için 1 saniye, haftalık takvim, kritik yazmalar ve büyük iş başlatma için 2 saniyedir. Kalan iş istek dağılımını ve test verisini kaydetmek, iş kuyruğu ve finans mutabakatıyla birlikte ölçmek, O08 tatbikatından RPO/RTO çıkarmaktır.
 
 ## Plan bazlı son kabul
 

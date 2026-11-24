@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { QueryClient } from "@tanstack/react-query";
-import type { CalendarItem, EarningView, SessionView } from "@ftksaas/api-contracts";
+import type { CalendarItem, SessionView } from "@ftksaas/api-contracts";
 const mock = vi.hoisted(() => ({ call: vi.fn(), session: vi.fn() }));
 vi.mock("../../lib/scoped-backend", () => ({ scopedBackend: async () => ({ call: mock.call }) }));
 vi.mock("../schedule/schedule-read", () => ({ readScheduleSession: mock.session }));
@@ -173,38 +173,41 @@ describe("instructor bounded self reads", () => {
       "INSTRUCTOR_CALENDAR_UNAVAILABLE",
     );
   });
-  it("sums native corrections exactly per currency across the bounded monthly cursors", async () => {
-    const earning: EarningView = {
-      id: id(10),
-      person_id: id(6),
-      center_id: scope.centerId,
-      session_id: session.id,
-      event_assignment_id: null,
-      amount_minor: "9007199254740993",
-      paid_minor: "0",
-      remaining_minor: "9007199254740993",
-      currency: "TRY",
-      direction: "add",
-      previous_id: null,
-      closure_id: null,
-      created_at: "2026-11-16T10:00:00Z",
-      version: 1,
-      basis: { source: "agreement_fixed", currency: "TRY", quantity: 1, excluded_blocked: 0 },
+  it("reads native signed monthly totals once without rounding or exposing earning rows", async () => {
+    const packet = {
+      items: [],
+      next_cursor: null,
+      as_of: "2026-11-16T10:00:00Z",
+      period_totals: [
+        { currency: "USD", net_minor: "-100" },
+        { currency: "TRY", net_minor: "9007199254740990" },
+      ],
     };
-    mock.call
-      .mockResolvedValueOnce({ items: [earning], next_cursor: "next" })
-      .mockResolvedValueOnce({
-        items: [
-          { ...earning, id: id(11), amount_minor: "3", direction: "subtract" },
-          { ...earning, id: id(12), amount_minor: "100", currency: "USD" },
-        ],
-        next_cursor: null,
-      });
+    mock.call.mockResolvedValueOnce(packet);
     await expect(readInstructorEarnings(scope, id(6), interval)).resolves.toEqual([
       { currency: "TRY", amount: "9007199254740990" },
-      { currency: "USD", amount: "100" },
+      { currency: "USD", amount: "-100" },
     ]);
-    expect(mock.call).toHaveBeenCalledTimes(2);
+    expect(mock.call).toHaveBeenCalledExactlyOnceWith(
+      "earnings_list_v1",
+      expect.objectContaining({
+        org_id: scope.orgId,
+        center_id: scope.centerId,
+        person_id: id(6),
+        interval,
+        summary_only: true,
+        page: { limit: 1 },
+      }),
+    );
+    for (const invalid of [
+      { ...packet, items: [{}] },
+      { ...packet, next_cursor: "next" },
+      { ...packet, period_totals: [...packet.period_totals, packet.period_totals[0]] },
+      { ...packet, period_totals: [{ currency: "USD", net_minor: "1.5" }] },
+    ]) {
+      mock.call.mockResolvedValueOnce(invalid);
+      await expect(readInstructorEarnings(scope, id(6), interval)).rejects.toThrow();
+    }
   });
 });
 

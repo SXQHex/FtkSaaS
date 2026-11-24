@@ -143,6 +143,22 @@ Bu teslimin O11 kontrolü, [ürün teslim sınırındaki](../../../docs/contract
 
 Bu asgari işlem aşağıdaki Business sonrası tam restore/sicil/non-resurrection hedeflerini yeni teslim önkoşulu yapmaz; mevcut kaynak ve testleri korur.
 
+<a id="o03-saklama-ve-imha-envanteri"></a>
+## Saklama ve imha envanteri
+
+Saklama sınıfları, başlangıç olayları ve varsayılan süreler [teknik sözleşmenin 19. bölümünden](../../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md#19-geçici-uzun-saklama-varsayılanları--hukuk-incelemesi-açık) alınır. Belgelenmiş saklama gerekçesi veya hold, yalnız kayıt ve gerekli alanlar için izlenir. Hold inceleme tarihinin geçmesi imhaya izin vermez. Erişim engeli, her yüzeyin gerçek imha kaydından ayrı tutulur.
+
+| Yüzey ve işletim sahibi | Saklama ve hold kapsamı | İmha yöntemi ve doğrulama |
+| --- | --- | --- |
+| Uygulama DB’si · backend privacy worker | Profil/iletişim, gerekli finans/işlem/belge kanıtı ve imha makbuzu kendi sınıflarında. Hesap ve somut kayıt hold’ları uygulanır. | Profil ve tercih satırlarını sil, korunması gereken karma kanıtı gerekli alanlarla sınırla. Kesinti sonrası tekrar ve kapsamlı kalan referans kontrolü [O04](remaining-work.md#o04). |
+| Native Auth ve sağlayıcı kayıtları · backend Auth işletimi / sağlayıcı | Aktif kimlik, oturum, geçici akış ve güvenlik logları kendi sınıflarında. Hesap ve hedef kayıt hold’ları korunur. | Native hard delete, ertelenmiş işlem makbuzu, sağlayıcı okumasında yokluk ve giriş reddi. Sağlayıcı dış log/kopyalarının politikası ve kalan Auth yüzeyleri [O04](remaining-work.md#o04). |
+| Edge erişim ve bildirim sağlayıcı kayıtları · backend işletimi / sağlayıcı | Güvenlik erişim logları ve bildirim metadata’sı ayrı sınıflarda. Somut hold ve sınırlı kanıt saklama uygulanır. | Sağlayıcıdaki etkin varsayılan süre, varsa kopyalar ve sona erme kanıtı yüzey bazında doğrulanır. Etkin politika ve kanıt eksikliği [sağlayıcı izlemesinde](remaining-work.md#o04) açıktır. |
+| Storage nesne baytları · backend Storage işletimi | Profil medyası ile belgelenmiş iş nesnesi ayrı sınıflarda. İzinli hold altındaki nesne korunur. | Native nesne silme. Nesne envanteri, checksum ve erişim reddiyle doğrula. Tüm kapsamda dolu nesne ve retry kabulü [O05](remaining-work.md#o05). |
+| Üretilmiş export ve geçici kopyalar · backend export/worker işletimi | Üretilmiş dosyaya geçici export süresi, kaynak veriye kendi sınıfı uygulanır. Dosya ve kaynak sahibi ayrımı ile somut hold korunur. | İndirilebilir DB baytını ve varsa worker/aktarımı yapan bileşenin geçici kopyalarını kaldır. Boyut/hash makbuzu, download reddi ve yeniden başlatma sonrası envanter [O05](remaining-work.md#o05). |
+| Yedekler ve restore kopyaları · backend backup işletimi / sağlayıcı | Yedek döngüsü, imha talebinden itibaren hedef süre ve kayıt düzeyi hold ayrı izlenir. Gerekli iş kanıtı kendi saklama sınıfındadır. | Uygulanan backup/Storage envanteri ve expiry kanıtı. Restore öncesi bağımsız sicili doğrula ve silinmiş öznenin tekrar erişime açılmadığını göster. Gerçek rotasyon ve tam restore kanıtı [O06](remaining-work.md#o06), [O08](remaining-work.md#o08) ve [O09](remaining-work.md#o09). |
+
+O04–O09 kayıtları eksik ortam ayarlarının ve uygulanmış imha kanıtının sahibidir. Makbuzda yalnız yöntem, kapsam, sonuç ve doğrulamaya gerekli asgari referans tutulur.
+
 ## Managed restore prosedürünün sınırı
 
 Kaynak ve hedef ayrı ve açık tanımlanır; deneme hedefi izole olmalıdır. Managed Auth/Storage şema sahiplerini platform kurar. Uygulama şema/rol/owner/ACL/RLS/policy/fonksiyon güvenlik ayarları korunur; `--no-owner/--no-acl` ile güvenlik farkı gizlenmez. Aynı read-only snapshot’tan veri ve uygulama migration geçmişi alınır; sağlayıcının kendi migration tabloları hedef platforma bırakılır. Rol üyelikleri mevcut grant zinciriyle karşılaştırılır, gereksiz grant tekrarları yapılmaz. Worker parolası veya provider secret’ı SQL dump’tan geri gelmiş sayılmaz.
