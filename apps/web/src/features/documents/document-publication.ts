@@ -1,3 +1,4 @@
+import { requireSupabasePublishableKey, requireSupabaseUrl } from "../../lib/public-config";
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { scopedUploadUrl, sha256Hex } from "../../lib/document-upload";
@@ -67,11 +68,7 @@ export async function prepareUpload(intent: UploadIntent) {
     throw Error("DOCUMENT_UPLOAD_UNAVAILABLE");
   return upload;
 }
-export function uploadUrl(
-  scope: ClientScope,
-  upload: UploadRef,
-  base = import.meta.env.VITE_SUPABASE_URL,
-) {
+export function uploadUrl(scope: ClientScope, upload: UploadRef, base = requireSupabaseUrl()) {
   const url = scopedUploadUrl(
     base,
     upload.upload_url,
@@ -91,7 +88,7 @@ export async function transferUpload(intent: UploadIntent, upload: UploadRef) {
     redirect: "error",
     referrerPolicy: "no-referrer",
     headers: {
-      apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+      apikey: requireSupabasePublishableKey(),
       "content-type": intent.request.mime,
     },
     body: intent.body,

@@ -1,7 +1,8 @@
+import { requireSupabasePublishableKey, requireSupabaseUrl } from "../../lib/public-config";
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { scopedBackend, type AccountReadContext, type ClientScope } from "../../lib/scoped-backend";
-import { createBackend, queryBackendRead, readEnvelope } from "../../lib/backend";
+import { getBackend, queryBackendRead, readEnvelope } from "../../lib/backend";
 import { getSupabaseClient } from "../../lib/supabase";
 import type {
   RequestReportExportStart,
@@ -30,6 +31,14 @@ export const reportsCommon = (scope: ClientScope) => ({
   client_api_version: 1 as const,
   org_id: scope.orgId,
   center_id: scope.centerId,
+});
+const reportDownload = z.object({ download_path: z.string().min(1), expires_at: z.string() });
+const importUpload = z.object({
+  file_id: z.uuid(),
+  upload_url: z.string().min(1),
+  allowed_mime: z.array(z.string()),
+  max_bytes: z.number().int().positive(),
+  expires_at: z.string(),
 });
 export async function writeReportJob(intent: ReportJobIntent) {
   const backend = await scopedBackend(intent.scope);
@@ -91,12 +100,8 @@ async function reportFileSession(scope: ClientScope) {
   if (error) throw error;
   if (!data.session) throw Error("AUTH_REQUIRED");
   const bearer = data.session.access_token;
-  const base = import.meta.env.VITE_SUPABASE_URL;
-  const backend = createBackend({
-    functionsUrl: `${base}/functions/v1/backend-v1`,
-    publishableKey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-    getAccessToken: async () => bearer,
-  });
+  const base = requireSupabaseUrl();
+  const backend = getBackend(bearer);
   const account = await backend.call("account_get_v1", {
     client_api_version: 1,
     request_id: uuidv7(),
@@ -112,7 +117,9 @@ export async function downloadReport(scope: ClientScope, jobId: string, key: str
     operation_key: key,
     job_id: z.uuid().parse(jobId),
   };
-  const file = await backend.call("report_file_get_v1", request);
+  const metadata = reportDownload.safeParse(await backend.call("report_file_get_v1", request));
+  if (!metadata.success) throw Error("REPORT_DOWNLOAD_INVALID");
+  const file = metadata.data;
   const url = new URL(file.download_path, base);
   if (
     url.origin !== new URL(base).origin ||
@@ -147,7 +154,7 @@ async function requestCsv(url: URL, bearer: string, request: object) {
     referrerPolicy: "no-referrer",
     headers: {
       authorization: `Bearer ${bearer}`,
-      apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+      apikey: requireSupabasePublishableKey(),
       "content-type": "application/json",
     },
     body: JSON.stringify(request),
@@ -196,18 +203,19 @@ export async function prepareImport(intent: ImportUploadIntent) {
   const data = await (
     await scopedBackend(intent.scope)
   ).call("import_upload_prepare_v1", { ...intent.request, request_id: uuidv7() });
-  z.uuid().parse(data.file_id);
+  const capability = importUpload.safeParse(data);
   if (
-    !data.allowed_mime.includes("text/csv") ||
-    data.max_bytes < intent.body.byteLength ||
-    !(Date.parse(data.expires_at) > Date.now())
+    !capability.success ||
+    !capability.data.allowed_mime.includes("text/csv") ||
+    capability.data.max_bytes < intent.body.byteLength ||
+    !(Date.parse(capability.data.expires_at) > Date.now())
   )
     throw Error("IMPORT_UPLOAD_INVALID");
   return data;
 }
 export async function transferImport(intent: ImportUploadIntent, upload: UploadRef) {
   await scopedBackend(intent.scope);
-  const base = new URL(import.meta.env.VITE_SUPABASE_URL),
+  const base = new URL(requireSupabaseUrl()),
     url = new URL(upload.upload_url, base);
   if (
     url.origin !== base.origin ||
@@ -225,7 +233,7 @@ export async function transferImport(intent: ImportUploadIntent, upload: UploadR
     credentials: "omit",
     redirect: "error",
     referrerPolicy: "no-referrer",
-    headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY, "content-type": "text/csv" },
+    headers: { apikey: requireSupabasePublishableKey(), "content-type": "text/csv" },
     body: intent.body,
     signal: AbortSignal.timeout(30000),
   });

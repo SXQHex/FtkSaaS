@@ -1,3 +1,4 @@
+import { hasSupabaseConfig } from "../../lib/public-config";
 import { useEffect, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { useQueryClient } from "@tanstack/react-query";
@@ -25,9 +26,7 @@ function sameSession(previous: NativeIdentity | null | undefined, current: Nativ
 }
 
 export function useAuthSession(enabled = true, onSessionHandoff?: (pending: boolean) => void) {
-  const configured = Boolean(
-    import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-  );
+  const configured = hasSupabaseConfig();
   const [ready, setReady] = useState(!configured);
   const [observing, setObserving] = useState(enabled);
   if (observing !== enabled) {

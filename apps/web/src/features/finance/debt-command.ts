@@ -1,3 +1,4 @@
+import { readFinanceOperationReceipt } from "./finance-receipt";
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
@@ -146,24 +147,8 @@ export async function writeDebt(intent: DebtIntent) {
   z.uuid().parse(result.primary_id);
   return result;
 }
-export async function readDebtReceipt(intent: DebtIntent) {
-  const backend = await scopedBackend(intent.scope);
-  const result = await backend.call("operation_status_get_v1", {
-    client_api_version: 1,
-    request_id: uuidv7(),
-    org_id: intent.scope.orgId,
-    operation: intent.operation,
-    key: intent.request.operation_key,
-  });
-  const type =
-    intent.operation === "debt_adjust_v1" ? "debt_adjustments" : "student_credit_movements";
-  if (
-    result.operation !== intent.operation ||
-    result.key !== intent.request.operation_key ||
-    (result.result_reference && result.result_reference.type !== type)
-  )
-    throw new Error("FINANCE_RECEIPT_UNAVAILABLE");
-  return result;
+export function readDebtReceipt(intent: DebtIntent) {
+  return readFinanceOperationReceipt(intent);
 }
 export async function readDebtResult(
   intent: DebtIntent,

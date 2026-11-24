@@ -1,3 +1,4 @@
+import { hasSupabaseConfig } from "../lib/public-config";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { HomePage } from "../components/home-page";
 
@@ -8,8 +9,7 @@ export const Route = createFileRoute("/")({
       if (["__home_example", "__form_example", "__states_example"].some((key) => search.has(key)))
         return;
     }
-    const configured =
-      import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+    const configured = hasSupabaseConfig();
     throw redirect({ to: configured ? "/account" : "/login" });
   },
   component: import.meta.env.DEV ? HomePage : undefined,

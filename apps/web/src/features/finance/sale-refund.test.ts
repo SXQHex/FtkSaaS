@@ -123,6 +123,7 @@ it("binds receipt to the exact operation/key while keeping the refund fact disti
     operation: intent.operation,
     key: "other",
     status: "succeeded",
+    result_available: true,
     result_reference: { type: "sales", id: scope.centerId },
   });
   await expect(readSaleRefundReceipt(intent)).rejects.toThrow("SALE_REFUND_RECEIPT_UNAVAILABLE");
@@ -130,6 +131,7 @@ it("binds receipt to the exact operation/key while keeping the refund fact disti
     operation: intent.operation,
     key: intent.request.operation_key,
     status: "succeeded",
+    result_available: true,
     result_reference: { type: "sales", id: scope.centerId },
   });
   expect((await readSaleRefundReceipt(intent)).result_reference?.id).toBe(scope.centerId);

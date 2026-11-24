@@ -1,3 +1,4 @@
+import { readFinanceOperationReceipt } from "./finance-receipt";
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { BackendError, queryBackendRead } from "../../lib/backend";
@@ -11,6 +12,49 @@ const money = z
   .regex(/^(0|[1-9][0-9]{0,18})$/)
   .refine((value) => BigInt(value) <= 9223372036854775807n);
 const currency = z.string().regex(/^[A-Z]{3}$/);
+const instant = z.iso.datetime({ offset: true });
+const version = z.number().int().positive().optional();
+const financeView = z.looseObject({
+  person_id: z.uuid(),
+  currency,
+  credit_available_minor: money,
+  subscriber_number: z.string().nullish(),
+  debts: z.array(
+    z.looseObject({
+      id: z.uuid(),
+      due_at: instant,
+      remaining_minor: money,
+      center_id: z.uuid().optional(),
+      version,
+      net_minor: money.optional(),
+      paid_minor: money.optional(),
+      claimed_minor: money.optional(),
+    }),
+  ),
+  movements: z.looseObject({
+    items: z.array(
+      z.looseObject({
+        id: z.uuid(),
+        kind: z.enum(["collection", "refund", "correction_in", "correction_out"]),
+        amount_minor: money,
+        currency,
+        occurred_at: instant,
+        center_id: z.uuid().optional(),
+        version,
+        previous_id: z.uuid().nullish(),
+        payment: z
+          .looseObject({
+            method: z.enum(["cash", "bank_transfer", "card_pos"]),
+            reference: z.string().nullish(),
+          })
+          .nullish(),
+      }),
+    ),
+    as_of: instant,
+    next_cursor: z.string().nullish(),
+  }),
+}) satisfies z.ZodType<FinanceView>;
+
 export interface FinanceSelection {
   personId: string;
   currency: string;
@@ -26,7 +70,7 @@ export async function readFinancePage(
   z.uuid().parse(selection.personId);
   currency.parse(selection.currency);
   const backend = await scopedBackend(scope, signal, readContext);
-  const data = await queryBackendRead(
+  const native = await queryBackendRead(
     backend,
     "finance_get_v1",
     {
@@ -40,14 +84,13 @@ export async function readFinancePage(
     },
     signal,
   );
+  const parsed = financeView.safeParse(native);
+  if (!parsed.success) throw new Error("FINANCE_SOURCE_UNAVAILABLE");
+  const data = parsed.data;
   if (data.person_id !== selection.personId || data.currency !== selection.currency)
     throw new Error("FINANCE_SOURCE_UNAVAILABLE");
-  money.parse(data.credit_available_minor);
   const ids = new Set<string>();
   for (const row of data.movements.items) {
-    z.uuid().parse(row.id);
-    money.parse(row.amount_minor);
-    z.iso.datetime({ offset: true }).parse(row.occurred_at);
     if (
       row.currency !== selection.currency ||
       (row.center_id && row.center_id !== scope.centerId) ||
@@ -57,9 +100,6 @@ export async function readFinancePage(
     ids.add(row.id);
   }
   for (const debt of data.debts) {
-    z.uuid().parse(debt.id);
-    money.parse(debt.remaining_minor);
-    z.iso.datetime({ offset: true }).parse(debt.due_at);
     if (debt.center_id && debt.center_id !== scope.centerId)
       throw new Error("FINANCE_SOURCE_UNAVAILABLE");
   }
@@ -189,22 +229,8 @@ export async function writeCollection(intent: CollectionIntent) {
   z.uuid().parse(result.primary_id);
   return result;
 }
-export async function readCollectionReceipt(intent: CollectionIntent) {
-  const backend = await scopedBackend(intent.scope);
-  const receipt = await backend.call("operation_status_get_v1", {
-    client_api_version: 1,
-    request_id: uuidv7(),
-    org_id: intent.scope.orgId,
-    operation: intent.operation,
-    key: intent.request.operation_key,
-  });
-  if (
-    receipt.operation !== intent.operation ||
-    receipt.key !== intent.request.operation_key ||
-    (receipt.result_reference && receipt.result_reference.type !== "cash_movements")
-  )
-    throw new Error("FINANCE_RECEIPT_UNAVAILABLE");
-  return receipt;
+export function readCollectionReceipt(intent: CollectionIntent) {
+  return readFinanceOperationReceipt(intent);
 }
 export async function readCollectionResult(
   intent: CollectionIntent,

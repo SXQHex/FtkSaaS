@@ -30,3 +30,17 @@ it("sends only the typed anonymous signup precheck to the Worker", async () => {
     vi.unstubAllEnvs();
   }
 });
+
+it("rejects a successful envelope with the wrong signup decision", async () => {
+  vi.stubEnv("VITE_PUBLIC_GATEWAY_URL", "https://gateway.invalid");
+  server.use(
+    http.post("https://gateway.invalid/api/auth/signup-check", () =>
+      HttpResponse.json({ ok: true, data: { status: "created" }, trace_id: "test-trace" }),
+    ),
+  );
+  try {
+    await expect(checkSignup("signup@example.invalid")).rejects.toThrow("SIGNUP_CHECK_INVALID");
+  } finally {
+    vi.unstubAllEnvs();
+  }
+});

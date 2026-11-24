@@ -1,11 +1,8 @@
+import { readPublicGatewayUrl } from "../../lib/public-config";
 import type { DiscoveredPublicForm } from "./public-discovery";
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
-import type {
-  CrmContactIntake,
-  RequestPublicApplicationSubmit,
-  SuccessPublicApplicationSubmit,
-} from "@ftksaas/api-contracts";
+import type { CrmContactIntake, RequestPublicApplicationSubmit } from "@ftksaas/api-contracts";
 import { readEnvelope } from "../../lib/backend";
 
 const intakeSchema = z.object({
@@ -103,7 +100,7 @@ export async function submitPublicApplication(
   attempt: PublicApplicationAttempt | PublicEventApplicationAttempt,
   proof: string,
 ) {
-  const base = import.meta.env.VITE_PUBLIC_GATEWAY_URL?.trim();
+  const base = readPublicGatewayUrl();
   if (!base || !proof.trim()) throw new Error("PUBLIC_SUBMIT_UNAVAILABLE");
   const request: RequestPublicApplicationSubmit = {
     client_api_version: 1,
@@ -120,7 +117,7 @@ export async function submitPublicApplication(
     client_request_key: attempt.key,
     bot_proof: proof,
   };
-  const response = await fetch(`${base.replace(/\/$/, "")}/api/public/application`, {
+  const response = await fetch(`${base}/api/public/application`, {
     method: "POST",
     credentials: "omit",
     cache: "no-store",
@@ -128,7 +125,7 @@ export async function submitPublicApplication(
     headers: { "content-type": "application/json" },
     body: JSON.stringify(request),
   });
-  const result = await readEnvelope<SuccessPublicApplicationSubmit>(response);
+  const result = await readEnvelope(response);
   return "publicationId" in attempt
     ? z.object({ accepted: z.literal(true), application_state: z.literal("pending") }).parse(result)
     : z.object({ accepted: z.literal(true) }).parse(result);

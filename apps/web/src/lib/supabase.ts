@@ -1,18 +1,12 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { requireSupabasePublishableKey, requireSupabaseUrl } from "./public-config";
 
 let client: SupabaseClient | undefined;
 
 export function getSupabaseClient(): SupabaseClient {
   if (client) return client;
 
-  const url = import.meta.env.VITE_SUPABASE_URL?.trim();
-  const publishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY?.trim();
-
-  if (!url || !publishableKey) {
-    throw new Error("Supabase bağlantı yapılandırması eksik.");
-  }
-
-  client = createClient(url, publishableKey, {
+  client = createClient(requireSupabaseUrl(), requireSupabasePublishableKey(), {
     auth: {
       flowType: "pkce",
       persistSession: true,

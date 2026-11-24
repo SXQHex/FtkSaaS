@@ -1,3 +1,4 @@
+import { readTurnstileSiteKey } from "../../lib/public-config";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@ftksaas/ui/components/button";
@@ -64,7 +65,7 @@ export function PublicTurnstile({ onProof }: { onProof: (proof: string) => void 
   const { t } = useTranslation();
   useEffect(() => {
     const element = container.current;
-    const key = import.meta.env.VITE_TURNSTILE_SITE_KEY?.trim();
+    const key = readTurnstileSiteKey();
     if (!element || !key) return;
     let active = true;
     let widget: string | undefined;

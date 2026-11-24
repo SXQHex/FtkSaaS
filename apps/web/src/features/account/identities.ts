@@ -1,3 +1,4 @@
+import { requireAppOrigin } from "../../lib/public-config";
 import type { UserIdentity } from "@supabase/supabase-js";
 import { getSupabaseClient } from "../../lib/supabase";
 
@@ -7,8 +8,7 @@ export async function readIdentities() {
   return data.identities;
 }
 export async function linkGoogle() {
-  const origin = import.meta.env.VITE_APP_ORIGIN?.trim();
-  if (!origin) throw new Error("APP_ORIGIN_REQUIRED");
+  const origin = requireAppOrigin();
   const { error } = await getSupabaseClient().auth.linkIdentity({
     provider: "google",
     options: { redirectTo: `${origin}/auth/callback` },
