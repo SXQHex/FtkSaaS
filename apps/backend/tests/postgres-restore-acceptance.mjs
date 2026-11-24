@@ -8,7 +8,7 @@ import {generateKeyPairSync,sign,randomUUID} from 'node:crypto';
 import {connect,stackStatus} from '../scripts/db.mjs';
 import {restorePostgresSnapshot} from '../scripts/postgres-restore.mjs';
 import {canonical,sha256} from '../scripts/restore-guard.mjs';
-import {rotateErasureRegister} from '../scripts/erasure-register.mjs';
+import {publishErasureCheckpoint,readErasureCheckpoint,rotateErasureRegister,signErasureCheckpointRotation} from '../scripts/erasure-register.mjs';
 
 // Real isolated databases on the existing loopback CI PostgreSQL. No hosted URL,
 // reset, service key, constraint bypass, provider or mocked SQL connection.
@@ -76,19 +76,29 @@ test('guarded PostgreSQL recovery retains atomic rows and a closed connection ga
    fs.copyFileSync(old.registerFile,archivedRegister);
    const {privateKey:newPrivate,publicKey:newPublic}=generateKeyPairSync('ed25519');
    const newPublicPem=newPublic.export({type:'spki',format:'pem'});
-   const next=rotateErasureRegister({
-    file:old.registerFile,sourceProjectRef:old.trust.source_project_ref,
-    expectedHead:old.trust.ledger_sha256,expectedSequence:old.trust.ledger_sequence,
-    previousPublicKeyPem:old.trust.ledger_public_key_pem,
-    privateKeyPem:newPrivate.export({type:'pkcs8',format:'pem'}),publicKeyPem:newPublicPem
-   });
    const checkpointDir=fs.mkdtempSync(path.join(os.tmpdir(),'postgres-restore-trust-'));
    try{
-    const checkpoint=path.join(checkpointDir,'current.json');
-    const current={...old.trust,ledger_sha256:next.sha256,ledger_sequence:next.sequence,ledger_public_key_pem:newPublicPem};
-    fs.writeFileSync(checkpoint,JSON.stringify(current),{mode:0o600});
-    const readCheckpoint=async()=>JSON.parse(fs.readFileSync(checkpoint,'utf8'));
+    const checkpoint={checkpointFile:path.join(checkpointDir,'current.json'),sourceProjectRef:old.trust.source_project_ref};
+    const publication={...checkpoint,registerFile:old.registerFile};
+    const first=publishErasureCheckpoint({
+     ...publication,expected:null,head:{sha256:old.trust.ledger_sha256,sequence:old.trust.ledger_sequence},publicKeyPem:pem
+    });
+    const next=rotateErasureRegister({
+     file:old.registerFile,sourceProjectRef:checkpoint.sourceProjectRef,
+     expectedHead:first.ledger_sha256,expectedSequence:first.ledger_sequence,previousPublicKeyPem:pem,
+     privateKeyPem:newPrivate.export({type:'pkcs8',format:'pem'}),publicKeyPem:newPublicPem
+    });
+    const readCheckpoint=async()=>({...readErasureCheckpoint(checkpoint),snapshot_sha256:old.trust.snapshot_sha256});
     await admin.query('alter database "'+database+'" allow_connections false');
+    await assert.rejects(load(rows,{...old,readCheckpoint}),/LEDGER_DIGEST_MISMATCH/);
+    assert.equal(await gate(),false);
+    const rotationSignature=signErasureCheckpointRotation({
+     previous:first,head:next,publicKeyPem:newPublicPem,previousPrivateKeyPem:privateKey.export({type:'pkcs8',format:'pem'})
+    });
+    publishErasureCheckpoint({
+     ...publication,expected:first,head:next,publicKeyPem:newPublicPem,previousLedgerBytes:fs.readFileSync(archivedRegister),rotationSignature
+    });
+    const current=await readCheckpoint();
     const archived={...old,registerFile:archivedRegister,readCheckpoint};
     await assert.rejects(load(rows,archived),/CURRENT_CHECKPOINT_CHANGED/);
     assert.equal(await gate(),false);

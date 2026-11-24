@@ -615,6 +615,12 @@ Hedef hesabın `auth.one_time_tokens` satırına konan saklama blokajı izin haz
 
 Profil ve native Auth imhasının makbuzları oluştuktan sonra aynı hesaba ve veritabanı instance’ına bağlı P07 worker, uygulama güvenlik geçmişindeki hedef oturum kimliğini boşaltır. Olay, zaman, işlem bağlantısı ve diğer hesapların satırları korunur. Hesap, Auth kullanıcısı, oturum, olay veya bağlı işlem üzerindeki somut saklama blokajı adımı durdurur. Aktif oturum ya da başka hesaba ait aynı kimlik tespitinde işlem hata verir. Kanıt iç manifestin `database.security_history` alanına yazılır. Ana talep mevcut imha koşullarına göre ilerler.
 
+Organizasyon silme talebinde exact organizasyona bağlı P07 worker, bağımsız kişi iletişim kayıtlarından her claim’de en çok 100 e-posta veya telefon satırını temizler. Hesaba bağlı, hesaptan yansıtılmış veya birleştirilmiş kişi kayıtları ve somut saklama blokajlı satırlar korunur. İç manifestte `database.organization_contacts` altında ilerleme ve değişmez işlem makbuzunda kaldırılan satır sayısı tutulur. Genel veritabanı kapsamı kendi imha koşullarına bağlıdır.
+
+Hesap veya organizasyon imhasında süresi dolmuş, tamamlanmamış import yüklemeleri ayrı Storage adımından geçer. Yürütücü yalnız bağlı dosyanın yetkili Storage okumasıyla boyut ve SHA-256 eşliğini doğrular. Native silme işlemi güncel lease ve saklama blokajını yeniden denetler. Ayrı bağlı attestor, başarılı Storage silme cevabı ve nesneye özgü yokluk okuması sonrası makbuzu yazar. Silme cevabı kaybolduğunda tek başına sonraki yokluk okuması makbuz üretmez. Genel Storage kapsamı beklemede kalır.
+
+Sicil checkpoint’i, yetkili yayın sırasında önceki imzalı makbuzlar korunarak ilerler. Yeni anahtar, önceki anahtarın aynı geçişi yetkilendirdiği imzayı gerektirir. Gerçek yükleyici bağımsız checkpoint’i yeniden okur ve eski arşiv başını reddeder. [İşletim ve erişim kapısı](../apps/backend/docs/remote-backend-setup.md#restore-ve-yeniden-canlanma-engeli).
+
 ## WF18
 
 Business merkezler arası hesaplaşma. Yetkili A merkezi hareketleri/istekleri/authority okur → açık satış bedeli payı üzerinden `settlement_request_submit_v1` → B yetkilisi dondurulmuş hedefe `settlement_request_decide_v1` ile onay veya gerekçeli ret verir → istek/hareket/bakiye yeniden okunur. Withdraw ayrı komuttur. Aynı insan iki merkezde yetkili olabilir; her adımın farklı merkez yetkisi canlı doğrulanır. Süreli/sınırsız seans bedeli uydurulmaz; sadece A-B satış payı temeli kullanılır. Yetki/delegation değişikliği eski onayı veya finans geçmişini yeniden yazmaz.

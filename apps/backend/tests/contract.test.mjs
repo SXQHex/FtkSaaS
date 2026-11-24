@@ -4,6 +4,7 @@ import './member-lesson-discovery-unit.mjs';
 import './instructor-account-unit.mjs';
 import './settings-domain-closure-unit.mjs';
 import './native-account-erasure-unit.mjs';
+import './p07-storage-erasure-unit.mjs';
 import './crm-pipeline-unit.mjs';
 import './hosted-password-runner-unit.mjs';
 import './hosted-recovery-runner-unit.mjs';
