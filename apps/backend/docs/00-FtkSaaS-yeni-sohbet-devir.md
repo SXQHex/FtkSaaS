@@ -1,5 +1,14 @@
 # Güncel kaynak ve kabul
 
+<a id="o03-o10-isletim-kaniti"></a>
+## O03–O10 — Saklama, imha ve kurtarma kabulü
+
+24 Kasım 2026’da main `f5986658d8975f9218de3655de31f69555f8a6e5` kaynağı incelendi. [O03 işletim envanteri](remote-backend-setup.md#o03-saklama-ve-imha-envanteri), DB/Auth, nesne baytları, export/geçici kopyalar ve yedekleri mevcut saklama/hold kurallarına bağladı.
+
+Node 24.22.3 ve yerel PostgreSQL 17.12 üzerinde [restore guard](../tests/restore-guard.test.mjs), [native Auth imha runner birim testleri](../tests/native-account-erasure-unit.mjs) ve [PostgreSQL restore kabulü](../tests/postgres-restore-acceptance.mjs) **57/57** geçti. Restore kabulü ayrı geçici DB’lerde gerçek PostgreSQL kullanarak yetkili satır yükünü, kapalı bağlantı kapısını, geç FK hatasında rollback’i, checkpoint değişimini ve silinmiş özne reddini doğruladı. Auth runner testleri orkestrasyonu kapsar. Bu koşuda hosted Auth, Storage ve tam Supabase restore doğrulaması yapılmadı.
+
+Erişilebilen Supabase envanterinde FtkSaaS dışında ayrı restore projesi veya development branch görülmedi. O08 için gereken birlikte alınmış DB/Storage kurtarma paketi ve izole hedef, O06 için kalıcı bağımsız checkpoint ve gerçek imha makbuzu bu koşuda doğrulanamadı. Kalan kabul ölçütleri [backlog’dadır](remaining-work.md#business-sonrası-ayrı-altyapı-projesi).
+
 <a id="xreq-073-backend-kabulu"></a>
 ## XREQ-073 — Native okuma kabulü
 
