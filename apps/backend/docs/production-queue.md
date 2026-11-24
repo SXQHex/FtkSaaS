@@ -14,7 +14,7 @@ Bu dosya **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibi
 
 [G02 Pro](remaining-work.md#g02), [G01 Starter](remaining-work.md#g01) ve [G03 Business](remaining-work.md#g03) backend kabul kapıları kapalıdır. Business ölçütlerinin kaynak ve gerçek ortam eşleştirmesi [G03 devrindedir](00-FtkSaaS-yeni-sohbet-devir.md#g03-business-kabulu).
 
-**Sonraki planlı paket.** Business sonrası [O03–O10 altyapı projesi](remaining-work.md#business-sonrası-ayrı-altyapı-projesi). Plan kabulü dışındaki uygulama ve ortam takipleri [backend backlog’unda](remaining-work.md) izlenir.
+**Aktif işletim paketi.** Business sonrası [O03–O10 altyapı projesi](remaining-work.md#business-sonrası-ayrı-altyapı-projesi) [ortak işletim sırasından](#ortak-işletim-hattı) yürür.
 
 Teslim paketinde kullanıcının istediği genel backend belge tutarlılığı taraması tamamlanır: mevcut backlog/teslim kuyruğu/devir ile main'deki yayın farkları ve eski açık/kapalı anlatımlar aynı kaynak kanıtına göre uzlaştırılır. Bu teslim kontrolüdür; yeni roadmap veya ikinci durum listesi açılmaz.
 
@@ -40,7 +40,7 @@ Pro için [P05–P07](remaining-work.md#p05), [P10–P11](remaining-work.md#p10)
 
 [O01](remaining-work.md#o01) → [O02](remaining-work.md#o02) asgari mevcut sağlık/gerçek uyarı kontrolü ile [O11](remaining-work.md#o11) asgari veri güvenliği kontrolü mevcut teslimde yürür. Planlar arasında aynı kaynak/ortam için ortak kanıt kullanılır; Starter ve Business adına ayrı işletim, yük veya tam restore kabulü üretilmez. İşlev/yetki/limit regresyonları korunur.
 
-[O03–O10](remaining-work.md#business-sonrası-ayrı-altyapı-projesi), G03/Business tesliminden sonra ayrı altyapı projesidir. Bu işlerin iç bağımlılıkları kendi kayıtlarında korunur; Pro/Starter/Business teslimine doğrudan veya O02 üzerinden dolaylı kapı yapılmaz. Mevcut hesap silme, erişim engelleme, dosya temizliği ve testler bu ertelemeyle değiştirilmez.
+[O03](remaining-work.md#o03) envanterinden sonra sıra [O04](remaining-work.md#o04) ve [O05](remaining-work.md#o05) imha kanıtı, [O06](remaining-work.md#o06) sicil ve [O07](remaining-work.md#o07) guard kabulüdür. [O08](remaining-work.md#o08) tam restore’dan sonra aynı izole hedefte [O09](remaining-work.md#o09) tekrar imha ve [O10](remaining-work.md#o10) kurtarma ölçümü yürür. O10 yük profili koşudan önce kayda alınır. Sonuçların sahibi [işletim devridir](00-FtkSaaS-yeni-sohbet-devir.md#o03-o10-isletim-kaniti).
 
 Aynı migration veya ortak sözleşmeye yazan işler seri yönetilir. Bağımsız kaynak ve kanıt işleri eşzamanlı ilerleyebilir; kesin bağımlılık görevin kendi kaydındadır. Her ilişkili pakette olumsuz senaryolar, açık ortam girdileri ve son kaynak incelemesi tamamlanır. PR bir anlamlı teslim paketidir; her fonksiyon için ayrı push veya full clean üretilmez.
 
