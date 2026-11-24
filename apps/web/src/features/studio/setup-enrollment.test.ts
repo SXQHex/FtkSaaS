@@ -89,6 +89,28 @@ describe("scoped setup evidence", () => {
       expect(result.invitations).toBeNull();
     },
   );
+
+  it("keeps setup evidence unknown when the exact center response has a continuation", async () => {
+    mocks.call.mockResolvedValueOnce({
+      items: [
+        {
+          id: scope.centerId,
+          accessible: true,
+          name: "Fixture",
+          timezone: "Europe/Istanbul",
+          setup_status: summary,
+        },
+      ],
+      next_cursor: "unexpected",
+    });
+    const result = await readStudioSetup(scope, resources, []);
+    expect(result.documents).toBeNull();
+    expect(result.invitations).toBeNull();
+    expect(mocks.call).toHaveBeenCalledWith(
+      "centers_list_v1",
+      expect.objectContaining({ center_id: scope.centerId, page: { limit: 1 } }),
+    );
+  });
 });
 describe("closure center selection", () => {
   const center = { id: scope.centerId, accessible: true, version: 7, timezone: "Europe/Istanbul" };
