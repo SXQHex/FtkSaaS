@@ -10,12 +10,18 @@ Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin te
 
 **Yeni development olayı.** Stüdyo ve Üyeler okumalarında Edge 503, iç RPC 500 ve PostgreSQL statement timeout kanıtı [24 Kasım olay kaydında](00-FtkSaaS-yeni-sohbet-devir.md#development-503-studyo). Süre sınırını tüketen neden ve sağlıklı hosted tekrar açık.
 
-- [ ] `products_list_v1` için paylaşımlı kilit adayının CI ve development teslimini doğrula. Aynı organizasyondaki eşzamanlı canlı liste okumalarını ve süre sınırı kayıtlarını karşılaştır. [Ürün kataloğu olay ve yerel kabul kaydı](00-FtkSaaS-yeni-sohbet-devir.md#development-503-urun-katalogu).
+- [ ] `products_list_v1` paylaşımlı kilit düzeltmesi main ve development tesliminden geçti. Aynı organizasyondaki eşzamanlı canlı liste okumalarını ve süre sınırı kayıtlarını karşılaştır. [Ürün kataloğu olay ve yerel kabul kaydı](00-FtkSaaS-yeni-sohbet-devir.md#development-503-urun-katalogu).
 
 <a id="xreq-073"></a>
 ## XREQ-073 — M09 native okuma kapsamı
 
 **Kapalı — backend teslimi.** PR #412 ve #419 için kaynak, native CI, main ve development teslimi doğrulandı. Yerel karşılaştırma ve development ölçümünün kapsamı [kabul kaydında](00-FtkSaaS-yeni-sohbet-devir.md#xreq-073-backend-kabulu) yer alır. Kullanıcı kararıyla bu başlık altında ek canlı kabul koşusu planlanmaz. [Frontend M09](../../web/docs/remaining-work.md#router-query-birlesik) kendi kabul kaydında izlenir.
+
+<a id="xreq-073-takip"></a>
+### XREQ-073 — Frontend tüketim takibi
+
+- [x] Public development Worker’da kaynak şemasının dört okuma kipini kabul ettiğini ve geçersiz alanı reddettiğini doğrula. [Worker kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#xreq-073-development-worker).
+- [ ] [Takip adayının](../../../docs/requests.md#xreq-073-backend-takip) çıktı eşitliğini, farklı rol/plan/merkez retlerini, tekil seçicilerin uyumluluğunu ve cursor bağını aday native CI ve development üzerinde doğrula. Aynı fixture ile istek, satır ve gecikme karşılaştırmasını tüketici kabulünde kullan.
 
 <a id="ci503-native-baslangic"></a>
 ## CI503 — Native worker başlangıcı ve ödeme yanıtı teşhisi

@@ -101,6 +101,21 @@ async function earningsFixture(t){
   // Multi-generation replacement still permits an exact independent-chain boundary.
   const gap=await publishChain({starts_at:'2027-05-01T00:00:00Z',ends_at:'2027-06-01T00:00:00Z'},{supersedes_id:next.primary_id,expected_version:next.version});
   assert.equal(gap.version,4);
+  const listOperation='instructor_agreements_list_v1',selected={person_ids:[instructor.p,other.p]};
+  const selectedRead=(body,page={})=>must(owner,listOperation,scope({...body,page}));
+  const mine=await list(),otherAgreements=await selectedRead({person_id:other.p});
+  const firstPage=await selectedRead(selected,{limit:1});
+  assert.equal(firstPage.items.length,1);assert(firstPage.next_cursor);
+  const rest=await selectedRead(selected,{limit:200,cursor:firstPage.next_cursor});
+  assert.equal(rest.next_cursor,null);
+  const byId=items=>items.map(item=>[item.id,item]).sort(([a],[b])=>a.localeCompare(b));
+  assert.deepEqual(byId([...firstPage.items,...rest.items]),byId([...mine.items,...otherAgreements.items]));
+  assert.deepEqual((await selectedRead({person_ids:[instructor.p,key()]})).items,mine.items);
+  await fail(listOperation,{person_id:instructor.p,page:{cursor:firstPage.next_cursor}},'VALIDATION_FAILED');
+  await fail(listOperation,{person_ids:[instructor.p],page:{cursor:firstPage.next_cursor}},'VALIDATION_FAILED');
+  await fail(listOperation,{...selected,page:{}},'FORBIDDEN',student.u);
+  await fail(listOperation,{person_ids:[instructor.p,instructor.p],page:{}},'VALIDATION_FAILED');
+  await fail(listOperation,{person_id:instructor.p,...selected,page:{}},'VALIDATION_FAILED');
  });
  },
  earnings_packages_corrections: async()=>{

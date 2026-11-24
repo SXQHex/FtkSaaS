@@ -47,9 +47,18 @@ test('W1-BE-26/27 native event filters, totals and immutable registration paymen
  assert(!('venue_room_name' in labeled));
  const room=(await api('room_save_v1',{name:'Synthetic event room',capacity:20})).primary_id;
  const indoor=await make('Indoor label','0','TRY',true,false,room);
+ const roomLabels=()=>api('event_get_v1',{event_id:indoor.id,include_management_labels:true});
+ assert.equal((await roomLabels()).venue_active_room_name,'Synthetic event room');
  assert.equal((await api('event_get_v1',{event_id:indoor.id,include_management_labels:true})).venue_room_name,'Synthetic event room');
+ await db.query("update core.rooms set state='inactive' where org_id=$1 and id=$2",[org,room]);
+ try{
+  const historical=await roomLabels();
+  assert.equal(historical.venue_active_room_name,null);
+  assert.equal(historical.venue_room_name,'Synthetic event room');
+ }finally{await db.query("update core.rooms set state='active' where org_id=$1 and id=$2",[org,room]);}
  const publicDetail=await must(student,'event_get_v1',{org_id:org,center_id:center,event_id:indoor.id,include_management_labels:true});
  assert(!('venue_room_name' in publicDetail));
+ assert(!('venue_active_room_name' in publicDetail));
  assert.deepEqual(publicDetail.duties,[]);
  const beforePrep=await api('event_list_v1',{...request,query:'Other',page:{}});assert.deepEqual(beforePrep.summary.pending_payments,[]);
  await api('collection_record_v1',{person_id:studentPerson,debt_ids:[prepView.debt_id],amount_minor:'1500',currency:'TRY',occurred_at:new Date().toISOString()});const preparedReg=await api('event_register_v1',{event_id:prepared.id,person_id:studentPerson,preparation_id:prep.id});const linked=await payment(prepared.id,preparedReg.primary_id);assert.equal(linked.debts[0].preparation_id,prep.id);assert.equal(linked.paid_minor,'1500');assert.equal(linked.remaining_minor,'0');

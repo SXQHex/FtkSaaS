@@ -1022,6 +1022,14 @@ member_discovery?: boolean
  * Include lifecycle, attendance, current version and visible session duties on the returned page. Cannot be combined with member_discovery.
  */
 include_session_summary?: boolean
+/**
+ * Opt-in on a session summary. Includes active room and instructor names within existing management and person read authority.
+ */
+include_management_labels?: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+resource_person_id?: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -2212,6 +2220,40 @@ subscriber_number?: SubscriberNumber
  * via the `definition` "SettingsScope".
  */
 export type SettingsScope = ("user" | "member" | "center" | "organization" | "platform")
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_instructor_agreements_list".
+ */
+export type RequestInstructorAgreementsList = ({
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+page: Page
+/**
+ * @minItems 1
+ * @maxItems 50
+ *
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_ids?: [string, ...(string)[]]
+} & RequestInstructorAgreementsList1)
+export type RequestInstructorAgreementsList1 = {
+[k: string]: unknown
+}
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Request_settlement_request_submit".
@@ -5502,6 +5544,7 @@ PlatformDirectoryInvoice?: PlatformDirectoryInvoice
 ReservationSelfSummary?: ReservationSelfSummary
 EarningPeriodTotal?: EarningPeriodTotal
 ClassPageInstructorAssignment?: ClassPageInstructorAssignment
+PersonReadLabel?: PersonReadLabel
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8266,6 +8309,33 @@ assignments: {
 person_id: string
 duty: Duty
 }[]
+actor_class_duty?: {
+duty: Duty
+}
+room_labels?: SessionRoomLabel[]
+instructor_labels?: PersonReadLabel[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SessionRoomLabel".
+ */
+export interface SessionRoomLabel {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+room_id: string
+name: Text
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PersonReadLabel".
+ */
+export interface PersonReadLabel {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+name: Text
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8279,17 +8349,6 @@ remaining: Count
 category_held: (CategoryCapacities | null)
 category_remaining: (CategoryCapacities | null)
 room_capacity: (Count | null)
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "SessionRoomLabel".
- */
-export interface SessionRoomLabel {
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-room_id: string
-name: Text
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8397,6 +8456,8 @@ shared_participants?: SharedLessonParticipant[]
 management_attention?: "instructor_required"
 work_calendar_exception?: (WorkCalendarExceptionRecord | null)
 room_labels?: SessionRoomLabel[]
+title?: Text
+person_labels?: PersonReadLabel[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8463,6 +8524,15 @@ ends_at: Instant
 attendance_state: AttendanceClosure
 attendance_result: (AttendanceResult | null)
 cancellation: MemberLessonCancellation
+session_version?: PositiveInt
+session_state?: SessionState
+format?: SessionFormat
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id?: string
+room_labels?: Text[]
+instructor_labels?: Text[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8483,6 +8553,7 @@ version: PositiveInt
 protected: Bool
 eligibility_snapshot: (EligibilitySnapshot | null)
 subscriber_number?: (SubscriberNumber | null)
+person_display_name?: Text
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9487,6 +9558,10 @@ actual_start_history?: ActualStartHistoryItem[]
 shared_participants?: SharedLessonParticipant[]
 active_registration_count?: Count
 venue_room_name?: Text
+/**
+ * Explicit null when the internal room is inactive, absent if the caller cannot read the room.
+ */
+venue_active_room_name?: (Text | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -11717,6 +11792,11 @@ include_work_calendar_exception?: boolean
  * Opt-in display labels only for sessions where the caller has a live instructor/assistant assignment. No room management permission.
  */
 include_room_labels?: boolean
+include_title?: boolean
+/**
+ * Include person-reader-authorized names for session instructors and the assigned caller.
+ */
+include_person_display_names?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -12467,6 +12547,7 @@ center_id?: (string | null)
  */
 session_id: string
 include_correction_requests?: boolean
+include_person_display_names?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -22806,10 +22887,17 @@ include_details?: boolean
  */
 export interface ManagementSelectorAvailabilitySaveV1 {
 operation: "availability_save_v1"
-key: {
+key: ({
+[k: string]: unknown
+} & {
 rule_id?: (string | null)
-resource: ResourceRef
-}
+resource?: ResourceRef
+/**
+ * @minItems 1
+ * @maxItems 50
+ */
+resources?: [ResourceRef, ...(ResourceRef)[]]
+})
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -22817,9 +22905,16 @@ resource: ResourceRef
  */
 export interface ManagementSelectorAvailabilityExceptionSaveV1 {
 operation: "availability_exception_save_v1"
-key: {
-resource: ResourceRef
-}
+key: ({
+[k: string]: unknown
+} & {
+resource?: ResourceRef
+/**
+ * @minItems 1
+ * @maxItems 50
+ */
+resources?: [ResourceRef, ...(ResourceRef)[]]
+})
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -23115,16 +23210,25 @@ class_assignment_instructor_id?: string
  */
 export interface ManagementSelectorProgramPreviewV1 {
 operation: "program_preview_v1"
-key: {
+key: ({
+[k: string]: unknown
+} & {
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
-class_id: string
+class_id?: string
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 program_id?: string
-}
+/**
+ * @minItems 1
+ * @maxItems 50
+ *
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+class_ids?: [string, ...(string)[]]
+})
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -24996,30 +25100,6 @@ cancelled: Count
 notifications_created: Count
 followups_created: Count
 email_delivery: "not_supported"
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_instructor_agreements_list".
- */
-export interface RequestInstructorAgreementsList {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-center_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-person_id: string
-page: Page
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
