@@ -11,7 +11,12 @@ import { BackendError } from "../../lib/backend";
 import { MemberCancellationPolicy } from "../member-classes/member-cancellation-policy";
 import { CancelReservation } from "../member-profile/cancel-reservation";
 import { memberReservationRows } from "../member-profile/reservations";
-import { readOwnReservations, type OwnReservations } from "./member-reservations-read";
+import {
+  readOwnReservations,
+  reservationIsUpcoming,
+  type OwnReservations,
+} from "./member-reservations-read";
+import { StateView } from "../states/state-view";
 import { readOwnWaitlist, type OwnWaitlistRow } from "./member-waitlist";
 import { MemberWaitlistEditor } from "./member-waitlist-editor";
 import type { WaitlistAction } from "../session-detail/session-waitlist";
@@ -35,7 +40,7 @@ export function MemberReservationsContent({
   const { t } = useTranslation(),
     router = useRouter(),
     queries = useQueryClient();
-  const [upCursors, setUpCursors] = useState<(string | undefined)[]>([undefined]);
+  const [primaryCursors, setPrimaryCursors] = useState<(string | undefined)[]>([undefined]);
   const [pastCursors, setPastCursors] = useState<(string | undefined)[]>([undefined]);
   const [entryCursors, setEntryCursors] = useState<(string | undefined)[]>([undefined]),
     [offerCursors, setOfferCursors] = useState<(string | undefined)[]>([undefined]);
@@ -51,25 +56,33 @@ export function MemberReservationsContent({
     label: string;
   }>();
   const prefix = memberReservationKeys.person(scope, personId);
-  const up = useQuery({
-    queryKey: [...prefix, "upcoming", upCursors.at(-1), sessionId],
+  const showWaitlist = !sessionId || Boolean(offerId);
+  const primary = useQuery({
+    queryKey: [...prefix, sessionId ? "session" : "upcoming", primaryCursors.at(-1), sessionId],
     queryFn: (readContext) =>
-      readOwnReservations(scope, personId, "upcoming", upCursors.at(-1), sessionId, readContext),
+      readOwnReservations(
+        scope,
+        personId,
+        sessionId ? "all" : "upcoming",
+        primaryCursors.at(-1),
+        sessionId,
+        readContext,
+      ),
     ...(sessionId ? { staleTime: 0 } : {}),
     retry: false,
   });
   const past = useQuery({
-    queryKey: [...prefix, "past", pastCursors.at(-1), sessionId],
+    queryKey: [...prefix, "past", pastCursors.at(-1), undefined],
     queryFn: (readContext) =>
-      readOwnReservations(scope, personId, "past", pastCursors.at(-1), sessionId, readContext),
-    ...(sessionId ? { staleTime: 0 } : {}),
+      readOwnReservations(scope, personId, "past", pastCursors.at(-1), undefined, readContext),
+    enabled: !sessionId,
     retry: false,
   });
   const waiting = useQuery({
     queryKey: [...prefix, "waitlist", entryCursors.at(-1)],
     queryFn: (readContext) =>
       readOwnWaitlist(scope, "entries", entryCursors.at(-1), undefined, readContext),
-    enabled: !offerId,
+    enabled: !sessionId && !offerId,
     retry: false,
   });
   const offers = useQuery({
@@ -79,6 +92,7 @@ export function MemberReservationsContent({
         ? readOwnWaitlist(scope, "offers", undefined, { id: offerId, personId }, readContext)
         : readOwnWaitlist(scope, "offers", offerCursors.at(-1), undefined, readContext),
     ...(offerId ? { staleTime: 0 } : {}),
+    enabled: showWaitlist,
     retry: false,
   });
   const accessLost = useCallback(
@@ -100,20 +114,50 @@ export function MemberReservationsContent({
     [onLockChange],
   );
   useEffect(() => {
-    for (const error of [up.error, past.error, waiting.error, offers.error])
+    for (const error of [
+      primary.error,
+      !sessionId && past.error,
+      !sessionId && !offerId && waiting.error,
+      showWaitlist && offers.error,
+    ])
       if (error) accessLost(error);
-  }, [up.error, past.error, waiting.error, offers.error, accessLost]);
-  const loadingUpcoming = up.isPending || Boolean(sessionId && up.isFetching);
-  const loadingHistory = past.isPending || Boolean(sessionId && past.isFetching);
-  const upcoming = !up.isError && !loadingUpcoming ? up.data : undefined,
-    history = !past.isError && !loadingHistory ? past.data : undefined;
+  }, [
+    sessionId,
+    offerId,
+    showWaitlist,
+    primary.error,
+    past.error,
+    waiting.error,
+    offers.error,
+    accessLost,
+  ]);
+  const loadingUpcoming = primary.isPending || Boolean(sessionId && primary.isFetching);
+  const loadingHistory = sessionId ? loadingUpcoming : past.isPending;
+  const primaryPage = !primary.isError && !loadingUpcoming ? primary.data : undefined;
+  const linkedPage = primaryPage?.items.every((row) => row.session) ? primaryPage : undefined;
+  const upcoming = sessionId
+    ? linkedPage && {
+        ...linkedPage,
+        items: linkedPage.items.filter((row) => reservationIsUpcoming(row, linkedPage.asOf)),
+      }
+    : primaryPage;
+  const history = sessionId
+    ? linkedPage && {
+        ...linkedPage,
+        items: linkedPage.items.filter((row) => !reservationIsUpcoming(row, linkedPage.asOf)),
+      }
+    : !past.isError && !loadingHistory
+      ? past.data
+      : undefined;
   const date = new Intl.DateTimeFormat("tr-TR", { dateStyle: "medium", timeZone: timezone });
   const time = new Intl.DateTimeFormat("tr-TR", { timeStyle: "short", timeZone: timezone });
   const historyRows = history ? memberReservationRows(history.items, timezone, [], t) : undefined;
   function pagination(kind: "upcoming" | "past") {
-    const query = kind === "upcoming" ? up : past,
-      cursors = kind === "upcoming" ? upCursors : pastCursors;
-    const setCursors = kind === "upcoming" ? setUpCursors : setPastCursors,
+    if (sessionId && kind !== (history?.items.length ? "past" : "upcoming")) return;
+    const usesPrimary = Boolean(sessionId || kind === "upcoming");
+    const query = usesPrimary ? primary : past,
+      cursors = usesPrimary ? primaryCursors : pastCursors;
+    const setCursors = usesPrimary ? setPrimaryCursors : setPastCursors,
       next = query.data?.nextCursor;
     return (
       <div className="flex flex-wrap gap-2">
@@ -143,37 +187,45 @@ export function MemberReservationsContent({
   }
   async function refresh(purpose: "reservation" | "waitlist") {
     if (purpose === "waitlist") await invalidateMemberReservationViews(queries, scope, personId);
-    // A write can reorder all four lists. Do not reread old cursor snapshots.
-    const [upcomingResult, pastResult, waitingResult, offersResult] = await Promise.allSettled([
-      queries.fetchQuery({
-        queryKey: [...prefix, "upcoming", undefined, sessionId],
-        queryFn: () => readOwnReservations(scope, personId, "upcoming", undefined, sessionId),
-        staleTime: 0,
-        retry: false,
-      }),
-      queries.fetchQuery({
-        queryKey: [...prefix, "past", undefined, sessionId],
-        queryFn: () => readOwnReservations(scope, personId, "past", undefined, sessionId),
-        staleTime: 0,
-        retry: false,
-      }),
-      offerId
-        ? Promise.resolve()
-        : queries.fetchQuery({
-            queryKey: [...prefix, "waitlist", undefined],
-            queryFn: () => readOwnWaitlist(scope, "entries"),
+    // A write can reorder the visible lists. Reread the first pages only.
+    const reservationReads = sessionId
+      ? ([["session", "all"]] as const)
+      : ([
+          ["upcoming", "upcoming"],
+          ["past", "past"],
+        ] as const);
+    const [reservations, [waitingResult, offersResult]] = await Promise.all([
+      Promise.allSettled(
+        reservationReads.map(([key, filter]) =>
+          queries.fetchQuery({
+            queryKey: [...prefix, key, undefined, sessionId],
+            queryFn: () => readOwnReservations(scope, personId, filter, undefined, sessionId),
             staleTime: 0,
             retry: false,
           }),
-      queries.fetchQuery({
-        queryKey: [...prefix, "offers", undefined, offerId],
-        queryFn: () =>
-          offerId
-            ? readOwnWaitlist(scope, "offers", undefined, { id: offerId, personId })
-            : readOwnWaitlist(scope, "offers"),
-        staleTime: 0,
-        retry: false,
-      }),
+        ),
+      ),
+      Promise.allSettled([
+        sessionId || offerId
+          ? Promise.resolve()
+          : queries.fetchQuery({
+              queryKey: [...prefix, "waitlist", undefined],
+              queryFn: () => readOwnWaitlist(scope, "entries"),
+              staleTime: 0,
+              retry: false,
+            }),
+        showWaitlist
+          ? queries.fetchQuery({
+              queryKey: [...prefix, "offers", undefined, offerId],
+              queryFn: () =>
+                offerId
+                  ? readOwnWaitlist(scope, "offers", undefined, { id: offerId, personId })
+                  : readOwnWaitlist(scope, "offers"),
+              staleTime: 0,
+              retry: false,
+            })
+          : Promise.resolve(),
+      ]),
     ]);
     const waitlistReadFailed = [waitingResult, offersResult].some(
       (result) =>
@@ -184,22 +236,37 @@ export function MemberReservationsContent({
           result.reason.code === "PLAN_FEATURE_UNAVAILABLE"
         ),
     );
-    if (
-      upcomingResult.status === "rejected" ||
-      pastResult.status === "rejected" ||
-      waitlistReadFailed
-    )
+    if (reservations.some((result) => result.status === "rejected") || waitlistReadFailed)
       throw new Error("MEMBER_RESERVATIONS_REFRESH_UNAVAILABLE");
-    setUpCursors([undefined]);
+    setPrimaryCursors([undefined]);
     setPastCursors([undefined]);
     setEntryCursors([undefined]);
     setOfferCursors([undefined]);
   }
   const loadingOffers = offers.isPending || Boolean(offerId && offers.isFetching);
   const offerPage = offers.isError || loadingOffers ? undefined : offers.data;
+  const allReservations = (
+    <LinkButton
+      variant="outline"
+      href={`/member/reservations?${new URLSearchParams({ org: scope.orgId, center: scope.centerId })}`}
+      isDisabled={locked}
+    >
+      {t(($) => $.memberReservations.allReservations)}
+    </LinkButton>
+  );
+  if (
+    !showWaitlist &&
+    primaryPage &&
+    !primaryPage.items.length &&
+    primaryCursors.length === 1 &&
+    !locked &&
+    !target
+  )
+    return <StateView kind="notFound" headingLevel={1} actions={allReservations} />;
   return (
     <>
       <MemberReservationsView
+        showWaitlist={showWaitlist}
         pending={{
           upcoming: loadingUpcoming,
           waiting:
@@ -250,7 +317,9 @@ export function MemberReservationsContent({
                 <Button
                   variant="outline"
                   size="sm"
-                  isDisabled={locked || Boolean(target) || Boolean(waitTarget) || up.isFetching}
+                  isDisabled={
+                    locked || Boolean(target) || Boolean(waitTarget) || primary.isFetching
+                  }
                   onPress={() =>
                     setTarget({
                       reservationId: row.reservation.id,
@@ -391,15 +460,7 @@ export function MemberReservationsContent({
         historyPagination={pagination("past")}
         notice={
           <div className="space-y-3">
-            {(sessionId || offerId) && (
-              <LinkButton
-                variant="outline"
-                href={`/member/reservations?${new URLSearchParams({ org: scope.orgId, center: scope.centerId })}`}
-                isDisabled={locked}
-              >
-                {t(($) => $.memberReservations.allReservations)}
-              </LinkButton>
-            )}
+            {(sessionId || offerId) && allReservations}
             <p className="text-xs text-muted-foreground">
               {t(($) => $.memberReservations.historyHint)}
             </p>
@@ -408,16 +469,17 @@ export function MemberReservationsContent({
               variant="outline"
               isDisabled={
                 locked ||
-                up.isFetching ||
-                past.isFetching ||
-                waiting.isFetching ||
-                offers.isFetching
+                primary.isFetching ||
+                (!sessionId && past.isFetching) ||
+                (showWaitlist && (waiting.isFetching || offers.isFetching))
               }
               onPress={() => {
-                if (!offerId) void waiting.refetch();
-                void offers.refetch();
-                void up.refetch();
-                void past.refetch();
+                if (showWaitlist) {
+                  if (!offerId) void waiting.refetch();
+                  void offers.refetch();
+                }
+                void primary.refetch();
+                if (!sessionId) void past.refetch();
               }}
             >
               {t(($) => $.memberReservations.retry)}
@@ -449,7 +511,7 @@ export function MemberReservationsContent({
           sessionId={target.sessionId}
           label={target.label}
           sourceAvailable={Boolean(
-            !up.isError &&
+            !primary.isError &&
             upcoming?.items.some(
               (row) =>
                 row.reservation.id === target.reservationId && row.reservation.state === "active",

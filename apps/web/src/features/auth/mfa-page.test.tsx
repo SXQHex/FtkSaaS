@@ -13,6 +13,7 @@ vi.mock("@tanstack/react-router", () => ({
   useLoaderData: () => state.factors,
   useNavigate: () => navigate,
   useRouter: () => ({ invalidate: vi.fn() }),
+  useSearch: () => ({}),
 }));
 import { MfaPage } from "./mfa-page";
 afterEach(() => {

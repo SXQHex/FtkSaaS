@@ -5,11 +5,13 @@ import { queryClient } from "../../lib/query-client";
 import { accountQuery } from "./account-query";
 import { clearPrivateQueries } from "../../lib/cache-invalidation";
 import { hasDeletionReceipt } from "../account/deletion";
+import { storeGoogleCalendarReturn } from "./calendar-session-return";
 
 export async function loginWithPassword(
   values: { email: string; password: string },
   queries: QueryClient = queryClient,
 ) {
+  storeGoogleCalendarReturn();
   const { data, error } = await getSupabaseClient().auth.signInWithPassword(values);
   if (error) throw error;
   if (!data.session) throw new Error("AUTH_REQUIRED");
@@ -25,11 +27,17 @@ export async function loginWithPassword(
   return "/account" as const;
 }
 
-export async function loginWithGoogle() {
+export async function loginWithGoogle(calendarReturn?: string) {
   const origin = requireAppOrigin();
-  const { error } = await getSupabaseClient().auth.signInWithOAuth({
-    provider: "google",
-    options: { redirectTo: `${origin}/auth/callback` },
-  });
-  if (error) throw error;
+  storeGoogleCalendarReturn(calendarReturn);
+  try {
+    const { error } = await getSupabaseClient().auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${origin}/auth/callback` },
+    });
+    if (error) throw error;
+  } catch (error) {
+    storeGoogleCalendarReturn();
+    throw error;
+  }
 }

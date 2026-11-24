@@ -37,6 +37,7 @@ import { Route as InstructorSessionsSessionIdRouteImport } from './routes/instru
 import { Route as PublicSlugApplyRouteImport } from './routes/public.$slug.apply'
 import { Route as PublicSlugCalendarRouteImport } from './routes/public.$slug.calendar'
 import { Route as PublicSlugUnavailableRouteImport } from './routes/public.$slug.unavailable'
+import { Route as OrganizasyonOrgIdSeansSessionIdRouteImport } from './routes/organizasyon.$orgId.seans.$sessionId'
 import { Route as OOrgIdCCenterIdAccessRouteImport } from './routes/o.$orgId.c.$centerId.access'
 import { Route as OOrgIdCCenterIdAuditRouteImport } from './routes/o.$orgId.c.$centerId.audit'
 import { Route as OOrgIdCCenterIdAutomationRouteImport } from './routes/o.$orgId.c.$centerId.automation'
@@ -200,6 +201,12 @@ const PublicSlugUnavailableRoute = PublicSlugUnavailableRouteImport.update({
   path: '/public/$slug/unavailable',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrganizasyonOrgIdSeansSessionIdRoute =
+  OrganizasyonOrgIdSeansSessionIdRouteImport.update({
+    id: '/organizasyon/$orgId/seans/$sessionId',
+    path: '/organizasyon/$orgId/seans/$sessionId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const OOrgIdCCenterIdAccessRoute = OOrgIdCCenterIdAccessRouteImport.update({
   id: '/o/$orgId/c/$centerId/access',
   path: '/o/$orgId/c/$centerId/access',
@@ -341,6 +348,7 @@ export interface FileRoutesByFullPath {
   '/public/$slug/apply': typeof PublicSlugApplyRoute
   '/public/$slug/calendar': typeof PublicSlugCalendarRoute
   '/public/$slug/unavailable': typeof PublicSlugUnavailableRoute
+  '/organizasyon/$orgId/seans/$sessionId': typeof OrganizasyonOrgIdSeansSessionIdRoute
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
   '/o/$orgId/c/$centerId/audit': typeof OOrgIdCCenterIdAuditRoute
   '/o/$orgId/c/$centerId/automation': typeof OOrgIdCCenterIdAutomationRoute
@@ -392,6 +400,7 @@ export interface FileRoutesByTo {
   '/public/$slug/apply': typeof PublicSlugApplyRoute
   '/public/$slug/calendar': typeof PublicSlugCalendarRoute
   '/public/$slug/unavailable': typeof PublicSlugUnavailableRoute
+  '/organizasyon/$orgId/seans/$sessionId': typeof OrganizasyonOrgIdSeansSessionIdRoute
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
   '/o/$orgId/c/$centerId/audit': typeof OOrgIdCCenterIdAuditRoute
   '/o/$orgId/c/$centerId/automation': typeof OOrgIdCCenterIdAutomationRoute
@@ -444,6 +453,7 @@ export interface FileRoutesById {
   '/public/$slug/apply': typeof PublicSlugApplyRoute
   '/public/$slug/calendar': typeof PublicSlugCalendarRoute
   '/public/$slug/unavailable': typeof PublicSlugUnavailableRoute
+  '/organizasyon/$orgId/seans/$sessionId': typeof OrganizasyonOrgIdSeansSessionIdRoute
   '/o/$orgId/c/$centerId/access': typeof OOrgIdCCenterIdAccessRoute
   '/o/$orgId/c/$centerId/audit': typeof OOrgIdCCenterIdAuditRoute
   '/o/$orgId/c/$centerId/automation': typeof OOrgIdCCenterIdAutomationRoute
@@ -497,6 +507,7 @@ export interface FileRouteTypes {
     | '/public/$slug/apply'
     | '/public/$slug/calendar'
     | '/public/$slug/unavailable'
+    | '/organizasyon/$orgId/seans/$sessionId'
     | '/o/$orgId/c/$centerId/access'
     | '/o/$orgId/c/$centerId/audit'
     | '/o/$orgId/c/$centerId/automation'
@@ -548,6 +559,7 @@ export interface FileRouteTypes {
     | '/public/$slug/apply'
     | '/public/$slug/calendar'
     | '/public/$slug/unavailable'
+    | '/organizasyon/$orgId/seans/$sessionId'
     | '/o/$orgId/c/$centerId/access'
     | '/o/$orgId/c/$centerId/audit'
     | '/o/$orgId/c/$centerId/automation'
@@ -599,6 +611,7 @@ export interface FileRouteTypes {
     | '/public/$slug/apply'
     | '/public/$slug/calendar'
     | '/public/$slug/unavailable'
+    | '/organizasyon/$orgId/seans/$sessionId'
     | '/o/$orgId/c/$centerId/access'
     | '/o/$orgId/c/$centerId/audit'
     | '/o/$orgId/c/$centerId/automation'
@@ -651,6 +664,7 @@ export interface RootRouteChildren {
   PublicSlugApplyRoute: typeof PublicSlugApplyRoute
   PublicSlugCalendarRoute: typeof PublicSlugCalendarRoute
   PublicSlugUnavailableRoute: typeof PublicSlugUnavailableRoute
+  OrganizasyonOrgIdSeansSessionIdRoute: typeof OrganizasyonOrgIdSeansSessionIdRoute
   OOrgIdCCenterIdAccessRoute: typeof OOrgIdCCenterIdAccessRoute
   OOrgIdCCenterIdAuditRoute: typeof OOrgIdCCenterIdAuditRoute
   OOrgIdCCenterIdAutomationRoute: typeof OOrgIdCCenterIdAutomationRoute
@@ -872,6 +886,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicSlugUnavailableRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/organizasyon/$orgId/seans/$sessionId': {
+      id: '/organizasyon/$orgId/seans/$sessionId'
+      path: '/organizasyon/$orgId/seans/$sessionId'
+      fullPath: '/organizasyon/$orgId/seans/$sessionId'
+      preLoaderRoute: typeof OrganizasyonOrgIdSeansSessionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/o/$orgId/c/$centerId/access': {
       id: '/o/$orgId/c/$centerId/access'
       path: '/o/$orgId/c/$centerId/access'
@@ -1051,6 +1072,7 @@ const rootRouteChildren: RootRouteChildren = {
   PublicSlugApplyRoute: PublicSlugApplyRoute,
   PublicSlugCalendarRoute: PublicSlugCalendarRoute,
   PublicSlugUnavailableRoute: PublicSlugUnavailableRoute,
+  OrganizasyonOrgIdSeansSessionIdRoute: OrganizasyonOrgIdSeansSessionIdRoute,
   OOrgIdCCenterIdAccessRoute: OOrgIdCCenterIdAccessRoute,
   OOrgIdCCenterIdAuditRoute: OOrgIdCCenterIdAuditRoute,
   OOrgIdCCenterIdAutomationRoute: OOrgIdCCenterIdAutomationRoute,

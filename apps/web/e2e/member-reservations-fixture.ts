@@ -7,6 +7,9 @@ export async function mockOwnReservations(
   page: Page,
   options: {
     noStudent?: boolean;
+    signIn?: boolean;
+    projectLinkedReservation?: boolean;
+    hideLinkedReservation?: boolean;
     starter?: boolean;
     denied?: boolean;
     unknown?: boolean;
@@ -173,19 +176,49 @@ export async function mockOwnReservations(
           : I.center,
       );
       if (denied) return reject();
-      const items = req.session_id
-        ? reservations.filter(
-            (row, index) =>
-              row.session_id === req.session_id &&
-              (req.time_filter === "past"
-                ? index === 2
-                : req.time_filter !== "upcoming" || index !== 2),
-          )
-        : req.time_filter === "past"
-          ? [reservations[2]!]
-          : [reservations[req.page.cursor ? 1 : 0]!];
+      const items =
+        req.session_id && options.hideLinkedReservation
+          ? []
+          : req.session_id
+            ? reservations.filter(
+                (row, index) =>
+                  row.session_id === req.session_id &&
+                  (req.time_filter === "past"
+                    ? index === 2
+                    : req.time_filter !== "upcoming" || index !== 2),
+              )
+            : req.time_filter === "past"
+              ? [reservations[2]!]
+              : [reservations[req.page.cursor ? 1 : 0]!];
       return send({
-        items,
+        items: items.map((reservation) => {
+          if (!options.projectLinkedReservation || !req.session_id || !req.include_self_summary)
+            return reservation;
+          const session = sessions.find(({ id }) => id === reservation.session_id)!;
+          return {
+            ...reservation,
+            self_summary: {
+              title: session.id === sessions[2]!.id ? pastTitle : "Sentetik gelecek ders",
+              starts_at: session.starts_at,
+              ends_at: session.ends_at,
+              attendance_state: session.attendance_state,
+              attendance_result: session.attendance_state === "closed" ? "attended" : null,
+              session_version: session.version,
+              session_state: session.state,
+              format: session.format,
+              discipline_id: session.discipline_id,
+              instructor_labels: ["Öğrenciye görünür eğitmen"],
+              room_labels: ["Öğrenciye görünür salon"],
+              cancellation: {
+                status: "not_configured",
+                source: "reservation_policy",
+                policy_version_id: null,
+                terms: null,
+                cutoff_at: null,
+              },
+            },
+          } satisfies ReservationView;
+        }),
         next_cursor:
           !req.session_id && req.time_filter === "upcoming" && !req.page.cursor ? "own-next" : null,
         as_of:
@@ -194,8 +227,19 @@ export async function mockOwnReservations(
             : "2026-11-16T12:00:00Z",
       });
     }
-    if (operation === "session_get_v1")
-      return send(sessions.find((row) => row.id === req.session_id));
+    if (operation === "session_get_v1") {
+      const session = sessions.find((row) => row.id === req.session_id);
+      if (!session) return reject("NOT_FOUND");
+      if (req.include_center_id === true)
+        return send({
+          ...session,
+          center_id:
+            options.secondSessionCenter && session.id === reservations[1]!.session_id
+              ? options.secondSessionCenter
+              : I.center,
+        });
+      return send(session);
+    }
     if (operation === "attendance_get_v1") {
       if (closedLesson && closedLesson.session.id === req.session_id)
         return send({
@@ -352,14 +396,18 @@ export async function mockOwnReservations(
     }
     return route.fallback();
   });
-  await page.goto(`${origin}/login`);
-  await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
-  await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
-  await expect(page).toHaveURL(`${origin}/account`);
-  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
-  await page.goto(`${origin}/member/reservations?org=${I.org}&center=${I.center}`);
-  await expect(page.getByRole("heading", { name: "Rezervasyonlarım", exact: true })).toBeVisible();
+  if (options.signIn !== false) {
+    await page.goto(`${origin}/login`);
+    await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
+    await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
+    await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+    await expect(page).toHaveURL(`${origin}/account`);
+    await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
+    await page.goto(`${origin}/member/reservations?org=${I.org}&center=${I.center}`);
+    await expect(
+      page.getByRole("heading", { name: "Rezervasyonlarım", exact: true }),
+    ).toBeVisible();
+  }
   return {
     reads,
     writes,

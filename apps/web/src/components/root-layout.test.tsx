@@ -15,9 +15,10 @@ const state = vi.hoisted(() => ({
   command: vi.fn<() => Promise<void>>(),
   commandMounted: vi.fn(),
   commandUnmounted: vi.fn(),
-  router: { navigate: vi.fn(), invalidate: vi.fn() },
+  router: { navigate: vi.fn(), invalidate: vi.fn(), latestLocation: { pathname: "/login" } },
   onSessionHandoff: undefined as ((pending: boolean) => void) | undefined,
   onChecking: undefined as ((pending: boolean) => void) | undefined,
+  showLogin: undefined as (() => Promise<unknown>) | undefined,
 }));
 vi.mock("../features/auth/use-auth-session", () => ({
   useAuthSession: (_enabled: boolean, onSessionHandoff: (pending: boolean) => void) => {
@@ -28,11 +29,16 @@ vi.mock("../features/auth/use-auth-session", () => ({
 vi.mock("../features/auth/query-access-recovery", () => ({
   observeQueryAccessFailures: (
     _queries: QueryClient,
-    { onChecking }: { onChecking: (pending: boolean) => void },
+    {
+      onChecking,
+      showLogin,
+    }: { onChecking: (pending: boolean) => void; showLogin: () => Promise<unknown> },
   ) => {
     state.onChecking = onChecking;
+    state.showLogin = showLogin;
     return () => {
       state.onChecking = undefined;
+      state.showLogin = undefined;
     };
   },
 }));
@@ -120,10 +126,29 @@ async function renderRoot() {
 afterEach(() => {
   state.ready = true;
   state.pathname = "/login";
+  state.router.latestLocation.pathname = "/login";
   state.overlay = "none";
   state.onSessionHandoff = undefined;
   state.onChecking = undefined;
+  state.showLogin = undefined;
   vi.resetAllMocks();
+});
+
+it("keeps the pending calendar return when a shared account or workspace Query requests login", async () => {
+  state.pathname = "/account";
+  const path =
+    "/organizasyon/019a7b00-0000-7000-8000-000000000001/seans/019a7b00-0000-7000-8000-000000000002";
+  await renderRoot();
+  state.router.latestLocation.pathname = path;
+  await state.showLogin?.();
+  expect(state.router.navigate).toHaveBeenLastCalledWith({
+    to: "/login",
+    search: { next: path },
+    replace: true,
+  });
+  state.router.latestLocation.pathname = "/account";
+  await state.showLogin?.();
+  expect(state.router.navigate).toHaveBeenLastCalledWith({ to: "/login", replace: true });
 });
 it("keeps the login form mounted while post-authentication account reading fails", async () => {
   let reject!: (reason: Error) => void;

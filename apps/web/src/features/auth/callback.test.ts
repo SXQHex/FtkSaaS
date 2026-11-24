@@ -23,6 +23,7 @@ vi.mock("../../lib/account", () => ({
   },
 }));
 import { completeCallback, safeNext } from "./callback";
+import { storeGoogleCalendarReturn, takeGoogleCalendarReturn } from "./calendar-session-return";
 import { accountQueryKeys } from "./account-query";
 import { loadPlatformAccount } from "./account-guard";
 import { BackendError } from "../../lib/backend";
@@ -81,6 +82,35 @@ it("exchanges a code once even if the route is requested twice", async () => {
   );
   expect(account).toHaveBeenCalledOnce();
 });
+
+const calendarReturn = `/organizasyon/${nativeUserId}/seans/${firstSessionId}`;
+
+it.each([
+  { provider: "google", requireMfa: false, expected: calendarReturn },
+  {
+    provider: "google",
+    requireMfa: true,
+    expected: `/mfa?next=${encodeURIComponent(calendarReturn)}`,
+  },
+  { provider: "email", requireMfa: false, expected: "/account" },
+])(
+  "consumes the calendar return only for a Google sign-in ($provider, MFA $requireMfa)",
+  async ({ provider, requireMfa, expected }) => {
+    const session = nativeSession();
+    session.user.app_metadata = { provider };
+    if (provider === "google") session.provider_token = "fixture-google-token";
+    storeGoogleCalendarReturn(calendarReturn);
+    auth.exchangeCodeForSession.mockResolvedValue({ data: { session }, error: null });
+    auth.mfa.getAuthenticatorAssuranceLevel.mockResolvedValue({
+      data: { currentLevel: "aal1", nextLevel: requireMfa ? "aal2" : "aal1" },
+      error: null,
+    });
+    expect(
+      await completeCallback({ code: `calendar-${provider}-${requireMfa}`, next: "/account" }),
+    ).toBe(expected);
+    expect(takeGoogleCalendarReturn()).toBeUndefined();
+  },
+);
 it("does not accept provider errors or a missing code as a signed-in result", async () => {
   await expect(
     completeCallback({ code: "never-exchange", providerError: true, next: "/account" }),

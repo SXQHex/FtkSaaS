@@ -78,6 +78,14 @@ Refactoring tamamlanana dek otomatik frontend CI'si yalnız **Desktop Chromium**
 
 Kabul tek kaynak SHA'sına bağlıdır. [Önceki regression testleri](../src/features/workspace/query-invalidation.test.ts), [Auth](../src/features/auth/account-query.test.ts), [abort transport](../src/lib/backend-read-cancellation.test.ts), [SPA navigasyon](../e2e/auth-spa-navigation.spec.ts) ve [scope geçişi](../e2e/auth-scope-transition.spec.ts) korunur. Eski filtre/cursor, rol kaybı, aynı hesap-yeni session, late reply, bilinmeyen ACK ve ağ sayısı önce/sonra senaryoları [açık kabul listesinde](remaining-work.md#router-query-birlesik) eksiksiz kapatılır. Tek Desktop Chromium koşusu diğer üç tarayıcı profilinin kabulü değildir.
 
+## Kişisel takvimden seans açma
+
+Eski `/organizasyon/{org_id}/seans/{session_id}` bağlantısı native giriş ve gerekiyorsa MFA üzerinden devam eder. Devam adresi yalnız iki UUID içeren bu rotayı kabul eder. Google girişinde mevcut PKCE callback'i kullanılır ve devam adresi başlatan sekmede bir kez alınır.
+
+[WF03](../../../docs/workflows.md#wf03) kapsamındaki `session_get_v1` okuması `include_center_id:true` ile merkezi getirir. Aynı native oturumdaki eşzamanlı rota yükleyicileri devam eden isteği paylaşır. Rota hedef ekranın da kullandığı organizasyon kapsamını yeniler. Atanmış eğitmen veya asistan Eğitmen seansına gider.
+
+Öğrenci ekranı kendi kişi, merkez ve seans kimlikleriyle tek `reservation_list_v1` isteği yapar. Aynı sayfa hem sahipliği doğrular hem içeriği doldurur. Sunucu anı ve seans başlangıcı yaklaşan/geçmiş ayrımını belirler. Sürüm bağlı kendi rezervasyon özeti yeterliyse ek seans, takvim ve yoklama okuması gerekmez. Kesin rezervasyon görüntüsü bekleme listesi dizinlerini çağırmaz. Boş sonuçta erişilemeyen kayıt durumu gösterilir. [Kişisel takvim protokolü](../../../docs/client-integration.md#statik-spa-transportu)
+
 ## Yerel çalışma
 
 Repo kökünden `corepack enable`, `pnpm install --frozen-lockfile` ve `pnpm dev:web` çalıştırın. Gerçek geliştirme servisi için `apps/web/.env.example` değişkenlerini Git dışındaki `apps/web/.env.development.local` dosyasında tanımlayın. `VITE_` değerleri tarayıcıya açıktır. Native Auth loopback dönüşü için izinli yerel origin ve `/auth/callback` kullanılır. Test fixture'ları loopback arayüzünde çalışır. Hosted DB'ye reset veya seed uygulanmaz.

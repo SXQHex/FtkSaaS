@@ -1,6 +1,6 @@
 import { Link as AriaLink } from "react-aria-components";
 import { useState } from "react";
-import { useLoaderData, useNavigate, useRouter } from "@tanstack/react-router";
+import { useLoaderData, useNavigate, useRouter, useSearch } from "@tanstack/react-router";
 import { revalidateLogic, useForm } from "@tanstack/react-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
@@ -14,6 +14,7 @@ import { Button } from "@ftksaas/ui/components/button";
 
 export function MfaPage() {
   const factors = useLoaderData({ from: "/mfa" });
+  const { next } = useSearch({ from: "/mfa" });
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [failed, setFailed] = useState(false);
@@ -23,7 +24,9 @@ export function MfaPage() {
     setReading(true);
     setFailed(false);
     try {
-      await navigate({ to: await continueAfterMfa(), replace: true });
+      const to = await continueAfterMfa();
+      if (to === "/account" && next) await navigate({ href: next, replace: true });
+      else await navigate({ to, replace: true });
     } catch {
       setFailed(true);
     } finally {

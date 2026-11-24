@@ -6,6 +6,7 @@ import { hasDeletionReceipt } from "../account/deletion";
 import { accountQuery } from "./account-query";
 import { sameNativeSession } from "./native-session-id";
 import { rememberRecoverySession, requireRecoverySession } from "./password-recovery";
+import { takeGoogleCalendarReturn } from "./calendar-session-return";
 
 export function safeNext(next: unknown) {
   return next === "/reset-password" ? "/reset-password" : "/account";
@@ -47,9 +48,13 @@ export function completeCallback(
   input: CallbackInput,
   queries: QueryClient = queryClient,
 ): Promise<string> {
-  if (input.providerError || !input.code) return Promise.reject(new Error("AUTH_CALLBACK_INVALID"));
+  if (input.providerError || !input.code) {
+    takeGoogleCalendarReturn();
+    return Promise.reject(new Error("AUTH_CALLBACK_INVALID"));
+  }
   if (exchange?.code === input.code) return exchange.result;
   const code = input.code;
+  const calendarReturn = takeGoogleCalendarReturn();
   const result = (async () => {
     const auth = getSupabaseClient().auth;
     let recovery = false;
@@ -67,17 +72,25 @@ export function completeCallback(
     queries.clear();
     if (recovery) await rememberRecoverySession(data.session);
     const next = safeNext(input.next);
+    const providers = data.session.user.app_metadata;
+    const calendarNext =
+      next === "/account" &&
+      !recovery &&
+      data.session.provider_token &&
+      (providers.provider === "google" || providers.providers?.includes("google"))
+        ? calendarReturn
+        : undefined;
     if (next === "/reset-password") await requireRecoverySession();
     const assurance = await auth.mfa.getAuthenticatorAssuranceLevel(data.session.access_token);
     if (assurance.error) throw assurance.error;
     await verifyCallbackSession(data.session);
     if (assurance.data.nextLevel === "aal2" && assurance.data.currentLevel !== "aal2")
-      return "/mfa";
+      return calendarNext ? `/mfa?next=${encodeURIComponent(calendarNext)}` : "/mfa";
     if (next !== "/reset-password" && hasDeletionReceipt(data.session.user.id))
       return "/account/deletion";
     await queries.query(accountQuery(data.session.user.id, next === "/account"));
     await verifyCallbackSession(data.session);
-    return next;
+    return calendarNext ?? next;
   })();
   exchange = { code, result };
   return result;

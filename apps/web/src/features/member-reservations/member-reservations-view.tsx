@@ -53,6 +53,7 @@ export function MemberReservationsView({
   historyPagination,
   pending,
   notice,
+  showWaitlist,
 }: {
   upcoming: MemberUpcomingRow[] | null;
   waiting: MemberUpcomingRow[] | null;
@@ -62,6 +63,7 @@ export function MemberReservationsView({
   historyPagination?: ReactNode;
   pending: { upcoming: boolean; waiting: boolean; history: boolean };
   notice?: ReactNode;
+  showWaitlist: boolean;
 }) {
   const { t } = useTranslation();
   function list(rows: MemberUpcomingRow[] | null, kind: "upcoming" | "waiting") {
@@ -127,14 +129,16 @@ export function MemberReservationsView({
         <CardContent>{list(upcoming, "upcoming")}</CardContent>
         {upcomingPagination && <CardFooter>{upcomingPagination}</CardFooter>}
       </Card>
-      <Card className="min-w-0">
-        <CardHeader>
-          <CardTitle>{t(($) => $.memberReservations.waiting)}</CardTitle>
-          <CardDescription>{t(($) => $.memberReservations.waitingHint)}</CardDescription>
-        </CardHeader>
-        <CardContent>{list(waiting, "waiting")}</CardContent>
-        {waitingPagination && <CardFooter>{waitingPagination}</CardFooter>}
-      </Card>
+      {showWaitlist && (
+        <Card className="min-w-0">
+          <CardHeader>
+            <CardTitle>{t(($) => $.memberReservations.waiting)}</CardTitle>
+            <CardDescription>{t(($) => $.memberReservations.waitingHint)}</CardDescription>
+          </CardHeader>
+          <CardContent>{list(waiting, "waiting")}</CardContent>
+          {waitingPagination && <CardFooter>{waitingPagination}</CardFooter>}
+        </Card>
+      )}
       <Card className="min-w-0">
         <CardHeader>
           <CardTitle>{t(($) => $.memberReservations.history)}</CardTitle>
