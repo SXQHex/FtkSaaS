@@ -2,7 +2,7 @@ import type { AccountReadContext } from "../../lib/scoped-backend";
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { getTemporal } from "../../lib/temporal";
-import { studioBackend, studioPages, type StudioScope } from "./studio";
+import { studioBackend, type StudioScope } from "./studio";
 import type { CenterView, Interval, ResourceRef } from "@ftksaas/api-contracts";
 
 export interface ClosureDraft {
@@ -41,21 +41,19 @@ export async function readClosureContext(
   signal = readContext?.signal,
 ): Promise<ClosureContext> {
   const backend = await studioBackend(scope, signal, readContext);
-  const centers = await studioPages((cursor) =>
-    backend
-      .call("centers_list_v1", {
-        client_api_version: 1,
-        request_id: uuidv7(),
-        org_id: scope.orgId,
-        page: { limit: 50, ...(cursor ? { cursor } : {}) },
-      })
-      .then((page) => ({ items: page.items, next_cursor: page.next_cursor ?? null })),
-  );
-  const matches = centers.filter((center) => center.id === scope.centerId);
-  const center = matches[0];
+  const page = await backend.call("centers_list_v1", {
+    client_api_version: 1,
+    request_id: uuidv7(),
+    org_id: scope.orgId,
+    center_id: scope.centerId,
+    page: { limit: 1 },
+  });
+  const [center] = page.items;
   if (
-    matches.length !== 1 ||
-    !center?.accessible ||
+    page.items.length !== 1 ||
+    page.next_cursor ||
+    center?.id !== scope.centerId ||
+    !center.accessible ||
     !Number.isSafeInteger(center.version) ||
     center.version < 1 ||
     !center.timezone

@@ -494,6 +494,7 @@ export async function mockSettingsCompletion(
           person_id?: string;
           role?: string;
           permission?: string;
+          permission_summary?: boolean;
         };
       const resources = "resources" in r.selector ? r.selector.resources : undefined;
       if (operation === "policy_publish_v1")
@@ -596,7 +597,54 @@ export async function mockSettingsCompletion(
               })),
           ),
         );
-      if (operation === "permission_set_v1" && key.permission)
+      if (operation === "permission_set_v1" && key.permission_summary) {
+        const selected = key.person_id;
+        if (selected !== I.instructor && selected !== uid(130)) {
+          await send(nativePage([]));
+          return;
+        }
+        const permissions =
+          selected === I.instructor
+            ? [
+                "person.manage",
+                "person.activate",
+                "invite.student",
+                "reservation.write",
+                "attendance.draft",
+                "sale.write",
+                "finance.collect",
+                "reservation.capacity_override",
+                "sale.discount",
+                "request.write",
+                "request.resolve",
+                "crm.daily",
+              ]
+            : ["sale.discount"];
+        const overrides = permissions.map((permission) => {
+          const enabled =
+            selected === I.instructor ? (state.permissions[permission] ?? null) : null;
+          return {
+            permission,
+            override_exists: enabled !== null,
+            enabled,
+            override_version: enabled === null ? null : state.personVersion,
+            effective_staff_grant: enabled ?? false,
+          };
+        });
+        await send(
+          nativePage([
+            metadata(
+              operation,
+              "people",
+              selected,
+              { person_id: selected, permission_overrides: overrides },
+              state.personVersion,
+            ),
+          ]),
+        );
+      }
+      if (operation === "permission_set_v1" && key.permission) {
+        const enabled = state.permissions[key.permission];
         await send(
           nativePage([
             metadata(
@@ -606,13 +654,14 @@ export async function mockSettingsCompletion(
               {
                 person_id: I.instructor,
                 permission: key.permission,
-                enabled: state.permissions[key.permission] ?? false,
-                override_exists: key.permission in state.permissions,
+                ...(enabled === undefined ? {} : { enabled }),
+                override_exists: enabled !== undefined,
               },
               state.personVersion,
             ),
           ]),
         );
+      }
     }
     if (op === "operation_status_get_v1")
       await send({
