@@ -353,6 +353,46 @@ Hesap silme için mevcut global privacy worker'a ek `private.account_export_eras
 
 İç manifestte `exports.database_exports=completed` genel exports/Storage/backup veya hesabın tamamlandığı anlamına gelmez; ana talep partial/pending kalır. Bu DB kanıtı bağımsız imha sicili veya yedek yokluk kanıtının yerine geçmez. İptal/restore ve operator incelemesinde bu sınır korunur.
 
+<a id="o05-storage-on-kontrolu"></a>
+### O05 Storage ön kontrolü
+
+Yetkili işletim bağlantısında yalnız sayım al. Sorgu, `ftksaas-imports` nesnelerini beklenen organizasyon/dosya yolu, dosya amacı ve P06 sahiplik kaydı ile eşler. Hazır kaynakları, eşleşmesi belirsiz nesneleri ve süresi dolmuş bekleyen yüklemeleri tespit eder. Hesap blokajı organizasyonlar arasında, kayıt ve organizasyon blokajı kendi kapsamlarında geçerlidir.
+
+```sql
+with matched as (
+  select o.id,
+    count(f.id) as file_count,
+    bool_or(f.state = 'ready') as retained,
+    bool_or(f.state = 'pending_upload' and f.expires_at <= statement_timestamp()) as expired,
+    bool_or(exists (
+      select 1 from core.retention_holds h
+      where (h.subject_id = p.account_id and h.subject_table in ('accounts', 'core.accounts'))
+        or (h.org_id = f.org_id and (
+          (h.subject_id = f.org_id and h.subject_table in ('organizations', 'core.organizations'))
+          or (h.subject_id = f.id and h.subject_table in ('files', 'core.files', 'p06_files', 'private.p06_files'))
+          or (h.subject_id = o.id and h.subject_table in ('objects', 'storage.objects'))
+        ))
+    )) as held
+  from storage.objects o
+  left join (
+    core.files f join private.p06_files p on p.file_id = f.id
+  ) on f.purpose = 'import' and f.object_key = o.name
+     and f.object_key = f.org_id::text || '/' || f.id::text
+  where o.bucket_id = 'ftksaas-imports'
+  group by o.id
+)
+select count(*) as objects,
+  count(*) filter (where file_count <> 1) as unresolved,
+  count(*) filter (where file_count = 1 and retained) as retained,
+  count(*) filter (where file_count = 1 and expired and held) as expired_held,
+  count(*) filter (where file_count = 1 and expired and not held) as expired_unheld
+from matched;
+```
+
+Dolmuş bekleyen bir upload kaydı için imha testi, mevcut imzalı yükleme yetkisinin sona erdiğini ve eşzamanlı bir blokajın native Storage silmesini durdurduğunu izole sentetik nesne üzerinde doğrular. Supabase imzalı upload adresinin iki saat geçerli olduğunu yayımlıyor. Uygulamadaki `expires_at` ile sağlayıcının imzaladığı adresin süresini ayrı gözle. [Supabase imzalı upload](https://supabase.com/docs/reference/javascript/storage-from-createsigneduploadurl).
+
+Storage API üzerinden silme sonrası yeniden başlatılmış ortamda nesne okumasını, eski imzalı URL’yi ve kontrol nesnesinin checksum’unu doğrula. Bayt kanıtı için sağlayıcı nesne silme sonucunu da kaydet. Supabase’in yayımlanan kaynak uygulamasında metadata değişikliği fiziksel depolama temizliğinden önce gerçekleşebilir. Belirsiz sonuçta yalnız 404 ile imha makbuzu oluşturma. [Storage silme sözleşmesi](https://supabase.com/docs/guides/storage/management/delete-objects), [Supabase Storage kaynak uygulaması](https://github.com/supabase/storage/blob/master/src/storage/object.ts).
+
 ## Native Auth principal imhası işletimi
 
 `native-account-erasure.mjs` yalnız dedicated privacy worker bağlantısında mevcut claim request'iyle çalışır; native Auth admin anahtarı DB worker rolüne yetki eklemez. `private.account_auth_erasure_scopes` exact db_role/account_id/provider_origin ve PostgreSQL system_identifier bağını tutar; migration hiçbir hedef bağlamaz. Scope kurulumu yalnız onaylı imha hedefi için yetkili işletim adımıdır. Hosted origin mevcut projenin HTTPS köküdür; izole kabulde yalnız loopback portu kullanılır. Restore/clone sırasında binding/permit ve admin anahtarları taşınıp etkinleştirilmez; fiziksel klon system_identifier'ı koruyabileceğinden instance bağı tam restore erişim kapısının yerine geçmez.
