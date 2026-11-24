@@ -617,7 +617,11 @@ Profil ve native Auth imhasının makbuzları oluştuktan sonra aynı hesaba ve 
 
 Organizasyon silme talebinde exact organizasyona bağlı P07 worker, bağımsız kişi iletişim kayıtlarından her claim’de en çok 100 e-posta veya telefon satırını temizler. Hesaba bağlı, hesaptan yansıtılmış veya birleştirilmiş kişi kayıtları ve somut saklama blokajlı satırlar korunur. İç manifestte `database.organization_contacts` altında ilerleme ve değişmez işlem makbuzunda kaldırılan satır sayısı tutulur. Genel veritabanı kapsamı kendi imha koşullarına bağlıdır.
 
+Organizasyona bağlı operasyonel imha aşaması, sona ermiş davetin terminal teslim işinden alıcı ve şifreli gönderim alanlarını kaldırır. CRM iletişim ve takip geçmişinden serbest notu temizler. Devam eden işler, yapılandırılmış sonuçlar ve davet–iş bağlantısı korunur. Eksik veya karma sahiplik işlemi durdurur. `database.organization_operational` ve değişmez makbuz azaltılan kayıt grubunu sayar.
+
 Hesap veya organizasyon imhasında süresi dolmuş, tamamlanmamış import yüklemeleri ayrı Storage adımından geçer. Yürütücü yalnız bağlı dosyanın yetkili Storage okumasıyla boyut ve SHA-256 eşliğini doğrular. Native silme işlemi güncel lease ve saklama blokajını yeniden denetler. Ayrı bağlı attestor, başarılı Storage silme cevabı ve nesneye özgü yokluk okuması sonrası makbuzu yazar. Silme cevabı kaybolduğunda tek başına sonraki yokluk okuması makbuz üretmez. Genel Storage kapsamı beklemede kalır.
+
+Organizasyonun tüm veri silme talebi, iş veya belge bağlantısı bulunmayan hazır import yüklemesini aynı native Storage yoluyla işler. Ayrı yetkili DB export aşaması, aynı talebe bağlı geçici rapor baytlarını süre dolmadan işleyebilir. Mevcut dosya ve rapor sahipliği, boyut, SHA-256 ve saklama blokajı denetlenir. Kaynakla ilişkili dosyalar, somut blokajlı baytlar ve raporun gerekli metadata’sı korunur. Doğrulanmış imha alt aşaması ana talebin durumunu tek başına değiştirmez.
 
 Sicil checkpoint’i, yetkili yayın sırasında önceki imzalı makbuzlar korunarak ilerler. Yeni anahtar, önceki anahtarın aynı geçişi yetkilendirdiği imzayı gerektirir. Gerçek yükleyici bağımsız checkpoint’i yeniden okur ve eski arşiv başını reddeder. [İşletim ve erişim kapısı](../apps/backend/docs/remote-backend-setup.md#restore-ve-yeniden-canlanma-engeli).
 
