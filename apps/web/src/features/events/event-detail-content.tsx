@@ -64,7 +64,11 @@ export function EventDetailContent({
       ? source.data
       : undefined;
   const eventUnavailable = !event;
-  const roomId = event?.venue.kind === "internal" ? (event.venue.room_id ?? undefined) : undefined;
+  const venueRoomName = event?.venue_active_room_name;
+  const roomId =
+    event?.venue.kind === "internal" && venueRoomName === undefined
+      ? (event.venue.room_id ?? undefined)
+      : undefined;
   const room = useQuery({
     ...studioRoomQuery(queries, scope, roomId),
     enabled: !!roomId,
@@ -247,9 +251,9 @@ export function EventDetailContent({
             value:
               event.venue.kind === "external"
                 ? event.venue.name || unknown
-                : !room.isError && room.data?.active
+                : venueRoomName === undefined && !room.isError && room.data?.active
                   ? room.data.name
-                  : unknown,
+                  : (venueRoomName ?? unknown),
           },
           { label: t(($) => $.events.editor.timezone), value: event.timezone },
         ]}

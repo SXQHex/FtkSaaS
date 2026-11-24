@@ -35,6 +35,7 @@ export async function readScheduleSession(
   id: string,
   includeRoomLabels = false,
   readContext?: AccountReadContext,
+  projections?: { include_title?: boolean; include_person_display_names?: boolean },
 ) {
   const backend = await scopedBackend(scope, undefined, readContext);
   return sessionIdentity(
@@ -48,6 +49,7 @@ export async function readScheduleSession(
         center_id: scope.centerId,
         session_id: id,
         ...(includeRoomLabels ? { include_room_labels: true } : {}),
+        ...projections,
       },
       readContext?.signal,
     ),
@@ -71,15 +73,14 @@ export type ScheduleReadItem =
   | { type: "event"; item: CalendarItem };
 
 // Exhaust only the visible UTC interval, never all people or session history.
-// Both filters are native resource reads: intersect their complete result sets,
-// rather than filtering one cursor page or inventing an unsupported selector.
+// The server applies both filters before producing the scoped cursor page.
 export async function readScheduleRange(
   scope: ClientScope,
   interval: Interval,
   filters: { roomId?: string; instructorId?: string } = {},
   signal?: AbortSignal,
   readContext?: AccountReadContext,
-  projection: { sessionsStartingAfter?: number } = {},
+  projection: { sessionsStartingAfter?: number; managementLabels?: boolean } = {},
 ): Promise<{
   entries: ScheduleReadItem[];
   reads: { resource: ResourceRef | null; asOf: string[] }[];
@@ -89,80 +90,73 @@ export async function readScheduleRange(
     end = temporal.Instant.from(interval.ends_at);
   if (temporal.Instant.compare(start, end) >= 0) throw new Error("SCHEDULE_RANGE_INVALID");
   const backend = await scopedBackend(scope, signal, readContext);
-  const resources: (ResourceRef | null)[] = [
-    ...(filters.roomId ? [{ kind: "room" as const, id: filters.roomId }] : []),
-    ...(filters.instructorId ? [{ kind: "person" as const, id: filters.instructorId }] : []),
-  ];
-  const singleSource = resources.length <= 1;
-  async function calendar(resource: ResourceRef | null) {
-    const items: CalendarItem[] = [],
-      asOf: string[] = [];
-    const seenIds = new Set<string>(),
-      seenCursors = new Set<string>();
-    let cursor: string | undefined;
-    do {
-      const page = await queryBackendRead(
-        backend,
-        "calendar_get_v1",
-        {
-          client_api_version: 1,
-          request_id: uuidv7(),
-          org_id: scope.orgId,
-          center_id: scope.centerId,
-          interval: { ...interval },
-          ...(resource ? { resource } : {}),
-          ...(singleSource ? { include_session_summary: true } : {}),
-          page: { limit: 50, sort: "starts_at_asc", ...(cursor ? { cursor } : {}) },
-        },
-        signal,
-      );
-      temporal.Instant.from(page.as_of);
-      asOf.push(page.as_of);
-      for (const item of page.items) {
-        const itemStart = temporal.Instant.from(item.starts_at),
-          itemEnd = temporal.Instant.from(item.ends_at);
-        const key = `${item.type}:${item.id}`;
-        if (
-          !item.id ||
-          item.center_id !== scope.centerId ||
-          !["session", "event"].includes(item.type) ||
-          seenIds.has(key) ||
-          temporal.Instant.compare(itemStart, itemEnd) >= 0 ||
-          temporal.Instant.compare(itemStart, end) >= 0 ||
-          temporal.Instant.compare(itemEnd, start) <= 0
-        )
-          throw new Error("SCHEDULE_CALENDAR_UNAVAILABLE");
-        seenIds.add(key);
-        items.push(item);
-      }
-      cursor = page.next_cursor ?? undefined;
-      if (cursor && seenCursors.has(cursor)) throw new Error("SCHEDULE_CURSOR_UNAVAILABLE");
-      if (cursor) seenCursors.add(cursor);
-    } while (cursor);
-    return { items, resource, asOf };
-  }
-  const pages = await Promise.all((resources.length ? resources : [null]).map(calendar));
-  const first = pages[0]!;
-  const secondIds = pages[1]
-    ? new Set(pages[1].items.map((item) => `${item.type}:${item.id}`))
-    : undefined;
-  const items = first.items.filter((item) => {
-    if (secondIds && !secondIds.has(`${item.type}:${item.id}`)) return false;
-    return (
-      projection.sessionsStartingAfter === undefined ||
-      (item.type === "session" && Date.parse(item.starts_at) > projection.sessionsStartingAfter)
+  const resource: ResourceRef | null = filters.roomId
+    ? { kind: "room", id: filters.roomId }
+    : filters.instructorId
+      ? { kind: "person", id: filters.instructorId }
+      : null;
+  const calendar: CalendarItem[] = [],
+    asOf: string[] = [];
+  const seenIds = new Set<string>(),
+    seenCursors = new Set<string>();
+  let cursor: string | undefined;
+  do {
+    const page = await queryBackendRead(
+      backend,
+      "calendar_get_v1",
+      {
+        client_api_version: 1,
+        request_id: uuidv7(),
+        org_id: scope.orgId,
+        center_id: scope.centerId,
+        interval: { ...interval },
+        ...(resource ? { resource } : {}),
+        ...(filters.roomId && filters.instructorId
+          ? { resource_person_id: filters.instructorId }
+          : {}),
+        include_session_summary: true,
+        ...(projection.managementLabels ? { include_management_labels: true } : {}),
+        page: { limit: 50, sort: "starts_at_asc", ...(cursor ? { cursor } : {}) },
+      },
+      signal,
     );
-  });
+    temporal.Instant.from(page.as_of);
+    asOf.push(page.as_of);
+    for (const item of page.items) {
+      const itemStart = temporal.Instant.from(item.starts_at),
+        itemEnd = temporal.Instant.from(item.ends_at);
+      const key = `${item.type}:${item.id}`;
+      if (
+        !item.id ||
+        item.center_id !== scope.centerId ||
+        !["session", "event"].includes(item.type) ||
+        seenIds.has(key) ||
+        temporal.Instant.compare(itemStart, itemEnd) >= 0 ||
+        temporal.Instant.compare(itemStart, end) >= 0 ||
+        temporal.Instant.compare(itemEnd, start) <= 0
+      )
+        throw new Error("SCHEDULE_CALENDAR_UNAVAILABLE");
+      seenIds.add(key);
+      calendar.push(item);
+    }
+    cursor = page.next_cursor ?? undefined;
+    if (cursor && seenCursors.has(cursor)) throw new Error("SCHEDULE_CURSOR_UNAVAILABLE");
+    if (cursor) seenCursors.add(cursor);
+  } while (cursor);
+  const items = calendar.filter(
+    (item) =>
+      projection.sessionsStartingAfter === undefined ||
+      (item.type === "session" && Date.parse(item.starts_at) > projection.sessionsStartingAfter),
+  );
   const entries: ScheduleReadItem[] = [];
   // The optional summary is authorized on the same page as the session capacity.
-  // The exact reader still resolves rows without the projection and intersections
-  // built from two separately read resource pages.
+  // The exact reader still resolves rows without the projection.
   for (let index = 0; index < items.length; index += 4) {
     entries.push(
       ...(await Promise.all(
         items.slice(index, index + 4).map(async (item): Promise<ScheduleReadItem> => {
           if (item.type === "event") return { type: "event", item };
-          const summary = singleSource ? calendarSessionProjection(item) : undefined;
+          const summary = calendarSessionProjection(item);
           if (summary) return { type: "session", item, session: summary };
           const session = sessionIdentity(
             await queryBackendRead(
@@ -192,7 +186,7 @@ export async function readScheduleRange(
     );
   }
   signal?.throwIfAborted();
-  return { entries, reads: pages.map(({ resource, asOf }) => ({ resource, asOf })) };
+  return { entries, reads: [{ resource, asOf }] };
 }
 
 export async function readScheduleEditor(

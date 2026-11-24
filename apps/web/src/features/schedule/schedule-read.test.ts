@@ -126,23 +126,23 @@ describe("native visible calendar range", () => {
     );
   });
 
-  it("intersects all pages of both native resource reads, including a match on the second pages", async () => {
+  it("uses one intersection cursor, including a match on its second page", async () => {
     call.mockImplementation(async (_operation, request) => {
       expect(request.org_id).toBe(scope.orgId);
       expect(request.center_id).toBe(scope.centerId);
       expect(request.interval).toEqual(interval);
-      const room = request.resource.kind === "room";
-      return request.page.cursor
-        ? page([item("shared")])
-        : page([item(room ? "room-only" : "teacher-only")], room ? "room-next" : "teacher-next");
+      expect(request.resource).toEqual({ kind: "room", id: "room" });
+      expect(request.resource_person_id).toBe("teacher");
+      expect(request.include_session_summary).toBe(true);
+      return request.page.cursor ? page([item("shared")]) : page([], "intersection-next");
     });
     const result = await readScheduleRange(scope, interval, {
       roomId: "room",
       instructorId: "teacher",
     });
     expect(result.entries.map((entry) => entry.item.id)).toEqual(["shared"]);
-    expect(result.reads.map((read) => read.asOf.length)).toEqual([2, 2]);
-    expect(call).toHaveBeenCalledTimes(4);
+    expect(result.reads.map((read) => read.asOf.length)).toEqual([2]);
+    expect(call).toHaveBeenCalledTimes(2);
   });
 
   it("rejects repeated pagination rather than looping or showing partial success", async () => {

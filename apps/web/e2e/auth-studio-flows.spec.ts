@@ -31,8 +31,9 @@ function isRoomClosureRead(payload: unknown) {
     payload.org_id === studioIds.org &&
     payload.center_id === studioIds.center &&
     payload.selector.operation === "availability_exception_save_v1" &&
-    payload.selector.key.resource?.kind === "room" &&
-    payload.selector.key.resource.id === studioIds.room
+    (payload.selector.key.resources ?? [payload.selector.key.resource]).some(
+      (resource) => resource?.kind === "room" && resource.id === studioIds.room,
+    )
   );
 }
 

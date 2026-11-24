@@ -115,6 +115,38 @@ it("only opts in to the native self projection when a caller requests it", async
     "attendance_get_v1",
   ]);
 });
+it("uses the signed-in member's closed attendance and session snapshot in the same reservation row", async () => {
+  rows[0]!.self_summary = {
+    title: "Sentetik ders",
+    starts_at: nativeSession.starts_at,
+    ends_at: nativeSession.ends_at,
+    session_version: nativeSession.version,
+    session_state: nativeSession.state,
+    discipline_id: nativeSession.discipline_id,
+    format: nativeSession.format,
+    attendance_state: "closed",
+    attendance_result: "attended",
+    cancellation: {
+      status: "not_configured",
+      source: "reservation_policy",
+      policy_version_id: null,
+      terms: null,
+      cutoff_at: null,
+    },
+  };
+  const result = await readMemberReservations(scope, personId, undefined, "past", {
+    includeSelfSummary: true,
+  });
+  expect(result.items[0]).toMatchObject({
+    session: { id: nativeSession.id, version: nativeSession.version, format: "group" },
+    attendance: { result: "attended" },
+    attendanceAvailable: true,
+  });
+  expect(call).toHaveBeenCalledExactlyOnceWith(
+    "reservation_list_v1",
+    expect.objectContaining({ person_id: personId, include_self_summary: true }),
+  );
+});
 it.each(["all", "upcoming", "past"] as const)(
   "delegates %s to the native reader without filtering the returned cursor page",
   async (filter) => {

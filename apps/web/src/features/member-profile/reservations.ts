@@ -29,6 +29,52 @@ function accessLost(error: unknown) {
     (error instanceof Error && ["AUTH_REQUIRED", "ACCOUNT_CHANGED"].includes(error.message))
   );
 }
+function checkedSession(native: Session, id: string): Session {
+  if (native.id !== id || Date.parse(native.starts_at) >= Date.parse(native.ends_at))
+    throw new Error("PROFILE_SESSION_UNAVAILABLE");
+  z.iso.datetime({ offset: true }).parse(native.starts_at);
+  z.iso.datetime({ offset: true }).parse(native.ends_at);
+  z.number().int().positive().safe().parse(native.version);
+  z.uuid().parse(native.discipline_id);
+  z.enum(["group", "private"]).parse(native.format);
+  z.enum(["planned", "occurred", "cancelled"]).parse(native.state);
+  z.enum(["open", "closed"]).parse(native.attendance_state);
+  return {
+    id: native.id,
+    discipline_id: native.discipline_id,
+    format: native.format,
+    starts_at: native.starts_at,
+    ends_at: native.ends_at,
+    state: native.state,
+    attendance_state: native.attendance_state,
+    version: native.version,
+  };
+}
+
+function sessionFromReservation({ self_summary: summary, session_id }: ReservationView) {
+  if (
+    !summary ||
+    summary.session_version === undefined ||
+    summary.session_state === undefined ||
+    summary.discipline_id === undefined ||
+    summary.format === undefined
+  )
+    return;
+  return checkedSession(
+    {
+      id: session_id,
+      starts_at: summary.starts_at,
+      ends_at: summary.ends_at,
+      version: summary.session_version,
+      state: summary.session_state,
+      discipline_id: summary.discipline_id,
+      format: summary.format,
+      attendance_state: summary.attendance_state,
+    },
+    session_id,
+  );
+}
+
 export async function readMemberReservations(
   scope: ClientScope,
   personId: string,
@@ -79,51 +125,74 @@ export async function readMemberReservations(
     z.enum(["active", "cancelled", "completed"]).parse(row.state);
     z.number().int().positive().safe().parse(row.version);
   }
-  const sessions = new Map<string, { session?: Session; entries?: AttendanceEntryView[] }>();
-  const sessionIds = [...new Set(page.items.map((x) => x.session_id))];
+  const sessions = new Map<
+    string,
+    {
+      session?: Session;
+      entries?: Pick<AttendanceEntryView, "reservation_id" | "result">[];
+    }
+  >();
+  const reservations = new Map<string, ReservationView[]>();
+  for (const row of page.items) {
+    const matches = reservations.get(row.session_id);
+    if (matches) matches.push(row);
+    else reservations.set(row.session_id, [row]);
+  }
+  const sessionIds = [...reservations.keys()];
   // Only hydrate this visible cursor page. Keep the native order and bound concurrent reads.
   for (let i = 0; i < sessionIds.length; i += 4)
     await Promise.all(
       sessionIds.slice(i, i + 4).map(async (id) => {
-        let native: SessionView;
+        const rows = reservations.get(id)!;
+        const projected = options.includeSelfSummary ? sessionFromReservation(rows[0]!) : undefined;
+        let session: Session;
         try {
-          native = await queryBackendRead(
-            backend,
-            "session_get_v1",
-            {
-              ...common,
-              request_id: uuidv7(),
-              session_id: id,
-            },
-            readContext?.signal,
-          );
+          session =
+            projected ??
+            checkedSession(
+              await queryBackendRead(
+                backend,
+                "session_get_v1",
+                {
+                  ...common,
+                  request_id: uuidv7(),
+                  session_id: id,
+                },
+                readContext?.signal,
+              ),
+              id,
+            );
         } catch (error) {
           if (accessLost(error)) throw error;
           if (!(error instanceof BackendError)) throw error;
           sessions.set(id, {});
           return;
         }
-        if (native.id !== id || Date.parse(native.starts_at) >= Date.parse(native.ends_at))
-          throw new Error("PROFILE_SESSION_UNAVAILABLE");
-        z.iso.datetime({ offset: true }).parse(native.starts_at);
-        z.iso.datetime({ offset: true }).parse(native.ends_at);
-        z.number().int().positive().safe().parse(native.version);
-        z.uuid().parse(native.discipline_id);
-        z.enum(["group", "private"]).parse(native.format);
-        z.enum(["planned", "occurred", "cancelled"]).parse(native.state);
-        z.enum(["open", "closed"]).parse(native.attendance_state);
-        const session: Session = {
-          id: native.id,
-          discipline_id: native.discipline_id,
-          format: native.format,
-          starts_at: native.starts_at,
-          ends_at: native.ends_at,
-          state: native.state,
-          attendance_state: native.attendance_state,
-          version: native.version,
-        };
         if (options.includeAttendance === false) {
           sessions.set(id, { session });
+          return;
+        }
+        if (
+          projected?.attendance_state === "closed" &&
+          rows.every(
+            ({ self_summary: summary }) =>
+              summary?.session_version === projected.version &&
+              summary.attendance_state === projected.attendance_state &&
+              summary.attendance_result !== undefined,
+          )
+        ) {
+          const entries = rows.flatMap(({ id: reservation_id, self_summary }) => {
+            const result = self_summary!.attendance_result;
+            return result === null
+              ? []
+              : [
+                  {
+                    reservation_id,
+                    result: z.enum(["unmarked", "attended", "no_show", "blocked"]).parse(result),
+                  },
+                ];
+          });
+          sessions.set(id, { session, entries });
           return;
         }
         // Do not retain participant/contact metadata from SessionView or another member's roster entries.

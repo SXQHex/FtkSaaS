@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "00cce644946b6181b951138dfd53cc0869b2512d1ca66693c41c25cbf84748b4",
-        "reason": "Edge bundle doğru çalışma ağacının doğrulayıcılarıyla üretildi. Gerçek PostgreSQL RPC üzerinde istek ve yanıt sınırları karşılaştırıldı."
+        "fingerprint": "c2e2b2477de0b1f17ebbe6560736b69919c301f0894d9470e9b66b6760252629",
+        "reason": "M09 için onaylanan dört test beklentisi incelendi. Yayın bağlamı isteği, aynı kapsamlı Genel Bakış etiket seçeneği ve oda/eğitmen kesişiminin tek cursor zinciri ile kesin çağrı sayısı doğrulandı."
       }
     },
     {

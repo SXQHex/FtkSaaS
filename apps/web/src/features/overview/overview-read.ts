@@ -2,7 +2,11 @@ import type { ReservationView } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
 import { getTemporal } from "../../lib/temporal";
 import type { ClientScope, AccountReadContext } from "../../lib/scoped-backend";
-import { readScheduleRange, type ScheduleReadItem } from "../schedule/schedule-read";
+import {
+  readScheduleRange,
+  readScheduleSession,
+  type ScheduleReadItem,
+} from "../schedule/schedule-read";
 import {
   readSessionInstructors,
   readSessionParticipants,
@@ -36,9 +40,9 @@ export async function readOverviewDay(
   context?: AccountReadContext,
 ) {
   const period = await overviewDay(timezone, now),
-    result = context
-      ? await readScheduleRange(scope, period.interval, undefined, undefined, context)
-      : await readScheduleRange(scope, period.interval);
+    result = await readScheduleRange(scope, period.interval, undefined, undefined, context, {
+      managementLabels: true,
+    });
   const sessions = result.entries
     .filter((r): r is OverviewSession => r.type === "session")
     .sort(
@@ -77,12 +81,27 @@ export async function readOverviewLabels(
   for (let index = 0; index < sessions.length; index += 4)
     await Promise.all(
       sessions.slice(index, index + 4).map(async (before) => {
-        const fresh = await readSessionInstructors(
-          scope,
-          before.session.id,
-          true,
-          ...(context ? ([context] as const) : []),
-        );
+        const summary = before.item.session_summary;
+        const labels = summary?.version === before.session.version ? summary : undefined;
+        const instructors = labels?.instructor_labels?.map(({ name }) => name);
+        if (instructors && labels?.room_labels) {
+          result.set(before.session.id, {
+            rooms: labels.room_labels.map(({ name }) => name),
+            instructors,
+          });
+          return;
+        }
+        const fresh = instructors
+          ? {
+              session: await readScheduleSession(scope, before.session.id, true, context),
+              instructors: [],
+            }
+          : await readSessionInstructors(
+              scope,
+              before.session.id,
+              true,
+              ...(context ? ([context] as const) : []),
+            );
         if (fresh.session.version !== before.session.version)
           throw Error("OVERVIEW_SESSION_CHANGED");
         const nativeRooms = fresh.session.room_labels?.map((r) => r.name) ?? [];
@@ -94,7 +113,9 @@ export async function readOverviewLabels(
               ),
             );
         result.set(before.session.id, {
-          instructors: fresh.instructors.flatMap((r) => (r.person ? [r.person.display_name] : [])),
+          instructors:
+            instructors ??
+            fresh.instructors.flatMap((r) => (r.person ? [r.person.display_name] : [])),
           rooms: names.filter((name): name is string => name !== null),
         });
       }),

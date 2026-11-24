@@ -7,6 +7,7 @@ import {
   publicCalendarInterval,
   publicProgramRows,
   readPublicCalendar,
+  readPublicContext,
   readPublicProgramPage,
 } from "./public-calendar-read";
 const id = "019ab7b0-0000-7000-8000-000000000001",
@@ -63,6 +64,38 @@ function endpoint(data: Record<string, unknown>) {
     ),
   );
 }
+it("cancels an abandoned context read before sending it to the Worker", async () => {
+  const abort = new AbortController();
+  const fetch = vi.spyOn(globalThis, "fetch");
+  const request = readPublicContext({ slug: "test" }, abort.signal);
+  abort.abort();
+  await expect(request).rejects.toMatchObject({ name: "AbortError" });
+  expect(fetch).not.toHaveBeenCalled();
+});
+it("requests the exact public event once and rejects a different publication", async () => {
+  const event = { ...item, kind: "event" };
+  endpoint({ items: [event], next_cursor: null, as_of: interval.starts_at });
+  const fetch = vi.spyOn(globalThis, "fetch");
+  expect(
+    (await readPublicContext({ slug: "test", centerId: id, publicationId: id })).items,
+  ).toEqual([event]);
+  expect(fetch).toHaveBeenCalledTimes(1);
+  const body = fetch.mock.calls[0]?.[1]?.body;
+  if (typeof body !== "string") throw Error("Expected a serialized public event request");
+  const request: unknown = JSON.parse(body);
+  expect(request).toEqual({
+    client_api_version: 1,
+    request_id: expect.any(String),
+    slug: "test",
+    center_id: id,
+    mode: "event",
+    publication_id: id,
+    page: {},
+  });
+  await expect(
+    readPublicContext({ slug: "test", centerId: id, publicationId: discipline }),
+  ).rejects.toThrow("PUBLIC_CONTEXT_UNAVAILABLE");
+});
 it("reads only the anonymous Worker with fixed interval, native details and cursor", async () => {
   const fetch = vi.spyOn(globalThis, "fetch");
   vi.stubEnv("VITE_PUBLIC_GATEWAY_URL", "https://public.invalid/");
