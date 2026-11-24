@@ -912,7 +912,7 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 
 **Seçili Auth kalıntıları:** Mevcut imha yolu hedef flow/orphan refresh satırlarını ve native audit’te hedefe ait bilinen kişisel alanları işler. Karma hesap flow’u ve yanlış refresh/session sahipliği işlemi durdurur. [Kaynak ve kabul](00-FtkSaaS-yeni-sohbet-devir.md#auth-kalıntı-ve-yöntem-paketi). Kalan iş, sağlayıcının dış log/kopyaları ve diğer Auth yüzeyleri için saklama ve imha kanıtı ile DB’deki karma geçmiş ve organizasyon kapsamının doğrulanmasıdır.
 
-**Tek kullanımlık Auth token’ları:** Hedef token için kayıt bazlı saklama blokajı ve silme sonrası yokluk kontrolü [yerel kaynak kabulünde](00-FtkSaaS-yeni-sohbet-devir.md#o04-auth-token-hold) doğrulandı. Gerçek Supabase Auth ve ortam kanıtı bekleniyor.
+**Tek kullanımlık Auth token’ları:** Hedef token için kayıt bazlı saklama blokajı ve silme sonrası yokluk kontrolünün [native Auth, main ve development teslimi](00-FtkSaaS-yeni-sohbet-devir.md#o04-auth-token-hold) tamamlandı.
 
 <a id="o05"></a>
 ### O05 — Storage ve export fiziksel imha
@@ -930,6 +930,8 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 **Hosted expiry dilimi:** Gerçek API ile üretilip indirilen dolu CSV, test-owned erken expiry/hold enjeksiyonu sonrası native Cron ile fiziksel olarak temizlendi; ayrı kontrol dosyası korundu. Bu doğal yedi günlük süre veya dolu hesap-silme export kabulü değildir; [sonuç ve açık kapsam](00-FtkSaaS-yeni-sohbet-devir.md#pro-hosted-profil-ve-export-kabulü).
 
 **Native Storage dilimi:** [Yerel disk baytı](00-FtkSaaS-yeni-sohbet-devir.md#o03-o10-guncel-isletim-kontrolleri) ve [ayrı hosted hedefte eski imzalı URL ile yönetici okumasının reddi](00-FtkSaaS-yeni-sohbet-devir.md#o08-hosted-sentetik-restore) doğrulandı. Privacy işinde Storage hold ve geçici kopyaların imhası açık.
+
+**Geçici takip kopyaları:** Önizleme ve işlem bağlamı kopyalarının hold kontrollü expiry temizliği [yerel kaynak kabulünde](00-FtkSaaS-yeni-sohbet-devir.md#o05-gecici-takip-kopyalari) doğrulandı. Diğer geçici kopya ve Storage yüzeyleri açık.
 
 <a id="o06"></a>
 ### O06 — Bağımsız imha sicili
