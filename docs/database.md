@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `61156f566bba6f53137f5233b0cea08518c276daa148d91c24cce32054dd609d`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `4e5209a920d43c83b1b07e03b197c4fd190274cf65583bde33f299b5eae33d27`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 226. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 227. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -234,3 +234,4 @@ Sıralı migration: 226. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261124152000_scoped_consumer_followup.sql](../apps/backend/supabase/migrations/20261124152000_scoped_consumer_followup.sql) | `2c51135a186258d4db7a2deff072e1d9048aacc43b22bfecd37d58e3f40aab56` |
 | [20261124211200_account_native_retention_hold.sql](../apps/backend/supabase/migrations/20261124211200_account_native_retention_hold.sql) | `5b918546bc6e28c6f7d7d82af3ee21e58cef2bdd98e69ba36d1a2fa2e52c074a` |
 | [20261124214437_p06_tracking_retention_holds.sql](../apps/backend/supabase/migrations/20261124214437_p06_tracking_retention_holds.sql) | `35f587158918f944ac47f9a05e085e22c6160315fab05e296b0e06b423c4302d` |
+| [20261124220645_session_read_center_projection.sql](../apps/backend/supabase/migrations/20261124220645_session_read_center_projection.sql) | `0b1f571b1c84fe755ba81b8f965e56f715380c4549ba799edaf8cbe0209639b3` |

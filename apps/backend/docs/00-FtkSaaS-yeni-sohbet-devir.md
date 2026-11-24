@@ -130,6 +130,11 @@ Aynı main SHA’sının [merge doğrulaması](https://github.com/SXQHex/FtkSaaS
 
 Aynı sentetik slug ve merkezle kaynak şemasından geçen klasik takvim, `context`, kesin `event` ve `include_details:true` sırasıyla `200` döndü. Her yanıt uygulama origin’i ve `no-store` başlıklarını korudu. Bilinmeyen alan `400 VALIDATION_FAILED` döndü. Bu ölçüm anonim transport ve gizli yayın kapsamındaki boş sonuç içindir. Yayın ve gerçek form/onay çıktısının eşliği [native kabul senaryosunda](../tests/public-program-discovery-acceptance.mjs) izlenir.
 
+<a id="xreq-074-kaynak-ve-kabul"></a>
+## XREQ-074 — Kesin seans merkezi
+
+25 Kasım 2026’da [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/45496294438) doğrulanan `693e8f4fca949347a54cf8f94e0931a98fbe4134` kaynak tabanında `session_get_v1` yeni seçeneği `VALIDATION_FAILED` ile reddetti. [Append-only migration](../supabase/migrations/20261124220645_session_read_center_projection.sql) ve üretilen Edge paketiyle izole Auth → Edge → RPC seans okuma kökünde **30/30** test geçti. İki merkezli sahip, kendi kaydını okuyan öğrenci ve görevli eğitmen doğru merkezi aldı. Yanlış organizasyon/merkez, ilgisiz seans, görev ve hesap bağı kaybı, F08 reddi ve salt okuma sınırı doğrulandı. [Kabul kaynağı](../tests/schedule-reads.test.mjs) · [Açık teslim ölçütleri](remaining-work.md#xreq-074).
+
 <a id="web1-backend-canli-takip-kapanisi"></a>
 ## Web1 — Backend canlı tekrar kapanışı
 

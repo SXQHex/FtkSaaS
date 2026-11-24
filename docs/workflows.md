@@ -96,6 +96,8 @@ Kapanış için mevcut aynı-resource management listesi gerçek `exception_id`,
 
 ## WF03
 
+Kişisel ICS bağlantısı organizasyon ve seans kimliği taşıyorsa `session_get_v1(org_id,session_id,include_center_id:true)` çağrısı mevcut yetkili seans yanıtına kaydın gerçek `center_id` alanını ekler. İstekle gönderilen `center_id` kesin kapsam filtresidir. Seçenek yoksa veya `false` ise yanıt önceki biçimindedir. Seansın sürümü ile canlı oturum, plan, merkez, görev ve kendi rezervasyonu sınırları aynı okumada korunur. [Kişisel takvim](#wf09).
+
 Oda ve eğitmeni birlikte süzmek için `calendar_get_v1` isteğinde `resource:{kind:room,id}` ve `resource_person_id` gönder. Kesişim mevcut görünür kümede cursor ve limitten önce uygulanır. `include_session_summary:true` seansın sürümüne bağlı `actor_class_duty` alanını yalnız çağıranın canlı rolü ve geçerli sınıf görevi varsa döndürür. `include_management_labels:true` aynı özette kişi okuyucusunun izin verdiği eğitmen adlarını ve merkez yöneticisinin görebildiği aktif oda adlarını ekler. Eksik özet veya sürüm uyuşmazlığında kesin okumaya dönülür. `session_get_v1` için `include_title:true` kesin seans başlığını, `include_person_display_names:true` yetkili eğitmen ve atanmış çağıran adlarını `person_labels` içinde verir. İki alanda da mevcut seans yetkisi geçerlidir.
 
 Stüdyo program okumasında `selector.key.class_ids` tekil `class_id` yerine 1–50 farklı sınıf kabul eder. Sınıflar aynı merkez ve plan kapsamında doğrulanır. Tek cursor seçilen sınıfları kapsar. Her program satırı kendi sınıf ve program sürümlerini taşır.

@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "89515273bcd0aa0925f081bf3180186fcfda733b1905fb397b60a672d6bdfc34",
-        "reason": "Migration sayısı ve sabit geçmiş güncellendi, P06 test kaynağı mevcut CI işine bağlı."
+        "fingerprint": "b8adc39c70d1daa683425e559d8948a96832369f30a04f3f6129f08f7110008c",
+        "reason": "Üretilen şema, Edge doğrulayıcısı ve test envanteri opt-in alanla eşleşiyor. Kimlik ve taşıma kuralları aynı."
       }
     },
     {
@@ -651,7 +651,8 @@
         "apps/backend/supabase/migrations/20261118010101_reservation_debt_and_session_change_notice.sql",
         "apps/backend/supabase/migrations/20261119170000_shared_center_authorization.sql",
         "apps/backend/supabase/migrations/20261124013000_scoped_read_projections.sql",
-        "apps/backend/supabase/migrations/20261124152000_scoped_consumer_followup.sql"
+        "apps/backend/supabase/migrations/20261124152000_scoped_consumer_followup.sql",
+        "apps/backend/supabase/migrations/20261124220645_session_read_center_projection.sql"
       ],
       "operations": [
         "availability_save_v1",
@@ -674,8 +675,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "8b391474538d3d38779aeaa69ff623d95c7e0d9407c874362c22e192e2b9e8b6",
-        "reason": "Birleşik takvim ve aktör sınıf görevi kaynak testleri mevcut assertion gövdelerini koruyor."
+        "fingerprint": "ccbd5e479ee98114ae54fbf41f115ab4f9c309d135c319c78ee77f84b169e3bf",
+        "reason": "Yetkili kesin seans okuması opt-in gerçek merkezini, mevcut sürüm ve kapsamla döndürüyor."
       }
     },
     {
@@ -795,8 +796,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "1d57fc2b67b5d903857b333ff11a7c4bfa52fe5535e33229e11d8c9efe429d8e",
-        "reason": "Self rezervasyon ve kişi projeksiyonu native roster sınırlarıyla yeniden incelendi."
+        "fingerprint": "7e1de918bd6960c4d6b3939e9338fc0a7885b1a1888cd6d81d448dd168665c05",
+        "reason": "Ortak native test kendi rezervasyonu ve hesap bağı kaybı kapsamını kesin seans okumasında doğruluyor. Kişi dizini sözleşmesi aynı."
       }
     },
     {
@@ -1039,8 +1040,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "8ccec568fc640b9098f6fea90b959473aa5142fff67e10050005f228c1af5226",
-        "reason": "Rezervasyon görünürlüğü ve eski okuyucuların assertion gövdeleri korundu."
+        "fingerprint": "1983445e2ded4d0e2fab5f95ae476f1864a179acbc7eba5b0ede1ec6d44599d6",
+        "reason": "Rezervasyon ve takvim keşfinin kapsamı, cursor ve canlı retleri ortak seans testinde korunuyor."
       }
     },
     {
@@ -1113,8 +1114,8 @@
         "attendance_correction_request_v1"
       ],
       "review": {
-        "fingerprint": "4a160e492146b1113acd53bf8e9851b5b36a65671a503a8de76775c0fde71d3a",
-        "reason": "Yoklama adları ve gerçek kişi görünürlüğü kaynak testleri ile yeniden eşleştirildi."
+        "fingerprint": "8ca71453b34a27729b011d19fec437168422824381b682322dec2c5822ffaea2",
+        "reason": "Yoklama projeksiyonu, seans sürümü ve izinli eğitmen okuması ortak native regresyonda doğrulandı."
       }
     },
     {
@@ -2115,8 +2116,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "ed7c9edf78282a75cb3ce2321c253d4be9da981e5900fce875e7f3f63cff1dd8",
-        "reason": "Takvim ve seans görevleriyle paylaşılan test gövdeleri ve bekleme listesi sınırları korundu."
+        "fingerprint": "d8e2757916421d5a428d169f0e3a53014c733af47c6847c61e3179297390f917",
+        "reason": "Bekleme ve kaynak özeti ortak seans regresyonunda mevcut rol ve plan sınırlarıyla doğrulandı."
       }
     },
     {

@@ -22,6 +22,13 @@ Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin te
 
 Frontend ekran entegrasyonu, istek ve dönen satır sayısı ile gecikme karşılaştırması [M09 kabulünde](../../web/docs/remaining-work.md#router-query-birlesik) izlenir.
 
+<a id="xreq-074"></a>
+## XREQ-074 — Kişisel ICS bağlantısı için kesin seans merkezi
+
+[Frontend talebi](../../../docs/requests.md#xreq-074) · [Native çağrı](../../../docs/workflows.md#wf03) · [Kaynak ve test kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#xreq-074-kaynak-ve-kabul).
+
+- [ ] Aynı adayın zorunlu CI kabulü, main ve development teslimi doğrulanınca backend talebi kapanır. ICS bağlantısının rol bazlı ekran kabulü [MONO-02](../../web/docs/remaining-work.md#monorepo-geçişi) kapsamındadır.
+
 <a id="ci503-native-baslangic"></a>
 ## CI503 — Native worker başlangıcı ve ödeme yanıtı teşhisi
 

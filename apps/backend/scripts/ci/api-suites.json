@@ -1274,7 +1274,7 @@
     },
     {
       "path": "apps/backend/tests/schedule-reads.test.mjs",
-      "sha256": "29452202abaa506bc26cdc8579b17efc809213900c14fd814560f3d45cbe6226",
+      "sha256": "799337861b3a627eaaaeb69006e76205f234e7124b93f7508951b8a91e82bdbf",
       "shared": [
         [
           6,
@@ -1287,7 +1287,7 @@
           "ranges": [
             [
               12,
-              468
+              494
             ]
           ]
         }
@@ -1319,7 +1319,7 @@
           "sha256": "711436cf2c71cef5abef536f5537b157cacc3f5b2e527cce0f542f4eaef3ec0f"
         },
         {
-          "line": 469,
+          "line": 495,
           "path": "apps/backend/tests/member-lesson-discovery-acceptance.mjs",
           "sha256": "2696ee36b0cdbfd66bf6ae363bd3638a4cbba2d7a7adff9d6a5ffc1e180817d0"
         }
