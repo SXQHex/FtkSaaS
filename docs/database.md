@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `42c7aa760a672d42437fd162ff84e4487f5cf1825fc4987828f89d9811f4d159`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `e946802565734fa9287aa2e705a0691886d21c32715703a573b43e8b2114455f`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 220. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 221. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -228,3 +228,4 @@ Sıralı migration: 220. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261124012000_share_organization_read_locks.sql](../apps/backend/supabase/migrations/20261124012000_share_organization_read_locks.sql) | `64692aeae8771e9040bffeee00b219ab1ce2d15d017d312de36e85422ab597b7` |
 | [20261124013000_scoped_read_projections.sql](../apps/backend/supabase/migrations/20261124013000_scoped_read_projections.sql) | `6ce78242eb01ab9c330a4d3f11ddc98a21c0486c298d63f34463333d3eee3fac` |
 | [20261124013100_exact_public_finance_and_setup_reads.sql](../apps/backend/supabase/migrations/20261124013100_exact_public_finance_and_setup_reads.sql) | `f770dfdbb4fa45fedf9412ab7403f533e20625192be86e13899ed586e1c3d43b` |
+| [20261124013200_exact_management_readbacks.sql](../apps/backend/supabase/migrations/20261124013200_exact_management_readbacks.sql) | `c6c38223f8f7933113ab282fad4b84ba77095713269e66ccde0952562edada12` |

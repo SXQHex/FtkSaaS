@@ -12,8 +12,10 @@ Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin te
 ## XREQ-073 — M09 native okuma kapsamı
 
 - [x] Merkez ve Ekip seçicileri, takvim ve rezervasyon özetleri, aktif sınıf ataması, finans özetleri, public okuma ve Platform sıra seçicisi main’e alındı. Kaynak kabulü ve Supabase development teslimi geçti. [API kapsamı](../../../docs/requests.md#xreq-073-backend-uygulamasi) · [CI ve teslim kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#xreq-073-backend-kabulu).
-- [ ] Yönetim satırlarında canonical kişi adını mevcut kişi okuma yetkisiyle eşleştir. Stüdyo kaynak ve anlaşma özetlerini görünür kaynak ve dönem kapsamındaki ölçüme göre değerlendir.
-- [ ] Etkinliğin yönetim etiketlerini ve kayıt öncesi ödeme hazırlığı keşfini mevcut yetkiyle doğrula. Platform sıra sürümü için yazma önkoşulunu belirle. Kayıp özel ders onay yanıtında kesin seans ve rezervasyon kimliği için native readback kanıtını tamamla.
+- [x] [Son kaynak paketi](../supabase/migrations/20261124013200_exact_management_readbacks.sql) Ekip, CRM takipleri ve rezervasyon sayfalarına yetkili canonical ad, etkinlik ayrıntısına mekân/görevli etiketi, etkinlik ödemesine kesin hazırlık seçicisi ve kayıp özel ders onayı için kesin rezervasyon okumasını ekler. İzole native Auth → Edge → Data API → PostgreSQL koşusunda dört ilgili API test dosyasındaki 57 test geçti.
+- [x] Yerel karşılaştırmada aynı beş Ekip ataması için 30 örnekte 5 istek ve 9 satırdan 1 istek ve 5 satıra inildi. p50 104,21 → 41,63 ms, p95 137,36 → 73,61 ms. Aynı ortamda bir oda, bir eğitmen ve bir sınıf için mevcut program, müsaitlik, kapanış ve anlaşma okumaları 6 paralel istek ve 3 satır döndürdü. p50 42,61 ms, p95 69,94 ms. Daha geniş Stüdyo projeksiyonu kararı development ölçümüne bağlıdır.
+- [x] Platform kurulum komutu talebin kimliğini, eşleşen hesabı ve adı açık durumdayken satır kilidi altında denetler. Bu kayıtta değişebilir bir taslak alanı bulunmadığı için kesin sıra okuyucusuna ek yazma sürümü eklenmedi.
+- [ ] Son kaynak paketinin aday CI, main kabulü ve development teslimini doğrula.
 - [ ] Development ortamında aynı görünür satırlarda eşdeğerliği, istek ve satır sayısını ve hosted gecikmeyi ölç. İstemci kabulü [Frontend M09](../../web/docs/remaining-work.md#router-query-birlesik) kaydında izlenir.
 
 <a id="ci503-native-baslangic"></a>

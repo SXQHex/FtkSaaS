@@ -20,4 +20,8 @@ test('P11 Pro renewal and inactivity lists include eligible leadless students',{
  const inactive=await api('crm_followup_list_v1',{kind:'inactive_student',page:{}});assert(inactive.items.some(x=>x.person_id===target));assert(inactive.items.some(x=>x.person_id===excluded));assert(inactive.items.filter(x=>[target,excluded].includes(x.person_id)).every(x=>x.lead_id===null));
  for(const item of inactive.items)assert.equal(item.subscriber_number,(await db.query('select private.subscriber_number($1,$2) n',[org,item.person_id])).rows[0].n);
  const renewal=await api('crm_followup_list_v1',{kind:'renewal_due',page:{}});assert(renewal.items.some(x=>x.person_id===target));assert(!renewal.items.some(x=>x.person_id===excluded));
+ const withNames=await api('crm_followup_list_v1',{kind:'renewal_due',include_person_display_names:true,page:{}});
+ const visible=await api('person_get_v1',{person_id:target});
+ assert.equal(withNames.items.find(x=>x.person_id===target).person_display_name,visible.display_name);
+ assert.deepEqual(withNames.items.map(({person_display_name,...row})=>row),renewal.items);
 });

@@ -139,6 +139,22 @@ test('P01-B request intent, alternatives and atomic guarded approval through Aut
   await fail('lesson_request_approve_v1',body,'DOCUMENT_REQUIRED',owner,k);assert.deepEqual(await domainCounts(),before);assert.equal((await view(r.primary_id)).state,'pending');
   await db.query("insert into core.document_acceptances(id,org_id,person_id,account_id,document_version_id,accepted_at,operation_id,context) values($1,$2,$3,$4,$5,now(),$6,$7)",[key(),org,student.p,student.a.id,v,r.operation_id,{gate:'reservation',subject:{type:'lesson_requests',id:r.primary_id}}]);
   const result=await mut('lesson_request_approve_v1',body,owner,k);assert(result.related.some(v=>v.type==='sessions'));assert.equal((await view(r.primary_id)).state,'approved');
+  const receipt=await must(owner,'operation_status_get_v1',{org_id:org,operation:'lesson_request_approve_v1',key:k});
+  assert.equal(receipt.result_available,true);
+  assert.equal(receipt.result_reference.id,r.primary_id);
+  const approved=await view(receipt.result_reference.id);
+  assert.equal(approved.state,'approved');
+  const exact={reservation_id:approved.reservation_id,include_person_display_names:true,page:{limit:1}};
+  const page=await must(owner,'reservation_list_v1',scope(exact));
+  assert.equal(page.items.length,1);
+  assert.equal(page.next_cursor,null);
+  const reservation=page.items[0];
+  assert.equal(reservation.id,result.related.find(v=>v.type==='reservations').id);
+  assert.equal(reservation.session_id,result.related.find(v=>v.type==='sessions').id);
+  assert.equal(reservation.person_display_name,(await must(owner,'person_get_v1',scope({person_id:student.p}))).display_name);
+  assert.equal((await must(owner,'session_get_v1',scope({session_id:reservation.session_id}))).id,reservation.session_id);
+  assert.deepEqual((await must(other.u,'reservation_list_v1',scope(exact))).items,[]);
+  assert.deepEqual((await must(owner,'reservation_list_v1',scope({...exact,person_id:other.p}))).items,[]);
  });
  await t.test('status filter and center summary use the existing native management route',async()=>{
   for(let i=0;i<2;i++)await db.query("insert into core.lesson_requests(id,org_id,center_id,person_id,format,discipline_id,requested_start,duration_minutes,state) values($1,$2,$3,$4,'private',$5,$6,60,'pending')",[key(),org,center,student.p,discipline,new Date(Date.now()+(50+i)*86400000)]);

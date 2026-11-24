@@ -1,6 +1,6 @@
 # Güvenlik kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `42c7aa760a672d42437fd162ff84e4487f5cf1825fc4987828f89d9811f4d159`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `e946802565734fa9287aa2e705a0691886d21c32715703a573b43e8b2114455f`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 İnsan istemci native Auth ile JWT doğrulanan Edge yolunu, düz merkez listesi ise [istemci protokolündeki](client-integration.md) Data API yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan denetlenir. İstemci erişimi core/private ve service-only RPC dışında kalır. Worker ve public credential transport ayrı yetki yollarıdır. [Teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
 
@@ -447,6 +447,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [20261120145403_account_display_label.sql](../apps/backend/supabase/migrations/20261120145403_account_display_label.sql) | `9ad08d75b7ba5fa897a4dd6b7faa1f68e0c35f1d0eae99e344e3aa9eed9d3f5d` |
 | [20261124013000_scoped_read_projections.sql](../apps/backend/supabase/migrations/20261124013000_scoped_read_projections.sql) | `6ce78242eb01ab9c330a4d3f11ddc98a21c0486c298d63f34463333d3eee3fac` |
 | [20261124013100_exact_public_finance_and_setup_reads.sql](../apps/backend/supabase/migrations/20261124013100_exact_public_finance_and_setup_reads.sql) | `f770dfdbb4fa45fedf9412ab7403f533e20625192be86e13899ed586e1c3d43b` |
+| [20261124013200_exact_management_readbacks.sql](../apps/backend/supabase/migrations/20261124013200_exact_management_readbacks.sql) | `c6c38223f8f7933113ab282fad4b84ba77095713269e66ccde0952562edada12` |
 | [member-profile-lifecycle.sql](../apps/backend/tests/fixtures/member-profile-lifecycle.sql) | `1cac25c1610482b03cb7e594e4c28a61903bd047ae86ff724623c600dbf858d0` |
 | [product-class-management-acceptance.sql](../apps/backend/tests/fixtures/product-class-management-acceptance.sql) | `52141944d8ff08008a71d20be6b69d79e55480fad3e387f4ad377ace15a274d1` |
 | [sale-discount-acceptance.sql](../apps/backend/tests/fixtures/sale-discount-acceptance.sql) | `c17253fcdcd3460048bc35bf31c752315e1b7d5092b6c4231ab9b5349b4afc29` |
