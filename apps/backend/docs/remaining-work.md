@@ -10,6 +10,8 @@ Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin te
 
 **Yeni development olayı.** Stüdyo ve Üyeler okumalarında Edge 503, iç RPC 500 ve PostgreSQL statement timeout kanıtı [24 Kasım olay kaydında](00-FtkSaaS-yeni-sohbet-devir.md#development-503-studyo). Süre sınırını tüketen neden ve sağlıklı hosted tekrar açık.
 
+- [ ] `products_list_v1` için paylaşımlı kilit adayının CI ve development teslimini doğrula. Aynı organizasyondaki eşzamanlı canlı liste okumalarını ve süre sınırı kayıtlarını karşılaştır. [Ürün kataloğu olay ve yerel kabul kaydı](00-FtkSaaS-yeni-sohbet-devir.md#development-503-urun-katalogu).
+
 <a id="xreq-073"></a>
 ## XREQ-073 — M09 native okuma kapsamı
 

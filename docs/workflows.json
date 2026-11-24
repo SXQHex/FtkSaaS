@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "7afe28d4bbf93d9b2efe33d58f96cb8926ed03976a69c01fc8af67ef12d01505",
-        "reason": "Aday test envanteri ve migration sayısı yeni kilit regresyonuyla eşlendi. Transport zarfı, actor ve retry protokolü aynı."
+        "fingerprint": "06fe384e1f2c9574b6025a9cbec1051a83ae7a12c9b278cf4f42796137393305",
+        "reason": "Migration sayacı ve API suite özeti güncellendi. İstemci protokolü değişmedi."
       }
     },
     {
@@ -552,8 +552,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "f5a200ce6cdb56aa5f39a740df96843e1e0cdb631ca32d5344119013242f605c",
-        "reason": "Merkez disiplini ve kapanış yönetim okumaları mevcut yetki ve sürüm kontrolleriyle paylaşımlı kilit alır. Regresyon her okuma için bağımsız yazma kilidi reddini doğrular."
+        "fingerprint": "f62efe8853fcaa1a130a4dd9e84aa04e3e8d0bfbfb18a36f2999238b69241f3a",
+        "reason": "Ortak kilit testine ürün kataloğu eklendi. Stüdyo seçicileri ve yetki koruması aynı."
       }
     },
     {
@@ -791,8 +791,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "9e6aa8e3bb761360444ee285d3b41aff017b2b334b5ab20cd525879db0e203f7",
-        "reason": "Öğrenci dizini regresyonunda paylaşımlı organizasyon kilidinin yazma kilidiyle çakışması her işlem için ayrı doğrulandı."
+        "fingerprint": "0007447ce398c14786257b15a3ca8c3077964f3261d8a5bef493923778b189c1",
+        "reason": "Ortak test, kişi listesi ve ürün kataloğunun paylaşımlı okumalarını ve yazma kilidiyle çakışmayı doğruluyor. Öğrencilik davranışı aynı."
       }
     },
     {
@@ -820,7 +820,8 @@
         "apps/backend/tests/fixtures/member-profile-lifecycle.sql",
         "apps/backend/tests/web1-review-unit.mjs",
         "apps/backend/tests/member-self-discovery-unit.mjs",
-        "apps/backend/tests/member-self-discovery-acceptance.mjs"
+        "apps/backend/tests/member-self-discovery-acceptance.mjs",
+        "apps/backend/tests/student-status-filter-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -887,7 +888,8 @@
         "apps/backend/database/freeze-cancellation.sql",
         "apps/backend/supabase/migrations/20261116013944_member_time_freeze_cancel.sql",
         "apps/backend/database/member-self-discovery.sql",
-        "apps/backend/supabase/migrations/20261116223700_member_self_discovery.sql"
+        "apps/backend/supabase/migrations/20261116223700_member_self_discovery.sql",
+        "apps/backend/supabase/migrations/20261124150021_share_product_list_read_lock.sql"
       ],
       "operations": [
         "products_list_v1",
@@ -919,8 +921,8 @@
         "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "e5160a212b03db1354ad43ff554b495171949596253d6ac0d5d42235feda78b8",
-        "reason": "XREQ-073 paylaşılan sözleşme ve test kaynağı incelendi. Bu akışın komutları, mevcut alanları ve yetki koşulları aynı."
+        "fingerprint": "c6ceba47199310ef181196af20a01fb1487997dd10871b498a8d4e7457caea26",
+        "reason": "Aktif ürün kataloğu eşzamanlı okumada paylaşımlı organizasyon kilidi alır. Canlı erişim, plan ve cursor kuralları aynı."
       }
     },
     {
