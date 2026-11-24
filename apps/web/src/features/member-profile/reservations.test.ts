@@ -90,6 +90,31 @@ it("reads only the requested native cursor page and discards other members and s
   expect(result.nextCursor).toBe("native-next");
   expect(result.partial).toBe(false);
 });
+it("only opts in to the native self projection when a caller requests it", async () => {
+  await readMemberReservations(scope, personId, undefined, "past");
+  expect(call.mock.calls[0]![1]).not.toHaveProperty("include_self_summary");
+  call.mockClear();
+
+  await readMemberReservations(scope, personId, "native-current", "past", {
+    includeSelfSummary: true,
+  });
+  expect(call.mock.calls[0]).toEqual([
+    "reservation_list_v1",
+    expect.objectContaining({
+      org_id: scope.orgId,
+      center_id: scope.centerId,
+      person_id: personId,
+      time_filter: "past",
+      include_self_summary: true,
+      page: { limit: 20, sort: "created_at_desc", cursor: "native-current" },
+    }),
+  ]);
+  expect(call.mock.calls.map(([operation]) => operation)).toEqual([
+    "reservation_list_v1",
+    "session_get_v1",
+    "attendance_get_v1",
+  ]);
+});
 it.each(["all", "upcoming", "past"] as const)(
   "delegates %s to the native reader without filtering the returned cursor page",
   async (filter) => {

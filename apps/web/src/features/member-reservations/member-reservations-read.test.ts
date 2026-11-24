@@ -123,6 +123,60 @@ it("keeps history on its existing header reader without scanning discovery histo
   expect(header).toHaveBeenCalledTimes(1);
   expect(result.items[0]).toMatchObject({ title: "Mevcut başlık", lesson: undefined });
 });
+it("uses the exact member's historical title from the same reservation page", async () => {
+  reservations.mockResolvedValueOnce({
+    items: [
+      {
+        reservation: {
+          id: id(6),
+          person_id: person,
+          session_id: session.id,
+          self_summary: {
+            title: "Mevcut başlık",
+            starts_at: session.starts_at,
+            ends_at: session.ends_at,
+          },
+        },
+        session,
+      },
+    ],
+  });
+  const result = await readOwnReservations(scope, person, "past");
+  expect(result.items[0]?.title).toBe("Mevcut başlık");
+  expect(reservations).toHaveBeenCalledExactlyOnceWith(
+    scope,
+    person,
+    undefined,
+    "past",
+    expect.objectContaining({ includeSelfSummary: true }),
+  );
+  expect(header).not.toHaveBeenCalled();
+  expect(discovery).not.toHaveBeenCalled();
+});
+it("rejects projected titles with a different owner or session interval", async () => {
+  for (const [person_id, ends_at] of [
+    [id(99), session.ends_at],
+    [person, "2026-11-17T17:00:00Z"],
+  ]) {
+    reservations.mockResolvedValueOnce({
+      items: [
+        {
+          reservation: {
+            id: id(6),
+            person_id,
+            session_id: session.id,
+            self_summary: { title: "Eski başlık", starts_at: session.starts_at, ends_at },
+          },
+          session,
+        },
+      ],
+    });
+    expect((await readOwnReservations(scope, person, "past")).items[0]?.title).toBe(
+      "Mevcut başlık",
+    );
+  }
+  expect(header).toHaveBeenCalledTimes(2);
+});
 it("uses the existing header only when the native discovery has no visible session", async () => {
   discovery.mockResolvedValueOnce([]);
   expect((await readOwnReservations(scope, person, "upcoming")).items[0]!.title).toBe(

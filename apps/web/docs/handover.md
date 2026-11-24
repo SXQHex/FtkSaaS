@@ -4,7 +4,8 @@
 
 ## Kaynak ve kontrol noktası
 
-- **Güncel main · 24 Kasım 2026.** `7c4f8e7f471c9d0fa6064f76927766601a741ee4` için [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/45404516607), [merge doğrulaması](https://github.com/SXQHex/FtkSaaS/actions/runs/45404517244) ve [Cloudflare statik SPA dağıtımı](https://github.com/SXQHex/FtkSaaS/actions/runs/45404619752) başarılı.
+- **Güncel main · 24 Kasım 2026.** `eeffd4193787c02f0e633977fa9b53600dfaa46b` için [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/45417549607), [merge doğrulaması](https://github.com/SXQHex/FtkSaaS/actions/runs/45417549659) ve [Supabase development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/45417696259) başarılı. Bu kaynağın frontend ağacı, `159bb12db01afa2e7af066748656a215bc26fab2` ile aynı. [Cloudflare statik SPA dağıtımı](https://github.com/SXQHex/FtkSaaS/actions/runs/45416226329)
+- **M09 Stüdyo kaynak kabulü.** [PR #433](https://github.com/SXQHex/FtkSaaS/pull/433) head `c88098713fce7f4a34b9d148362571f67e9b6c41`, main `159bb12db01afa2e7af066748656a215bc26fab2`. [Frontend CI](https://github.com/SXQHex/FtkSaaS/actions/runs/45413355345) checks ve 12/12 Desktop Chromium başarılı.
 - **C-ortak ve Üyeler kaynak kabulü.** [PR #430](https://github.com/SXQHex/FtkSaaS/pull/430) head `f07cdfff70bd835a17a352e17e2977a05f08ac53`, main `d967ba1076852cd50ee511e468d9a28b6a8015ac`. [Frontend CI](https://github.com/SXQHex/FtkSaaS/actions/runs/45402238370) attempt 1, checks ve 12/12 Desktop Chromium başarılı. [Main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/45404113020)
 - **M09 PR #423 kaynak kabulü.** Head `c50152317077c147ba83bba45a27f2474547a07b`, base `5fa8ee30b396fe09be2cc9154bf08dfacf9bce61`, test edilen merge `2d4dafbf2b3b981c5f9797c698dfe9b2a710d18c`. Aday ve main aynı `0377b67863d15d31f5166c2aadcee407baf17332` Git ağacına sahip. [Frontend CI](https://github.com/SXQHex/FtkSaaS/actions/runs/45374829702) attempt 1 ve 12/12 Desktop Chromium başarılı. Kişi yazma reddi testi, tek istek ve sıfır kayıt kontrollerinden önce ekrandaki reddi bekliyor. [PR #423](https://github.com/SXQHex/FtkSaaS/pull/423)
 - **M09 PR #424 kaynak kabulü.** Head `341af39b9de0fe3b84bed8d99f69e49c5fad11f3`, base `f5986658d8975f9218de3655de31f69555f8a6e5`, test edilen merge `9ecf811aa900f84b10de73bb045ef77e5641e5af`, main merge `ebf2796d21460e4b91358dd3c8948547769d2f07`. Aday ve main aynı `27b90fee76f3af31ffc10e49380b1f8070b8c58c` Git ağacına sahip. [Frontend CI](https://github.com/SXQHex/FtkSaaS/actions/runs/45371217180), [Backend full clean](https://github.com/SXQHex/FtkSaaS/actions/runs/45371217211) core ve 12 API shard, [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/45373659058) başarılı. Yerel istek ölçümleri [PR #424](https://github.com/SXQHex/FtkSaaS/pull/424) içinde kayıtlı.
@@ -37,11 +38,32 @@
 
 `account_get_v1` / organizasyon / merkez / rol / `management_state_get_v1` sırasıyla 11 / 3 / 5 / 3 / 21 kaldı. Geri ve ileri adımlarının her birinde organizasyon, merkez ve rol bir kez doğrulandı. `session_get_v1` 3'ten 1'e, toplam okuma 80'den 78'e ve dönen satır 84'ten 82'ye düştü. Tarayıcı aynı belgeyi korudu. Panelde sürüm 4 ile tek `class_save_v1` çalıştı ve güncel ders adı geri okundu. Yerel süreler adıma göre arttı veya azaldı.
 
-Development'ta önceden ayrılmış sentetik test sahibiyle bir tarayıcı turunda beş ekran, geri/ileri, 20 öğelik ikinci üye sayfası ve üye özeti açıldı. Karşılaştırma turlarındaki [503 tanı kaydı](#c-common-development-503) nedeniyle sağlıklı canlı önce/sonra çifti açık. Tek yazma ve sonuç okuması yerel fixture'da çalıştırıldı. [C-ortak kabulü](remaining-work.md#router-query-birlesik)
+24 Kasım 2026’da aynı development projesinde, aynı sentetik hesap, organizasyon ve merkezle `48ad4019d3f9391c3afc0eba257329c2e1e0ee61` ve `eeffd4193787c02f0e633977fa9b53600dfaa46b` üretim derlemeleri karşılaştırıldı. Her kaynak ayrı bir 1280×720 Desktop Chromium oturumunda native giriş yaptı. Üyeler’e dönüşte iki ölçümde de ikinci sayfa tıklamasından önce aynı 450 ms beklendi. İki sayfada da 20’şer üye doğrulandı. İstek sayısına tarayıcı iptalleri ve beklenen izin/plan retleri dahil, satır sayısı başarılı yanıtları kapsar.
+
+| Canlı adım          | Okuma denemesi |   Dönen satır |                 Süre (ms) |
+| ------------------- | -------------: | ------------: | ------------------------: |
+| Giriş ve Stüdyo     |        30 → 31 |       34 → 34 |              12484 → 7137 |
+| Üyeler              |          2 → 2 |       20 → 20 |               1933 → 1961 |
+| Ders programı       |          5 → 6 |       10 → 10 |               1391 → 1755 |
+| Genel bakış         |          3 → 2 |         0 → 0 |               1949 → 1955 |
+| Ayarlar             |          8 → 8 |       13 → 16 |               3942 → 1942 |
+| Geri ve ileri       |  4 + 4 → 4 + 4 | 3 + 3 → 3 + 3 | 2392 / 1323 → 1387 / 1846 |
+| Üyeler’e dönüş      |          0 → 0 |         0 → 0 |                   73 → 87 |
+| Üyeler ikinci sayfa |          1 → 1 |       20 → 20 |               1367 → 2389 |
+| Üye özet paneli     |          0 → 0 |         0 → 0 |                  56 → 106 |
+| **Toplam**          |    **57 → 58** | **103 → 106** |                           |
+
+`account_get_v1` / organizasyon / merkez / rol / `management_state_get_v1` sırasıyla 2 / 4 / 7 / 3 / 14 kaldı. Bu canlı karşılaştırma bir başarılı çifti kapsar. Fixture’ın seçilen gününde takvim seans satırı dönmedi. Seans projeksiyonu ve tek `class_save_v1` ardından taze sonuç doğrulaması üstteki yerel fixture ölçümünde çalıştırıldı. İlk canlı turun servis hatası [503 tanı kaydında](#c-common-development-503). [C-ortak kabulü](remaining-work.md#router-query-birlesik)
 
 Üyeler araması, uygulanan arama metni değiştiğinde ilk cursor'a döner. İlk açılış ve yalnız boşluk değişiklikleri mevcut sayfayı ve seçimi korur. [WF04 tarayıcı regresyonu](../e2e/auth-people-summary.spec.ts)
 
 M09 adayında kapanış yazması sonrası aynı salon için kapanış okuması 2’den 1’e indi. Güncel Stüdyo okumasında hedef kaynak varsa makbuz kimliği o kaynaktaki satırdan doğrulanır. Hedefin doğrulanamaması yalnız okumanın yeniden denenmesine izin verir. Stüdyo kurulum özeti tek merkez ister ve beklenmeyen devam cursor’ını doğrulanmamış sonuç olarak gösterir. [Kapanış regresyonu](../e2e/auth-studio-flows.spec.ts) · [Kesin kurulum okuması](../src/features/studio/setup-enrollment.test.ts)
+
+### M09 okuma ölçümü
+
+WF03’te tam özet içeren doğrudan eğitmen ataması ve uygun özel ders adayı için aynı fixture sonucu `calendar_get_v1` + `session_get_v1` yerine tek `calendar_get_v1` ile alındı. İki senaryoda da dönen üst düzey kayıt 2’den 1’e indi. Sınıf ataması, eksik özet ve talep onayından sonra makbuzla bağlı kesin seans için `session_get_v1` sürüyor. Ders talebi seçicisinde merkez, saat, disiplin, eğitmen ve açık yoklama kontrolleri korunuyor. Bu istek ve satır sayıları yerel regresyona dayanıyor. [Eğitmen regresyonu](../src/features/instructor/instructor-read.test.ts) · [Ders talebi regresyonu](../src/features/lesson-requests/lesson-request-session-selection.test.ts) · [WF03](../../../docs/workflows.md#wf03)
+
+WF04’te bir geçmiş üye rezervasyonunun başlığı kendi `reservation_list_v1` satırından alındı. Yerel fixture’da seans başlığı için ayrı takvim çağrısı ve onun tek satırı kaldırıldı. Aynı üye/saat eşleşmesi doğrulandı. Eksik veya uyuşmayan özet kesin başlık okuyucusuna dönüyor. Seans sürümü, yoklama ve yaklaşan dersin dondurulmuş iptal kaynağı kendi native doğrulamalarını sürdürüyor. [Üye geçmişi regresyonu](../src/features/member-reservations/member-reservations-read.test.ts) · [Sayfa seçicisi regresyonu](../src/features/member-profile/reservations.test.ts) · [WF04](../../../docs/workflows.md#wf04)
 
 <a id="c-common-development-503"></a>
 
@@ -51,11 +73,12 @@ M09 adayında kapanış yazması sonrası aynı salon için kapanış okuması 2
 
 `7c4f8e7f471c9d0fa6064f76927766601a741ee4` kaynaklı tanı tekrarında Stüdyo açılışı sırasında `POST /functions/v1/backend-v1/management_state_get_v1` için `availability_exception_save_v1` seçicisi aynı hatayı verdi. Bu çağrı kapanış listesini okur. [Native akış](../../../docs/functions.md)
 
-| İstek başlangıcı UTC    | HTTP ve hata            | Tarayıcı süresi | API `trace_id`                         | Supabase `sb-request-id`               | Edge `x-deno-execution-id`             |
-| ----------------------- | ----------------------- | --------------: | -------------------------------------- | -------------------------------------- | -------------------------------------- |
-| 2026-11-24 13:38:43.300 | 503 `TEMPORARY_FAILURE` |       10.315 ms | `01a20dc7-e3fd-70e3-ac36-0e9043ce0459` | `01a20dc7-bbfc-7744-b67c-21ac6451669f` | `2a42eafc-fa4c-480a-9be2-247218628251` |
+| İstek başlangıcı UTC    | İşlem                     | HTTP ve hata            | Tarayıcı süresi | API `trace_id`                         | Supabase `sb-request-id`               | Edge `x-deno-execution-id`             |
+| ----------------------- | ------------------------- | ----------------------- | --------------: | -------------------------------------- | -------------------------------------- | -------------------------------------- |
+| 2026-11-24 13:38:43.300 | `management_state_get_v1` | 503 `TEMPORARY_FAILURE` |       10.315 ms | `01a20dc7-e3fd-70e3-ac36-0e9043ce0459` | `01a20dc7-bbfc-7744-b67c-21ac6451669f` | `2a42eafc-fa4c-480a-9be2-247218628251` |
+| 2026-11-24 14:47:44.911 | `products_list_v1`        | 503 `TEMPORARY_FAILURE` |        9.179 ms | `01a20e07-1150-7002-af51-47e81683e2bd` | `01a20e06-ee27-778d-9717-945b24fb4c9c` | `5c35e3e1-f3cd-45dc-9a2a-84f5241d4463` |
 
-Bu üç kimlik development Edge ve veritabanı loglarını ilişkilendirmek için kaydedildi. Tarayıcı kanıtı sunucu içindeki kök nedeni belirlemiyor. İnceleme, [O10 işletim ölçümü](../../backend/docs/remaining-work.md#o10) için de kaynak olabilir.
+`products_list_v1` hatası, kapanış kilidi düzeltmesinin development tesliminden sonraki ilk karşılaştırmanın `48ad4019d3f9391c3afc0eba257329c2e1e0ee61` turunda kaydedildi. UTC ve istek kimlikleri development Edge ve veritabanı loglarını ilişkilendirmek için kullanılabilir. [Kapanış düzeltmesi](https://github.com/SXQHex/FtkSaaS/pull/434) · [O10 işletim ölçümü](../../backend/docs/remaining-work.md#o10)
 
 ## Devam
 

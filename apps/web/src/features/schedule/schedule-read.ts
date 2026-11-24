@@ -12,6 +12,7 @@ import type {
 import { readClosureContext } from "../studio/closure";
 import { readStudioResources } from "../studio/studio";
 import { readStudioInstructors } from "../studio/studio-reads";
+import { calendarSessionProjection, sessionIdentity } from "./calendar-session";
 
 export async function readScheduleSources(
   scope: ClientScope,
@@ -28,19 +29,6 @@ export async function readScheduleSources(
 export async function scheduleLocalDate(instant: string, timezone: string) {
   const temporal = await getTemporal();
   return temporal.Instant.from(instant).toZonedDateTimeISO(timezone).toPlainDate().toString();
-}
-function sessionIdentity<T extends ScheduleRangeSession>(session: T, id: string) {
-  if (
-    session.id !== id ||
-    !Number.isSafeInteger(session.version) ||
-    session.version < 1 ||
-    !["planned", "occurred", "cancelled"].includes(session.state) ||
-    [session.capacity.total, session.capacity.held, session.capacity.remaining].some(
-      (value) => !Number.isSafeInteger(value) || value < 0,
-    )
-  )
-    throw new Error("SCHEDULE_SESSION_UNAVAILABLE");
-  return session;
 }
 export async function readScheduleSession(
   scope: ClientScope,
@@ -81,25 +69,6 @@ type ScheduleRangeSession = Pick<
 export type ScheduleReadItem =
   | { type: "session"; item: CalendarItem; session: ScheduleRangeSession }
   | { type: "event"; item: CalendarItem };
-
-function calendarSession(item: CalendarItem): ScheduleRangeSession | undefined {
-  const { id, starts_at, ends_at, session_summary, capacity, room_labels } = item;
-  if (!session_summary || !capacity || !("held" in capacity)) return;
-  return sessionIdentity(
-    {
-      id,
-      starts_at,
-      ends_at,
-      class_id: session_summary.class_id,
-      version: session_summary.version,
-      state: session_summary.state,
-      assignments: session_summary.assignments,
-      capacity,
-      room_labels,
-    },
-    id,
-  );
-}
 
 // Exhaust only the visible UTC interval, never all people or session history.
 // Both filters are native resource reads: intersect their complete result sets,
@@ -193,7 +162,7 @@ export async function readScheduleRange(
       ...(await Promise.all(
         items.slice(index, index + 4).map(async (item): Promise<ScheduleReadItem> => {
           if (item.type === "event") return { type: "event", item };
-          const summary = singleSource ? calendarSession(item) : undefined;
+          const summary = singleSource ? calendarSessionProjection(item) : undefined;
           if (summary) return { type: "session", item, session: summary };
           const session = sessionIdentity(
             await queryBackendRead(

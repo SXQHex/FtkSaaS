@@ -1033,6 +1033,22 @@ Frontend [M09 taraması](../apps/web/docs/remaining-work.md#router-query-birlesi
 
 **Frontend ortam gözlemi · C-ortak.** Development Edge, Stüdyo ve Üyeler’in salt okumalarında HTTP 503 / `TEMPORARY_FAILURE` döndürdü. Backend log korelasyonu için UTC, seçici, API trace, Supabase istek ve Edge yürütme kimlikleri [frontend tanı kaydında](../apps/web/docs/handover.md#c-common-development-503).
 
+<a id="m09-kalan-native-destek"></a>
+
+### Frontend tüketim doğrulaması · 24 Kasım 2026
+
+| Tüketici | Aynı yetki ve çıktıyla ayrı okumayı kaldırmak için gereken destek |
+| --- | --- |
+| Genel Bakış | Görünür takvim seansıyla aynı sürüme bağlı, mevcut kişi ve aktif oda okumasının izin verdiği eğitmen ve oda adları. |
+| Takvim ve Eğitmen Takvimi | Tek cursor içinde oda ve eğitmen koşullarının kesişimi. Eğitmen öznesinin aynı seans sürümündeki aktif sınıf görevinin görünür kanıtı. |
+| Eğitmen seans ayrıntısı | Kesin seans başlığı ve yalnız ilgili `person_get_v1` yetkisiyle görünür yoklama ve eğitmen adları. Kişi ayrıntısına izin yoksa ad gizli kalır. |
+| Üye rezervasyonları ve üye profili | Self özette aynı seansın görünür sürümü, türü, disiplini ve izinli oda/eğitmen etiketleri. Yönetici profilindeki yoklama görünürlüğü kendi yetkisine bağlı kalır. |
+| Etkinlik iç mekânı | Yetkili etkinlik mekân etiketi ile aynı merkezdeki aktif oda kaydının eşdeğerliği. Oda devre dışıysa aktif oda etiketi dönmez. |
+| Stüdyo ve çekmeceleri | Görünür kaynak/dönemde kişi-anlaşma, sınıf-program, kaynak-kapanış ve eğitmen-müsaitlik ilişkileri. Yetki, sayfa kapsamı ve komutun beklediği güncel kaynak sürümleri korunur. |
+| Public yayın durumu ve başvuru | Development Worker’da `context`, kesin `event` ve ayrıntılı takvim kiplerinin yayımlanmış şema ile eşliği. Görünür etkinlik, bağlı güncel form/onay ve anonim erişim aynı kalır. |
+
+Anonim development Worker karşılaştırmasında yerel `spa-validators` şemasının kabul ettiği aynı sentetik slug ve merkezle klasik takvim `200`, `context`, `event` ve `include_details:true` takvim isteği `400 VALIDATION_FAILED` döndürdü. Sırasıyla Cloudflare `cf-ray` değerleri `a5f945116896810f-MXP`, `a5f9450efaa6810f-MXP`, `a5f945109fe95230-MXP` ve `a5f945144897810f-MXP`. İstek gövdeleri [backend gateway kabulündeki](../apps/backend/tests/public-program-discovery-acceptance.mjs) kiplerle yapısal olarak eşleşiyor. [Development gateway sözleşmesi](client-integration.md)
+
 <a id="xreq-073-backend-degerlendirmesi"></a>
 ### Uygulama öncesi backend değerlendirmesi · 24 Kasım 2026
 

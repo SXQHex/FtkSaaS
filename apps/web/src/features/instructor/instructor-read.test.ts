@@ -139,6 +139,69 @@ describe("instructor bounded self reads", () => {
       });
     }
   });
+  it("uses the authorized calendar summary for a direct instructor assignment", async () => {
+    const item: CalendarItem = {
+      ...calendar,
+      discipline_id: session.discipline_id,
+      capacity: session.capacity,
+      room_labels: [{ room_id: id(20), name: "Salon A" }],
+      session_summary: {
+        state: session.state,
+        attendance_state: session.attendance_state,
+        format: session.format,
+        class_id: session.class_id,
+        assignments: session.assignments,
+        version: session.version,
+      },
+    };
+    mock.call.mockResolvedValue({ items: [item], next_cursor: null });
+    mock.session.mockResolvedValue(session);
+
+    await expect(readInstructorCalendar(scope, id(6), interval)).resolves.toEqual([
+      { item, session: { ...session, room_labels: item.room_labels } },
+    ]);
+    expect(mock.call).toHaveBeenCalledExactlyOnceWith(
+      "calendar_get_v1",
+      expect.objectContaining({
+        include_session_summary: true,
+        resource: { kind: "person", id: id(6) },
+      }),
+    );
+    expect(mock.session).not.toHaveBeenCalled();
+  });
+  it("checks a class-only assignment with the exact reader and excludes a booking match", async () => {
+    const item: CalendarItem = {
+      ...calendar,
+      discipline_id: session.discipline_id,
+      capacity: session.capacity,
+      room_labels: [],
+      session_summary: {
+        state: session.state,
+        attendance_state: session.attendance_state,
+        format: session.format,
+        class_id: id(20),
+        assignments: [],
+        version: session.version,
+      },
+    };
+    mock.call.mockResolvedValue({ items: [item, { ...item, id: id(22) }], next_cursor: null });
+    mock.session.mockResolvedValueOnce({
+      ...session,
+      class_id: id(20),
+      assignments: [],
+      class_assignments: [
+        { id: id(21), person_id: id(6), duty: "instructor", state: "active", version: 1 },
+      ],
+    });
+    mock.session.mockResolvedValueOnce({ ...session, id: id(22), assignments: [] });
+
+    const result = await readInstructorCalendar(scope, id(6), interval);
+    expect(result.map(({ session }) => session.id)).toEqual([session.id]);
+    expect(mock.session.mock.calls).toEqual([
+      [scope, session.id, true],
+      [scope, id(22), true],
+    ]);
+  });
   it("distinguishes omitted room labels, no assigned room, and multiple native names", () => {
     expect(instructorRoomLabel(session, "unknown", "unassigned")).toBe("unknown");
     expect(instructorRoomLabel({ ...session, room_labels: [] }, "unknown", "unassigned")).toBe(

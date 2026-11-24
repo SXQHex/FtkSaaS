@@ -6,11 +6,10 @@ Cache doğruluğu ve oturum kapsamı [kabul edildi](remaining-work.md#final-cach
 
 ## Aktif sıra
 
-| Öncelik | Teslim dilimi                                                        | Kontrol noktası                                                                                                                                                                                                     |
-| ------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1       | [M09](remaining-work.md#router-query-birlesik)                       | Yayımlanmış eşdeğer seçicilerin frontend kabulü. Ardından [XREQ-073](../../../docs/requests.md#xreq-073-backend-uygulamasi) bağımlı tüketicileri ve [M09 kabul koşulları](remaining-work.md#router-query-birlesik). |
-| 2       | [C-ortak](remaining-work.md#router-query-birlesik)                   | Aynı fixture ile okuma maliyeti karşılaştırması ve canlı ölçüm.                                                                                                                                                     |
-| 3       | [D01–D05](remaining-work.md#d--regresyon-güvenlik-ve-yayın-kapanışı) | Birleşik regresyon, dört tarayıcı ve gerekli gerçek ortam kabulü.                                                                                                                                                   |
+| Öncelik | Teslim dilimi                                                        | Kontrol noktası                                                                                                                            |
+| ------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1       | [M09](remaining-work.md#router-query-birlesik)                       | [Native ve Worker bağımlılıkları](../../../docs/requests.md#m09-kalan-native-destek), ardından açık okuyucuların frontend ölçüm ve kabulü. |
+| 2       | [D01–D05](remaining-work.md#d--regresyon-güvenlik-ve-yayın-kapanışı) | Birleşik regresyon, dört tarayıcı ve gerekli gerçek ortam kabulü.                                                                          |
 
 Her teslim ayrı branch ve Draft PR ile başlar. Kod, test ve kabul aynı kaynak SHA'sına bağlıdır. Merge ve production değişikliği açık yetkiye bağlıdır.
 
