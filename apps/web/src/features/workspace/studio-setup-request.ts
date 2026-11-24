@@ -47,6 +47,31 @@ export async function readPlatformStudioQueue(
   return result;
 }
 
+export async function readPlatformStudioRequest(
+  accountId: string,
+  requestId: string,
+  context?: AccountReadContext,
+) {
+  const id = z.uuid().parse(requestId);
+  const backend = await scopedBackend({ accountId }, undefined, context);
+  const result = page.parse(
+    await backend.call("studio_setup_list_v1", {
+      ...common(),
+      platform_queue: true,
+      setup_request_id: id,
+      page: { limit: 1 },
+    }),
+  );
+  const [row] = result.items;
+  if (
+    result.items.length > 1 ||
+    result.next_cursor ||
+    (row && (row.id !== id || row.state !== "pending"))
+  )
+    throw Error("STUDIO_SETUP_SOURCE_INVALID");
+  return row ?? null;
+}
+
 export async function readOwnStudioSetup(accountId: string, context?: AccountReadContext) {
   const backend = await scopedBackend({ accountId }, undefined, context);
   const rows = new Map<string, z.infer<typeof request>>();

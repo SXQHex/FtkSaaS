@@ -146,36 +146,16 @@ async function fixture(
         starts_at: "2026-10-31T21:00:00Z",
         ends_at: "2026-11-30T21:00:00Z",
       });
-      const base = {
-        person_id: I.self,
-        center_id: I.center,
-        session_id: sessions[0]!.id,
-        event_assignment_id: null,
-        paid_minor: "0",
-        remaining_minor: "0",
-        previous_id: null,
-        closure_id: null,
-        created_at: "2026-11-16T12:00:00Z",
-        version: 1,
-        basis: { source: "agreement_fixed", currency: "TRY", quantity: 1, excluded_blocked: 0 },
-      };
+      expect(req.summary_only).toBe(true);
+      expect(req.page).toEqual({ limit: 1 });
       return send({
-        items: req.page.cursor
-          ? [
-              { ...base, id: uid(92), amount_minor: "3", currency: "TRY", direction: "subtract" },
-              { ...base, id: uid(93), amount_minor: "100", currency: "USD", direction: "add" },
-            ]
-          : [
-              {
-                ...base,
-                id: uid(91),
-                amount_minor: "9007199254740993",
-                currency: "TRY",
-                direction: "add",
-              },
-            ],
-        next_cursor: req.page.cursor ? null : "earnings-second-page",
+        items: [],
+        next_cursor: null,
         as_of: "2026-11-16T12:00:00Z",
+        period_totals: [
+          { currency: "TRY", net_minor: "9007199254740990" },
+          { currency: "USD", net_minor: "100" },
+        ],
       });
     }
     return route.fallback();
@@ -278,7 +258,7 @@ test("instructor day reads all scoped week pages and exact monthly currencies wi
   ).toBeVisible();
   await closeWorkspaceNavigation(page);
   expect(reads.filter((row) => row.operation === "calendar_get_v1")).toHaveLength(2);
-  expect(reads.filter((row) => row.operation === "earnings_list_v1")).toHaveLength(2);
+  expect(reads.filter((row) => row.operation === "earnings_list_v1")).toHaveLength(1);
   expect(reads.filter((row) => row.operation === "attendance_get_v1")).toHaveLength(1);
   expect(
     reads.filter((row) =>

@@ -62,7 +62,8 @@ export async function readScopedReport(
     cursor,
     aggregate = false,
     limit = 20,
-  }: { cursor?: string; aggregate?: boolean; limit?: number },
+    groupBy,
+  }: { cursor?: string; aggregate?: boolean; limit?: number; groupBy?: "center" },
   readContext?: AccountReadContext,
 ): Promise<ReportView> {
   const ids = new Set(filters.center_ids);
@@ -81,6 +82,7 @@ export async function readScopedReport(
     ...(aggregate ? {} : { center_id: scope.centerId }),
     report,
     ...(report === "crm_conversion" ? { include_crm_funnel: true } : {}),
+    ...(groupBy ? { group_by: groupBy } : {}),
     filters: structuredClone(filters),
     page: { limit, ...(cursor ? { cursor } : {}) },
   });

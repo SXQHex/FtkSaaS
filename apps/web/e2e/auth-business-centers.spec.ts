@@ -185,11 +185,49 @@ async function businessFixture(page: Page, role: Role, plan = "business", active
       const requested: string[] = request.filters.center_ids;
       const amount = requested.reduce((sum, id) => sum + (id === second ? 200 : 100), 0);
       const delta = !request.center_id && discrepancy ? 50 : 0;
+      const rows = request.center_id
+        ? []
+        : requested.flatMap((center_id) => {
+            const value = center_id === second ? 200 : 100;
+            return request.report === "sales"
+              ? [
+                  {
+                    group_key: "gross_sales:2026-11-09",
+                    center_id,
+                    currency: "TRY",
+                    count: 1,
+                    amount_minor: String(value),
+                  },
+                  {
+                    group_key: "gross_sales:2026-11-09",
+                    center_id,
+                    currency: "EUR",
+                    count: 1,
+                    amount_minor: String(value * 2),
+                  },
+                ]
+              : [
+                  {
+                    group_key: "collections",
+                    center_id,
+                    currency: "TRY",
+                    count: 1,
+                    amount_minor: String(value * 2),
+                  },
+                  {
+                    group_key: "outstanding_debt",
+                    center_id,
+                    currency: "TRY",
+                    count: 1,
+                    amount_minor: String(value * 3),
+                  },
+                ];
+          });
       return send({
         report_kind: request.report,
         as_of: at,
         filters: request.filters,
-        rows: nativePage([]),
+        rows: nativePage(rows),
         totals:
           request.report === "sales"
             ? [
@@ -576,9 +614,22 @@ test("Business owner manages centers, reads native center resources, routes an a
       op === "report_get_v1" && ["sales", "collections_debts"].includes(String(request.report)),
   );
   for (const id of [I.center, second, third]) {
-    expect(reads.filter(({ request }) => request.center_id === id)).toHaveLength(2);
+    expect(reads.filter(({ request }) => request.center_id === id)).toHaveLength(0);
   }
   expect(reads.filter(({ request }) => request.center_id === undefined)).toHaveLength(2);
+  expect(reads.map(({ request }) => request)).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({
+        report: "sales",
+        filters: expect.objectContaining({ center_ids: [I.center, second, third] }),
+      }),
+      expect.objectContaining({
+        report: "collections_debts",
+        group_by: "center",
+        filters: expect.objectContaining({ center_ids: [I.center, second, third] }),
+      }),
+    ]),
+  );
   expect(
     new Set(
       reads.map(({ request }) =>
