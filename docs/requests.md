@@ -71,7 +71,7 @@ Bu dosya alanlar arası talep ve teslim kabulünün tek kaydıdır. Sohbet devri
 
 | XREQ-071 | Backend; kullanıcının ödeme onayı gecikmesi itirazı | Frontend | [WF17](workflows.md#wf17), [WF13](workflows.md#wf13); [talep ve kabul](#xreq-071) | Son onay → komut ACK → doğrulanmış görünür sonuç ayrı ölçülür; gereksiz ağ beklemeleri azaltılırken hesap/oturum, güncel kaynak, aynı-key ve readback garantileri korunur. | Değerlendirmede | Backend kaynak incelemesi tamamlandı; frontend teknik değerlendirmesi ve gerçek ekran kabulü bekleniyor. |
 | XREQ-072 | Backend; native CI boş 503 kanıtı | Yönetim | [WF00](workflows.md#wf00); [runtime kusuru ve kabul](#xreq-072) | Normal worker tamamlanması geçerli dış yanıtı iptal etmez; oneshot, kaynak/bellek sınırları ve eksiksiz native kabul korunarak kaynak bağlı runtime düzeltmesi kurulur. | Native aday doğrulandı. Kurulum ve tam CI kabulü açık. | PR395 API8 base/server iptali kaydedildi. [Backend adayının kaynağı, binary hash'i ve yerel doğrulaması](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#xreq-072-runtime-adayi). |
-| XREQ-073 | Frontend · M09 okuma maliyeti | Backend değerlendirmesi | [Frontend M09](../apps/web/docs/remaining-work.md#router-query-birlesik) · [İstek ve kabul](#xreq-073) | Mevcut kaynak ve alan yetkileriyle sınırlı typed sayfa projeksiyonları, toplamlar ve kesin seçiciler. | Backend uygulaması kısmi | [Uygulanan okumalar ve açık kabuller](#xreq-073-backend-uygulamasi). Kaynak bağlı clean ve hosted ölçüm açık. |
+| XREQ-073 | Frontend · M09 okuma maliyeti | Backend değerlendirmesi | [Frontend M09](../apps/web/docs/remaining-work.md#router-query-birlesik) · [İstek ve kabul](#xreq-073) | Mevcut kaynak ve alan yetkileriyle sınırlı typed sayfa projeksiyonları, toplamlar ve kesin seçiciler. | İlk backend kapsamı main’de | [Uygulanan okumalar](#xreq-073-backend-uygulamasi) · [CI ve teslim kanıtı](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#xreq-073-backend-kabulu) · [Kalan backend kapsamı](../apps/backend/docs/remaining-work.md#xreq-073). |
 
 Alanların kendi planlarındaki bağımlılık gözlemleri otomatik olarak talep, onay veya işe başlama yetkisi sayılmaz; somut talep bu tabloya kaydedildiğinde `XREQ-001` biçiminde sabit bir kimlik alır.
 
@@ -1032,7 +1032,7 @@ Frontend [M09 taraması](../apps/web/docs/remaining-work.md#router-query-birlesi
 **Kabul.** Aynı aktör, native oturum, organizasyon, merkez, plan, canonical veri sahibi ve alan görünürlüğü korunur. Sonuç kümesi görünür kayıt ve seçili dönemle sınırlanır. İzin reddi, kaynak yokluğu, boş sonuç ve sıfır ayrı kalır. Cursor tüm seçicilere bağlanır. İlgili pozitif ve negatif native testler, önce/sonra istek ve satır sayısı, aynı fixture'da gecikme ve ayrı hosted ölçümle doğrulanır. Komut hazırlığı, idempotent yazma ve taze sonuç okuması kendi native kontrolünde kalır.
 
 <a id="xreq-073-backend-degerlendirmesi"></a>
-### Backend değerlendirmesi · 24 Kasım 2026
+### Uygulama öncesi backend değerlendirmesi · 24 Kasım 2026
 
 **Karar önerisi.** Talep kısmen karşılanıyor. Önce mevcut işlem sonucu ve yetkili projeksiyonlar tüketilebilir. Kalan okumalar mevcut okuyuculara dar seçiciler veya isteğe bağlı alanlar olarak eklenmeli. Kaynak incelemesi `eda71119a383214c7052c01dfe8d94437158aff4` üzerinde yapıldı. Son birleşimin [kaynak doğrulaması](https://github.com/SXQHex/FtkSaaS/actions/runs/45289635510) başarılı.
 
@@ -1051,6 +1051,8 @@ Frontend [M09 taraması](../apps/web/docs/remaining-work.md#router-query-birlesi
 
 <a id="xreq-073-backend-uygulamasi"></a>
 ### Backend uygulaması
+
+[PR #412](https://github.com/SXQHex/FtkSaaS/pull/412) ile main’e alınan okumalar aşağıdadır. [Kaynak bağlı kabul ve development teslimi](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#xreq-073-backend-kabulu) ile [kalan işler](../apps/backend/docs/remaining-work.md#xreq-073) backend kayıtlarında izlenir.
 
 | Alan | Native sözleşme |
 |---|---|
