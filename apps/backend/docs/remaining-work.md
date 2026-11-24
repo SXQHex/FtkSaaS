@@ -8,6 +8,14 @@ Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin te
 - [x] Canlı RPC gecikmesini ve kişi listesi organizasyon kilidi bekleyişini ölç. İncelenen okumalarda paylaşımlı satır kilidini ve yazma/okuma çakışmasını izole PostgreSQL'de doğrula. [Ölçüm ve kaynak kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#hosted-api-gecikmesi).
 - [ ] Aday native CI ve development teslimi sonrası aynı istemci akışlarının canlı gecikmesini yeniden ölç. Organizasyon kapsamı dışındaki `account_get_v1` gecikmesi için PostgREST bekleme süresi ile PostgreSQL çalışma süresini aynı isteklerle eşleştir.
 
+<a id="xreq-073"></a>
+## XREQ-073 — M09 native okuma kapsamı
+
+- [x] Merkez ve Ekip seçicileri, takvim ve rezervasyon özetleri, aktif sınıf ataması, finans özetleri, public okuma ve Platform sıra seçicisi main’e alındı. Kaynak kabulü ve Supabase development teslimi geçti. [API kapsamı](../../../docs/requests.md#xreq-073-backend-uygulamasi) · [CI ve teslim kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#xreq-073-backend-kabulu).
+- [ ] Yönetim satırlarında canonical kişi adını mevcut kişi okuma yetkisiyle eşleştir. Stüdyo kaynak ve anlaşma özetlerini görünür kaynak ve dönem kapsamındaki ölçüme göre değerlendir.
+- [ ] Etkinliğin yönetim etiketlerini ve kayıt öncesi ödeme hazırlığı keşfini mevcut yetkiyle doğrula. Platform sıra sürümü için yazma önkoşulunu belirle. Kayıp özel ders onay yanıtında kesin seans ve rezervasyon kimliği için native readback kanıtını tamamla.
+- [ ] Development ortamında aynı görünür satırlarda eşdeğerliği, istek ve satır sayısını ve hosted gecikmeyi ölç. İstemci kabulü [Frontend M09](../../web/docs/remaining-work.md#router-query-birlesik) kaydında izlenir.
+
 <a id="ci503-native-baslangic"></a>
 ## CI503 — Native worker başlangıcı ve ödeme yanıtı teşhisi
 

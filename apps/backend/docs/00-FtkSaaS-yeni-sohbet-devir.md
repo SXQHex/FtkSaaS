@@ -1,5 +1,14 @@
 # Güncel kaynak ve kabul
 
+<a id="xreq-073-backend-kabulu"></a>
+## XREQ-073 — Native okuma kabulü
+
+[PR #412](https://github.com/SXQHex/FtkSaaS/pull/412), 24 Kasım 2026’da main `b5a772ee3a06c5e1bbdee50111b4655de6aaeca4` olarak birleşti. [Aday Backend CI](https://github.com/SXQHex/FtkSaaS/actions/runs/45302402118) ilk denemede kalite, runtime paketi, temiz DB ve 12 API shard’ında başarılı oldu. Temiz DB’ye 220 migration uygulandı.
+
+Aday head `10b9b928bf55cc4ca1eb401757e481b2f6fe8314`, base `48ad4019d3f9391c3afc0eba257329c2e1e0ee61`, test edilen birleşim `9483a73287222072c990697a82ea207b1459cfe5`. Test edilen birleşim ve main aynı `478abbcfb0c24ba9482d9d6b5d741195d81db31d` kaynak ağacına sahip. [Main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/45303377819) ve [birleşim kanıtı](https://github.com/SXQHex/FtkSaaS/actions/runs/45303377747) başarılı.
+
+Aynı main SHA için [Supabase development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/45303465801) başarılı. Kaynak, hosted backend ve dağıtılan şema doğrulamaları geçti. Hosted eşdeğerlik ve gecikme ölçümü ile [kalan kapsam](remaining-work.md#xreq-073) açık. [Uygulanan native okuyucular ve yerel ölçüm](../../../docs/requests.md#xreq-073-backend-uygulamasi).
+
 <a id="hosted-api-gecikmesi"></a>
 ## Hosted API gecikmesi ve organizasyon okuma kilidi
 
