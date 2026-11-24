@@ -3989,6 +3989,30 @@
             ],
             "additionalProperties": false
           }
+        },
+        "actor_class_duty": {
+          "type": "object",
+          "properties": {
+            "duty": {
+              "$ref": "#/$defs/Duty"
+            }
+          },
+          "required": [
+            "duty"
+          ],
+          "additionalProperties": false
+        },
+        "room_labels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SessionRoomLabel"
+          }
+        },
+        "instructor_labels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PersonReadLabel"
+          }
         }
       },
       "required": [
@@ -4213,6 +4237,15 @@
           "items": {
             "$ref": "#/$defs/SessionRoomLabel"
           }
+        },
+        "title": {
+          "$ref": "#/$defs/Text"
+        },
+        "person_labels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PersonReadLabel"
+          }
         }
       },
       "required": [
@@ -4331,6 +4364,9 @@
               "type": "null"
             }
           ]
+        },
+        "person_display_name": {
+          "$ref": "#/$defs/Text"
         }
       },
       "required": [
@@ -5637,6 +5673,17 @@
         },
         "venue_room_name": {
           "$ref": "#/$defs/Text"
+        },
+        "venue_active_room_name": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Text"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Explicit null when the internal room is inactive, absent if the caller cannot read the room."
         }
       },
       "required": [
@@ -10039,6 +10086,14 @@
         "include_session_summary": {
           "type": "boolean",
           "description": "Include lifecycle, attendance, current version and visible session duties on the returned page. Cannot be combined with member_discovery."
+        },
+        "include_management_labels": {
+          "type": "boolean",
+          "description": "Opt-in on a session summary. Includes active room and instructor names within existing management and person read authority."
+        },
+        "resource_person_id": {
+          "$ref": "#/$defs/FtkUuid",
+          "description": "Additional person filter on a room-resource calendar. Both conditions hold before paging."
         }
       },
       "required": [
@@ -10089,7 +10144,14 @@
                     }
                   }
                 ]
-              }
+              },
+              "include_session_summary": {
+                "const": false
+              },
+              "include_management_labels": {
+                "const": false
+              },
+              "resource_person_id": false
             },
             "not": {
               "anyOf": [
@@ -10104,6 +10166,52 @@
                   ]
                 }
               ]
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "resource_person_id"
+            ]
+          },
+          "then": {
+            "required": [
+              "resource"
+            ],
+            "properties": {
+              "resource": {
+                "properties": {
+                  "kind": {
+                    "const": "room"
+                  }
+                },
+                "not": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "include_management_labels"
+            ],
+            "properties": {
+              "include_management_labels": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "include_session_summary"
+            ],
+            "properties": {
+              "include_session_summary": {
+                "const": true
+              }
             }
           }
         }
@@ -10463,6 +10571,13 @@
           "type": "boolean",
           "default": false,
           "description": "Opt-in display labels only for sessions where the caller has a live instructor/assistant assignment. No room management permission."
+        },
+        "include_title": {
+          "type": "boolean"
+        },
+        "include_person_display_names": {
+          "type": "boolean",
+          "description": "Include person-reader-authorized names for session instructors and the assigned caller."
         }
       },
       "required": [
@@ -11952,6 +12067,9 @@
           "$ref": "#/$defs/FtkUuid"
         },
         "include_correction_requests": {
+          "type": "boolean"
+        },
+        "include_person_display_names": {
           "type": "boolean"
         }
       },
@@ -33425,17 +33543,37 @@
         },
         "page": {
           "$ref": "#/$defs/Page"
+        },
+        "person_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FtkUuid"
+          },
+          "minItems": 1,
+          "maxItems": 50,
+          "uniqueItems": true
         }
       },
       "required": [
         "client_api_version",
         "request_id",
         "org_id",
-        "person_id",
         "page",
         "center_id"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "required": [
+            "person_id"
+          ]
+        },
+        {
+          "required": [
+            "person_ids"
+          ]
+        }
+      ]
     },
     "Success_instructor_agreements_list": {
       "type": "object",
@@ -39312,12 +39450,31 @@
             },
             "resource": {
               "$ref": "#/$defs/ResourceRef"
+            },
+            "resources": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ResourceRef"
+              },
+              "minItems": 1,
+              "maxItems": 50,
+              "uniqueItems": true
             }
           },
-          "required": [
-            "resource"
-          ],
-          "additionalProperties": false
+          "required": [],
+          "additionalProperties": false,
+          "oneOf": [
+            {
+              "required": [
+                "resource"
+              ]
+            },
+            {
+              "required": [
+                "resources"
+              ]
+            }
+          ]
         }
       },
       "required": [
@@ -39337,12 +39494,31 @@
           "properties": {
             "resource": {
               "$ref": "#/$defs/ResourceRef"
+            },
+            "resources": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ResourceRef"
+              },
+              "minItems": 1,
+              "maxItems": 50,
+              "uniqueItems": true
             }
           },
-          "required": [
-            "resource"
-          ],
-          "additionalProperties": false
+          "required": [],
+          "additionalProperties": false,
+          "oneOf": [
+            {
+              "required": [
+                "resource"
+              ]
+            },
+            {
+              "required": [
+                "resources"
+              ]
+            }
+          ]
         }
       },
       "required": [
@@ -40017,12 +40193,31 @@
             },
             "program_id": {
               "$ref": "#/$defs/FtkUuid"
+            },
+            "class_ids": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "minItems": 1,
+              "maxItems": 50,
+              "uniqueItems": true
             }
           },
-          "required": [
-            "class_id"
-          ],
-          "additionalProperties": false
+          "required": [],
+          "additionalProperties": false,
+          "oneOf": [
+            {
+              "required": [
+                "class_id"
+              ]
+            },
+            {
+              "required": [
+                "class_ids"
+              ]
+            }
+          ]
         }
       },
       "required": [
@@ -68807,6 +69002,30 @@
         },
         "cancellation": {
           "$ref": "#/$defs/MemberLessonCancellation"
+        },
+        "session_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "session_state": {
+          "$ref": "#/$defs/SessionState"
+        },
+        "format": {
+          "$ref": "#/$defs/SessionFormat"
+        },
+        "discipline_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "room_labels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Text"
+          }
+        },
+        "instructor_labels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Text"
+          }
         }
       },
       "required": [
@@ -68881,6 +69100,22 @@
         "id",
         "state",
         "version"
+      ],
+      "additionalProperties": false
+    },
+    "PersonReadLabel": {
+      "type": "object",
+      "properties": {
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "name": {
+          "$ref": "#/$defs/Text"
+        }
+      },
+      "required": [
+        "person_id",
+        "name"
       ],
       "additionalProperties": false
     }
@@ -118491,6 +118726,36 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_calendar_get/properties/resource_person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_instructor_agreements_list/properties/person_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_program_preview_v1/properties/key/properties/class_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ReservationSelfSummary/properties/discipline_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PersonReadLabel/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -119001,7 +119266,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 223,
+      "migration_count": 224,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

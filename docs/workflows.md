@@ -44,6 +44,8 @@ Hesap kimliği, native provider ve oturum komutlarının alan/sürüm ayrıntıl
 
 ## WF02
 
+Stüdyo uygunluk ve kapanış okuyucularında `selector.key.resources` tekil `resource` yerine 1–50 farklı oda veya kişi kabul eder. Her kaynak aynı merkezde ve mevcut plan/yetkiyle doğrulanır. Tek cursor bütün seçimi kapsar ve her öğe gerçek `current.values.resource` değerini taşır. Uygunlukta kural sürümü, kapanışta merkez aggregate sürümü kullanılır. Yazma ve sonrasındaki taze tekil okuma mevcut seçicileri kullanır.
+
 `roles_list_v1(include_person_display_names:true)` görünür atama sayfasına `person_display_name` ekleyebilir. Ad, aynı organizasyon ve istek merkeziyle bağımsız `person_get_v1` okuması izinliyse canonical kayıttan gelir. Bu seçenek cursor kapsamına dahildir.
 
 Kesin merkez okumasında `centers_list_v1(center_id,page)` mevcut görünürlükle tek satır, saat dilimi ve sürüm döndürür. Erişilemeyen görünürlük kapsamı boş kalır. Ekip için `management_state_get_v1` üzerinden `permission_set_v1` seçicisinde `key:{person_id,permission_summary:true}` kullanılır. Dönen kişi canonical kimliktir. `versions` yazmanın kişi sürümünü, `permission_overrides` kayıtlı seçimi ve varsa override sürümünü taşır. `effective_staff_grant` canlı personel grant kontrolünün sonucudur. Her komut kendi ek plan, rol ve politika koşullarını uygular.
@@ -94,6 +96,10 @@ Kapanış için mevcut aynı-resource management listesi gerçek `exception_id`,
 
 ## WF03
 
+Oda ve eğitmeni birlikte süzmek için `calendar_get_v1` isteğinde `resource:{kind:room,id}` ve `resource_person_id` gönder. Kesişim mevcut görünür kümede cursor ve limitten önce uygulanır. `include_session_summary:true` seansın sürümüne bağlı `actor_class_duty` alanını yalnız çağıranın canlı rolü ve geçerli sınıf görevi varsa döndürür. `include_management_labels:true` aynı özette kişi okuyucusunun izin verdiği eğitmen adlarını ve merkez yöneticisinin görebildiği aktif oda adlarını ekler. Eksik özet veya sürüm uyuşmazlığında kesin okumaya dönülür. `session_get_v1` için `include_title:true` kesin seans başlığını, `include_person_display_names:true` yetkili eğitmen ve atanmış çağıran adlarını `person_labels` içinde verir. İki alanda da mevcut seans yetkisi geçerlidir.
+
+Stüdyo program okumasında `selector.key.class_ids` tekil `class_id` yerine 1–50 farklı sınıf kabul eder. Sınıflar aynı merkez ve plan kapsamında doğrulanır. Tek cursor seçilen sınıfları kapsar. Her program satırı kendi sınıf ve program sürümlerini taşır.
+
 `calendar_get_v1(include_session_summary:true)` görünür sayfa içindeki seanslara yaşam döngüsü, yoklama durumu, sürüm, sınıf/format ve seans görevlerini ekler. Yönetim anlaşması, ücret ve katılımcı alanları yoktur. Var olan oda etiketi isteği ve yetkisi ayrı kalır. Özet seçeneği aralık, kaynak ve aktörle birlikte cursor kapsamına girer. Üye ders keşfi kendi `member_lesson` projeksiyonunu kullanır. Yönetim sınıf kataloğunda `class_save_v1` management seçicisine `class_assignment_instructor_id` eklemek yalnız aktif sınıfları ve seçili eğitmenin atama durumu/gerçek satır sürümünü döndürür. Atama bulunmazsa id, durum ve sürüm null gelir. Bu seçici de cursor kapsamına bağlıdır.
 
 Öğrencinin henüz kayıtlı olmadığı grup/özel dersler için ayrı opt-in takvim keşfi ve güvenli politika/etiket tüketimi [WF06](#wf06) sahibindedir; normal takvim/seans/roster yetkisi genişletilmez.
@@ -135,6 +141,8 @@ Program/seans değişikliği preview'sinde bu doğrulama noktasında geçerli an
 **Seans düzenleme ve telafi keşfi:** `management_state_get_v1(operation:session_change_preview_v1,selector:{operation:session_change_preview_v1,key:{session_id,scope}},page)` gerçek `sessions` kimliği/sürümü, durum ve `current.values.patch` içinde mevcut UTC aralığı, aktif kaynaklar ve public `{total,categories?}` kapasitesini verir. single seçili kaydı; this_and_future aynı programın seçili başlangıç ve sonrasındaki kayıtlarını kapsar. Yetki, plan ve merkez orijinal schedule.manage preflight'ından geçer; okuma yazının uygunluk garantisi değildir. Sonrasında seçili değişiklikle normal preview→onay→apply gerekir. `operation:replacement_session_create_v1`, aynı selector ve `key:{replaces_id}` mevcut telafi seanslarını gerçek entity/sürüm ve kalıcı `current.values.replaces_id` bağıyla listeler; boş sayfa telafi bulunmadığı anlamındadır. Bu tarihçe receipt veya tarayıcı belleğinden türetilmez. Her iki okumada created_at_asc/limit≤200 cursor kullanılır; filtre/aktör/kapsam değişimi VALIDATION_FAILED, içerik değişimi VERSION_CONFLICT sonrası ilk sayfadan okunur.
 
 ## WF04
+
+Rezervasyonun `self_summary` alanı seans sürümü, durumu, türü ve disiplin kimliğini de taşıyabilir. `room_labels` ve `instructor_labels` yalnız aynı seans üyenin mevcut ders keşfi kurallarıyla görünürse gelir. Geçmiş satırlarda kesinleşmiş kendi yoklaması ve bağlı iptal kaynağı korunur. Yönetici profilinde başka kişinin satırına self özet veya yeni yoklama yetkisi eklenmez.
 
 `reservation_list_v1(include_self_summary:true)` aynı canonical kişinin kendi rezervasyonuna seans başlığını, aralığını, kesinleşen yoklamayı ve rezervasyona bağlı iptal politikasını ekler. Açık yoklamada sonuç null kalır. Başka katılımcıların satırları bu alanı taşımaz. Seçenek cursor kapsamına bağlıdır.
 
@@ -262,6 +270,8 @@ Cursor aktör/hesap/org/merkez/aralık/keşif modu ve kronolojik sıralamaya ba�
 **Yeni rezervasyonda borç politikası:** `reservation_create_v1`, mevcut yazma yetkileri doğrulandıktan sonra etkin `debt_booking` ve ödenmemiş borç nedeniyle `DEBT_BOOKING_BLOCKED` döndürür. Hata borç kimliği veya tutar taşımaz. Yetki reddi mevcut genel koduyla kalır. Hata halinde rezervasyon, tahsis veya başarılı işlem makbuzu oluşmaz.
 
 ## WF07
+
+`attendance_get_v1(include_person_display_names:true)` mevcut roster yanıtının her satırına, bağımsız `person_get_v1` yetkisi izin veriyorsa `person_display_name` ekler. Bu seçenek roster kapsamını veya yoklama durumunu değiştirmez. Seans ayrıntısından okunmuş `version` ile `session_version` aynı olmalıdır.
 
 **Yoklama penceresi ve düzeltme talebi.** `policy_publish_v1(key:attendance_window,value:{kind:attendance_window,opens_minutes_before,closes_minutes_after})` başlangıç öncesi ve bitiş sonrası dakika uzaklıklarını yayımlar. Etkin kaynak varsa pencere yoklamanın fiilî başlangıç ve taslak işlemlerini sınırlar. Mevcut yetkili kapanış, geç tamamlanmış derslerin sonlandırılması için kullanılabilir. `attendance_get_v1(include_correction_requests:true)` etkin sınırları ve yetkili düzeltme taleplerini döndürür. Etkin politika yoksa pencere null’dır. Atanmış eğitmen `attendance_correction_request_v1(session_id,closure_revision,reason)` çağırır. Aynı eğitmen ve kapanış revizyonu için tek talep vardır. Canlı CM aynı komutu `correction_request_id,expected_version,decision` ile kullanır. Yeni yoklama revizyonu eski talebin incelenmesini engeller. Kabul, mevcut preview/apply zincirinden ayrı bir karardır ve yoklamayı, hakkı veya hakedişi değiştirmez.
 
@@ -472,6 +482,8 @@ Standart planın etkin ticari limitleri geçmiş katalog/fiyat satırı değişt
 
 ## WF14
 
+Stüdyo anlaşma listesinde `instructor_agreements_list_v1.person_ids` tekil `person_id` yerine 1–50 farklı kimlik kabul eder. Merkez ve `earnings.manage` sınırı değişmez. Tek cursor seçilen kimlikleri kapsar ve satırlar asıl kişi, şart ve sürüm bilgilerini korur.
+
 `earnings_list_v1(summary_only:true)` aktif özne eğitmenin seçili merkezi ve `[starts_at,ends_at)` dönemi için para birimi başına işaretli `period_totals` döndürür. Satır ve cursor dönmez. Eşleşen hareket yoksa dizi boştur. Sıfıra ulaşan tutar ilgili para birimiyle döner. Yetkili yönetim `instructor_finance_directory_get_v1(view:instructors,include_closed_session_count:true)` çağrısında yalnız sayfadaki eğitmenlerin aynı dönem ve merkez için farklı kapalı seans sayısını alır.
 
 **Yönetici keşfi (W1-BE-33):** `instructor_finance_directory_get_v1(org_id,center_id,view:instructors|earnings|payments,page,person_id?,interval?)` mevcut earnings.read yönetim kapsamındaki org reader veya CM içindir; self eğitmen bu endpoint’i kullanamaz. Açık erişilebilir merkez ve F20 zorunludur; eski self/earnings/anlaşma getter’ları ve yetkileri değişmez. interval yokluğu bütün dönemlerdir; varsa yarı açık UTC dönemdir. Native p06 cursor hesabı/aktörü/bütün filtreyi ve tam sonucu bağlar; canlı defter değişirse VERSION_CONFLICT ile ilk sayfadan okunur.
@@ -508,7 +520,7 @@ Yayımlanmış anlaşma zinciri immutable'dır; yerine geçen sürüm açık pre
 
 ## WF15
 
-`event_get_v1(include_management_labels:true)` görünür görev satırlarına bağımsız organizasyon kapsamlı kişi okuması izin veriyorsa `person_display_name` ekler. İç mekânın `venue_room_name` alanı mevcut merkez oda dizini yetkisini ister. `event_payment_get_v1` hazırlık kimliğini veya `selection:{event_id,person_id,registration_id?}` seçicisini kabul eder. Kayıt kimliği yoksa açık hazırlık, varsa aynı kişi ve etkinliğe bağlı kesin hazırlık okunur. Mevcut CM, tahsilat ve kendine ait hazırlık kuralları geçerlidir. Sonuç yokluğu `NOT_FOUND`, yetki reddi `FORBIDDEN` olarak döner.
+`event_get_v1(include_management_labels:true)` görünür görev satırlarına bağımsız organizasyon kapsamlı kişi okuması izin veriyorsa `person_display_name` ekler. İç mekânın `venue_room_name` alanı mevcut merkez oda dizini yetkisini ister. Aynı yetkiyle gelen `venue_active_room_name` aktif oda adını taşır, oda devre dışıysa `null` döner. Özgün mekân etiketi geçmiş kayıt için korunur. `event_payment_get_v1` hazırlık kimliğini veya `selection:{event_id,person_id,registration_id?}` seçicisini kabul eder. Kayıt kimliği yoksa açık hazırlık, varsa aynı kişi ve etkinliğe bağlı kesin hazırlık okunur. Mevcut CM, tahsilat ve kendine ait hazırlık kuralları geçerlidir. Sonuç yokluğu `NOT_FOUND`, yetki reddi `FORBIDDEN` olarak döner.
 
 Yönetim etkinlik dizini: `event_list_v1(center_id,interval,discipline_id?,query?,status?,include_summary:true,page)` kullanır. `query` boş olmayan, kırpılmış başlığın büyük/küçük harfsiz literal alt dizisidir; `status` all/published/draft/occurred/cancelled olup saatten türetilmez. Başlık, disiplin, aralık kesişimi ve native görünürlük limitten önce; durum da cursor/limitten önce uygulanır. Cursor aktör/hesap, org/merkez, aralık, disiplin, arama, durum ve özet seçimine bağlıdır; filtre değişince ilk sayfaya dönülür. `as_of` sayfalama damgasıdır, değişmez veri snapshot'ı değildir; canlı yetki her çağrıda denetlenir. Bu seçenekler yoksa eski okuyucu ve DTO korunur.
 

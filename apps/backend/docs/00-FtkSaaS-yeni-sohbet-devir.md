@@ -105,6 +105,17 @@ Aynı main SHA için [Supabase development teslimi](https://github.com/SXQHex/Ft
 
 24 Kasım development ölçümünde bir Pro sahibi aynı merkezdeki yedi rol satırını native Auth → Edge ile okudu. Mevcut ayrı kişi okumaları ve birleştirilmiş projeksiyon 12 dönüşümlü eşleştirmede aynı yedi adı ve aynı satırları döndürdü. İstek sayısı 8 → 1, API yanıtlarındaki kayıt sayısı 14 → 7, istemci toplam p50 936 → 202 ms ve p95 4.801 → 1.962 ms oldu. Kesin merkez seçicisi aynı aktörün görünür listesindeki tek merkezle eşleşti. Aynı merkezde takvimdeki dört seansın durumu, yoklama durumu, sürümü, formatı ve sınıf kimliği 12 eşleştirmede mevcut seans detaylarıyla aynıydı. Dört seans ve bir etkinlik için 5 → 1 istek ve 9 → 5 kayıt ölçüldü. İstemci toplam p50 513 → 235 ms, p95 1.401 → 853 ms oldu. Ölçümler tek merkez ve tek test hesabı kapsamındadır. Diğer XREQ-073 akışları için ek canlı ölçüm veya geniş Stüdyo projeksiyonu yürütülmedi.
 
+### XREQ-073 — Takip adayının kaynak doğrulaması
+
+İzole PostgreSQL 17 üzerinde 224 migration boş veritabanına uygulandı. Sentetik Auth kimliğiyle service-role RPC ve üretilmiş DTO doğrulayıcılarından takvim kesişimi, seans/yoklama projeksiyonu, kendi rezervasyon özeti, iki kaynaklı uygunluk/kapanış, iki sınıflı program, çoklu kişi anlaşması ve etkinliğin aktif oda etiketi sınandı. [İlk aday CI](https://github.com/SXQHex/FtkSaaS/actions/runs/45428620160) core doğrulamasında `Edge bundle drift` ile durdu. Geçici çalışma ağacındaki sözleşme paketinin bağlantısı başka checkout’a çözülmüş ve eski doğrulayıcılar Edge bundle’ına girmişti. Bağlantı aday kaynağına alındı ve izlenen `backend-v1/index.js` yeniden üretildi. Eski bundle ile istek `400` ve yanıt `500` yeniden görüldü. Yeni bundle sentetik Auth ve gerçek loopback PostgreSQL RPC’siyle dokuz isteği kabul etti ve geçersiz isteği reddetti. Normal Auth ve Edge zinciri yeni aday CI’da doğrulanır. [Takip işi](remaining-work.md#xreq-073-takip).
+
+<a id="xreq-073-development-worker"></a>
+### XREQ-073 — Public development Worker
+
+24 Kasım’da 13 Kasım tarihli development Worker sürümünde klasik takvim `200`, yeni kipler `400 VALIDATION_FAILED` verdi. Kabul edilmiş main `52e542d58981657881790dbe4aa6a09769c64fa1` kaynağından üretilen Worker modülünün SHA256'sı `2fb172684dadc879d9b1f89ab54271ad9ab484f90057355252a24dd8bf0985ea`. Sürüm `f18d4d45-d8cc-4a2e-aca6-23c380fc6c90`, deployment `673a31a8-a628-465e-bbb7-60e68c7560d5` ile development trafiğinin yüzde 100’ünde okundu. Mevcut origin ve secret binding adlarıyla uyumluluk ayarları sürümden doğrulandı.
+
+Aynı sentetik slug ve merkezle kaynak şemasından geçen klasik takvim, `context`, kesin `event` ve `include_details:true` sırasıyla `200` döndü. Her yanıt uygulama origin’i ve `no-store` başlıklarını korudu. Bilinmeyen alan `400 VALIDATION_FAILED` döndü. Bu ölçüm anonim transport ve gizli yayın kapsamındaki boş sonuç içindir. Yayın ve gerçek form/onay çıktısının eşliği [native kabul senaryosunda](../tests/public-program-discovery-acceptance.mjs) izlenir.
+
 <a id="web1-backend-canli-takip-kapanisi"></a>
 ## Web1 — Backend canlı tekrar kapanışı
 
@@ -177,7 +188,7 @@ Yerel `verify` sözleşme, yönetişim ve restore testlerinde 468/468, CI araç 
 
 24 Kasım 2026’da 17.47.53 TSİ’de `products_list_v1`, [development dağıtımı](https://github.com/SXQHex/FtkSaaS/actions/runs/45417696259) sonrasında Edge v114 üzerinden HTTP 503 verdi. Edge 9,03 saniyede, iç RPC HTTP 500 ile 8,67 saniyede tamamlandı. Aynı PostgreSQL oturumu organizasyon satırında iki `FOR UPDATE` bekleyişinde toplam 5,58 saniye geçirdi ve `57014` statement timeout ile kesildi. Ardından aynı işlem için üç HTTP 200 kaydedildi.
 
-İzole native Supabase’de ürün listesi başka bir okuma organizasyon kilidini tutarken başarısız oldu. [Yeni migration](../supabase/migrations/20261124150021_share_product_list_read_lock.sql) yalnız `products_list_v1` için organizasyon kilidini `FOR SHARE` yapar. Eşzamanlı okumalar ilerlerken organizasyon yazma ve yetki kaldırma kilitleriyle çakışma sürer. [Kilit regresyonu](../tests/student-status-filter-acceptance.mjs) ve [Auth → Edge → RPC katalog kabulü](../tests/p01-catalog-entitlement-reads.test.mjs) toplam 22/22 geçti. Aday CI ve dağıtımdan sonra eşzamanlı canlı tekrar bekleniyor.
+İzole native Supabase’de ürün listesi başka bir okuma organizasyon kilidini tutarken başarısız oldu. [Yeni migration](../supabase/migrations/20261124150021_share_product_list_read_lock.sql) yalnız `products_list_v1` için organizasyon kilidini `FOR SHARE` yapar. Eşzamanlı okumalar ilerlerken organizasyon yazma ve yetki kaldırma kilitleriyle çakışma sürer. [Kilit regresyonu](../tests/student-status-filter-acceptance.mjs) ve [Auth → Edge → RPC katalog kabulü](../tests/p01-catalog-entitlement-reads.test.mjs) toplam 22/22 geçti. [PR #437](https://github.com/SXQHex/FtkSaaS/pull/437) `52e542d58981657881790dbe4aa6a09769c64fa1` olarak birleşti. [Main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/45422561991) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/45422689632) geçti. Eşzamanlı canlı tekrar [backlog kaydında](remaining-work.md#hosted-api-gecikmesi) açık.
 
 <a id="xreq-071-backend-kapanisi"></a>
 ### XREQ-071 — Ödeme onayı backend incelemesi

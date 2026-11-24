@@ -80,7 +80,7 @@
     },
     {
       "path": "apps/backend/tests/availability-policies.test.mjs",
-      "sha256": "0a5b32fefdcf26662228a0bfc536fec35bdce0e5fcfc1b1381322d18ae35e036",
+      "sha256": "8c2ce56cd9688b94c7f859f3549d9336a55bd759cbc8b07778f23a67bb0f8ecf",
       "shared": [
         [
           2,
@@ -93,7 +93,7 @@
           "ranges": [
             [
               9,
-              268
+              312
             ]
           ]
         }
@@ -370,7 +370,7 @@
         {
           "line": 417,
           "path": "apps/backend/tests/event-directory-finance-acceptance.mjs",
-          "sha256": "be69a9ef078c0fe5b1123152c2ec5196e799dbac748cc7ba21e28dfb54c27479"
+          "sha256": "8a63a2636fee9b588029881edde0d20ae8045eca6f62b3ce389a0a0c06d4eddb"
         },
         {
           "line": 418,
@@ -385,7 +385,7 @@
         {
           "line": 420,
           "path": "apps/backend/tests/public-program-discovery-acceptance.mjs",
-          "sha256": "ffdee037635954efccd897647b9b8da8bad4c09ea493f603d5719603f237b443"
+          "sha256": "46d416b24f120b132ed8238caa63c658fa10c2cf8c4433c3a84b86ddadf6242d"
         },
         {
           "line": 421,
@@ -402,15 +402,15 @@
     },
     {
       "path": "apps/backend/tests/instructor-earnings.test.mjs",
-      "sha256": "8838a2055147c4633ef530539ca76cb88ebfdbdf760e45ce0e23a212445bf13a",
+      "sha256": "310a8db036e0791d180e4b20407cbb7373851bf6ac20d91eb3589ac877fd2ba5",
       "shared": [
         [
           2,
           71
         ],
         [
-          398,
-          399
+          413,
+          414
         ]
       ],
       "parts": [
@@ -419,11 +419,11 @@
           "ranges": [
             [
               72,
-              105
+              120
             ],
             [
-              400,
-              400
+              415,
+              415
             ]
           ]
         },
@@ -431,12 +431,12 @@
           "id": "earnings-packages-corrections",
           "ranges": [
             [
-              106,
-              190
+              121,
+              205
             ],
             [
-              401,
-              401
+              416,
+              416
             ]
           ]
         },
@@ -444,12 +444,12 @@
           "id": "earnings-valuation-closure",
           "ranges": [
             [
-              191,
-              245
+              206,
+              260
             ],
             [
-              402,
-              402
+              417,
+              417
             ]
           ]
         },
@@ -457,12 +457,12 @@
           "id": "earnings-occurrence-authority",
           "ranges": [
             [
-              246,
-              365
+              261,
+              380
             ],
             [
-              403,
-              403
+              418,
+              418
             ]
           ]
         },
@@ -470,12 +470,12 @@
           "id": "earnings-pilot",
           "ranges": [
             [
-              366,
-              397
+              381,
+              412
             ],
             [
-              404,
-              404
+              419,
+              419
             ]
           ]
         }
@@ -703,15 +703,15 @@
     },
     {
       "path": "apps/backend/tests/program-session-lifecycle.test.mjs",
-      "sha256": "e6b30d3fbcfb197cc4fe3b9d7ec53093374c1a51d230befee17a740bd7b8d627",
+      "sha256": "fbb2c21345c56ab71f07f93afe185b3a331156e47e38f18f48ef103165406d17",
       "shared": [
         [
           3,
           9
         ],
         [
-          492,
-          492
+          508,
+          508
         ]
       ],
       "parts": [
@@ -720,7 +720,7 @@
           "ranges": [
             [
               10,
-              491
+              507
             ]
           ]
         },
@@ -728,8 +728,8 @@
           "id": "program-session-lifecycle-root-2",
           "ranges": [
             [
-              493,
-              612
+              509,
+              628
             ]
           ]
         }
@@ -1274,7 +1274,7 @@
     },
     {
       "path": "apps/backend/tests/schedule-reads.test.mjs",
-      "sha256": "543bc77155bd3466c6a479d2999c381a8d9a8ffaf7cce9a55b7358e68c39c46d",
+      "sha256": "29452202abaa506bc26cdc8579b17efc809213900c14fd814560f3d45cbe6226",
       "shared": [
         [
           6,
@@ -1287,7 +1287,7 @@
           "ranges": [
             [
               12,
-              328
+              468
             ]
           ]
         }
@@ -1319,7 +1319,7 @@
           "sha256": "711436cf2c71cef5abef536f5537b157cacc3f5b2e527cce0f542f4eaef3ec0f"
         },
         {
-          "line": 329,
+          "line": 469,
           "path": "apps/backend/tests/member-lesson-discovery-acceptance.mjs",
           "sha256": "2696ee36b0cdbfd66bf6ae363bd3638a4cbba2d7a7adff9d6a5ffc1e180817d0"
         }
