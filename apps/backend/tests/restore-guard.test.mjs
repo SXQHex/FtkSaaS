@@ -24,7 +24,7 @@ test('signed malformed request ID array is rejected',()=>{const x=fixture();cons
 for(const name of ['snapshot','captured_at'])test('snapshot metadata cannot hide structured payload in '+name,()=>{const x=fixture();const data=JSON.parse(x.snapshotBytes);data[name]={hidden_rows:[{id:erased}]};x.snapshotBytes=Buffer.from(JSON.stringify(data));x.trust.snapshot_sha256=sha256(x.snapshotBytes);assert.throws(()=>inspectRestore(x),/INVALID_SNAPSHOT/);});
 
 // Real disk + Ed25519 adapter tests: no database/provider substitutes.
-const {appendErasure,rotateErasureRegister}=await import('../scripts/erasure-register.mjs');
+const {appendErasure,rotateErasureRegister,signErasureCheckpointRotation,publishErasureCheckpoint,readErasureCheckpoint}=await import('../scripts/erasure-register.mjs');
 const fs=await import('node:fs');const path=await import('node:path');const os=await import('node:os');
 function diskFixture(run){const dir=fs.mkdtempSync(path.join(os.tmpdir(),'erasure-register-'));try{return run(path.join(dir,'ledger.json'));}finally{fs.rmSync(dir,{recursive:true,force:true});}}
 function appendArgs(file){return{file,privateKeyPem:privateKey.export({type:'pkcs8',format:'pem'}),publicKeyPem:pem,sourceProjectRef:'abcdefghijklmnopqrst',expectedHead:null,expectedSequence:0,entry:{request_id:request,kind:'account',subject_ids:[erased],completed_at:'2026-10-29T10:00:00.000Z'},now:'2026-10-29T11:00:00.000Z'};}
@@ -41,6 +41,75 @@ function rotationArgs(args,head){
   publicKeyPem:pair.publicKey.export({type:'spki',format:'pem'}),now:'2026-10-29T11:01:00.000Z'
  };
 }
+
+test('independent checkpoint verifies the signed head and publishes rotation in order',()=>diskFixture(file=>{
+ const args=appendArgs(file),first=appendErasure(args);
+ const independent=fs.mkdtempSync(path.join(os.tmpdir(),'erasure-checkpoint-'));
+ try{
+  const checkpointFile=path.join(independent,'restore-head.json');
+  const checkpoint={checkpointFile,sourceProjectRef:args.sourceProjectRef};
+  const publication={...checkpoint,registerFile:file,head:first,expected:null,publicKeyPem:args.publicKeyPem,now};
+  const before=publishErasureCheckpoint(publication);
+  assert.deepEqual(readErasureCheckpoint(checkpoint),before);
+  assert.equal(fs.statSync(checkpointFile).mode&0o777,0o600);
+  assert.deepEqual(publishErasureCheckpoint(publication),before);
+  const rotation=rotationArgs(args,first),previousLedgerBytes=fs.readFileSync(file);
+  const head=rotateErasureRegister(rotation),next={...publication,head,publicKeyPem:rotation.publicKeyPem};
+  assert.throws(()=>publishErasureCheckpoint(next),/CHECKPOINT_HEAD_CONFLICT/);
+  assert.deepEqual(readErasureCheckpoint(checkpoint),before);
+  assert.throws(()=>publishErasureCheckpoint({...next,expected:before,publicKeyPem:pem}),/INVALID_LEDGER_SIGNATURE/);
+  assert.throws(()=>publishErasureCheckpoint({...next,expected:before}),/PREVIOUS_ERASURE_LEDGER_REQUIRED/);
+  assert.throws(()=>publishErasureCheckpoint({...next,expected:before,previousLedgerBytes}),/CHECKPOINT_ROTATION_NOT_AUTHORIZED/);
+  const rotationSignature=signErasureCheckpointRotation({...next,previous:before,previousPrivateKeyPem:args.privateKeyPem});
+  const current=publishErasureCheckpoint({...next,expected:before,previousLedgerBytes,rotationSignature});
+  assert.equal(current.ledger_sequence,2);
+  assert.equal(current.ledger_sha256,sha256(fs.readFileSync(file)));
+  assert.deepEqual(readErasureCheckpoint(checkpoint),current);
+  assert.throws(()=>publishErasureCheckpoint(publication),/LEDGER_DIGEST_MISMATCH/);
+ }finally{fs.rmSync(independent,{recursive:true,force:true});}
+}));
+
+test('checkpoint publication rejects a correctly signed replacement that discards prior receipts',()=>diskFixture(file=>{
+ const args=appendArgs(file),first=appendErasure(args);
+ const previousLedgerBytes=fs.readFileSync(file);
+ const independent=fs.mkdtempSync(path.join(os.tmpdir(),'erasure-checkpoint-'));
+ try{
+  const checkpointFile=path.join(independent,'restore-head.json');
+  const checkpoint={checkpointFile,sourceProjectRef:args.sourceProjectRef};
+  const publication={...checkpoint,registerFile:file,head:first,expected:null,publicKeyPem:pem,now};
+  const before=publishErasureCheckpoint(publication);
+  const payload=JSON.parse(previousLedgerBytes);
+  delete payload.signature;
+  const replacement={...payload,sequence:2,erasures:[{...args.entry,subject_ids:[other]}]};
+  const bytes=Buffer.from(JSON.stringify({...replacement,signature:sign(null,Buffer.from(canonical(replacement)),privateKey).toString('base64')}));
+  fs.writeFileSync(file,bytes,{mode:0o600});
+  assert.throws(()=>publishErasureCheckpoint({...publication,expected:before,head:{sha256:sha256(bytes),sequence:2},previousLedgerBytes}),/CHECKPOINT_ERASURE_HISTORY_MISMATCH/);
+  assert.deepEqual(readErasureCheckpoint(checkpoint),before);
+  fs.writeFileSync(file,previousLedgerBytes,{mode:0o600});
+  const head=appendErasure({...args,expectedHead:first.sha256,expectedSequence:first.sequence,
+   entry:{...args.entry,request_id:other,subject_ids:[other]}});
+  const after=publishErasureCheckpoint({...publication,expected:before,head,previousLedgerBytes});
+  assert.equal(after.ledger_sequence,2);
+  assert.deepEqual(readErasureCheckpoint(checkpoint),after);
+ }finally{fs.rmSync(independent,{recursive:true,force:true});}
+}));
+
+test('checkpoint reads fail closed on interrupted publication or a different project',()=>diskFixture(file=>{
+ const args=appendArgs(file),head=appendErasure(args);
+ const independent=fs.mkdtempSync(path.join(os.tmpdir(),'erasure-checkpoint-'));
+ try{
+  const checkpointFile=path.join(independent,'restore-head.json');
+  const checkpoint={checkpointFile,sourceProjectRef:args.sourceProjectRef};
+  const publication={...checkpoint,registerFile:file,head,expected:null,publicKeyPem:args.publicKeyPem,now};
+  assert.throws(()=>publishErasureCheckpoint({...publication,checkpointFile:path.join(path.dirname(file),'head.json')}),/INDEPENDENT_CHECKPOINT_REQUIRED/);
+  publishErasureCheckpoint(publication);
+  assert.throws(()=>readErasureCheckpoint({...checkpoint,sourceProjectRef:'bcdefghijklmnopqrstu'}),/INVALID_ERASURE_CHECKPOINT/);
+  fs.writeFileSync(checkpointFile+'.pending','interrupted checkpoint publication',{mode:0o600});
+  assert.throws(()=>readErasureCheckpoint(checkpoint),/CHECKPOINT_RECOVERY_REQUIRED/);
+  assert.throws(()=>publishErasureCheckpoint(publication),/CHECKPOINT_RECOVERY_REQUIRED/);
+  assert.equal(fs.readFileSync(checkpointFile+'.pending','utf8'),'interrupted checkpoint publication');
+ }finally{fs.rmSync(independent,{recursive:true,force:true});}
+}));
 
 test('key rotation preserves receipts and requires a new trusted head before restore',()=>diskFixture(file=>{
  const args=appendArgs(file),first=appendErasure(args),rotation=rotationArgs(args,first),oldBytes=fs.readFileSync(file);

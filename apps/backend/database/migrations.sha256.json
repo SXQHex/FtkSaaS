@@ -226,5 +226,7 @@
   "20261124211200_account_native_retention_hold.sql": "5b918546bc6e28c6f7d7d82af3ee21e58cef2bdd98e69ba36d1a2fa2e52c074a",
   "20261124214437_p06_tracking_retention_holds.sql": "35f587158918f944ac47f9a05e085e22c6160315fab05e296b0e06b423c4302d",
   "20261124220645_session_read_center_projection.sql": "0b1f571b1c84fe755ba81b8f965e56f715380c4549ba799edaf8cbe0209639b3",
-  "20261124222220_account_security_history_minimization.sql": "34fd4cf20222572129b11b519163b0f934fadcb1eec2a02156a3a0c55bf157b5"
+  "20261124222220_account_security_history_minimization.sql": "34fd4cf20222572129b11b519163b0f934fadcb1eec2a02156a3a0c55bf157b5",
+  "20261124224225_organization_contact_erasure.sql": "592e0f08fb45010d4d1346af8fc129b66f651ca8c370eb5a667d67b8d061d610",
+  "20261124224526_p07_storage_import_erasure.sql": "a198587bebbeecb1e33f2b372807edc75fb95aa6967c55c78b469295be0fc925"
 }
