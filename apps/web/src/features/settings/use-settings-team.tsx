@@ -108,12 +108,15 @@ export function useSettingsTeam({
   });
   const records = enabled && !page.isError ? page.data?.records : undefined;
   const permissions = useQuery({
-    queryKey: ["settings-team-permissions", scope, person?.id, permissionKeys],
-    queryFn: (context) => readTeamPermissions(scope, person!.id, permissionKeys, context),
+    queryKey: ["settings-team-permissions", scope, person?.id],
+    queryFn: (context) => readTeamPermissions(scope, person!.id, context),
     enabled: enabled && visible && level === "center" && !!person,
     retry: false,
     refetchOnWindowFocus: false,
   });
+  const visiblePermissions = permissions.data?.filter((row) =>
+    permissionKeys.includes(row.permission),
+  );
   const denied = lostScope(page.error) || lostScope(permissions.error);
   useEffect(() => {
     for (const error of [page.error, permissions.error])
@@ -163,11 +166,13 @@ export function useSettingsTeam({
     command.reset();
   }
   async function changePermission(personId: string, key: string, value: boolean) {
+    const permission = visiblePermissions?.find((row) => row.permission === key)?.permission;
     if (
       locked ||
       preparing ||
       !writable ||
-      !permissionKeys.includes(key as TeamPermission) ||
+      permissions.isError ||
+      !permission ||
       personId !== person?.id ||
       denied
     )
@@ -175,7 +180,7 @@ export function useSettingsTeam({
     setPreparing(true);
     setError(false);
     try {
-      const intent = await prepareTeamPermission(scope, personId, key as TeamPermission, value);
+      const intent = await prepareTeamPermission(scope, personId, permission, value);
       command.reset();
       setAccepted(false);
       setReview(intent);
@@ -186,13 +191,13 @@ export function useSettingsTeam({
     }
   }
   const matrix: SettingsViewData["permissions"] =
-    enabled && level === "center" && person && !permissions.isError && permissions.data
+    enabled && level === "center" && person && !permissions.isError && visiblePermissions
       ? {
           people: [{ id: person.id, name: person.display_name }],
-          rows: permissions.data.map((row) => ({
+          rows: visiblePermissions.map((row) => ({
             id: row.permission,
             label: permissionLabels[row.permission],
-            values: { [person.id]: { value: row.enabled, writable } },
+            values: { [person.id]: { value: row.enabled ?? row.effectiveStaffGrant, writable } },
           })),
         }
       : undefined;

@@ -25,7 +25,9 @@ import {
 } from "./settings-downgrade";
 import {
   readTeamPage,
+  readTeamPermissions,
   prepareTeamPermission,
+  teamPermissions,
   writeTeam,
   teamResult,
   prepareTeamRole,
@@ -152,7 +154,9 @@ const snapshot = (
   next_cursor: null,
   as_of: at,
 });
-beforeEach(() => call.mockReset());
+beforeEach(() => {
+  call.mockReset();
+});
 it("shares the verified organization subscription across centers without caching a command scope", async () => {
   call.mockResolvedValue(sub);
   const queries = new QueryClient({ defaultOptions: { queries: { staleTime: 30_000 } } });
@@ -455,6 +459,95 @@ it("team directory reads only one native role page and its actual visible people
   });
   expect(call.mock.calls.some((row) => row[0] === "management_state_get_v1")).toBe(false);
 });
+const permissionRows = teamPermissions.map((permission, index) => ({
+  permission,
+  override_exists: index < 2,
+  enabled: index < 2 ? index === 0 : null,
+  override_version: index < 2 ? 2 : null,
+  effective_staff_grant: index === 2,
+}));
+it("reads all selected center permissions once and keeps override, effective grant and person version distinct", async () => {
+  const personId = id(21);
+  call.mockImplementation(async (_operation, request) => {
+    const { permission_summary, permission } = request.selector.key;
+    return snapshot(
+      "permission_set_v1",
+      "people",
+      personId,
+      permission_summary
+        ? { person_id: personId, permission_overrides: permissionRows }
+        : { person_id: personId, permission, enabled: false, override_exists: false },
+      [{ entity: { type: "people", id: personId }, version: 7 }],
+    );
+  });
+  const result = await readTeamPermissions(scope, personId);
+  expect(call).toHaveBeenCalledExactlyOnceWith(
+    "management_state_get_v1",
+    expect.objectContaining({
+      org_id: scope.orgId,
+      center_id: scope.centerId,
+      selector: {
+        operation: "permission_set_v1",
+        key: { person_id: personId, permission_summary: true },
+      },
+      page: { limit: 1 },
+    }),
+  );
+  expect(result.slice(0, 3)).toMatchObject([
+    {
+      personId,
+      enabled: true,
+      overrideExists: true,
+      overrideVersion: 2,
+      effectiveStaffGrant: false,
+      version: 7,
+    },
+    {
+      personId,
+      enabled: false,
+      overrideExists: true,
+      overrideVersion: 2,
+      effectiveStaffGrant: false,
+      version: 7,
+    },
+    {
+      personId,
+      enabled: null,
+      overrideExists: false,
+      overrideVersion: null,
+      effectiveStaffGrant: true,
+      version: 7,
+    },
+  ]);
+  call.mockResolvedValueOnce(
+    snapshot("permission_set_v1", "people", personId, {
+      person_id: personId,
+      permission_overrides: permissionRows.slice(0, 1),
+    }),
+  );
+  await expect(readTeamPermissions(scope, personId)).resolves.toHaveLength(1);
+});
+
+it.each(["foreign", "duplicate", "invalid-override"])(
+  "rejects a %s permission summary",
+  async (scenario) => {
+    const personId = scenario === "foreign" ? id(23) : id(21);
+    const overrides =
+      scenario === "duplicate"
+        ? [permissionRows[0], permissionRows[0]]
+        : scenario === "invalid-override"
+          ? [{ ...permissionRows[0], override_version: null }]
+          : permissionRows;
+    call.mockResolvedValue(
+      snapshot("permission_set_v1", "people", personId, {
+        person_id: personId,
+        permission_overrides: overrides,
+      }),
+    );
+    await expect(readTeamPermissions(scope, id(21))).rejects.toThrow("TEAM_PERMISSION_UNAVAILABLE");
+  },
+);
+
 it("single permission change uses the real person version and verifies the native effective override after ACK", async () => {
   let version = 3,
     enabled = false;
@@ -464,7 +557,12 @@ it("single permission change uses the real person version and verifies the nativ
           "permission_set_v1",
           "people",
           id(21),
-          { person_id: id(21), permission: "sale.write", enabled, override_exists: enabled },
+          {
+            person_id: id(21),
+            permission: "sale.write",
+            override_exists: enabled,
+            ...(enabled ? { enabled } : {}),
+          },
           [{ entity: { type: "people", id: id(21) }, version }],
         )
       : { primary_id: id(22) },

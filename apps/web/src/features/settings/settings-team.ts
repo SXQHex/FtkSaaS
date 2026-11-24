@@ -4,6 +4,7 @@ import type { ClientScope, AccountReadContext } from "../../lib/scoped-backend";
 import { scopedBackend } from "../../lib/scoped-backend";
 import type {
   InstructorRevocationPreview,
+  ManagementSelectorPermissionSetV1,
   Permission,
   RoleView,
   RequestRoleAssign,
@@ -151,52 +152,113 @@ export async function readTeamPersonRoles(
     throw Error("TEAM_SOURCE_INVALID");
   return items;
 }
-export async function readTeamPermission(
+async function readTeamPermissionSource(
   scope: ClientScope,
-  personId: string,
-  permission: TeamPermission,
-  client?: Awaited<ReturnType<typeof scopedBackend>>,
+  key: ManagementSelectorPermissionSetV1["key"],
+  readContext?: AccountReadContext,
 ) {
-  const data = await (client ?? (await scopedBackend(scope))).call("management_state_get_v1", {
+  const personId = z.uuid().parse(key.person_id);
+  const backend = await scopedBackend(scope, undefined, readContext);
+  const data = await backend.call("management_state_get_v1", {
     ...common(scope),
     request_id: uuidv7(),
     operation: "permission_set_v1",
-    selector: { operation: "permission_set_v1", key: { person_id: personId, permission } },
+    selector: { operation: "permission_set_v1", key },
     page: { limit: 1 },
   });
   const row = data.items[0];
   if (
     data.items.length !== 1 ||
     data.next_cursor ||
-    row?.current?.operation !== "permission_set_v1" ||
-    row.current.values.person_id !== personId ||
-    row.current.values.permission !== permission ||
-    typeof row.current.values.enabled !== "boolean" ||
-    typeof row.current.values.override_exists !== "boolean"
+    !row?.exists ||
+    row.operation !== "permission_set_v1" ||
+    row.entity?.type !== "people" ||
+    row.entity.id !== personId ||
+    row.current?.operation !== "permission_set_v1" ||
+    row.current.values.person_id !== personId
   )
     throw Error("TEAM_PERMISSION_UNAVAILABLE");
   const versions = row.versions.filter(
     (item) => item.entity.type === "people" && item.entity.id === personId,
   );
   if (versions.length !== 1) throw Error("TEAM_PERMISSION_UNAVAILABLE");
+  const version = z.number().int().positive().safe().parse(versions[0]!.version);
+  return { values: row.current.values, version };
+}
+
+async function readTeamPermission(
+  scope: ClientScope,
+  personId: string,
+  permission: TeamPermission,
+) {
+  const { values, version } = await readTeamPermissionSource(scope, {
+    person_id: personId,
+    permission,
+  });
+  const { enabled, override_exists: overrideExists } = values;
+  if (
+    values.permission !== permission ||
+    typeof overrideExists !== "boolean" ||
+    (overrideExists && typeof enabled !== "boolean")
+  )
+    throw Error("TEAM_PERMISSION_UNAVAILABLE");
   return {
     personId,
     permission,
-    enabled: row.current.values.enabled,
-    overrideExists: row.current.values.override_exists,
-    version: z.number().int().positive().safe().parse(versions[0]!.version),
+    enabled: overrideExists ? enabled : null,
+    overrideExists,
+    version,
   };
 }
+
+const permissionSummary = z.array(
+  z.object({
+    permission: z.string().min(1),
+    override_exists: z.boolean(),
+    enabled: z.boolean().nullable(),
+    override_version: z.number().int().positive().safe().nullable(),
+    effective_staff_grant: z.boolean(),
+  }),
+);
+
 export async function readTeamPermissions(
   scope: ClientScope,
   personId: string,
-  permissions: readonly TeamPermission[] = teamPermissions,
   readContext?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope, undefined, readContext);
-  return Promise.all(
-    permissions.map((permission) => readTeamPermission(scope, personId, permission, backend)),
+  const { values, version } = await readTeamPermissionSource(
+    scope,
+    { person_id: personId, permission_summary: true },
+    readContext,
   );
+  const source = permissionSummary.safeParse(values.permission_overrides);
+  if (!source.success) throw Error("TEAM_PERMISSION_UNAVAILABLE");
+  const byPermission = new Map(source.data.map((row) => [row.permission, row]));
+  if (
+    byPermission.size !== source.data.length ||
+    source.data.some((row) =>
+      row.override_exists
+        ? row.enabled === null || row.override_version === null
+        : row.enabled !== null || row.override_version !== null,
+    )
+  )
+    throw Error("TEAM_PERMISSION_UNAVAILABLE");
+  return teamPermissions.flatMap((permission) => {
+    const row = byPermission.get(permission);
+    return row
+      ? [
+          {
+            personId,
+            permission,
+            enabled: row.enabled,
+            overrideExists: row.override_exists,
+            overrideVersion: row.override_version,
+            effectiveStaffGrant: row.effective_staff_grant,
+            version,
+          },
+        ]
+      : [];
+  });
 }
 export type TeamIntent =
   | {

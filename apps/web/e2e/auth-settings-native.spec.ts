@@ -786,8 +786,25 @@ test("team permission unknown state blocks scope and retries exactly one frozen 
 }) => {
   const f = await mockSettingsCompletion(page, { permissionUnknown: true });
   await page.getByRole("tab", { name: "Ekip", exact: true }).click();
+  const panelStart = f.requests.length;
   await page.getByRole("button", { name: "İzinleri seç", exact: true }).click();
   await page.getByRole("tab", { name: "İzinler", exact: true }).click();
+  await expect(
+    page.getByRole("checkbox", { name: "Sentetik personel: Satış", exact: true }),
+  ).toBeVisible();
+  const panelReads = requestsFor(f.requests.slice(panelStart), "management_state_get_v1").filter(
+    (row) => row.r.operation === "permission_set_v1",
+  );
+  expect(panelReads).toHaveLength(1);
+  expect(panelReads[0]!.r).toMatchObject({
+    org_id: I.org,
+    center_id: I.center,
+    selector: {
+      operation: "permission_set_v1",
+      key: { person_id: I.instructor, permission_summary: true },
+    },
+    page: { limit: 1 },
+  });
   await page
     .getByRole("checkbox", { name: "Sentetik personel: Satış", exact: true })
     .press("Space");
@@ -828,6 +845,32 @@ test("team permission unknown state blocks scope and retries exactly one frozen 
   expect(f.state.permissions["person.manage"]).toBe(false);
   await manageReview.getByRole("button", { name: "Vazgeç", exact: true }).click();
   await expect(manage).not.toBeChecked();
+
+  await page.getByRole("tab", { name: "Kişiler", exact: true }).click();
+  await page
+    .getByRole("combobox", { name: "Görev türü", exact: true })
+    .selectOption("center_manager");
+  const managerStart = f.requests.length;
+  await page
+    .getByRole("row")
+    .filter({ hasText: "Sentetik yönetici" })
+    .getByRole("button", { name: "İzinleri seç", exact: true })
+    .click();
+  await page.getByRole("tab", { name: "İzinler", exact: true }).click();
+  const managerPermissions = page.getByRole("tabpanel", { name: "İzinler", exact: true });
+  await expect(managerPermissions.getByRole("checkbox")).toHaveCount(1);
+  await expect(managerPermissions.getByRole("checkbox")).toHaveAccessibleName(
+    `Sentetik yönetici: ${common.settings.teamNative.permissions.sale.discount}`,
+  );
+  const managerReads = requestsFor(
+    f.requests.slice(managerStart),
+    "management_state_get_v1",
+  ).filter((row) => row.r.operation === "permission_set_v1");
+  expect(managerReads).toHaveLength(1);
+  expect(managerReads[0]!.r.selector.key).toEqual({
+    person_id: uid(130),
+    permission_summary: true,
+  });
 });
 test("operational team role is a separate reviewed command and native channel/template limits stay read-only on mobile", async ({
   page,
