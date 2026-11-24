@@ -228,5 +228,7 @@
   "20261124220645_session_read_center_projection.sql": "0b1f571b1c84fe755ba81b8f965e56f715380c4549ba799edaf8cbe0209639b3",
   "20261124222220_account_security_history_minimization.sql": "34fd4cf20222572129b11b519163b0f934fadcb1eec2a02156a3a0c55bf157b5",
   "20261124224225_organization_contact_erasure.sql": "592e0f08fb45010d4d1346af8fc129b66f651ca8c370eb5a667d67b8d061d610",
-  "20261124224526_p07_storage_import_erasure.sql": "a198587bebbeecb1e33f2b372807edc75fb95aa6967c55c78b469295be0fc925"
+  "20261124224526_p07_storage_import_erasure.sql": "a198587bebbeecb1e33f2b372807edc75fb95aa6967c55c78b469295be0fc925",
+  "20261124230652_organization_export_and_source_erasure.sql": "227d944f40b36d03009fa96433a8a53f8d3b40a4eeeedf3b39c561f440251427",
+  "20261124230835_organization_operational_erasure.sql": "af4aecf877911100b3a27781edd131e88f69c935039b49ea6c4499e27234e9ca"
 }

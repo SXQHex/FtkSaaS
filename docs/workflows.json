@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "40febae8113756a5a4beb843dfb717d305a97e81fbdb39559b18be60ca42d76c",
-        "reason": "İmha migration envanteri ve ayrık Storage yetki kanıtları ortak kabulde incelendi."
+        "fingerprint": "f6f90fdf6460bc233f2c93c9cf14bdb2b4324bdbb8a147ae5094e1f07056a93b",
+        "reason": "İmha migration sayımı, mevcut makine sözleşmesi envanteri ve üretim bağları doğrulandı."
       }
     },
     {
@@ -1694,8 +1694,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "348f45b09803c53fcf660bb9c181d82aaf19f1a57a61efb8a93296970f6625e9",
-        "reason": "Ortak P07 lifecycle kapsamındaki organizasyon, Storage ve korunan finans adımları incelendi."
+        "fingerprint": "b48dbcf8d360ea80bd2dfa295c3b69eb60ebc91c92f424be5bd601374257bc8f",
+        "reason": "Ortak P07 native kabulünde abonelik ve finans kanıtı ile operasyonel imha sınırı incelendi."
       }
     },
     {
@@ -1945,7 +1945,8 @@
         "apps/backend/tests/public-program-discovery-acceptance.mjs",
         "apps/backend/tests/account-identity-acceptance.mjs",
         "apps/backend/tests/p07-storage-erasure-acceptance.mjs",
-        "apps/backend/tests/p07-storage-erasure-unit.mjs"
+        "apps/backend/tests/p07-storage-erasure-unit.mjs",
+        "apps/backend/tests/native-erasure-restore-fixture.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -2023,7 +2024,9 @@
         "apps/backend/supabase/migrations/20261124013100_exact_public_finance_and_setup_reads.sql",
         "apps/backend/supabase/migrations/20261124224225_organization_contact_erasure.sql",
         "apps/backend/supabase/migrations/20261124224526_p07_storage_import_erasure.sql",
-        "apps/backend/scripts/p07-storage-erasure.mjs"
+        "apps/backend/scripts/p07-storage-erasure.mjs",
+        "apps/backend/supabase/migrations/20261124230652_organization_export_and_source_erasure.sql",
+        "apps/backend/supabase/migrations/20261124230835_organization_operational_erasure.sql"
       ],
       "operations": [
         "account_delete_preview_v1",
@@ -2048,8 +2051,8 @@
         "platform_operator_access_set_v1"
       ],
       "review": {
-        "fingerprint": "3a438794ab80c611d7177abe0e6825acf7e29ed321f7725affb1807bcc9af958",
-        "reason": "Organizasyon ve Storage makbuz sınırları, imzalı checkpoint sürekliliği ve gerçek PostgreSQL yüklemesi incelendi."
+        "fingerprint": "8f2ce93ff765c5f32ad61ac5b1a80c2d3ffcd48543c95eff1aa78b1e05129bbb",
+        "reason": "Davet ve CRM minimizasyonu, bağlı kaynakların korunması ve gerçek makbuzla restore kabulü incelendi."
       }
     },
     {
@@ -2153,7 +2156,8 @@
         "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
         "apps/backend/tests/content-catalog-acceptance.mjs",
         "apps/backend/tests/p07-storage-erasure-acceptance.mjs",
-        "apps/backend/tests/p07-storage-erasure-unit.mjs"
+        "apps/backend/tests/p07-storage-erasure-unit.mjs",
+        "apps/backend/tests/native-erasure-restore-fixture.mjs"
       ],
       "sources": [
         "apps/backend/database/automation-results.sql",
@@ -2241,7 +2245,9 @@
         "apps/backend/supabase/migrations/20261119170003_sql_report_pagination.sql",
         "apps/backend/supabase/migrations/20261124224225_organization_contact_erasure.sql",
         "apps/backend/supabase/migrations/20261124224526_p07_storage_import_erasure.sql",
-        "apps/backend/scripts/p07-storage-erasure.mjs"
+        "apps/backend/scripts/p07-storage-erasure.mjs",
+        "apps/backend/supabase/migrations/20261124230652_organization_export_and_source_erasure.sql",
+        "apps/backend/supabase/migrations/20261124230835_organization_operational_erasure.sql"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -2256,8 +2262,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "8ede34aa7479320b96d9f69e824b1dae9023211108ca4f955ce3386cffcbd756",
-        "reason": "P07 exact lease ve hold fence, ayrı Storage attestor ve güvenli tekrar senaryoları incelendi."
+        "fingerprint": "5d2ef2902581ddbd5c592f0a6dbfd897a23d26e5e4e73da3390c0ca6d8c1d51d",
+        "reason": "Organizasyon kapsamı, exact worker bağlantısı ve export ile Storage makbuzlarının gerçek checkpoint girdisi incelendi."
       }
     }
   ]

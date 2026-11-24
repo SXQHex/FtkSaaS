@@ -925,7 +925,9 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 
 **Organizasyon DB imhası:** Mevcut P07 worker veritabanı kapsamını `pending` bırakır. Kalan uygulama, organizasyona ait silinebilir satırları kayıt bazlı blokaj ve belgeli saklama kapsamıyla ayırıp imha etmek. Kabul, başka organizasyonların ve ortak giriş hesaplarının korunmasını da doğrular. [Kalıcı silme kapsamı](../../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md#kalıcı-silme-kapsamı).
 
-**Bağımsız iletişim kayıtları:** Kuruluşa bağlı ayrı P07 yetkisi, ortak hesap veya birleştirilmiş kişiyle bağlı olmayan e-posta ve telefon kayıtlarını sınırlı gruplar halinde temizler. Kayıt, kişi, merkez veya organizasyon blokajı geçerlidir. [İzole DB kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#o04-o07-kapanis-tatbikati). Kalan karma veri ve gerekli arşiv kayıtlarının ayrımı ile native aday ve development kabulü açık.
+**Bağımsız iletişim kayıtları:** Kuruluşa bağlı ayrı P07 yetkisi, ortak hesap veya birleştirilmiş kişiyle bağlı olmayan e-posta ve telefon kayıtlarını sınırlı gruplar halinde temizler. Kayıt, kişi, merkez veya organizasyon blokajı geçerlidir. [Native aday ve development teslimi](00-FtkSaaS-yeni-sohbet-devir.md#o04-o07-kapanis-tatbikati) doğrulandı. Kalan karma veri ve gerekli arşiv kayıtlarının ayrımı açık.
+
+**Davet ve CRM kişisel alanları:** Organizasyona bağlı P07 kapsamı terminal davet tesliminin alıcı ve şifreli gönderim alanlarını, CRM iletişim ve takip satırının serbest notunu temizler. Saklama blokajı, karma sahiplik, açık iş ve sonuç kayıtları korunur. Finans, belge onayı ve denetim kanıtının gerekli alanlara indirgenmesi ve arşiv ayrımı açık.
 
 <a id="o05"></a>
 ### O05 — Storage ve export fiziksel imha
@@ -946,12 +948,14 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 
 **Geçici takip kopyaları:** Önizleme ve işlem bağlamı kopyalarının hold kontrollü expiry temizliği [aday, main ve development kabulünü](00-FtkSaaS-yeni-sohbet-devir.md#o05-gecici-takip-kopyalari) geçti. Bir sonraki Storage kabulünün [nesne envanteri](00-FtkSaaS-yeni-sohbet-devir.md#o05-storage-envanter-kabul) ve [doğrulama sınırı](remote-backend-setup.md#o05-storage-on-kontrolu) kayıtlıdır.
 
-**Süresi dolmuş import yüklemeleri:** Bağlı P07 worker, tamamlanmamış import yüklemesinin bağımsız Storage bağını, güncel blokajı ve bayt özetini doğrular. Ayrı attestor, API ile silme ve yetkili nesne yokluğu doğrulandıktan sonra değişmez makbuzu yazar. Hazır iş belgeleri, kaynak dosyalar ve diğer geçici aktarım yüzeylerinin kabulü açık.
+**Süresi dolmuş import yüklemeleri:** Bağlı P07 worker, tamamlanmamış import yüklemesinin bağımsız Storage bağını, güncel blokajı ve bayt özetini doğrular. Ayrı attestor, API ile silme ve yetkili nesne yokluğu doğrulandıktan sonra değişmez makbuzu yazar. [Native aday ve development teslimi](00-FtkSaaS-yeni-sohbet-devir.md#o04-o07-kapanis-tatbikati) doğrulandı. Hazır iş belgeleri, kaynak dosyalar ve diğer geçici aktarım yüzeylerinin kabulü açık.
+
+**Organizasyon export ve bağlantısız hazır kaynakları:** Aynı P07 talebi kapsamında, doğrulanmış geçici DB rapor baytları ve bağlı kullanımı olmayan hazır import nesneleri ayrı değişmez makbuz üretir. İşe bağlanmış import kaynakları ve işleme kopyaları, belge ve fatura baytları için saklama ile imha sınırı ve açık kalan yürütüm kendi kapsamlarında doğrulanır.
 
 <a id="o06"></a>
 ### O06 — Bağımsız imha sicili
 
-- [ ] **Durum:** [Sicil, anahtar rotasyonu ve checkpoint yayımı izole kabulü](00-FtkSaaS-yeni-sohbet-devir.md#o04-o07-kapanis-tatbikati) geçti, tamamlanmış imha makbuzuyla kalıcı işletim kabulü açık · **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
+- [ ] **Durum:** [Gerçek alt aşama makbuzlarıyla bağımsız checkpoint kabulü](00-FtkSaaS-yeni-sohbet-devir.md#o04-o07-gercek-makbuz) geçti, tüm kapsam makbuzuyla kalıcı işletim kabulü açık · **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
 - **Bağımlılık:** O04,O05
 - **Kabul:** İmzalı sicil gerçek imha sonucuna ve bağımsız güncel checkpoint/trust kaynağına bağlıdır.
 - **Sınır/olumsuz durum:** Sicil ve trust aynı eski backup ile geriye alınamaz; tamamlanmamış imha başarı yazmaz.
@@ -962,7 +966,7 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 <a id="o07"></a>
 ### O07 — Guard ile gerçek restore yükleyicisi
 
-- [ ] **Durum:** [Bağımsız checkpoint kullanan izole PostgreSQL tatbikatı](00-FtkSaaS-yeni-sohbet-devir.md#o04-o07-kapanis-tatbikati) geçti, O06’da tamamlanmış imha makbuzu bekleniyor · **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
+- [ ] **Durum:** [Gerçek alt aşama makbuzlarına bağlı izole PostgreSQL tatbikatı](00-FtkSaaS-yeni-sohbet-devir.md#o04-o07-gercek-makbuz) geçti, O06’nın kalıcı işletim kabulü bekleniyor · **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
 - **Bağımlılık:** O06
 - **Kabul:** Guard reddi yüklemeyi, loader hatası hizmete erişim açılmasını engeller.
 - **Sınır/olumsuz durum:** Kod rollback DB restore değildir; production reset/seed yok.

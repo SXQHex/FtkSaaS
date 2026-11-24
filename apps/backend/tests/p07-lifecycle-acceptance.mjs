@@ -123,6 +123,36 @@ test('P07 billing and privacy use live Auth, atomic receipts and scoped native w
    const status=await must(owner,'job_status_get_v1',{org_id:org,job_id:deleted.job_id});assert.equal(status.privacy.request_state,'partial');assert(!status.privacy.pending_scopes.includes('auth'));assert.equal(status.privacy.completed_at,null);
    assert(status.privacy.pending_scopes.includes('database'));
    assert.equal((await q('select state from core.accounts where id=$1',[account.id]))[0].state,'active');assert.equal((await call(owner,'organization_reopen_v1',{org_id:org},key())).result.ok,false);
+   const invitation=key(),deliveryJob=key(),activity=key(),outcome=key(),activityHold=key();
+   const recipient='synthetic-delivery-'+key()+'@ftksaas.invalid';
+   await db.query("insert into core.invitations(id,org_id,center_id,person_id,email,token_hash,inviter_account_id,expires_at,state) values($1,$2,$3,$4,$5,repeat('a',64),$6,clock_timestamp(),'revoked')",[invitation,org,center,contactPerson,recipient,account.id]);
+   await db.query("insert into core.outbox_jobs(id,org_id,kind,dedupe_key,state,attempts) values($1,$2,'account_invitation',$3,'succeeded',1)",[deliveryJob,org,invitation]);
+   await db.query("insert into private.invitation_deliveries(invitation_id,job_id,recipient,sealed_token) values($1,$2,$3,'synthetic serialized delivery copy')",[invitation,deliveryJob,recipient]);
+   await db.query("insert into core.crm_activities(id,org_id,center_id,person_id,kind,note,outcome) values($1,$2,$3,$4,'followup','synthetic disposable note',null),($5,$2,$3,$4,'outcome','synthetic outcome note','synthetic outcome')",[activity,org,center,contactPerson,outcome]);
+   await db.query("insert into core.retention_holds(id,org_id,subject_table,subject_id,reason,authority_reference,review_at) values($1,$2,'crm_activities',$3,'Synthetic CRM hold','synthetic-test',clock_timestamp()-interval '1 day')",[activityHold,org,activity]);
+   const inviteEvidence=await q('select * from core.invitations where id=$1',[invitation]);
+   const readActivity=async id=>(await q('select * from core.crm_activities where id=$1',[id]))[0];
+   const contactActivity=await readActivity(activity),outcomeActivity=await readActivity(outcome);
+   const operationalState=async()=>(await q("select scopes#>>'{database,organization_operational,state}' as state from private.p07_privacy_manifests where request_id=$1",[request]))[0].state;
+   const operationalProof=()=>q('select invitation_rows::int,activity_rows::int from private.organization_operational_erasures where request_id=$1 order by completed_at,operation_id',[request]);
+   assert.equal(await operationalState(),'unbound');
+   await db.query('insert into private.organization_operational_erasure_scopes values($1,$2)',[role,org]);
+   await db.query("update private.p07_privacy_jobs set next_attempt_at=clock_timestamp()-interval '1 second' where id=$1",[deleted.job_id]);
+   const [operations]=await claim(c,true,org);assert.equal((await execute(c,operations,true)).ok,true);
+   assert.equal(await operationalState(),'held');
+   assert.deepEqual(await q('select job_id,recipient,sealed_token from private.invitation_deliveries where invitation_id=$1',[invitation]),[{job_id:deliveryJob,recipient:null,sealed_token:null}]);
+   assert.deepEqual(await q('select * from core.invitations where id=$1',[invitation]),inviteEvidence);
+   assert.deepEqual(await readActivity(activity),contactActivity);
+   assert.deepEqual(await operationalProof(),[{invitation_rows:1,activity_rows:0}]);
+   await db.query('delete from core.retention_holds where id=$1',[activityHold]);
+   await db.query("update private.p07_privacy_jobs set next_attempt_at=clock_timestamp()-interval '1 second' where id=$1",[deleted.job_id]);
+   const [resume]=await claim(c,true,org);const opResult=await execute(c,resume,true);assert.equal(opResult.ok,true,JSON.stringify(opResult));
+   assert.deepEqual(await execute(c,resume,true),opResult);
+   assert.equal(await operationalState(),'completed');
+   assert.deepEqual(await readActivity(activity),{...contactActivity,note:null});
+   assert.deepEqual(await readActivity(outcome),outcomeActivity);
+   assert.deepEqual(await operationalProof(),[{invitation_rows:1,activity_rows:0},{invitation_rows:0,activity_rows:1}]);
+   await assert.rejects(c.query('select * from private.organization_operational_erasures'),/permission denied/);
   });
   await t.test('P07 hosted lanes use separate native identities, rotate global/tenant privacy fairly and stop when disabled',async()=>{
    const login=async lane=>{const role='ftk_ops_'+lane,password=randomBytes(24).toString('hex');hostedRoles.push(role);await db.query(`alter role ${role} password '${password}'`);const u=new URL(context().env.DB_URL);u.username=role;u.password=password;const c=await guard.connect(u.href);clients.push(c);return c;};
@@ -330,13 +360,14 @@ test('P07 billing and privacy use live Auth, atomic receipts and scoped native w
    assert.equal(deniedManifest.database.security_history.state,'unbound');
    await unbound.query('drop table p07_residue_attempt');await unbound.query('drop function pg_temp.p07_residue_attempt()');
   });
-  await t.test('native organization contact and Storage erasure preserve holds and verify old URL absence',{timeout:120000},verifyNativeStorageErasure);
+  await t.test('native contact and Storage receipts block pre-erasure restore and preserve the control object',{timeout:120000},verifyNativeStorageErasure);
  }finally{
   if(trigger){await db.query(`drop trigger if exists ${trigger} on ${triggerTable}`);await db.query(`drop function if exists private.${trigger}()`);}
   for(const c of clients)if(!c._ending)await c.end();
   for(const role of hostedRoles){await db.query('delete from private.p07_worker_scopes where db_role=$1',[role]);await db.query('delete from private.p07_privacy_worker_scopes where db_role=$1',[role]);await db.query(`alter role ${role} password null`);}
   await db.query("update private.ops_worker_health set enabled=false where lane in ('p07','p07_privacy')");
   for(const role of roles)await db.query('delete from private.organization_contact_erasure_scopes where db_role=$1',[role]);
+  for(const role of roles)await db.query('delete from private.organization_operational_erasure_scopes where db_role=$1',[role]);
   // These roles only receive group membership. DROP ROLE rejects unexpected owned objects/direct grants.
   for(const role of roles){await db.query('delete from private.account_auth_erasure_permits where db_role=$1',[role]);await db.query('delete from private.account_auth_erasure_scopes where db_role=$1',[role]);await db.query('delete from private.account_profile_erasure_scopes where db_role=$1',[role]);await db.query('delete from private.p07_worker_scopes where db_role=$1',[role]);await db.query('delete from private.p07_privacy_worker_scopes where db_role=$1',[role]);await step('cleanup.drop-role',()=>db.query(`drop role ${role}`));}
   await db.end();
