@@ -45,7 +45,10 @@ Son salt okunur kontrolde Auth imha makbuzu ve ana talebin `partial` durumu tekr
 
 Bu ortamda tamamlanmış privacy talebi bulunmadığı için O06’nın tamamlanmış imha makbuzu girdisi ve O09’un bu makbuzla güvenli açılışı bekliyor.
 
-İzole yerel Supabase’de kişisel takvimin native Auth ve gerçek HTTP yaşam döngüsü, restore guard ve gerçek PostgreSQL yükleyici birlikte **56/56** geçti. Eski ve imzası değiştirilmiş sicil reddedildi. İmha kaydıyla eşleşen satır yükleyiciye ulaşmadı ve hazırlıktan sonra değişen checkpoint commit’i engelledi. Kişisel takvimin hosted yapılandırma kabulü ayrı bekliyor.
+İzole yerel Supabase’de kişisel takvimin native Auth ve gerçek HTTP yaşam döngüsü, restore guard ve gerçek PostgreSQL yükleyici birlikte **56/56** geçti. Eski ve imzası değiştirilmiş sicil reddedildi. İmha kaydıyla eşleşen satır yükleyiciye ulaşmadı ve hazırlıktan sonra değişen checkpoint commit’i engelledi.
+
+<a id="o08-hosted-takvim-konfigurasyonu"></a>
+**Kişisel takvim yapılandırması.** Kullanıcı onayıyla `7c4f8e7f471c9d0fa6064f76927766601a741ee4` kaynağının takvim işlevi yalnız izole kurtarma projesine dağıtıldı. Hedefe ait abonelik adresi, sentetik seans URL şablonu ve yeni bir takvim imza anahtarı tanımlandı. Geri yüklenen hesap native giriş yaptı. Abonelik oluşturma ve tekrar, gerçek ICS GET/HEAD ve `no-store`, yenilemeyle eski adresin reddi, eski sürüm reddi ve iptal sonrası 404 geçti. Hedefte etkin test aboneliği kalmadı. Üç Auth hesabı, tek organizasyon ve iki Storage nesnesi korundu. `backend-v1` JWT şartı ve yetkisiz istekte 401 doğrulandı. Seansın frontend rotası ve erişim kaybı senaryosu bu hosted koşuda çalıştırılmadı. [Aynı SHA’nın main kanıtı](https://github.com/SXQHex/FtkSaaS/actions/runs/45404516607).
 
 Snapshot ile doğrulanmış hosted uygulama okuması arasında 26 dakika 27 saniye geçti. Bu süre bu tatbikata aittir. Dış sağlayıcı yapılandırması ve sırları, bağımsız kalıcı imha sicili ve O10 pilot ölçümü kendi kabul kapsamlarında açık. Güvenli özet `.artifacts/o08-pr428-hosted-logical-restore.json` makbuzunda durur.
 
@@ -68,6 +71,19 @@ Yerel ortam yeniden başlatıldı. Aynı 10 organizasyon ve 50 sentetik kullanı
 Yerel PostgreSQL’in birikimli işlem istatistiklerinde en uzun kişi listesi sorgusu 307 ms, kişi detayı 15 ms, takvim 40 ms ve rapor başlatma 13 ms sürdü. Edge yöntem kontrolü uygulama sorgusuna ulaşmadan yavaşladığı için yerel gateway ve Edge çalıştırma yolu da gecikmeye katkıda bulunuyor. Ayrı dalga p95’leri birbirinden çıkarılarak katman süreleri hesaplanmadı.
 
 Seri native program ve seans yaşam döngüsü testleri **47/47** geçti. Business senaryosu rezervasyon, iptal, tahsilat, yoklama kapatma, finans ve hak kayıtlarının işlevsel doğrulamasını çalıştırdı. Bu seri testlerde eşzamanlı kritik yazma p95’i ölçülmedi.
+
+#### O10 — Yerel kritik yazma ölçümü
+
+10 organizasyon ve 5.000 aktif öğrenci üzerinde 50 farklı native Auth yöneticisiyle dört ayrı yazma dalgası çalıştı. Her dalgada 50 istek ve sıfır hata görüldü. Fixture hazırlığı ölçüm dışındaydı.
+
+| İşlem | p95 (ms) | Hedef (ms) |
+| --- | ---: | ---: |
+| Tahsilat | 3.732 | 2.000 |
+| Rezervasyon | 3.708 | 2.000 |
+| Rezervasyon iptali | 3.580 | 2.000 |
+| Yoklama kapatma | 3.946 | 2.000 |
+
+Dört işlemden birer örnek aynı anahtarla tekrarlandı. 50 tahsilatın toplamı 50.000 kuruştu, ilgili 50 borç kapandı, 50 rezervasyon iptal edildi ve 50 yoklama için birer hak tüketildi. SaaS abonelik tahsilatlarının mutabakatı korundu. Dört p95 hedefi aşıldı. Tam hosted iş karışımı ve ölçülmüş RPO/RTO açık. Güvenli sonuç `.artifacts/o08-o10-operations-followup.json` makbuzundadır.
 
 Aynı izole hosted projede tek geri yüklenmiş sentetik kullanıcıyla küçük bir karşılaştırma yapıldı. On eşzamanlı istekte 30 kişi listesi okumasının istemci p95’i 892 ms, sağlayıcının `x-envoy-upstream-service-time` başlığı p95’i 707 ms oldu. Seri 10 okumada bu değerler 1.203 ve 1.030 ms idi. Sağlayıcı Edge logunda 40 okumanın `execution_time_ms` p95’i 771 ms, RPC’ye gitmeyen 40 yöntem kontrolünün p95’i 103 ms oldu. Ölçüm tek organizasyon ve tek oturum kapsamındadır. Hosted kabulü için 10 organizasyon × 500 öğrenci, 50 ayrı kullanıcı ve kritik yazma karışımı gerekir. Hedefte üç Auth kullanıcısı ve iki Storage nesnesi korundu. Ölçüm özeti `.artifacts/o10-isolated-latency-diagnostic.json` dosyasındadır. [Supabase Edge log alanları](https://supabase.com/docs/guides/observability/log-field-reference).
 
@@ -139,6 +155,17 @@ Frankfurt Edge v114 üzerinde bir Pro test hesabıyla sıralı salt okunur istek
 30 hesap isteğinin tamamı yanıt istek kimliğiyle Edge günlüklerine bağlandı. Edge p50 195 ms ve p95 514 ms idi. Aynı 11 saniyelik pencerede 30 hesap RPC’si görüldü. PostgREST upstream p50 77 ms ve p95 285 ms idi. İç RPC ve PostgreSQL çalışma süresini dış isteğe tekil olarak bağlayan kayıt bulunamadı. Hesap çağrısındaki önceki 10 saniyelik beklemenin kaynağı belirlenemedi. Ayrı Türkiye tarayıcı örnekleminde kişi dizini için 5.743 ms ve abonelik için 445 ms süren birer çağrı vardı. Bu örnek sayıları eski tarayıcı dağılımıyla performans karşılaştırması yapmaya yetmez.
 
 Kullanıcı kararıyla [bağımsız backend gecikme takibi](remaining-work.md#hosted-api-gecikmesi) kapatıldı. Ölçümlerde görülen kişi dizini gecikmesi ve hesap çağrısındaki eski bekleme kayıtta durur.
+
+<a id="development-503-studyo"></a>
+### Development 503 — Stüdyo ve Üyeler
+
+24 Kasım 2026’da 16.32–16.39 TSİ arasında development Edge v114, `management_state_get_v1` için iki ve `settings_catalog_get_v1`, `people_list_v1`, `centers_list_v1` için birer HTTP 503 kaydetti. Yürütme süreleri 9,42–11,40 saniye aralığındaydı. Aynı aralıkta sekiz iç Data API RPC’si HTTP 500 döndü. PostgreSQL’de dokuz `57014` statement timeout kaydı görüldü. `authenticator` ve `authenticated` rolleri için süre sınırı 8 saniyeydi.
+
+Frontend tekrarındaki `management_state_get_v1` / `availability_exception_save_v1` seçicisinin dış istek kimliği sağlayıcının Edge kaydıyla eşleşti. Edge 503, iç RPC 500 ve `require_feature → starter_resource_page → execute_operation` bağlamındaki PostgreSQL iptali aynı isteğin zaman aralığındaydı. Dış istek ile PostgreSQL kaydı ortak kimlikle eşleşmedi. Uygulama Edge’i başarısız iç RPC’yi `503 TEMPORARY_FAILURE` olarak döndürüyor. Süre sınırına götüren bekleyişin kaynağı ve düzeltme sonrası hosted tekrar açık.
+
+İzole native Supabase’de Stüdyo kapanış okumasının aynı organizasyondaki paylaşımlı satır kilidini beklediği gösterildi. Regression testi önce mevcut kaynakta kırıldı. Yeni append-only SQL, kapanış ve merkez disiplini için yalnız eşleşen `management_state_get_v1` seçicilerine `FOR SHARE` uygular. Bu okumalar yan yana ilerler ve aynı organizasyondaki yazma kilidiyle çakışmaya devam eder. İki native test dosyasında 24/24 kontrol geçti. Bu yerel sonuç kilit bekleyişi için bir düzeltme kanıtıdır. Development olayı için kalan diğer süre kaynakları ve canlı tekrar ölçümü açıktır.
+
+Yerel `verify` sözleşme, yönetişim ve restore testlerinde 468/468, CI araç testlerinde 149/150 verdi. Linux `/proc` bellek örneğini isteyen mevcut observer testi macOS’ta `PROC_UNAVAILABLE` ile kaldı. Bu kontrolün sonucu Linux aday koşusunda doğrulanır.
 
 <a id="xreq-071-backend-kapanisi"></a>
 ### XREQ-071 — Ödeme onayı backend incelemesi
