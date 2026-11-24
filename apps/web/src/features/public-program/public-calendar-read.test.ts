@@ -1,10 +1,13 @@
 import { afterEach, expect, it, vi } from "vitest";
 import { http, HttpResponse } from "msw";
+import { getTemporal } from "../../lib/temporal";
 import { server } from "../../test/server";
 import {
+  combinePublicProgramRows,
   publicCalendarInterval,
   publicProgramRows,
   readPublicCalendar,
+  readPublicProgramPage,
 } from "./public-calendar-read";
 const id = "019ab7b0-0000-7000-8000-000000000001",
   discipline = "019ab7b0-0000-7000-8000-000000000002";
@@ -281,5 +284,41 @@ it("distinguishes a truly unavailable publication from an available empty progra
   endpoint({ items: [], as_of: interval.starts_at, publication_state: "available" });
   expect((await readPublicCalendar({ slug: "test", interval })).publication_state).toBe(
     "available",
+  );
+});
+
+it("keeps calendar page data to the visible projection and still validates duplicate publications across cursors", async () => {
+  const temporal = await getTemporal();
+  endpoint({
+    items: [{ ...item, discipline_ids: [discipline] }],
+    as_of: interval.starts_at,
+    next_cursor: "next",
+    application: { state: "open", form },
+    organization_profile: {
+      name: "Yayındaki stüdyo",
+      disciplines: [{ id: discipline, name: "Tango" }],
+    },
+  });
+  const first = await readPublicProgramPage(temporal, { slug: "test", interval });
+  expect(first).toMatchObject({
+    applicationState: "open",
+    nextCursor: "next",
+    rows: [{ id, title: "Tango", fee: "₺500,00" }],
+    disciplines: [{ id: discipline, name: "Tango" }],
+  });
+  expect(first).not.toHaveProperty("items");
+  expect(first).not.toHaveProperty("application");
+  expect(first.rows[0]).not.toHaveProperty("discipline_ids");
+
+  const following = {
+    ...first,
+    rows: [{ ...first.rows[0]!, id: discipline, title: "Yeni etkinlik" }],
+  };
+  const combined = combinePublicProgramRows(temporal, [first, following]);
+  expect(combined.rows.map(({ title }) => title)).toEqual(["Tango", "Yeni etkinlik"]);
+  expect(combined.rows[0]).toBe(first.rows[0]);
+  expect(combined.rows[1]).toBe(following.rows[0]);
+  expect(() => combinePublicProgramRows(temporal, [first, first])).toThrow(
+    "Yinelenen public program kaydı.",
   );
 });

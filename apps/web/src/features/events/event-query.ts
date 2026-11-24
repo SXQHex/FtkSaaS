@@ -1,6 +1,8 @@
+import { v7 as uuidv7 } from "uuid";
 import { queryOptions, type QueryClient } from "@tanstack/react-query";
 import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
-import type { ClientScope } from "../../lib/scoped-backend";
+import { BackendError, queryBackendRead } from "../../lib/backend";
+import { scopedBackend, type ClientScope } from "../../lib/scoped-backend";
 import { invalidateEarningsViews } from "../earnings/earnings-query";
 import { reportCollectionFamilies } from "../reports/reports-query";
 import { productsKeys } from "../products/products-query";
@@ -17,6 +19,55 @@ export function eventDetailQuery(scope: ClientScope, eventId: string) {
     retry: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
+  });
+}
+
+let activeDutyReads = 0;
+const waitingDutyReads: (() => void)[] = [];
+
+async function withDutyReadSlot<T>(read: () => Promise<T>) {
+  if (activeDutyReads < 4) activeDutyReads += 1;
+  else await new Promise<void>((resolve) => waitingDutyReads.push(resolve));
+  try {
+    return await read();
+  } finally {
+    // Transfer the slot before a new query can start ahead of the waiting reads.
+    const next = waitingDutyReads.shift();
+    if (next) next();
+    else activeDutyReads -= 1;
+  }
+}
+
+export function eventDutyNameQuery(scope: ClientScope, personId: string) {
+  return queryOptions({
+    queryKey: ["event-duty-persons", scope.accountId, scope.orgId, scope.centerId, personId],
+    queryFn: (readContext) => {
+      const { signal } = readContext;
+      return withDutyReadSlot(async () => {
+        signal.throwIfAborted();
+        const backend = await scopedBackend(scope, undefined, readContext);
+        try {
+          const person = await queryBackendRead(
+            backend,
+            "person_get_v1",
+            {
+              client_api_version: 1,
+              request_id: uuidv7(),
+              org_id: scope.orgId,
+              person_id: personId,
+            },
+            signal,
+          );
+          if (person.id !== personId) throw new Error("EVENT_PERSON_UNAVAILABLE");
+          return person.display_name;
+        } catch (error) {
+          if (error instanceof BackendError && ["FORBIDDEN", "NOT_FOUND"].includes(error.code))
+            return null;
+          throw error;
+        }
+      });
+    },
+    retry: false,
   });
 }
 

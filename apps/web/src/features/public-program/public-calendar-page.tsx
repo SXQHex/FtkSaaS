@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { getRouteApi } from "@tanstack/react-router";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { getTemporal } from "../../lib/temporal";
 import { PublicShell } from "./public-shell";
 import { PublicUnavailableView } from "./public-unavailable-view";
 import { PublicCalendarView } from "./public-calendar-view";
 import {
-  publicCalendarInterval,
-  publicProgramRows,
-  readPublicCalendar,
+  combinePublicProgramRows,
+  publicCalendarIntervalAt,
+  readPublicProgramPage,
 } from "./public-calendar-read";
 
 const route = getRouteApi("/public/$slug/calendar");
@@ -20,48 +21,72 @@ export function PublicCalendarRoutePage() {
 export function PublicCalendarPage({ slug, centerId }: { slug: string; centerId?: string }) {
   const [openedAt] = useState(Date.now);
   const [disciplineId, setDisciplineId] = useState("");
-  const interval = useQuery({
-    queryKey: ["public-calendar-interval", openedAt],
-    queryFn: () => publicCalendarInterval(openedAt),
+  const temporal = useQuery({
+    queryKey: ["public-calendar-temporal"],
+    queryFn: getTemporal,
     staleTime: Infinity,
+    retry: false,
   });
+  const interval = useMemo(
+    () => temporal.data && publicCalendarIntervalAt(temporal.data, openedAt),
+    [openedAt, temporal.data],
+  );
   const program = useInfiniteQuery({
-    queryKey: ["public-calendar", slug, centerId, interval.data, disciplineId],
-    enabled: !!interval.data,
+    queryKey: ["public-calendar", slug, centerId, interval, disciplineId],
+    enabled: !!interval,
     initialPageParam: null as string | null,
     queryFn: ({ pageParam, signal }) =>
-      readPublicCalendar(
+      readPublicProgramPage(
+        temporal.data!,
         {
           slug,
           centerId,
           disciplineId: disciplineId || undefined,
-          interval: interval.data!,
+          interval: interval!,
           cursor: pageParam,
         },
         signal,
       ),
-    getNextPageParam: (page) => page.next_cursor ?? undefined,
+    getNextPageParam: (page) => page.nextCursor ?? undefined,
     retry: false,
     refetchOnWindowFocus: false,
   });
-  const presentation = useQuery({
-    queryKey: ["public-calendar-presentation", slug, centerId, program.data],
-    enabled: !!program.data,
-    queryFn: () => publicProgramRows(program.data!.pages),
-    retry: false,
-  });
-  const latest = program.data?.pages.at(-1);
-  const profile = latest?.center_profile ?? latest?.organization_profile;
-  const params = new URLSearchParams(centerId ? { center_id: centerId } : {});
-  const suffix = params.size ? `?${params}` : "";
-  const calendarHref = `/public/${encodeURIComponent(slug)}/calendar${suffix}`;
+  const pages = program.data?.pages;
+  const presentation = useMemo(() => {
+    if (!temporal.data || !pages) return {};
+    try {
+      return { data: combinePublicProgramRows(temporal.data, pages) };
+    } catch (error) {
+      return { error };
+    }
+  }, [pages, temporal.data]);
+  const latest = pages?.at(-1);
+  const profile = latest?.profile;
+  const publicPath = `/public/${encodeURIComponent(slug)}`;
+  const suffix = centerId ? `?${new URLSearchParams({ center_id: centerId })}` : "";
+  const calendarHref = `${publicPath}/calendar${suffix}`;
   const applyHref =
-    latest?.publication_state === "available" &&
-    latest.application.state === "open" &&
+    latest?.publicationState === "available" &&
+    latest.applicationState === "open" &&
     !program.isRefetchError
-      ? `/public/${encodeURIComponent(slug)}/apply${suffix}`
+      ? `${publicPath}/apply${suffix}`
       : undefined;
-  const unavailable = !program.isError && latest?.publication_state === "unavailable";
+  const canApplyForEvent = !program.isError && latest?.publicationState === "available";
+  const rows = useMemo(() => {
+    return (presentation.data?.rows ?? []).map((row) => {
+      const href =
+        row.kind === "event"
+          ? canApplyForEvent
+            ? `${publicPath}/apply?${new URLSearchParams({
+                ...(centerId ? { center_id: centerId } : {}),
+                event: row.id,
+              })}`
+            : undefined
+          : applyHref;
+      return href ? { ...row, applyHref: href } : row;
+    });
+  }, [presentation.data, canApplyForEvent, centerId, publicPath, applyHref]);
+  const unavailable = !program.isError && latest?.publicationState === "unavailable";
   return (
     <PublicShell
       name={profile?.name}
@@ -73,36 +98,23 @@ export function PublicCalendarPage({ slug, centerId }: { slug: string; centerId?
         <PublicUnavailableView />
       ) : (
         <PublicCalendarView
-          rows={(presentation.data?.rows ?? []).map((row) => ({
-            ...row,
-            applyHref:
-              row.kind === "event"
-                ? !program.isError && latest?.publication_state === "available"
-                  ? `/public/${encodeURIComponent(slug)}/apply?${new URLSearchParams({ ...Object.fromEntries(params), event: row.id })}`
-                  : undefined
-                : applyHref,
-          }))}
+          rows={rows}
           address={profile?.address}
           timezone={presentation.data?.timezone}
-          disciplines={
-            latest?.center_profile?.disciplines ?? latest?.organization_profile?.disciplines ?? []
-          }
+          disciplines={latest?.disciplines ?? []}
           selected={disciplineId}
           onSelect={setDisciplineId}
           filterAvailable={!!latest && !unavailable}
           applyHref={applyHref}
-          applicationUnavailable={!program.isError && latest?.application.state === "unavailable"}
-          loading={
-            interval.isPending || program.isPending || (!!program.data && presentation.isPending)
-          }
+          applicationUnavailable={!program.isError && latest?.applicationState === "unavailable"}
+          loading={temporal.isPending || (program.isPending && !temporal.isError)}
           error={
-            interval.isError ||
-            (program.isError && (!program.data || latest?.publication_state === "unavailable")) ||
-            presentation.isError
+            temporal.isError ||
+            (program.isError && (!program.data || latest?.publicationState === "unavailable")) ||
+            Boolean(presentation.error)
           }
           onRetry={() => {
-            if (interval.isError) void interval.refetch();
-            else if (presentation.isError) void presentation.refetch();
+            if (temporal.isError) void temporal.refetch();
             else void program.refetch();
           }}
           hasNext={program.hasNextPage}
