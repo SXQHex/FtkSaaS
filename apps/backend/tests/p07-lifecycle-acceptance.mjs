@@ -185,6 +185,11 @@ test('P07 billing and privacy use live Auth, atomic receipts and scoped native w
    assert.equal((await prepare()).state,'unbound');
    await db.query('insert into private.account_auth_erasure_scopes(db_role,account_id,provider_origin) values($1,$2,$3)',[role,memberAccount.id,new URL(context().env.API_URL).origin]);
    const flow=key(),foreignFlow=key(),ownAudit=key(),actorAudit=key(),subjectAudit=key(),foreignAudit=key(),stable=key();
+   const token=key(),foreignToken=key();
+   for(const [id,user] of [[token,member.id],[foreignToken,owner.id]])await db.query(
+    "insert into auth.one_time_tokens(id,user_id,token_type,token_hash,relates_to) values($1,$2,'recovery_token',$3,$4)",
+    [id,user,'synthetic-'+id,'synthetic-recovery-'+id]
+   );
    for(const [id,user] of [[flow,member.id],[foreignFlow,owner.id]])await db.query("insert into auth.flow_state(id,user_id,auth_code,provider_type,authentication_method,provider_access_token,created_at,updated_at) values($1,$2,$3,'email','email',$4,clock_timestamp(),clock_timestamp())",[id,user,'synthetic-'+id,'synthetic-provider-token']);
    await db.query("insert into auth.refresh_tokens(token,user_id,session_id,revoked,created_at,updated_at) values($1,$2,null,true,clock_timestamp(),clock_timestamp())",['synthetic-retired-'+key(),member.id]);
    const auditRows=[
@@ -195,6 +200,8 @@ test('P07 billing and privacy use live Auth, atomic receipts and scoped native w
    ];
    for(const [id,payload,ip] of auditRows)await db.query('insert into auth.audit_log_entries(id,payload,ip_address,created_at) values($1,$2,$3,clock_timestamp())',[id,payload,ip]);
    const residueState=async()=>({flows:await q('select id from auth.flow_state where id=any($1::uuid[]) order by id',[[flow,foreignFlow]]),audit:await q("select id,encode(extensions.digest(to_jsonb(e)::text,'sha256'),'hex') hash from auth.audit_log_entries e where id=any($1::uuid[]) order by id",[auditRows.map(x=>x[0])]),proofs:await q('select count(*)::int n from private.account_auth_residue_erasures where request_id=$1',[request])});
+   const tokenIds=()=>q('select id from auth.one_time_tokens where id=any($1::uuid[]) order by id',[[token,foreignToken]]);
+   const tokensBefore=await tokenIds();
    const residueBefore=await residueState();
    await assert.rejects(c.query('select private.account_auth_residue_erasure($1,$2,false)',[request,role]),/permission denied/);
    assert.equal((await prepare()).state,'ready');
@@ -211,9 +218,10 @@ test('P07 billing and privacy use live Auth, atomic receipts and scoped native w
    await db.query("insert into core.retention_holds(id,subject_table,subject_id,reason,authority_reference,review_at) values($1,'accounts',$2,'Synthetic late Auth hold','synthetic-test',clock_timestamp()-interval '1 day')",[hold,memberAccount.id]);
    assert.equal((await prepare()).state,'held');await rejected();
    await db.query('delete from core.retention_holds where id=$1',[hold]);
-   for(const [table,id] of [['flow_state',flow],['audit_log_entries',subjectAudit]]){
+   for(const [table,id] of [['flow_state',flow],['audit_log_entries',subjectAudit],['one_time_tokens',token],['auth.one_time_tokens',token]]){
     await db.query("insert into core.retention_holds(id,org_id,subject_table,subject_id,reason,authority_reference,review_at) values($1,$2,$3,$4,'Synthetic exact Auth hold','synthetic-test',clock_timestamp()-interval '1 day')",[hold,org,table,id]);
     assert.equal((await prepare()).state,'held');await rejected();
+    assert.deepEqual(await tokenIds(),tokensBefore);
     await db.query('delete from core.retention_holds where id=$1',[hold]);
    }
    await db.query("update private.account_auth_erasure_permits set expires_at=clock_timestamp()-interval '1 second' where request_id=$1",[request]);await rejected();
@@ -222,8 +230,12 @@ test('P07 billing and privacy use live Auth, atomic receipts and scoped native w
    await db.query(`create function private.${trigger}() returns trigger language plpgsql as $$begin if new.request_id='${request}'::uuid then raise exception using errcode='23514',message='synthetic late Auth proof';end if;return new;end$$`);
    await db.query(`create trigger ${trigger} before insert on ${triggerTable} for each row execute function private.${trigger}()`);
    await rejected();assert.equal((await q('select count(*)::int n from private.account_auth_erasures where request_id=$1',[request]))[0].n,0);
+   assert.deepEqual(await tokenIds(),tokensBefore);
    await db.query(`drop trigger ${trigger} on ${triggerTable}`);await db.query(`drop function private.${trigger}()`);trigger=null;
+   await db.query("insert into core.retention_holds(id,org_id,subject_table,subject_id,reason,authority_reference,review_at) values($1,$2,'auth.one_time_tokens',$3,'Synthetic unrelated Auth hold','synthetic-test',clock_timestamp())",[hold,org,foreignToken]);
    const result=await eraseNativeAccount({db:c,request:entry.request,apiUrl:env.API_URL,serviceKey:env.SERVICE_ROLE_KEY});assert.equal(result.state,'completed');
+   assert.deepEqual(await tokenIds(),[{id:foreignToken}]);
+   await db.query('delete from core.retention_holds where id=$1',[hold]);
    for(const table of ['users','identities','sessions','mfa_factors'])assert.equal((await q('select count(*)::int n from auth.'+table+' where '+(table==='users'?'id':'user_id')+'=$1',[member.id]))[0].n,0);
    assert.equal((await q('select count(*)::int n from auth.refresh_tokens where user_id=$1',[member.id]))[0].n,0);
    assert.equal((await q('select count(*)::int n from auth.users where id=$1',[owner.id]))[0].n,1);
