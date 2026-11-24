@@ -317,7 +317,18 @@ test('W1-BE-67 account labels use canonical names and verified fallback within l
 
  const legacy=await authUser('operator-label-no-verified-name');
  await db.query("update auth.users set raw_user_meta_data='{}',email_confirmed_at=null where id=$1",[legacy.id]);
- await db.query('insert into private.platform_operators(auth_user_id) values($1)',[legacy.id]);
- const unresolved=(await must(platform,'platform_directory_get_v1',directory)).items.find(x=>x.account_id===null);
- assert.equal(unresolved.display_name,null);
+ // Other suites can leave unprovisioned operators in the shared directory.
+ const {rows:[membership]}=await db.query(`insert into private.platform_operators(auth_user_id)
+  values($1) returning to_jsonb(created_at) as granted_at`,[legacy.id]);
+ try{
+  const matching=(await must(platform,'platform_directory_get_v1',directory)).items
+   .filter(x=>x.granted_at===membership.granted_at);
+  assert.equal(matching.length,1);
+  const [unresolved]=matching;
+  assert.equal(unresolved.account_id,null);
+  assert.equal(unresolved.eligible,false);
+  assert.equal(unresolved.display_name,null);
+ }finally{
+  await db.query('delete from private.platform_operators where auth_user_id=$1',[legacy.id]);
+ }
 });

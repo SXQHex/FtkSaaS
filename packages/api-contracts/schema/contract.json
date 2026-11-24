@@ -3943,6 +3943,61 @@
       ],
       "additionalProperties": false
     },
+    "CalendarSessionSummary": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "$ref": "#/$defs/SessionState"
+        },
+        "attendance_state": {
+          "$ref": "#/$defs/AttendanceClosure"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "format": {
+          "$ref": "#/$defs/SessionFormat"
+        },
+        "class_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "assignments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "person_id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "duty": {
+                "$ref": "#/$defs/Duty"
+              }
+            },
+            "required": [
+              "person_id",
+              "duty"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "state",
+        "attendance_state",
+        "version",
+        "format",
+        "class_id",
+        "assignments"
+      ],
+      "additionalProperties": false
+    },
     "CalendarItem": {
       "type": "object",
       "properties": {
@@ -4009,6 +4064,9 @@
         },
         "member_lesson": {
           "$ref": "#/$defs/MemberLessonDiscovery"
+        },
+        "session_summary": {
+          "$ref": "#/$defs/CalendarSessionSummary"
         }
       },
       "required": [
@@ -4064,7 +4122,8 @@
               },
               "discipline_ids": {
                 "$ref": "#/$defs/EventDisciplineIds"
-              }
+              },
+              "session_summary": false
             }
           }
         }
@@ -4211,6 +4270,9 @@
         },
         "source_summary": {
           "$ref": "#/$defs/ReservationSourceSummary"
+        },
+        "self_summary": {
+          "$ref": "#/$defs/ReservationSelfSummary"
         }
       },
       "required": [
@@ -6605,6 +6667,12 @@
         },
         "as_of": {
           "$ref": "#/$defs/Instant"
+        },
+        "period_totals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EarningPeriodTotal"
+          }
         }
       },
       "required": [
@@ -7831,14 +7899,15 @@
             {
               "type": "null"
             }
-          ]
+          ],
+          "description": "When supplied, returns only that center if visible under the existing reader scope."
         },
         "page": {
           "$ref": "#/$defs/Page"
         },
         "include_setup_status": {
           "type": "boolean",
-          "description": "Opt-in manager-only setup summary. Requires center_id; returns only that center. Omitted/false preserves the original list."
+          "description": "Opt-in manager-only setup summary. Requires center_id. Omitted or false uses the normal center reader."
         }
       },
       "required": [
@@ -9953,6 +10022,10 @@
           "type": "boolean",
           "default": false,
           "description": "Explicit native-self student discovery of accessible upcoming group and private lessons. Does not grant management or roster access."
+        },
+        "include_session_summary": {
+          "type": "boolean",
+          "description": "Include lifecycle, attendance, current version and visible session duties on the returned page. Cannot be combined with member_discovery."
         }
       },
       "required": [
@@ -11571,6 +11644,10 @@
           "type": "boolean",
           "default": false,
           "description": "Only the authorized page receives the actual assigned sale and permitted current rights; no automatic package selection."
+        },
+        "include_self_summary": {
+          "type": "boolean",
+          "description": "For the caller’s own reservations in the returned page, include session title and interval, final attendance and the reservation cancellation policy."
         }
       },
       "required": [
@@ -14189,6 +14266,10 @@
         },
         "page": {
           "$ref": "#/$defs/Page"
+        },
+        "summary_only": {
+          "type": "boolean",
+          "description": "Return calendar-period net movements by currency for the current instructor and center. Requires interval and no cursor."
         }
       },
       "required": [
@@ -17740,16 +17821,90 @@
         },
         "include_details": {
           "type": "boolean"
+        },
+        "mode": {
+          "enum": [
+            "calendar",
+            "context",
+            "event"
+          ],
+          "description": "Context resolves publication and form status without listing rows. Event resolves one visitor-visible upcoming event using slug, center and publication identity."
+        },
+        "publication_id": {
+          "$ref": "#/$defs/FtkUuid"
         }
       },
       "required": [
         "client_api_version",
         "request_id",
         "slug",
-        "interval",
         "page"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "enum": [
+                  "context",
+                  "event"
+                ]
+              }
+            },
+            "required": [
+              "mode"
+            ]
+          },
+          "then": {
+            "properties": {
+              "interval": false,
+              "discipline_id": false,
+              "include_disciplines": false,
+              "include_details": false
+            }
+          },
+          "else": {
+            "required": [
+              "interval"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "event"
+              }
+            },
+            "required": [
+              "mode"
+            ]
+          },
+          "then": {
+            "allOf": [
+              {
+                "properties": {
+                  "center_id": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "required": [
+                  "center_id",
+                  "publication_id"
+                ]
+              }
+            ]
+          },
+          "else": {
+            "properties": {
+              "publication_id": false
+            }
+          }
+        }
+      ]
     },
     "Success_public_calendar_get": {
       "type": "object",
@@ -34271,6 +34426,49 @@
       ],
       "additionalProperties": false
     },
+    "TeamPermissionOverrideSummary": {
+      "type": "object",
+      "properties": {
+        "permission": {
+          "$ref": "#/$defs/Permission"
+        },
+        "override_exists": {
+          "type": "boolean"
+        },
+        "enabled": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "override_version": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PositiveInt"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "effective_staff_grant": {
+          "type": "boolean",
+          "description": "Result of the native staff grant check for this person, center and permission. Command-specific authorization still applies."
+        }
+      },
+      "required": [
+        "permission",
+        "override_exists",
+        "enabled",
+        "override_version",
+        "effective_staff_grant"
+      ],
+      "additionalProperties": false
+    },
     "ManagementProjection_permission_set_v1": {
       "type": "object",
       "properties": {
@@ -34291,6 +34489,12 @@
             },
             "override_exists": {
               "type": "boolean"
+            },
+            "permission_overrides": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/TeamPermissionOverrideSummary"
+              }
             }
           },
           "required": [],
@@ -34680,6 +34884,9 @@
             },
             "waitlist_impact": {
               "$ref": "#/$defs/ClassWaitlistImpact"
+            },
+            "instructor_assignment": {
+              "$ref": "#/$defs/ClassPageInstructorAssignment"
             }
           },
           "required": [],
@@ -39167,13 +39374,28 @@
             },
             "permission": {
               "$ref": "#/$defs/Permission"
+            },
+            "permission_summary": {
+              "const": true,
+              "description": "Read all settable overrides for the canonical person in the selected center."
             }
           },
           "required": [
-            "person_id",
-            "permission"
+            "person_id"
           ],
-          "additionalProperties": false
+          "additionalProperties": false,
+          "oneOf": [
+            {
+              "required": [
+                "permission"
+              ]
+            },
+            {
+              "required": [
+                "permission_summary"
+              ]
+            }
+          ]
         }
       },
       "required": [
@@ -39692,6 +39914,10 @@
             },
             "include_waitlist": {
               "type": "boolean"
+            },
+            "class_assignment_instructor_id": {
+              "$ref": "#/$defs/FtkUuid",
+              "description": "Return only active classes and the existing duty or absence for the selected instructor."
             }
           },
           "required": [],
@@ -65129,6 +65355,9 @@
           "items": {
             "$ref": "#/$defs/FtkUuid"
           }
+        },
+        "closed_session_count": {
+          "$ref": "#/$defs/Count"
         }
       },
       "required": [
@@ -65230,6 +65459,10 @@
         },
         "page": {
           "$ref": "#/$defs/Page"
+        },
+        "include_closed_session_count": {
+          "type": "boolean",
+          "description": "Include an exact closed session count for each returned instructors row in the selected period."
         }
       },
       "required": [
@@ -66598,6 +66831,10 @@
         },
         "page": {
           "$ref": "#/$defs/Page"
+        },
+        "setup_request_id": {
+          "$ref": "#/$defs/FtkUuid",
+          "description": "Select one request within the existing self or platform queue visibility."
         }
       },
       "required": [
@@ -68461,6 +68698,110 @@
         "bytes",
         "published_at",
         "checksum"
+      ],
+      "additionalProperties": false
+    },
+    "ReservationSelfSummary": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "$ref": "#/$defs/Text"
+        },
+        "starts_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "ends_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "attendance_state": {
+          "$ref": "#/$defs/AttendanceClosure"
+        },
+        "attendance_result": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AttendanceResult"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cancellation": {
+          "$ref": "#/$defs/MemberLessonCancellation"
+        }
+      },
+      "required": [
+        "title",
+        "starts_at",
+        "ends_at",
+        "attendance_state",
+        "attendance_result",
+        "cancellation"
+      ],
+      "additionalProperties": false
+    },
+    "EarningPeriodTotal": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "net_minor": {
+          "type": "string",
+          "pattern": "^(0|-?[1-9][0-9]*)$"
+        }
+      },
+      "required": [
+        "currency",
+        "net_minor"
+      ],
+      "additionalProperties": false
+    },
+    "ClassPageInstructorAssignment": {
+      "type": "object",
+      "properties": {
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "state": {
+          "anyOf": [
+            {
+              "enum": [
+                "active",
+                "inactive"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "version": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PositiveInt"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "person_id",
+        "id",
+        "state",
+        "version"
       ],
       "additionalProperties": false
     }
@@ -118005,6 +118346,48 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_studio_setup_list/properties/setup_request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CalendarSessionSummary/properties/class_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CalendarSessionSummary/properties/assignments/items/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_public_calendar_get/properties/publication_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_class_save_v1/properties/key/properties/class_assignment_instructor_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ClassPageInstructorAssignment/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ClassPageInstructorAssignment/properties/id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -118515,7 +118898,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 218,
+      "migration_count": 220,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

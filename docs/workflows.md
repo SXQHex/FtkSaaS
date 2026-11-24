@@ -44,6 +44,8 @@ Hesap kimliği, native provider ve oturum komutlarının alan/sürüm ayrıntıl
 
 ## WF02
 
+Kesin merkez okumasında `centers_list_v1(center_id,page)` mevcut görünürlükle tek satır, saat dilimi ve sürüm döndürür. Erişilemeyen görünürlük kapsamı boş kalır. Ekip için `management_state_get_v1` üzerinden `permission_set_v1` seçicisinde `key:{person_id,permission_summary:true}` kullanılır. Dönen kişi canonical kimliktir. `versions` yazmanın kişi sürümünü, `permission_overrides` kayıtlı seçimi ve varsa override sürümünü taşır. `effective_staff_grant` canlı personel grant kontrolünün sonucudur. Her komut kendi ek plan, rol ve politika koşullarını uygular.
+
 **İlk plan keşfi.** Platform yetkilisi kuruluş veya ilk stüdyo talebi için `platform_directory_get_v1(view:initial_plans,page)` ile her plan adı, dönem ve para birimi için yürürlükteki son sürümü okur. Dönen sürüm kimliği `organization_create_v1.initial_plan_id` girdisidir. Kuruluş komutunun plan ve doğrulanmış hesap kontrolleri geçerlidir.
 
 **İlk stüdyo talebi.** Aktif organizasyon bağı olmayan doğrulanmış hesap `studio_setup_open_v1(name)` çağırır ve `studio_setup_list_v1(page)` ile kendi talebini takip eder. Aynı anahtar aynı talebi döndürür. Platform operatörü `studio_setup_list_v1(platform_queue:true,page)` ile pending talepleri görür ve mevcut `organization_create_v1` komutuna `studio_setup_id`, eşleşen doğrulanmış hesabı, talep adını ve seçtiği geçerli planı verir. Kuruluş ve talebin fulfilled olması atomiktir. Başvuran daha sonra `organizations_list_v1` üzerinden kuruluşu açar ve hazır organizasyondaki mevcut merkez/CM adımlarını izler.
@@ -90,6 +92,8 @@ Kapanış için mevcut aynı-resource management listesi gerçek `exception_id`,
 
 ## WF03
 
+`calendar_get_v1(include_session_summary:true)` görünür sayfa içindeki seanslara yaşam döngüsü, yoklama durumu, sürüm, sınıf/format ve seans görevlerini ekler. Yönetim anlaşması, ücret ve katılımcı alanları yoktur. Var olan oda etiketi isteği ve yetkisi ayrı kalır. Özet seçeneği aralık, kaynak ve aktörle birlikte cursor kapsamına girer. Üye ders keşfi kendi `member_lesson` projeksiyonunu kullanır. Yönetim sınıf kataloğunda `class_save_v1` management seçicisine `class_assignment_instructor_id` eklemek yalnız aktif sınıfları ve seçili eğitmenin atama durumu/gerçek satır sürümünü döndürür. Atama bulunmazsa id, durum ve sürüm null gelir. Bu seçici de cursor kapsamına bağlıdır.
+
 Öğrencinin henüz kayıtlı olmadığı grup/özel dersler için ayrı opt-in takvim keşfi ve güvenli politika/etiket tüketimi [WF06](#wf06) sahibindedir; normal takvim/seans/roster yetkisi genişletilmez.
 
 Katılımcılar arası profil/fotoğraf/iletişim görünümü yalnız aynı kayıttaki kesin katılımcılara, güncel ayrı paylaşım onayıyla verilir; bitiş/iptal/bağlantı veya onay kaybında kapanır. Medya erişimi aynı canlı kitleyi yeniden denetler. [Açık karar ve medya protokolü](settings.md#katılımcı-paylaşımı-ve-açık-karar-kanıtı).
@@ -129,6 +133,8 @@ Program/seans değişikliği preview'sinde bu doğrulama noktasında geçerli an
 **Seans düzenleme ve telafi keşfi:** `management_state_get_v1(operation:session_change_preview_v1,selector:{operation:session_change_preview_v1,key:{session_id,scope}},page)` gerçek `sessions` kimliği/sürümü, durum ve `current.values.patch` içinde mevcut UTC aralığı, aktif kaynaklar ve public `{total,categories?}` kapasitesini verir. single seçili kaydı; this_and_future aynı programın seçili başlangıç ve sonrasındaki kayıtlarını kapsar. Yetki, plan ve merkez orijinal schedule.manage preflight'ından geçer; okuma yazının uygunluk garantisi değildir. Sonrasında seçili değişiklikle normal preview→onay→apply gerekir. `operation:replacement_session_create_v1`, aynı selector ve `key:{replaces_id}` mevcut telafi seanslarını gerçek entity/sürüm ve kalıcı `current.values.replaces_id` bağıyla listeler; boş sayfa telafi bulunmadığı anlamındadır. Bu tarihçe receipt veya tarayıcı belleğinden türetilmez. Her iki okumada created_at_asc/limit≤200 cursor kullanılır; filtre/aktör/kapsam değişimi VALIDATION_FAILED, içerik değişimi VERSION_CONFLICT sonrası ilk sayfadan okunur.
 
 ## WF04
+
+`reservation_list_v1(include_self_summary:true)` aynı canonical kişinin kendi rezervasyonuna seans başlığını, aralığını, kesinleşen yoklamayı ve rezervasyona bağlı iptal politikasını ekler. Açık yoklamada sonuç null kalır. Başka katılımcıların satırları bu alanı taşımaz. Seçenek cursor kapsamına bağlıdır.
 
 **Amaç/aktör:** Yetkili merkez kullanıcısı kişi ve öğrencilik ilişkisini yönetir; hesap bağlantısını ayrıca kurar.
 
@@ -293,6 +299,8 @@ Yetkili sonuç tek `items` satırında gerçek entity/state/version ve `current:
 Her yanıttaki totals, liste filtrelerinden bağımsız yetkili merkez içindir: dönem net satışları/tahsilat yönlü düzeltmeleri/nakit iadeleri ile güncel borç/alacak ve kişi sayıları para birimine ayrılır. Para birimi dönüşümü veya genel toplam yoktur; toplamlar kesin decimal minor-unit string'dir. Dönem dışında güncel borç/alacak kaybolmaz. created_at_asc cursor/limit≤200; filtre/aktör/kapsam değişiminde VALIDATION_FAILED, içerik değişiminde VERSION_CONFLICT sonrası baştan okunur. Eski `finance_get_v1(person_id,currency,page)` ve tahsilat keşfi/yazısı değişmez; report.read, audit veya Business hesaplaşma listesi bu okuyucunun yerine kullanılmaz.
 
 ## WF09
+
+`public_calendar_get_v1(mode:context,slug,center_id?,page:{})` anonim yayın durumu ve form bağını satır getirmeden döndürür. `mode:event` aynı public adres ve kesin merkez/yayın kimliğiyle yalnız ilgili görünür gelecek etkinliği verir. Yayın seçilemezse `items:[]` ile form kapalı gelir. İki mod interval ve devam cursor’ı almaz. Form doğrulaması ve başvuru komutu kendi güncel native kontrollerini uygular.
 
 **Etkinlik başvurusu ve yayın adresi.** Etkinlik kartından `public_application_submit_v1(event_application:true,page_slug,publication_id,contact,bot_proof,client_request_key)` gönderilir. Sunucu güncel adresi ve canlı etkinlik yayını bağını doğrular. `application_state:pending` yetkili incelemeye alınan başvurudur. Kontenjan, ödeme, belge ve üyelik koşulları gerçek etkinlik kaydı sırasında mevcut etkinlik akışında doğrulanır. Organizasyon Owner/OM, F25 açıkken `settings_update_v1(scope:organization,patch:{public_page:{slug,enabled}})` ile bütün ziyaretçi yüzeyinin adresini yönetir. Başarı sonrası `settings_get_v1` ve yeni adres yeniden okunur. Adres değişince önceki adres kapanır. Kapatma ziyaretçi programını, yayın başvurularını ve bağlı web formu alımını kapatır. Kaynak kayıtları ve form ayarları korunur. Herhangi bir adres yapılandırmamış organizasyon mevcut yayın adreslerini kullanır.
 
@@ -460,6 +468,8 @@ Standart planın etkin ticari limitleri geçmiş katalog/fiyat satırı değişt
 
 ## WF14
 
+`earnings_list_v1(summary_only:true)` aktif özne eğitmenin seçili merkezi ve `[starts_at,ends_at)` dönemi için para birimi başına işaretli `period_totals` döndürür. Satır ve cursor dönmez. Eşleşen hareket yoksa dizi boştur. Sıfıra ulaşan tutar ilgili para birimiyle döner. Yetkili yönetim `instructor_finance_directory_get_v1(view:instructors,include_closed_session_count:true)` çağrısında yalnız sayfadaki eğitmenlerin aynı dönem ve merkez için farklı kapalı seans sayısını alır.
+
 **Yönetici keşfi (W1-BE-33):** `instructor_finance_directory_get_v1(org_id,center_id,view:instructors|earnings|payments,page,person_id?,interval?)` mevcut earnings.read yönetim kapsamındaki org reader veya CM içindir; self eğitmen bu endpoint’i kullanamaz. Açık erişilebilir merkez ve F20 zorunludur; eski self/earnings/anlaşma getter’ları ve yetkileri değişmez. interval yokluğu bütün dönemlerdir; varsa yarı açık UTC dönemdir. Native p06 cursor hesabı/aktörü/bütün filtreyi ve tam sonucu bağlar; canlı defter değişirse VERSION_CONFLICT ile ilk sayfadan okunur.
 
 İnstructors görünümü mevcut/eskiden anlaşma, hakediş veya ödeme sahibi kişileri ve mevcut eğitmen bağlarını canonical kişi başına bulur; tarihsel kayıtlar güncel görev yokluğuyla kaybolmaz. agreement_ids değişmez okunabilir sürümlerdir, current_agreement_ids doğrulama anındaki native agreement_at sonucudur; eksik kaynak doldurulmaz. Her eğitmen satırının totals’ı aynı dönem/kapsama aittir. Earnings görünümünde eski native EarningView aynı yardımcıdan gelir; display_name, gerçek ders/etkinlik adı (yoksa null), earning.agreement_id’ye ait gerçek immutable sürüm eklenir. Başka seansın/güncel anlaşmanın bedeli kullanılmaz.
@@ -552,6 +562,8 @@ selector.operation automation_save_v1, key `{scope,discovery:jobs,automation_id?
 Keşif hiçbir worker/job/receipt/domain sonucu oluşturmaz. Haftalık veya segmente giriş tetikleme, elle çalıştırma, silme ve yeni koşullar mevcut native WF16 kapsamında desteklenmez. Mevcut disable ve başarısız iş retry yolu yukarıdaki sürümlü komuttur; başarılı sonucun tekrar çalıştırılması yoktur. Plan/rol kaybında yeni sayfa da kapanır, stale cursor/definition halinde ilk sayfadan yeniden okunur.
 
 ## WF17
+
+`studio_setup_list_v1(setup_request_id,page)` mevcut self kapsamı veya yetkili Platform kuyruğu içinde tek başvuruyu arar. Kuyruktan çıkan başvuru Platform sonucunda boş, başvuru sahibinin self sonucunda gerçekleşmiş olarak okunur. Seçici, aktör ve kuyruk modu cursor kapsamına bağlıdır.
 
 **Platform konsolu keşfi.** `account_get_v1(include_platform_scope:true)` oturumun canlı platform kapsamını ve kullanılabilir eylemleri döndürür. `platform_directory_get_v1(view,page,scope?)` canlı platform yetkisiyle organizasyon, mevcut sahip ve ödeme okumalarını ayırır. Scope açık bir organizasyonla sınırlar. Ödeme görünümü `payment_id` ve `payment_state` ile daraltılabilir. `view:verified_accounts` tam e-posta eşleşmesi ister ve yalnız uygun doğrulanmış hesabın kimliğini verir. Merkez ve organizasyon yöneticiliği bu okumaları açmaz. Ödeme doğrulama, grace ve sahiplik değişimi mevcut native komutlarla yapılır. Başarı sonrası ilgili kayıt yeniden okunur. `platform_organization_suspension_set_v1(org_id,expected_version,suspended,reason)` yalnız platform yetkilisine açıktır. Askı, normal stüdyo işlemlerini ve anonim yayın erişimini kapatır. Organizasyonun yaşam döngüsü ve aboneliği korunur. Mevcut abonelik, ödeme ve gizlilik yolları kendi native izinleriyle çalışır. Askı kaldırınca canlı plan ve organizasyon durumu tekrar belirleyicidir.
 

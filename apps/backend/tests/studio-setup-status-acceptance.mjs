@@ -15,13 +15,13 @@ async function fixture(t,label){
  const center=(await create('First')).primary_id,other=(await create('Other')).primary_id;
  const person=(await rows('select owner_person_id from core.organizations where id=$1',[org]))[0].owner_person_id;
  const api=(op,b={},u=owner,k=key())=>must(u,op,{org_id:org,center_id:center,...b},k);
- await api('center_manager_assign_v1',{person_id:person});
+ const managerGrant=await api('center_manager_assign_v1',{person_id:person});
  await api('center_manager_assign_v1',{center_id:other,person_id:person});
  const payment=await api('saas_payment_submit_v1',{amount_minor:'1000',currency:'TRY',reference:'Synthetic setup status',occurred_at:new Date().toISOString()});
  await api('saas_payment_verify_v1',{payment_id:payment.primary_id,accepted:true},platform);
  const fail=async(op,b,code,u=owner)=>{const r=await call(u,op,{org_id:org,center_id:center,...b});assert.equal(r.result.ok,false,JSON.stringify(r.result));assert.equal(r.result.error.code,code);};
  const counts=async()=>JSON.stringify(await rows('select (select count(*) from core.audit_events where org_id=$1) a,(select count(*) from core.operation_receipts where org_id=$1) r,(select count(*) from core.outbox_jobs where org_id=$1) o',[org]));
- return {db,rows,org,center,other,owner,stranger,person,api,fail,counts};
+ return {db,rows,org,center,other,owner,stranger,person,managerGrant,api,fail,counts};
 }
 
 test('Centers Data API preserves the plain list contract and live authorization',{timeout:300000},async t=>{
@@ -57,6 +57,7 @@ test('Centers Data API preserves the plain list contract and live authorization'
  try{await compare(owner,{},[center,other],browserOrigin);}
  finally{await db.query('delete from private.centers_read_browser_origins where origin=$1',[browserOrigin]);}
  await compare(owner,{include_setup_status:false,page:{limit:1,cursor:null}},[center,other]);
+ await compare(owner,{center_id:center,page:{limit:1}},[center]);
  await compare(stranger,{},'NOT_FOUND');
  await compare(owner,{center_id:key()},'NOT_FOUND');
  await compare(owner,{org_id:key()},'NOT_FOUND');
@@ -78,6 +79,8 @@ test('Centers Data API preserves the plain list contract and live authorization'
  await db.query("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[link,org,account.id,person]);
  await db.query("insert into core.center_relationships(id,org_id,center_id,person_id,kind,state,started_at) values($1,$2,$3,$4,'student','active',now())",[key(),org,center,person]);
  await compare(member,{},[center]);
+ await compare(member,{center_id:center},[center]);
+ await compare(member,{center_id:other},[]);
  const strong=await nativeTotp(t,member);
  await compare(member,{},'AUTH_REQUIRED');
  await compare(strong,{},[center]);
@@ -91,7 +94,8 @@ test('Centers Data API preserves the plain list contract and live authorization'
   has_function_privilege('anon','api_read.centers_list_v1(jsonb)','execute') as anon_rpc,
   has_any_column_privilege('authenticated','core.centers','select') as core_columns,
   has_function_privilege('authenticated','api_v1.centers_list_v1(jsonb,uuid,uuid,uuid[],jsonb)','execute') as service_rpc,
-  has_function_privilege('authenticated','private.centers_read_rows(uuid,uuid,boolean)','execute') as projection,
+  has_function_privilege('anon','private.centers_read_rows(uuid,uuid,boolean,uuid)','execute') as anon_projection,
+  has_function_privilege('authenticated','private.centers_read_rows(uuid,uuid,boolean,uuid)','execute') as authenticated_projection,
   (select rolbypassrls from pg_roles where rolname='ftk_centers_read') as bypass_rls`);
  assert(Object.values(grants).every(value=>value===false),JSON.stringify(grants));
 
@@ -106,19 +110,30 @@ test('Centers Data API preserves the plain list contract and live authorization'
 });
 
 test('Center setup summaries expose only scoped publication and provider handoff facts',{timeout:300000},async t=>{
- const f=await fixture(t,'setup-summary'),{db,org,center,other,owner,stranger,person,api,fail,counts}=f;
+ const f=await fixture(t,'setup-summary'),{db,org,center,other,owner,stranger,person,managerGrant,api,fail,counts}=f;
  const read=(c=center,u=owner)=>api('centers_list_v1',{center_id:c,include_setup_status:true,page:{}},u);
  const status=async(c=center)=>{const page=await read(c);assert.equal(page.items.length,1);assert.equal(page.items[0].id,c);const s=page.items[0].setup_status;assert.deepEqual(Object.keys(s).sort(),['as_of','document_published','member_invitation_sent']);assert(Number.isFinite(Date.parse(s.as_of)));return s;};
  const assertStatus=async(c,document,invitation)=>{const s=await status(c);assert.equal(s.document_published,document);assert.equal(s.member_invitation_sent,invitation);};
- await t.test('opt in is explicit, center bounded, permission checked and read only',async()=>{
+ await t.test('plain reads omit setup status and honor an explicit center selector',async()=>{
+  const api=(operation,body)=>f.api(operation,{center_id:null,...body});
   const baseline=await api('centers_list_v1',{page:{}});assert.equal(baseline.items.length,2);assert(baseline.items.every(x=>!Object.hasOwn(x,'setup_status')));
+  assert.deepEqual(baseline.items.map(x=>x.id).sort(),[center,other].sort());
   const disabled=await api('centers_list_v1',{page:{},include_setup_status:false});assert(disabled.items.every(x=>!Object.hasOwn(x,'setup_status')));
+  assert.deepEqual(disabled.items.map(x=>x.id).sort(),[center,other].sort());
+  const exact=await api('centers_list_v1',{center_id:center,page:{},include_setup_status:false});
+  assert.deepEqual(exact.items.map(x=>x.id),[center]);
+  assert(!Object.hasOwn(exact.items[0],'setup_status'));
+ });
+ await t.test('opt in is explicit, center bounded, permission checked and read only',async()=>{
   const before=await counts();await assertStatus(center,false,false);await assertStatus(other,false,false);assert.equal(await counts(),before);
   await fail('centers_list_v1',{center_id:null,include_setup_status:true,page:{}},'VALIDATION_FAILED');
   await fail('centers_list_v1',{include_setup_status:true,page:{}},'NOT_FOUND',stranger);
-  await api('center_manager_revoke_v1',{person_id:person,expected_version:1,reason:'Synthetic live permission check'});
+  const revoked=await api('center_manager_revoke_v1',{center_id:center,person_id:person,expected_version:managerGrant.version,reason:'Synthetic live permission check'});
+  assert.equal(revoked.primary_id,managerGrant.primary_id);
   await fail('centers_list_v1',{include_setup_status:true,page:{}},'FORBIDDEN');
-  await api('center_manager_assign_v1',{person_id:person});
+  await assertStatus(other,false,false);
+  await api('center_manager_assign_v1',{center_id:center,person_id:person});
+  await assertStatus(center,false,false);
  });
  const source={name:'Synthetic setup document',language:'tr',template_id:'synthetic-setup',template_version:'1',text:'Synthetic setup acceptance terms.'};
  const publish=(scope,requirements)=>api('document_version_publish_v1',{center_id:scope.kind==='organization'?null:scope.center_id,digital_content:source,version_label:key(),scope,requirements});

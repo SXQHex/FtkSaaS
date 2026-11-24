@@ -15,6 +15,20 @@ test('W1-BE-25 anonymous discovery keeps old publications private and uses an ex
  const content={name:'Synthetic public consent',language:'tr',template_id:'synthetic-public-form',template_version:'1',text:'Synthetic explicit application consent text.'},doc=await api('document_version_publish_v1',{digital_content:content,version_label:'public-form-1',scope:{kind:'center',center_id:center},requirements:[]}),document=doc.related.find(x=>x.type==='documents').id;
  const catalog=await api('content_catalog_get_v1',{scope_key:'center:'+org+':'+center,code:'document.'+document,channel:'document'}),source=catalog.items.find(x=>x.source_version===doc.primary_id),binding={form_id:form,consents:[{purpose:'application',version:doc.primary_id,required:true,content_template_id:source.id}]};assert(source.id);
  await f.change('center',{public_application_form:binding});const opened=(await read({include_details:true})).application;assert.equal(opened.state,'open');assert.equal(opened.form.form_id,form);assert.deepEqual(opened.form.consents[0].content,content);assert.equal(opened.form.consents[0].source_version,doc.primary_id);assert.match(opened.form.consents[0].content_hash,/^[a-f0-9]{64}$/);assert(!JSON.stringify(opened).includes('source_url'));
+ const contextOnly={mode:'context',interval:undefined};
+ const publicContext=await read(contextOnly);
+ assert.deepEqual(publicContext.items,[]);
+ assert.deepEqual(publicContext.application,opened);
+ const eventOnly={mode:'event',interval:undefined,publication_id:eventPublication.primary_id};
+ const eventPage=await read(eventOnly);
+ assert.deepEqual(eventPage.items,[publicEvent]);
+ assert.deepEqual(eventPage.application,opened);
+ for(const selector of [{center_id:key()},{slug:key()},{publication_id:publication.primary_id}]){
+  const hidden=await read({...eventOnly,...selector});
+  assert.deepEqual(hidden.items,[]);
+  assert.equal(hidden.publication_state,'unavailable');
+  assert.equal(hidden.application.form,null);
+ }
  const evidence=(await db.query('select private.public_form_consent_evidence($1,$2,$3) data',[org,form,JSON.stringify([{purpose:'application',version:doc.primary_id,accepted:true,occurred_at:new Date().toISOString()}])])).rows[0].data;assert.equal(evidence.public_consents[0].content_template_id,source.id);await assert.rejects(db.query('select private.public_form_consent_evidence($1,$2,$3)',[org,form,JSON.stringify([{purpose:'application',version:'invented',accepted:true,occurred_at:new Date().toISOString()}])]),/VALIDATION_FAILED/);
  await db.query("select set_config('request.jwt.claim.role','service_role',false)");const proof={purpose:'application',version:doc.primary_id,accepted:true,occurred_at:new Date().toISOString()},submission={client_api_version:1,request_id:key(),form_id:form,client_request_key:key(),contact_intake:{display_name:'Synthetic public applicant',phone:'+12025550101',consents:[proof]}};
  const submit=async body=>(await db.query('select private.crm_intake_submit($1,$2,$3) result',[JSON.stringify(body),Array.from({length:4096},key),{ip_hash:'b'.repeat(64),target_hash:'c'.repeat(64),bot_verified:true}])).rows[0].result;
@@ -46,6 +60,7 @@ test('W1-BE-25 anonymous discovery keeps old publications private and uses an ex
   await f.change('organization',{public_page:{slug:second,enabled:false}});
   const hidden=await atAddress(second);
   assert.equal(hidden.publication_state,'unavailable');assert.deepEqual(hidden.items,[]);assert.equal(hidden.application.form,null);
+  assert.deepEqual((await read({...eventOnly,slug:second})).items,[]);
   assert.equal((await submit({...submission,client_request_key:key()})).error.code,'SERVICE_UNAVAILABLE');
   assert.equal((await submit(submission)).error.code,'SERVICE_UNAVAILABLE');
   assert.equal((await submitEvent({page_slug:second,client_request_key:key()})).error.code,'SERVICE_UNAVAILABLE');

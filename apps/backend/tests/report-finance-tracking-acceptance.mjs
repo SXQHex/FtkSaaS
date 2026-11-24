@@ -19,6 +19,10 @@ test('W1-BE-33 manager directory discovers historical instructor ledgers and pre
  assert.deepEqual(first.totals.map(x=>[x.currency,x.earned_minor,x.paid_minor,x.remaining_minor]),[['TRY','80','50','30'],['USD','200','0','200']]);
  assert.equal((await read({view:'earnings',page:{limit:1,cursor:first.next_cursor}})).items[0].earning.id,usd);
  const people=await read({view:'instructors',page:{}});assert.equal(people.items.length,1);assert.equal(people.items[0].person_id,person);assert.deepEqual(people.items[0].agreement_ids,[]);
+ const closed=await read({view:'instructors',include_closed_session_count:true,page:{limit:1}});
+ const selected=await read({view:'instructors',person_id:person,page:{}});
+ assert.equal(closed.items[0].closed_session_count,selected.closed_session_count);
+ assert.equal(closed.items[0].closed_session_count,0);
  const payments=await read({view:'payments',page:{}});assert.equal(payments.items.length,1);assert.equal(payments.items[0].payment.reference,'Synthetic actual payment');assert.equal(payments.items[0].root_payment_id,paid.primary_id);
  const corrected=await api('instructor_payment_correct_v1',{payment_id:paid.primary_id,expected_version:payments.items[0].version,correction:{direction:'decrease',amount_minor:'10',currency:'TRY',occurred_at:new Date().toISOString()},reason:'Synthetic actual correction'});assert(corrected.primary_id);
  const current=await read({view:'payments',page:{}});assert.equal(current.items.length,2);assert.equal(current.items[0].version,2);assert.equal(current.items[1].previous_id,paid.primary_id);assert.equal(current.items[1].reason,'Synthetic actual correction');assert.equal(current.totals[0].paid_minor,'40');
