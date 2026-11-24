@@ -906,7 +906,7 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 
 - [ ] **Durum:** Kısmi kabul · **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
 - **Bağımlılık:** O03
-- **Kabul:** Yetkili imha gerçek profil/Auth yüzeyini hedef sırada kaldırır.
+- **Kabul:** Yetkili imha FtkSaaS’ın yönettiği profil ve Auth yüzeylerini hedef sırada kaldırır. Karma uygulama geçmişinde gerekli kanıtlar korunarak imhaya tabi kişisel alanlar kaldırılır ve organizasyon kapsamı doğrulanır.
 - **Sınır/olumsuz durum:** Hold/korunan finans verisi keyfî silinmez; yarım iş completed olmaz.
 - **Doğrulama senaryosu:** Kesinti ve yeniden devam, kalan referans kontrolü, giriş/erişim reddi; yalnız izole/onaylı hedef.
 - **Kaynak alanı:** privacy executor/DB/Auth; ilgili acceptance
@@ -915,11 +915,15 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 
 **Hosted profil dilimi:** Gerçek native Cron, geçmiş review tarihli hold altında durma→hold kaldırma→normal retry ile profil satırı temizliğini doğruladı; hedefte avatar/export baytı yoktu. Bu sonuç Auth/Storage/organizasyon veya bütün DB imhasını kapatmaz. Public self status yeniden giriş kabulü yapılmadı; [kanıt ve sınır](00-FtkSaaS-yeni-sohbet-devir.md#pro-hosted-profil-ve-export-kabulü).
 
-**Native principal alt aşaması:** Scoped worker hazırlığı, provider transaction'ında canlı hold/lease fence, official hard delete, cascade sonrası commit proof ve 404 readback PR267 aday/main/development ve native kabulüyle kaynak teslimini geçti. [Ayrı hosted hedefte sentetik principal imhası](00-FtkSaaS-yeni-sohbet-devir.md#o04-hosted-sentetik-auth-imhasi) da doğrulandı. Sağlayıcı log ve kopyaları, diğer Auth yüzeyleri, karma geçmiş minimizasyonu ve O04 bütünü açık.
+**Native principal alt aşaması:** Scoped worker hazırlığı, provider transaction'ında canlı hold/lease fence, official hard delete, cascade sonrası commit proof ve 404 readback PR267 aday/main/development ve native kabulüyle kaynak teslimini geçti. [Ayrı hosted hedefte sentetik principal imhası](00-FtkSaaS-yeni-sohbet-devir.md#o04-hosted-sentetik-auth-imhasi) da doğrulandı.
 
-**Seçili Auth kalıntıları:** Mevcut imha yolu hedef flow/orphan refresh satırlarını ve native audit’te hedefe ait bilinen kişisel alanları işler. Karma hesap flow’u ve yanlış refresh/session sahipliği işlemi durdurur. [Kaynak ve kabul](00-FtkSaaS-yeni-sohbet-devir.md#auth-kalıntı-ve-yöntem-paketi). Kalan iş, sağlayıcının dış log/kopyaları ve diğer Auth yüzeyleri için saklama ve imha kanıtı ile DB’deki karma geçmiş ve organizasyon kapsamının doğrulanmasıdır.
+**Seçili Auth kalıntıları:** Mevcut imha yolu hedef flow/orphan refresh satırlarını ve native audit’te hedefe ait bilinen kişisel alanları işler. Karma hesap flow’u ve yanlış refresh/session sahipliği işlemi durdurur. [Kaynak ve kabul](00-FtkSaaS-yeni-sohbet-devir.md#auth-kalıntı-ve-yöntem-paketi). FtkSaaS’ın yönettiği diğer Auth yüzeylerinin, karma DB geçmişinin ve organizasyon imhasının doğrulaması açık.
 
 **Tek kullanımlık Auth token’ları:** Hedef token için kayıt bazlı saklama blokajı ve silme sonrası yokluk kontrolünün [native Auth, main ve development teslimi](00-FtkSaaS-yeni-sohbet-devir.md#o04-auth-token-hold) tamamlandı.
+
+**Uygulama güvenlik geçmişi:** Hedef hesabın geçmiş oturum kimliği [yerel kabulde](00-FtkSaaS-yeni-sohbet-devir.md#o04-guvenlik-gecmisi) temizlendi. Gerçek native aday kabulü ve organizasyon imhası açık.
+
+**Organizasyon DB imhası:** Mevcut P07 worker veritabanı kapsamını `pending` bırakır. Kalan uygulama, organizasyona ait silinebilir satırları kayıt bazlı blokaj ve belgeli saklama kapsamıyla ayırıp imha etmek. Kabul, başka organizasyonların ve ortak giriş hesaplarının korunmasını da doğrular. [Kalıcı silme kapsamı](../../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md#kalıcı-silme-kapsamı).
 
 <a id="o05"></a>
 ### O05 — Storage ve export fiziksel imha
@@ -996,6 +1000,11 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 - **Doğrulama senaryosu:** Yük profili ve eşikler koşudan önce kaydedilir; pilot RPO≤24saat/RTO≤8saat hedefleri ölçülür, ticari SLA sayılmaz.
 - **Kaynak alanı:** yük senaryoları; query/worker ölçümleri; runbook
 - **Ölçüm tabanı:** [Pilot performans hedefleri](../../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md#performans--business-sonrası-ölçüm-hedefleri) 10 organizasyon × 500 aktif öğrenci ve 50 eşzamanlı kullanıcı tanımlar. Backend p95 hedefi liste/detay için 1 saniye, haftalık takvim, kritik yazmalar ve büyük iş başlatma için 2 saniyedir. Kalan iş istek dağılımını ve test verisini kaydetmek, iş kuyruğu ve finans mutabakatıyla birlikte ölçmek, O08 tatbikatından RPO/RTO çıkarmaktır.
+
+<a id="saglayici-kopyalari-takibi"></a>
+### Sağlayıcı kopyalarının işletim takibi
+
+- [ ] Sağlayıcının kendi yönettiği dış Auth logları, altyapı kopyaları ve yedekleri için kapsamı, yürürlükteki sözleşme ve imha doğrulamasını kaydet. Gereken talepleri sağlayıcıya ilet ve cevabı izle. [Güncel kanıt](00-FtkSaaS-yeni-sohbet-devir.md#saglayici-kopyalari-kaniti) ve [sorumluluk sınırı](../../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md#veri-türüne-göre-yöntem).
 
 ## Plan bazlı son kabul
 

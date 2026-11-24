@@ -42,6 +42,8 @@ Pro için [P05–P07](remaining-work.md#p05), [P10–P11](remaining-work.md#p10)
 
 [O03](remaining-work.md#o03) envanterinden sonra sıra [O04](remaining-work.md#o04) ve [O05](remaining-work.md#o05) imha kanıtı, [O06](remaining-work.md#o06) sicil ve [O07](remaining-work.md#o07) guard kabulüdür. [O08](remaining-work.md#o08) tam restore’dan sonra aynı izole hedefte [O09](remaining-work.md#o09) tekrar imha ve [O10](remaining-work.md#o10) kurtarma ölçümü yürür. O10 yük profili koşudan önce kayda alınır. Sonuçların sahibi [işletim devridir](00-FtkSaaS-yeni-sohbet-devir.md#o03-o10-isletim-kaniti).
 
+[Sağlayıcı kopyalarının işletim takibi](remaining-work.md#saglayici-kopyalari-takibi), FtkSaaS’ın yönettiği DB ve Auth imhasıyla paralel yürür.
+
 Aynı migration veya ortak sözleşmeye yazan işler seri yönetilir. Bağımsız kaynak ve kanıt işleri eşzamanlı ilerleyebilir; kesin bağımlılık görevin kendi kaydındadır. Her ilişkili pakette olumsuz senaryolar, açık ortam girdileri ve son kaynak incelemesi tamamlanır. PR bir anlamlı teslim paketidir; her fonksiyon için ayrı push veya full clean üretilmez.
 
 ## Plan bazlı kapanış

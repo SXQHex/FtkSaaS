@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "b8adc39c70d1daa683425e559d8948a96832369f30a04f3f6129f08f7110008c",
-        "reason": "Üretilen şema, Edge doğrulayıcısı ve test envanteri opt-in alanla eşleşiyor. Kimlik ve taşıma kuralları aynı."
+        "fingerprint": "26d7be3fd7ed45e9469a88c0636683648e91c6d9fa33da9266c6b849d1394f23",
+        "reason": "Güvenlik geçmişi migration sayımı ve yayımlanan sözleşme envanteri güncellendi."
       }
     },
     {
@@ -1694,8 +1694,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "5eb9ec8ca3acb81ff0b9d2926188e535b23d857915a5f70833adbb106fda7b5f",
-        "reason": "Paylaşılan P07 lifecycle testi yalnız hesap imhasında hedef token blokajını doğruluyor."
+        "fingerprint": "1967de2372c094a6a02fb2cb1c5fc8da46221ff4f6a8bde706cb79f5035ffc94",
+        "reason": "Ortak P07 lifecycle kabulünde güvenlik geçmişi alanı ve mevcut işçi yetkisi doğrulandı."
       }
     },
     {
@@ -1997,6 +1997,7 @@
         "apps/backend/database/account-native-residues.sql",
         "apps/backend/supabase/migrations/20261108161621_account_native_residues.sql",
         "apps/backend/supabase/migrations/20261124211200_account_native_retention_hold.sql",
+        "apps/backend/supabase/migrations/20261124222220_account_security_history_minimization.sql",
         "apps/backend/scripts/postgres-restore.mjs",
         "apps/backend/database/account-export-erasure.sql",
         "apps/backend/supabase/migrations/20261108211924_account_export_erasure.sql",
@@ -2042,8 +2043,8 @@
         "platform_operator_access_set_v1"
       ],
       "review": {
-        "fingerprint": "c76aff265ad4975994e6766863f2501f467e607d9f765e74ebbe3cdc00ef33e8",
-        "reason": "Paylaşılan test P06 takip kopyalarının olağan expiry temizliğini ayrıca doğrular."
+        "fingerprint": "ee0125f0990b140869c18a744b6bc9cefefa721661dc271b4c7de8a4f15296a2",
+        "reason": "Profil ve native makbuz sonrası hesap güvenlik geçmişi minimizasyonu, hold ve worker sınırları incelendi."
       }
     },
     {
@@ -2208,6 +2209,7 @@
         "apps/backend/database/account-native-residues.sql",
         "apps/backend/supabase/migrations/20261108161621_account_native_residues.sql",
         "apps/backend/supabase/migrations/20261124211200_account_native_retention_hold.sql",
+        "apps/backend/supabase/migrations/20261124222220_account_security_history_minimization.sql",
         "apps/backend/database/account-export-erasure.sql",
         "apps/backend/supabase/migrations/20261108211924_account_export_erasure.sql",
         "apps/backend/supabase/migrations/20261124214437_p06_tracking_retention_holds.sql",
@@ -2244,8 +2246,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "3cbffca4f315a3dd3cca1fb731719e8ee9aa4d7e8c397698744b32b4f4038434",
-        "reason": "P06 claim ve export expiry organizasyon yazıcılarını sıralar ve eşzamanlı blokajın yabancı anahtar kontrolüne izin verir."
+        "fingerprint": "142ea19d94d4ef833ed340fb75858f8796eb2681f7024c1f1b96d9d99c501a54",
+        "reason": "İşçi tekrarında korunan güvenlik olayı, kayıt blokajı ve sabit işlem makbuzu incelendi."
       }
     }
   ]
