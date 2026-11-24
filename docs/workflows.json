@@ -96,6 +96,7 @@
         "apps/backend/scripts/check-migrations.py",
         "apps/backend/scripts/ci/api-suites.json",
         "apps/backend/scripts/ci/api-suites.mjs",
+        "apps/backend/scripts/ci/build-xreq-072-runtime.sh",
         "apps/backend/scripts/ci/candidate-inventory.mjs",
         "apps/backend/scripts/ci/check-quality.mjs",
         "apps/backend/scripts/ci/cleanup.mjs",
@@ -133,6 +134,7 @@
         "apps/backend/scripts/ci/summarize-timings.mjs",
         "apps/backend/scripts/ci/timing-reporter.mjs",
         "apps/backend/scripts/ci/timings.mjs",
+        "apps/backend/scripts/ci/with-xreq-072-runtime.mjs",
         "apps/backend/scripts/acceptance/edge-response-lifecycle.mjs",
         "apps/backend/scripts/acceptance/xreq-072-edge-runtime.patch",
         "apps/backend/scripts/db.mjs",
@@ -317,8 +319,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "6b28a5c7683fb702526a7d2aebf4b11134fb0f18ae0ad587261b62a63d2d2a44",
-        "reason": "Ortak istemci ve Edge sözleşme doğrulayıcıları ile native Edge yanıt ömrü yaması ve binary kabulü incelendi. İstek ve geçerli yanıt biçimleri aynı."
+        "fingerprint": "e20639c6b1466c415d18939579690a58d18fc11b37efbd0d8ac4cb23e57d979b",
+        "reason": "XREQ-072 paket üretimi, native CLI paket doğrulaması ve aynı binary ile core/API kabul akışı incelendi."
       }
     },
     {

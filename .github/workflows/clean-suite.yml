@@ -13,7 +13,53 @@ defaults:
     working-directory: apps/backend
 permissions: {}
 jobs:
+  runtime-package:
+    name: runtime-package
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    outputs:
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
+      archive: ${{ steps.build.outputs.archive }}
+      manifest: ${{ steps.build.outputs.manifest }}
+      elf: ${{ steps.build.outputs.elf }}
+    steps:
+      - name: Preserve historical manual diagnostics
+        if: fromJSON(inputs.binding).kind == 'manual-full'
+        working-directory: ${{ runner.temp }}
+        run: echo 'Manual diagnostic uses the runtime locked by the tested historical source.'
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: fromJSON(inputs.binding).kind != 'manual-full'
+        with:
+          ref: ${{ inputs.tested_sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        if: fromJSON(inputs.binding).kind != 'manual-full'
+        with:
+          node-version-file: '.nvmrc'
+      - name: Build and verify native runtime
+        if: fromJSON(inputs.binding).kind != 'manual-full'
+        id: build
+        env:
+          EXPECTED: ${{ inputs.tested_sha }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED"
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libopenblas-dev
+          rustup toolchain install 1.98.0 --profile minimal
+          bash scripts/ci/build-xreq-072-runtime.sh "$RUNNER_TEMP/xreq-072-runtime"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: fromJSON(inputs.binding).kind != 'manual-full'
+        id: upload
+        with:
+          name: xreq-072-runtime-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/xreq-072-runtime
+          if-no-files-found: error
+          compression-level: 0
+          archive: true
   core:
+    needs: runtime-package
     permissions:
       contents: read
     name: core
@@ -42,10 +88,26 @@ jobs:
       - run: corepack enable
       - run: pnpm --filter @ftksaas/backend... --filter ftksaas install --frozen-lockfile
         working-directory: .
+      - &download-runtime-package
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        if: fromJSON(inputs.binding).kind != 'manual-full'
+        with:
+          artifact-ids: ${{ needs.runtime-package.outputs.artifact_id }}
+          path: ${{ runner.temp }}/xreq-072-runtime
+          digest-mismatch: error
       - name: Clean acceptance
         env:
           FTK_TEST_TIMINGS: '1'
-        run: node scripts/test-clean.mjs core
+          ACCEPTANCE_KIND: ${{ fromJSON(inputs.binding).kind }}
+          FTK_EDGE_ARCHIVE_SHA256: ${{ needs.runtime-package.outputs.archive }}
+          FTK_EDGE_MANIFEST_SHA256: ${{ needs.runtime-package.outputs.manifest }}
+          FTK_EDGE_ELF_SHA256: ${{ needs.runtime-package.outputs.elf }}
+        run: |
+          runtime=()
+          if [[ "$ACCEPTANCE_KIND" != manual-full ]]; then
+            runtime=(node scripts/ci/with-xreq-072-runtime.mjs "$RUNNER_TEMP/xreq-072-runtime")
+          fi
+          "${runtime[@]}" node scripts/test-clean.mjs core
       - name: Upload schema baseline
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -71,6 +133,7 @@ jobs:
           include-hidden-files: true
           archive: true
   api:
+    needs: runtime-package
     permissions:
       contents: read
     name: api-${{ matrix.shard }}
@@ -103,12 +166,22 @@ jobs:
       - run: corepack enable
       - run: pnpm --filter @ftksaas/backend... --filter ftksaas install --frozen-lockfile
         working-directory: .
+      - *download-runtime-package
       - name: Clean acceptance
         env:
           FTK_TEST_TIMINGS: '1'
           SHARD: ${{ matrix.shard }}
           FTK_CI_BINDING: ${{ inputs.binding }}
-        run: FTK_EDGE_MEMORY_GUARD=1 node scripts/ci/observe-api.mjs node scripts/test-clean.mjs api "$SHARD"
+          ACCEPTANCE_KIND: ${{ fromJSON(inputs.binding).kind }}
+          FTK_EDGE_ARCHIVE_SHA256: ${{ needs.runtime-package.outputs.archive }}
+          FTK_EDGE_MANIFEST_SHA256: ${{ needs.runtime-package.outputs.manifest }}
+          FTK_EDGE_ELF_SHA256: ${{ needs.runtime-package.outputs.elf }}
+        run: |
+          runtime=()
+          if [[ "$ACCEPTANCE_KIND" != manual-full ]]; then
+            runtime=(node scripts/ci/with-xreq-072-runtime.mjs "$RUNNER_TEMP/xreq-072-runtime")
+          fi
+          FTK_EDGE_MEMORY_GUARD=1 "${runtime[@]}" node scripts/ci/observe-api.mjs node scripts/test-clean.mjs api "$SHARD"
       - if: always()
         run: node scripts/ci/summarize-timings.mjs
       - if: always()
@@ -126,6 +199,7 @@ jobs:
           include-hidden-files: true
           archive: true
   serial-reference:
+    needs: runtime-package
     permissions:
       contents: read
     name: serial-reference
@@ -155,10 +229,20 @@ jobs:
       - run: corepack enable
       - run: pnpm --filter @ftksaas/backend... --filter ftksaas install --frozen-lockfile
         working-directory: .
+      - *download-runtime-package
       - name: Clean acceptance
         env:
           FTK_TEST_TIMINGS: '1'
-        run: node scripts/test-clean.mjs serial
+          ACCEPTANCE_KIND: ${{ fromJSON(inputs.binding).kind }}
+          FTK_EDGE_ARCHIVE_SHA256: ${{ needs.runtime-package.outputs.archive }}
+          FTK_EDGE_MANIFEST_SHA256: ${{ needs.runtime-package.outputs.manifest }}
+          FTK_EDGE_ELF_SHA256: ${{ needs.runtime-package.outputs.elf }}
+        run: |
+          runtime=()
+          if [[ "$ACCEPTANCE_KIND" != manual-full ]]; then
+            runtime=(node scripts/ci/with-xreq-072-runtime.mjs "$RUNNER_TEMP/xreq-072-runtime")
+          fi
+          "${runtime[@]}" node scripts/test-clean.mjs serial
       - if: always()
         run: node scripts/ci/summarize-timings.mjs
       - if: always()

@@ -29,7 +29,11 @@ Resmi Linux amd64 paketi, CLI arşiv özeti doğrulanarak açıldı. İçindeki 
 
 Güncel backend-v1 bundle özeti `76bcf6b6565f162b93e5891ff6890585dcbe6bdb0763b2c351745b9b0fb4caec` ile ayrı metot doğrulama deneyi, eşzamanlılık 2 altında 200/200 beklenen `400 / VALIDATION_FAILED` ve 267516 KiB tepe RSS verdi. Optimize edilmemiş derleyicide büyük bundle varsayılan Rust iş parçacığı yığınını aştı. Bu deneyde yalnız debug süreç yığını `RUST_MIN_STACK=33554432` ile ayarlandı. HTTP yanıtı veritabanına erişmeyen doğrulama yolundan geldi.
 
-Bu kanıt izole Edge ikilisini kapsar. Yerel ortamda Unix soketi açma `Operation not permitted` ile reddedildiği için tam Supabase/DB kabulü bu adayla yerelde çalıştırılamadı. Ortak kurulumda onaylı ve sabitlenmiş paket kullanılmalı, gerçek core/API/quality koşusu aynı binary ile bağlanmalı. Özgün CI çağrısının kesin kapanma nedeni ve hosted ödeme ölçümü kendi kabul kayıtlarında açık kalır.
+Bu kanıt izole Edge ikilisini kapsar. Yerel ortamda Unix soketi açma `Operation not permitted` ile reddedildiği için tam Supabase/DB kabulü GitHub runner'ında çalıştırılmalıdır. Özgün CI çağrısının kesin kapanma nedeni ve hosted ödeme ölçümü kendi kabul kayıtlarında açık kalır.
+
+Ortak clean adayı, test edilen merge kaynağındaki yamadan Linux amd64 paketi bir kez üretir. Native yaşam döngüsü kabulü paketlenmeden önce aday ELF ile çalışır. Core ve on iki API shard'ı aynı koşuda yayımlanan tek immutable artifact'ı indirir, arşiv/manifest/ELF özetlerini karşılaştırır ve paketi CLI'nin native doğrulamasıyla kurar. Paket seçimi izole CI kabul komutu süresince geçerlidir. Kalıcı `supabase.lock`, manuel tarihsel tanı ve hosted teslim bu seçimi kullanmaz. Trusted politika kurulumu ve başarılı tam kabul [XREQ-072](../../../docs/requests.md#xreq-072) kapsamında beklenir.
+
+Yerel optimize ELF `0bdc07081ffb1edf8c122f0d9f06c84ef3b340923e04b10cf0369285e545a0f5` ile 11/11 native kontrol geçti. Tepe RSS 371648 KiB. Supabase CLI 3.0.0 `stack install --frozen --runtime native` arşiv `68644136d1bc326fb357026e902c51e68556d614eb66b8e5a42ca93a40c3b350` içindeki ELF'i kurdu. Runner da kendi paketinin ELF özetini kurulan kopyada doğrular.
 
 ### PR395 başarısız aday ve güncel main — 23 Kasım
 
