@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useBlocker } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import type { ResourceRef } from "@ftksaas/api-contracts";
 import { BackendError } from "../../lib/backend";
 import { StudioSheets } from "./studio-sheets";
 import {
@@ -15,6 +16,7 @@ import {
 import { readStudioClosures } from "./studio-reads";
 import type { StudioScope } from "./studio";
 import type { StudioViewData } from "./studio-view";
+import type { StudioSnapshot } from "./management-snapshot";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { Button } from "@ftksaas/ui/components/button";
 
@@ -39,7 +41,7 @@ export function StudioClosureEditor({
 }: {
   scope: StudioScope;
   data: StudioViewData;
-  onRefresh: () => Promise<void>;
+  onRefresh: () => Promise<Pick<StudioSnapshot, "closureResources" | "closures">>;
   onClose: () => void;
   onLockChange: (value: boolean) => void;
 }) {
@@ -96,8 +98,13 @@ export function StudioClosureEditor({
   async function finishRead() {
     const intent = pending.current;
     if (!intent || !acknowledged.current) return;
-    const [items] = await Promise.all([readStudioClosures(scope, intent.resource), onRefresh()]);
-    if (!items.some((item) => item.id === acknowledged.current))
+    const snapshot = await onRefresh();
+    const matchesResource = (resource: ResourceRef) =>
+      resource.kind === intent.resource.kind && resource.id === intent.resource.id;
+    const items = snapshot.closureResources.some(matchesResource)
+      ? snapshot.closures
+      : await readStudioClosures(scope, intent.resource);
+    if (!items.some((item) => item.id === acknowledged.current && matchesResource(item.resource)))
       throw new Error("STUDIO_UNAVAILABLE");
     if (mounted.current) {
       pending.current = undefined;
