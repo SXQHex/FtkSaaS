@@ -48,6 +48,8 @@ export function OverviewContent({
         r.session.id,
         r.session.version,
         r.session.room_labels?.map(({ room_id, name }) => [room_id, name]),
+        r.item.session_summary?.room_labels,
+        r.item.session_summary?.instructor_labels,
       ]),
     ],
     queryFn: (context) => readOverviewLabels(scope, entries!, context),

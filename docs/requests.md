@@ -1047,7 +1047,9 @@ Frontend [M09 taraması](../apps/web/docs/remaining-work.md#router-query-birlesi
 | Stüdyo ve çekmeceleri | Görünür kaynak/dönemde kişi-anlaşma, sınıf-program, kaynak-kapanış ve eğitmen-müsaitlik ilişkileri. Yetki, sayfa kapsamı ve komutun beklediği güncel kaynak sürümleri korunur. |
 | Public yayın durumu ve başvuru | Development Worker’da `context`, kesin `event` ve ayrıntılı takvim kiplerinin yayımlanmış şema ile eşliği. Görünür etkinlik, bağlı güncel form/onay ve anonim erişim aynı kalır. |
 
-Anonim development Worker karşılaştırmasında yerel `spa-validators` şemasının kabul ettiği aynı sentetik slug ve merkezle klasik takvim `200`, `context`, `event` ve `include_details:true` takvim isteği `400 VALIDATION_FAILED` döndürdü. Sırasıyla Cloudflare `cf-ray` değerleri `a5f945116896810f-MXP`, `a5f9450efaa6810f-MXP`, `a5f945109fe95230-MXP` ve `a5f945144897810f-MXP`. İstek gövdeleri [backend gateway kabulündeki](../apps/backend/tests/public-program-discovery-acceptance.mjs) kiplerle yapısal olarak eşleşiyor. [Development gateway sözleşmesi](client-integration.md)
+İlk anonim development Worker denemesinde yerel `spa-validators` şemasının kabul ettiği aynı sentetik slug ve merkezle klasik takvim `200`, `context`, `event` ve `include_details:true` takvim isteği `400 VALIDATION_FAILED` döndürdü. Sırasıyla Cloudflare `cf-ray` değerleri `a5f945116896810f-MXP`, `a5f9450efaa6810f-MXP`, `a5f945109fe95230-MXP` ve `a5f945144897810f-MXP`. İstek gövdeleri [backend gateway kabulündeki](../apps/backend/tests/public-program-discovery-acceptance.mjs) kiplerle yapısal olarak eşleşiyor. [Development gateway sözleşmesi](client-integration.md)
+
+Backend takip tesliminden sonra frontend yedi tüketiciyi yeni native alanlara bağladı. Anonim development Worker tekrarında klasik takvim, `context` ve `event` `200` ve `no-store` döndürdü. [Frontend kaynak ve ölçüm kaydı](../apps/web/docs/handover.md#m09-kaynak-ve-olcum).
 
 <a id="xreq-073-backend-degerlendirmesi"></a>
 ### Uygulama öncesi backend değerlendirmesi · 24 Kasım 2026

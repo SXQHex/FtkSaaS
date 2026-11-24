@@ -20,7 +20,8 @@ export async function readOwnReservations(
     {
       sort: filter === "upcoming" ? "starts_at_asc" : "created_at_desc",
       includeSourceSummary: true,
-      ...(filter === "upcoming" ? { includeAttendance: false } : { includeSelfSummary: true }),
+      includeSelfSummary: true,
+      ...(filter === "upcoming" ? { includeAttendance: false } : {}),
       sessionId,
     },
     ...(readContext ? ([readContext] as const) : []),
@@ -36,19 +37,36 @@ export async function readOwnReservations(
     string,
     { instructors: string[]; rooms: string[]; cancellation: MemberLessonCancellation }
   >();
-  if (filter === "past") {
-    for (const { reservation, session } of page.items) {
-      const summary = reservation.self_summary;
-      if (
-        reservation.person_id === personId &&
-        session?.id === reservation.session_id &&
-        typeof summary?.title === "string" &&
-        summary.title.length > 0 &&
-        Date.parse(summary.starts_at) === Date.parse(session.starts_at) &&
-        Date.parse(summary.ends_at) === Date.parse(session.ends_at)
-      )
-        titles.set(session.id, summary.title);
-    }
+  for (const { reservation, session } of page.items) {
+    const summary = reservation.self_summary;
+    if (
+      reservation.person_id !== personId ||
+      session?.id !== reservation.session_id ||
+      typeof summary?.title !== "string" ||
+      !summary.title ||
+      Date.parse(summary.starts_at) !== Date.parse(session.starts_at) ||
+      Date.parse(summary.ends_at) !== Date.parse(session.ends_at)
+    )
+      continue;
+    if (
+      summary.session_version === undefined
+        ? filter === "upcoming"
+        : summary.session_version !== session.version
+    )
+      continue;
+    titles.set(session.id, summary.title);
+    if (
+      filter === "upcoming" &&
+      session.state === "planned" &&
+      summary.cancellation?.source === "reservation_policy" &&
+      Array.isArray(summary.instructor_labels) &&
+      Array.isArray(summary.room_labels)
+    )
+      details.set(reservation.id, {
+        instructors: summary.instructor_labels,
+        rooms: summary.room_labels,
+        cancellation: summary.cancellation,
+      });
   }
   const unresolved = sessions.filter((session) => !titles.has(session.id));
   for (let index = 0; index < unresolved.length; index += 4)
@@ -81,7 +99,7 @@ export async function readOwnReservations(
                 ) &&
                 own.cancellation.source === "reservation_policy"
               )
-                details.set(session.id, {
+                details.set(own.id, {
                   instructors: native.member_lesson.instructor_labels,
                   rooms: native.member_lesson.room_labels,
                   cancellation: own.cancellation,
@@ -112,7 +130,7 @@ export async function readOwnReservations(
     items: page.items.map((row) => ({
       ...row,
       title: titles.get(row.reservation.session_id),
-      lesson: details.get(row.reservation.session_id),
+      lesson: details.get(row.reservation.id),
     })),
   };
 }

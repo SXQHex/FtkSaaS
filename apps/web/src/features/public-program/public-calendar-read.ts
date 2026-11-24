@@ -66,36 +66,23 @@ export async function readPublicCalendar(
     disciplineId?: string;
     interval: Interval;
     cursor?: string | null;
-    discoveryOnly?: boolean;
   },
   signal?: AbortSignal,
 ) {
-  const base = readPublicGatewayUrl();
-  if (!base) throw new Error("Public gateway yapılandırması eksik.");
-  const request: RequestPublicCalendarGet = {
-    client_api_version: 1,
-    request_id: uuidv7(),
-    slug: input.slug,
-    interval: input.interval,
-    page: {
-      limit: input.discoveryOnly ? 1 : 50,
-      sort: "starts_at_asc",
-      ...(input.cursor ? { cursor: input.cursor } : {}),
+  const data = await fetchPublicCalendar(
+    {
+      client_api_version: 1,
+      request_id: uuidv7(),
+      slug: input.slug,
+      interval: input.interval,
+      page: { limit: 50, sort: "starts_at_asc", ...(input.cursor ? { cursor: input.cursor } : {}) },
+      ...(input.centerId ? { center_id: input.centerId } : {}),
+      include_disciplines: true,
+      include_details: true,
+      ...(input.disciplineId ? { discipline_id: z.uuid().parse(input.disciplineId) } : {}),
     },
-    ...(input.centerId ? { center_id: input.centerId } : {}),
-    ...(!input.discoveryOnly ? { include_disciplines: true } : {}),
-    include_details: true,
-    ...(input.disciplineId ? { discipline_id: z.uuid().parse(input.disciplineId) } : {}),
-  };
-  const response = await fetch(`${base}/api/public/calendar`, {
-    method: "POST",
-    credentials: "omit",
-    cache: "no-store",
     signal,
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(request),
-  });
-  const data = calendar.parse(await readEnvelope(response, signal));
+  );
   const ids = new Set<string>();
   const T = await getTemporal();
   let previous: string | undefined;
@@ -114,11 +101,62 @@ export async function readPublicCalendar(
   }
   if (input.cursor && input.cursor === data.next_cursor)
     throw new Error("Geçersiz program cursor yanıtı.");
+  return data;
+}
+
+async function fetchPublicCalendar(request: RequestPublicCalendarGet, signal?: AbortSignal) {
+  // Let a removed Query observer cancel before the request reaches the Worker.
+  await Promise.resolve();
+  signal?.throwIfAborted();
+  const base = readPublicGatewayUrl();
+  if (!base) throw new Error("Public gateway yapılandırması eksik.");
+  const response = await fetch(`${base}/api/public/calendar`, {
+    method: "POST",
+    credentials: "omit",
+    cache: "no-store",
+    signal,
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(request),
+  });
+  const data = calendar.parse(await readEnvelope(response, signal));
   if (
     data.publication_state === "unavailable" &&
     (data.items.length || data.next_cursor || data.application.state === "open")
   )
     throw new Error("Geçersiz public yayın durumu.");
+  return data;
+}
+
+export async function readPublicContext(
+  input: { slug: string; centerId?: string; publicationId?: string },
+  signal?: AbortSignal,
+) {
+  const { slug, centerId, publicationId } = input;
+  if (publicationId && !centerId) throw Error("PUBLIC_EVENT_CENTER_REQUIRED");
+  const data = await fetchPublicCalendar(
+    {
+      client_api_version: 1,
+      request_id: uuidv7(),
+      slug,
+      ...(centerId ? { center_id: z.uuid().parse(centerId) } : {}),
+      page: {},
+      ...(publicationId
+        ? { mode: "event", publication_id: z.uuid().parse(publicationId) }
+        : { mode: "context" }),
+    },
+    signal,
+  );
+  if (data.next_cursor || data.items.length > (publicationId ? 1 : 0))
+    throw Error("PUBLIC_CONTEXT_UNAVAILABLE");
+  const event = data.items[0];
+  if (
+    (publicationId && !event && data.application.state === "open") ||
+    (event &&
+      (event.kind !== "event" ||
+        event.publication_id !== publicationId ||
+        Date.parse(event.interval.starts_at) >= Date.parse(event.interval.ends_at)))
+  )
+    throw Error("PUBLIC_CONTEXT_UNAVAILABLE");
   return data;
 }
 

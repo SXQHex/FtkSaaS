@@ -7,11 +7,7 @@ import { PublicShell } from "./public-shell";
 import { PublicUnavailableView } from "./public-unavailable-view";
 import { PublicApplicationView } from "./public-application-view";
 import { PublicEventApplicationView } from "./public-event-application-view";
-import {
-  publicCalendarInterval,
-  publicProgramRows,
-  readPublicCalendar,
-} from "./public-calendar-read";
+import { publicProgramRows, readPublicContext } from "./public-calendar-read";
 import { PublicTurnstile } from "./public-turnstile";
 import {
   preparePublicApplication,
@@ -43,31 +39,13 @@ async function readApplicationContext(
   slug: string,
   centerId: string | undefined,
   eventId: string | undefined,
-  openedAt: number,
   signal: AbortSignal,
 ) {
-  const interval = await publicCalendarInterval(openedAt);
-  const cursors = new Set<string>();
-  let cursor: string | undefined;
-  while (true) {
-    const data = await readPublicCalendar(
-      { slug, centerId, interval, cursor, discoveryOnly: !eventId },
-      signal,
-    );
-    const publication = eventId
-      ? data.items.find((item) => item.publication_id === eventId && item.kind === "event")
-      : undefined;
-    if (publication) {
-      const {
-        rows: [event],
-      } = await publicProgramRows([{ ...data, items: [publication] }]);
-      return { ...data, event };
-    }
-    if (!eventId || !data.next_cursor) return { ...data, event: undefined };
-    if (cursors.has(data.next_cursor)) throw Error("PUBLIC_EVENT_CURSOR_INVALID");
-    cursors.add(data.next_cursor);
-    cursor = data.next_cursor;
-  }
+  const data = await readPublicContext({ slug, centerId, publicationId: eventId }, signal);
+  const {
+    rows: [event],
+  } = await publicProgramRows([data]);
+  return { ...data, event };
 }
 
 type Attempt = PublicApplicationAttempt | PublicEventApplicationAttempt;
@@ -82,9 +60,11 @@ export function PublicApplicationPage({
 }) {
   const { t } = useTranslation();
   const [openedAt] = useState(Date.now);
+  const incompleteEvent = Boolean(eventId && !centerId);
   const discovery = useQuery({
     queryKey: ["public-application-discovery", slug, centerId, openedAt, eventId],
-    queryFn: ({ signal }) => readApplicationContext(slug, centerId, eventId, openedAt, signal),
+    queryFn: ({ signal }) => readApplicationContext(slug, centerId, eventId, signal),
+    enabled: !incompleteEvent,
     retry: false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
@@ -215,7 +195,9 @@ export function PublicApplicationPage({
       description={profile?.description}
       calendarHref={calendarHref}
     >
-      {discovery.isPending ? (
+      {incompleteEvent ? (
+        <PublicUnavailableView />
+      ) : discovery.isPending ? (
         <p role="status">{t(($) => $.publicApplication.loading)}</p>
       ) : discovery.isError ? (
         <>

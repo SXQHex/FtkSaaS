@@ -9,12 +9,14 @@ import type {
   ReservationView,
   WaitlistEntryView,
   SessionView,
+  ResourceRef,
 } from "@ftksaas/api-contracts";
 
 export async function readSessionHeader(
   scope: ClientScope,
   session: Pick<SessionView, "id" | "starts_at" | "ends_at">,
   readContext?: AccountReadContext,
+  options?: { resource: ResourceRef; include_room_labels: boolean },
 ) {
   const backend = await scopedBackend(scope, undefined, readContext),
     cursors = new Set<string>();
@@ -24,6 +26,7 @@ export async function readSessionHeader(
       ...common(scope),
       request_id: uuidv7(),
       interval: { starts_at: session.starts_at, ends_at: session.ends_at },
+      ...options,
       page: { limit: 50, sort: "starts_at_asc", ...(cursor ? { cursor } : {}) },
     });
     const matches = page.items.filter((row) => row.type === "session" && row.id === session.id);
@@ -191,6 +194,7 @@ export async function readSessionAttendance(
   scope: ClientScope,
   sessionId: string,
   readContext?: AccountReadContext,
+  includePersonNames = false,
 ) {
   z.uuid().parse(sessionId);
   const backend = await scopedBackend(scope, undefined, readContext);
@@ -200,6 +204,7 @@ export async function readSessionAttendance(
       request_id: uuidv7(),
       session_id: sessionId,
       include_correction_requests: true,
+      ...(includePersonNames ? { include_person_display_names: true } : {}),
     }),
     sessionId,
   );

@@ -4,7 +4,7 @@
 
 ## Kaynak ve kontrol noktası
 
-- **Güncel main · 24 Kasım 2026.** `eeffd4193787c02f0e633977fa9b53600dfaa46b` için [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/45417549607), [merge doğrulaması](https://github.com/SXQHex/FtkSaaS/actions/runs/45417549659) ve [Supabase development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/45417696259) başarılı. Bu kaynağın frontend ağacı, `159bb12db01afa2e7af066748656a215bc26fab2` ile aynı. [Cloudflare statik SPA dağıtımı](https://github.com/SXQHex/FtkSaaS/actions/runs/45416226329)
+- **Güncel main · 24 Kasım 2026.** `97176d4f4ff7ed73353d4ec8099172693135de20` için [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/45456445773) ve [merge doğrulaması](https://github.com/SXQHex/FtkSaaS/actions/runs/45456445945) başarılı. [Supabase](https://github.com/SXQHex/FtkSaaS/actions/runs/45456559571) ve [Cloudflare](https://github.com/SXQHex/FtkSaaS/actions/runs/45456559637) kaynak iş akışları tamamlandı. Tip güvenliği kabulü kendi bölümündedir.
 - **M09 Stüdyo kaynak kabulü.** [PR #433](https://github.com/SXQHex/FtkSaaS/pull/433) head `c88098713fce7f4a34b9d148362571f67e9b6c41`, main `159bb12db01afa2e7af066748656a215bc26fab2`. [Frontend CI](https://github.com/SXQHex/FtkSaaS/actions/runs/45413355345) checks ve 12/12 Desktop Chromium başarılı.
 - **C-ortak ve Üyeler kaynak kabulü.** [PR #430](https://github.com/SXQHex/FtkSaaS/pull/430) head `f07cdfff70bd835a17a352e17e2977a05f08ac53`, main `d967ba1076852cd50ee511e468d9a28b6a8015ac`. [Frontend CI](https://github.com/SXQHex/FtkSaaS/actions/runs/45402238370) attempt 1, checks ve 12/12 Desktop Chromium başarılı. [Main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/45404113020)
 - **M09 PR #423 kaynak kabulü.** Head `c50152317077c147ba83bba45a27f2474547a07b`, base `5fa8ee30b396fe09be2cc9154bf08dfacf9bce61`, test edilen merge `2d4dafbf2b3b981c5f9797c698dfe9b2a710d18c`. Aday ve main aynı `0377b67863d15d31f5166c2aadcee407baf17332` Git ağacına sahip. [Frontend CI](https://github.com/SXQHex/FtkSaaS/actions/runs/45374829702) attempt 1 ve 12/12 Desktop Chromium başarılı. Kişi yazma reddi testi, tek istek ve sıfır kayıt kontrollerinden önce ekrandaki reddi bekliyor. [PR #423](https://github.com/SXQHex/FtkSaaS/pull/423)
@@ -76,6 +76,33 @@ M09 adayında kapanış yazması sonrası aynı salon için kapanış okuması 2
 WF03’te tam özet içeren doğrudan eğitmen ataması ve uygun özel ders adayı için aynı fixture sonucu `calendar_get_v1` + `session_get_v1` yerine tek `calendar_get_v1` ile alındı. İki senaryoda da dönen üst düzey kayıt 2’den 1’e indi. Sınıf ataması, eksik özet ve talep onayından sonra makbuzla bağlı kesin seans için `session_get_v1` sürüyor. Ders talebi seçicisinde merkez, saat, disiplin, eğitmen ve açık yoklama kontrolleri korunuyor. Bu istek ve satır sayıları yerel regresyona dayanıyor. [Eğitmen regresyonu](../src/features/instructor/instructor-read.test.ts) · [Ders talebi regresyonu](../src/features/lesson-requests/lesson-request-session-selection.test.ts) · [WF03](../../../docs/workflows.md#wf03)
 
 WF04’te bir geçmiş üye rezervasyonunun başlığı kendi `reservation_list_v1` satırından alındı. Yerel fixture’da seans başlığı için ayrı takvim çağrısı ve onun tek satırı kaldırıldı. Aynı üye/saat eşleşmesi doğrulandı. Eksik veya uyuşmayan özet kesin başlık okuyucusuna dönüyor. Seans sürümü, yoklama ve yaklaşan dersin dondurulmuş iptal kaynağı kendi native doğrulamalarını sürdürüyor. [Üye geçmişi regresyonu](../src/features/member-reservations/member-reservations-read.test.ts) · [Sayfa seçicisi regresyonu](../src/features/member-profile/reservations.test.ts) · [WF04](../../../docs/workflows.md#wf04)
+
+<a id="m09-kaynak-ve-olcum"></a>
+
+#### XREQ-073 takip tüketimi
+
+[Backend PR #439](https://github.com/SXQHex/FtkSaaS/pull/439) `0e7fdf507d00590b7a56e825b7dd5e963606192f` üzerinde [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/45434558396) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/45434679289) doğrulandı. [Anonim Worker sürümü ve asıl form eşliği](../../backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#xreq-073-development-worker) backend devrinde.
+
+| Okuyucu                 | Aynı fixture için okuma farkı                                                                                                                                  | Kaynak kanıtı                                                                                                     |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Genel Bakış             | Yetkili tam özet, ayrı seans ve etiket okumalarını kaldırıyor. Yönetim oda projeksiyonunun gelmediği kapsam kendi kesin oda doğrulamasını kullanıyor.          | [Sürüm ve erişim regresyonu](../src/features/overview/overview-read.test.ts)                                      |
+| Oda ve eğitmen kesişimi | İki sayfalı karşılaştırma 4 → 2 istek. Tek oda ve eğitmen seçicisi aynı cursor zincirini kullanıyor.                                                           | [Takvim okuyucu regresyonu](../src/features/schedule/schedule-read.test.ts)                                       |
+| Eğitmen                 | Kendi sınıf görevi 2 → 1 istek, 2 → 1 üst düzey kayıt. Bir eğitmen ve bir katılımcılı seans ayrıntısı 5 → 2 istek. Kesin seans ve yoklama sürümleri eşleşiyor. | [Eğitmen regresyonu](../src/features/instructor/instructor-read.test.ts)                                          |
+| Üye                     | Kesinleşmiş bir kendi rezervasyonunun liste, seans ve yoklama zinciri 3 → 1 istek. Yaklaşan derste tam özet izinli etiketleri aynı satırdan alıyor.            | [Kendi özeti](../src/features/member-profile/reservations.test.ts)                                                |
+| Etkinlik                | Etkinlik ve aktif oda 2 → 1 istek. Açık null için ayrı oda sorgusu yok.                                                                                        | [Tarayıcı regresyonu](../e2e/auth-event-detail.spec.ts)                                                           |
+| Stüdyo                  | İki kişi, iki sınıf ve iki kaynaklı tek sayfa örneklerinde her okuma ailesi 2 → 1 istek. Devam sayfası aynı kimlik kümesine bağlı.                             | [Sınırlı toplu okuma](../src/features/studio/studio-reads.test.ts)                                                |
+| Public                  | Durum isteği takvim satırı getirmiyor. Etkinlik bir istek ve en fazla bir satır. Kesin kaynak, sürüm ve writer davranışı tarayıcı testinde sınandı.            | [Public durum](../e2e/auth-public-publication.spec.ts) · [Başvuru](../e2e/auth-public-application-submit.spec.ts) |
+
+24 Kasım development Worker denemesinde aynı gizli sentetik kapsam için üçer klasik takvim, `context` ve `event` okuması `200`, sıfır satır, kapalı form ve `no-store` döndürdü. İstek sürelerinin medyanı sırasıyla 523, 300 ve 239 ms. Gizli kapsamın anonim transport ölçümü, gerçek yayımlı form ve sağlayıcı kabulünden ayrı tutulur. [Native kapsama testi](../../backend/tests/public-program-discovery-acceptance.mjs)
+
+Aynı 1280×720 yerel Chromium fixture’ında, `97176d4f4ff7ed73353d4ec8099172693135de20` kaynak ağacı ve takip istemcisi tek işçiyle üçer kez ölçüldü. Tüm turlarda tek sınıf yazması ve güncel adın okunması doğrulandı. [Ölçüm senaryosu](../e2e/auth-c-common-read-cost.spec.ts)
+
+| Adım                         |   Okuma | Dönen satır |    p50 (ms) |
+| ---------------------------- | ------: | ----------: | ----------: |
+| Giriş ve Stüdyo              | 26 → 25 |     20 → 20 | 1244 → 1164 |
+| Genel Bakış                  |   5 → 3 |       3 → 1 |   197 → 216 |
+| Tek yazma sonrası taze liste | 22 → 20 |     18 → 17 |   399 → 257 |
+| Tüm akış                     | 78 → 73 |     82 → 79 |             |
 
 <a id="c-common-development-503"></a>
 

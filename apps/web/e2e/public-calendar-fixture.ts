@@ -105,7 +105,12 @@ export async function mockPublicCalendar(
     expect(req.headers()).not.toHaveProperty("apikey");
     const request = req.postDataJSON() as Record<string, unknown>;
     calls.push(request);
-    expect(request.include_details).toBe(true);
+    if (request.mode === "context" || request.mode === "event") {
+      expect(request).not.toHaveProperty("interval");
+      expect(request.page).toEqual({});
+    } else {
+      expect(request.include_details).toBe(true);
+    }
     const cursor = (request.page as { cursor?: string }).cursor;
     if (fail || (failNext && cursor))
       return route.fulfill({
@@ -122,6 +127,29 @@ export async function mockPublicCalendar(
       title: "İkinci program",
       interval: { starts_at: "2026-11-19T15:00:00Z", ends_at: "2026-11-19T16:00:00Z" },
     };
+    if (request.mode === "context" && mode !== "malformed")
+      return route.fulfill({
+        json: {
+          ok: true,
+          trace_id: publicCalendarId,
+          data: { ...packet, items: [], next_cursor: null },
+        },
+      });
+    if (request.mode === "event") {
+      const items = packet.items.filter(
+        ({ publication_id, kind }) => kind === "event" && publication_id === request.publication_id,
+      );
+      const data = items.length
+        ? { ...packet, items, next_cursor: null }
+        : {
+            ...packet,
+            items,
+            next_cursor: null,
+            publication_state: "unavailable",
+            application: { state: "closed", form: null },
+          };
+      return route.fulfill({ json: { ok: true, trace_id: publicCalendarId, data } });
+    }
     const data = request.discipline_id
       ? {
           ...packet,

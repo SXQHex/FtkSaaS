@@ -10,6 +10,30 @@ import type {
   InstructorFinanceEarning,
 } from "@ftksaas/api-contracts";
 const saved = "İşlem kaydedildi; güncel kayıt okundu.";
+test("event detail uses the active room projection and respects an inactive room", async ({
+  page,
+}) => {
+  const state = await mockEventDetail(page);
+  state.event.venue = { kind: "internal", room_id: I.room, timezone: state.event.timezone };
+  state.event.venue_active_room_name = "Sentetik etkinlik salonu";
+  const roomReads: string[] = [];
+  page.on("request", (request) => {
+    if (
+      request.url().endsWith("/management_state_get_v1") &&
+      request.postDataJSON().operation === "room_save_v1"
+    )
+      roomReads.push(request.url());
+  });
+  await page.reload();
+  await expect(page.getByText("Sentetik etkinlik salonu", { exact: true })).toBeVisible();
+  expect(roomReads).toHaveLength(0);
+
+  state.event.venue_active_room_name = null;
+  await page.reload();
+  await expect(page.getByRole("heading", { name: state.event.name })).toBeVisible();
+  await expect(page.getByText("Sentetik etkinlik salonu", { exact: true })).toHaveCount(0);
+  expect(roomReads).toHaveLength(0);
+});
 test("event detail displays the authorized duty name without a separate profile read", async ({
   page,
 }) => {

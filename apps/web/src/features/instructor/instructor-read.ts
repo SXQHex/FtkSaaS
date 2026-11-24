@@ -7,7 +7,7 @@ import { getTemporal } from "../../lib/temporal";
 import type { CalendarItem, Interval, SessionView } from "@ftksaas/api-contracts";
 import { calendarSessionWithDiscipline } from "../schedule/calendar-session";
 import { readScheduleSession } from "../schedule/schedule-read";
-import { readSessionAttendance } from "../session-detail/session-detail-read";
+import { readSessionAttendance, readSessionHeader } from "../session-detail/session-detail-read";
 
 export async function instructorPeriod(
   timezone: string,
@@ -95,7 +95,11 @@ export async function readInstructorCalendar(
     const entries = await Promise.all(
       calendar.slice(i, i + 4).map(async (item) => {
         const projected = calendarSessionWithDiscipline(item);
-        if (projected?.room_labels !== undefined && instructorAssigned(projected, personId))
+        if (
+          projected?.room_labels !== undefined &&
+          (instructorAssigned(projected, personId) ||
+            (projected.class_id && item.session_summary?.actor_class_duty?.duty === "instructor"))
+        )
           return { item, session: projected };
         const session = await readScheduleSession(
           scope,
@@ -108,11 +112,11 @@ export async function readInstructorCalendar(
           Date.parse(session.ends_at) !== Date.parse(item.ends_at)
         )
           throw new Error("INSTRUCTOR_CALENDAR_UNAVAILABLE");
-        return { item, session };
+        return instructorAssigned(session, personId) ? { item, session } : undefined;
       }),
     );
     // A person resource can also match a booking; it never grants an instructor assignment.
-    items.push(...entries.filter(({ session }) => instructorAssigned(session, personId)));
+    items.push(...entries.filter((row) => row !== undefined));
   }
   return items.sort(
     (a, b) =>
@@ -131,12 +135,14 @@ export async function readInstructorAttendance(
   scope: ClientScope,
   session: SessionView,
   readContext?: AccountReadContext,
+  includePersonNames = false,
 ) {
   try {
     const attendance = await readSessionAttendance(
       scope,
       session.id,
-      ...(readContext ? ([readContext] as const) : []),
+      readContext,
+      includePersonNames,
     );
     if (
       attendance.session_version !== session.version ||
@@ -195,12 +201,10 @@ export async function readInstructorSession(
 ) {
   z.uuid().parse(sessionId);
   z.uuid().parse(personId);
-  const session = await readScheduleSession(
-    scope,
-    sessionId,
-    true,
-    ...(readContext ? ([readContext] as const) : []),
-  );
+  const session = await readScheduleSession(scope, sessionId, true, readContext, {
+    include_title: true,
+    include_person_display_names: true,
+  });
   const assigned =
     session.assignments.some((row) => row.person_id === personId && duties.includes(row.duty)) ||
     Boolean(
@@ -209,50 +213,34 @@ export async function readInstructorSession(
       ),
     );
   if (!assigned) throw new Error("INSTRUCTOR_SESSION_UNAVAILABLE");
-  const backend = await scopedBackend(scope, undefined, readContext);
-  const headerPage = await backend.call("calendar_get_v1", {
-    client_api_version: 1,
-    request_id: uuidv7(),
-    org_id: scope.orgId,
-    center_id: scope.centerId,
-    interval: { starts_at: session.starts_at, ends_at: session.ends_at },
-    resource: { kind: "person", id: personId },
-    include_room_labels: true,
-    page: { limit: 50, sort: "starts_at_asc" },
-  });
-  // The exact session header can lie past another overlap's first cursor page.
-  const headers = [...headerPage.items];
-  const cursors = new Set<string>();
-  let cursor = headerPage.next_cursor ?? undefined;
-  while (cursor) {
-    if (cursors.has(cursor)) throw new Error("INSTRUCTOR_SESSION_UNAVAILABLE");
-    cursors.add(cursor);
-    const page = await backend.call("calendar_get_v1", {
-      client_api_version: 1,
-      request_id: uuidv7(),
-      org_id: scope.orgId,
-      center_id: scope.centerId,
-      interval: { starts_at: session.starts_at, ends_at: session.ends_at },
-      resource: { kind: "person", id: personId },
-      include_room_labels: true,
-      page: { limit: 50, sort: "starts_at_asc", cursor },
-    });
-    headers.push(...page.items);
-    cursor = page.next_cursor ?? undefined;
+  const [header, attendance] = await Promise.all([
+    session.title
+      ? { title: session.title }
+      : readSessionHeader(scope, session, readContext, {
+          resource: { kind: "person", id: personId },
+          include_room_labels: true,
+        }),
+    readInstructorAttendance(scope, session, readContext, true),
+  ]);
+  const names = new Map<string, string>();
+  if (session.person_labels !== undefined) {
+    const visible = new Set([
+      personId,
+      ...session.assignments
+        .filter(({ duty }) => duty === "instructor")
+        .map(({ person_id }) => person_id),
+    ]);
+    for (const { person_id, name } of session.person_labels) {
+      if (!visible.has(person_id) || names.has(person_id) || !name)
+        throw new Error("INSTRUCTOR_PERSON_UNAVAILABLE");
+      names.set(person_id, name);
+    }
+    if (attendance.status === "available")
+      for (const { person_id, person_display_name } of attendance.attendance.entries)
+        if (person_display_name !== undefined) names.set(person_id, person_display_name);
+    return { session, header, attendance, names };
   }
-  const matches = headers.filter((row) => row.type === "session" && row.id === sessionId);
-  if (
-    matches.length !== 1 ||
-    matches[0]!.center_id !== scope.centerId ||
-    Date.parse(matches[0]!.starts_at) !== Date.parse(session.starts_at) ||
-    Date.parse(matches[0]!.ends_at) !== Date.parse(session.ends_at)
-  )
-    throw new Error("INSTRUCTOR_SESSION_UNAVAILABLE");
-  const attendance = await readInstructorAttendance(
-    scope,
-    session,
-    ...(readContext ? ([readContext] as const) : []),
-  );
+  const backend = await scopedBackend(scope, undefined, readContext);
   const ids = [
     ...new Set([
       personId,
@@ -262,7 +250,6 @@ export async function readInstructorSession(
         : []),
     ]),
   ];
-  const names = new Map<string, string>();
   for (let i = 0; i < ids.length; i += 4)
     await Promise.all(
       ids.slice(i, i + 4).map(async (id) => {
@@ -282,5 +269,5 @@ export async function readInstructorSession(
         }
       }),
     );
-  return { session, header: matches[0]!, attendance, names };
+  return { session, header, attendance, names };
 }

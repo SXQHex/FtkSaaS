@@ -25,7 +25,7 @@ import {
   type SettingsDocumentSource,
 } from "./settings-document";
 import { invalidateSettingsPolicyViews, settingsPoliciesKey } from "./settings-policies";
-import { publicCalendarInterval, readPublicCalendar } from "../public-program/public-calendar-read";
+import { readPublicContext } from "../public-program/public-calendar-read";
 import { SettingsPolicyEditor } from "./settings-policy-editor";
 import type { PolicyView } from "@ftksaas/api-contracts";
 import { SettingsDowngradeEditor } from "./settings-downgrade-editor";
@@ -329,16 +329,8 @@ function SettingsManagement({
   });
   const legacyCenter = useQuery({
     queryKey: ["settings-public-legacy-center", scope.orgId, scope.centerId],
-    queryFn: async ({ signal }) =>
-      readPublicCalendar(
-        {
-          slug: scope.orgId,
-          centerId: scope.centerId,
-          interval: await publicCalendarInterval(),
-          discoveryOnly: true,
-        },
-        signal,
-      ),
+    queryFn: ({ signal }) =>
+      readPublicContext({ slug: scope.orgId, centerId: scope.centerId }, signal),
     enabled:
       section === "yayin" &&
       level === "center" &&
