@@ -508,6 +508,15 @@ test("reopening an event payment never offers a warm balance after a failed read
   }
   let sheet = await selectPerson();
   await sheet.getByRole("button", { name: "Devam", exact: true }).click();
+  const discoveryReads = state.reads.filter(
+    ({ op, request }) => op === "event_payment_get_v1" && request.selection,
+  );
+  expect(discoveryReads).toHaveLength(1);
+  expect(discoveryReads[0]?.request).toMatchObject({
+    org_id: I.org,
+    center_id: I.center,
+    selection: { event_id: state.event.id, person_id: I.instructor },
+  });
   await sheet.getByRole("button", { name: "Ödeme hazırlığını oluştur", exact: true }).click();
   const preparation = await accept(page, "Ödeme hazırlığını oluştur");
   await expect(preparation.getByText(saved, { exact: true })).toBeVisible();

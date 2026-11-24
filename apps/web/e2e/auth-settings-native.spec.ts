@@ -212,11 +212,13 @@ test("organization publication address uses versioned settings and closes old ad
   const f = await mockSettingsCompletion(page);
   f.state.values.organization!.public_page = { slug: "ilk-adres", enabled: true };
   const publicReads: string[] = [];
+  const publicationReadRequests: Record<string, unknown>[] = [];
   await page.route("**/api/public/calendar", (route) => {
     const request = route.request();
     expect(request.headers()).not.toHaveProperty("authorization");
     const { slug } = request.postDataJSON() as { slug: string };
     publicReads.push(slug);
+    publicationReadRequests.push(request.postDataJSON() as Record<string, unknown>);
     const current = f.state.values.organization!.public_page as { slug: string; enabled: boolean };
     return route.fulfill({
       json: {
@@ -256,6 +258,11 @@ test("organization publication address uses versioned settings and closes old ad
     patch: { public_page: { slug: "yeni-adres", enabled: true } },
   });
   expect(publicReads).toEqual(expect.arrayContaining(["ilk-adres", "yeni-adres"]));
+  expect(publicationReadRequests).toHaveLength(2);
+  for (const request of publicationReadRequests) {
+    expect(request).toMatchObject({ include_details: true, page: { limit: 1 } });
+    expect(request).not.toHaveProperty("include_disciplines");
+  }
   await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
   await expect(address).toHaveValue(`${origin}/public/yeni-adres/calendar`);
   await page.getByRole("button", { name: "Yayın ayarlarını düzenle", exact: true }).click();

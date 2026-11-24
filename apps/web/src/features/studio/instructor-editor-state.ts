@@ -1,8 +1,8 @@
-import { v7 as uuidv7 } from "uuid";
-import { studioBackend, type ClassRecord, type StudioScope } from "./studio";
+import { z } from "zod";
+import { readStudioInstructorClasses, type ClassRecord, type StudioScope } from "./studio";
 import { readStudioInstructors } from "./studio-reads";
 
-export interface InstructorClassAssignment {
+interface InstructorClassAssignment {
   classId: string;
   personId: string;
   id?: string;
@@ -10,91 +10,56 @@ export interface InstructorClassAssignment {
   active: boolean;
 }
 
+const assignmentProjection = z.object({
+  person_id: z.uuid(),
+  id: z.uuid().nullable(),
+  state: z.enum(["active", "inactive"]).nullable(),
+  version: z.number().int().positive().safe().nullable(),
+});
+
 export async function readInstructorEditor(
   scope: StudioScope,
   personId: string,
-  classes: ClassRecord[],
   signal?: AbortSignal,
 ) {
+  z.uuid().parse(personId);
   const roles = await readStudioInstructors(scope, personId, undefined, signal);
   const person = roles[0]?.person;
-  if (!person) throw new Error("STUDIO_UNAVAILABLE");
+  if (person?.id !== personId) throw new Error("STUDIO_UNAVAILABLE");
   const accessible = person.relationships.some(
     (item) => item.center_id === scope.centerId && item.state === "active",
   );
-  // The exact class-duty reader requires a live center relationship. An inactive
-  // membership does not prove an empty set of class assignments.
-  if (!accessible) return { person, roles, assignments: null };
-  if (
-    classes.some(
-      (item) =>
-        item.scope.accountId !== scope.accountId ||
-        item.scope.orgId !== scope.orgId ||
-        item.scope.centerId !== scope.centerId,
-    )
-  )
-    throw new Error("STUDIO_UNAVAILABLE");
-  const backend = await studioBackend(scope, signal);
-  const activeClasses = classes.filter((item) => item.active);
-  const assignments: InstructorClassAssignment[] = new Array(activeClasses.length);
-  let next = 0;
-  // This is an exact-key reader, not an unbounded class × person page load.
-  // Limit detail requests to four and read only the explicitly opened person.
-  await Promise.all(
-    Array.from({ length: Math.min(4, activeClasses.length) }, async () => {
-      while (next < activeClasses.length) {
-        const index = next++;
-        const lesson = activeClasses[index]!;
-        const page = await backend.call("management_state_get_v1", {
-          client_api_version: 1,
-          request_id: uuidv7(),
-          org_id: scope.orgId,
-          center_id: scope.centerId,
-          operation: "class_assignment_set_v1",
-          selector: {
-            operation: "class_assignment_set_v1",
-            key: { class_id: lesson.id, person_id: personId, duty: "instructor" },
-          },
-        });
-        const item = page.items[0];
-        if (
-          page.items.length !== 1 ||
-          page.next_cursor ||
-          item?.current?.operation !== "class_assignment_set_v1" ||
-          item.current.values.class_id !== lesson.id ||
-          item.current.values.person_id !== personId ||
-          item.current.values.duty !== "instructor"
-        )
-          throw new Error("STUDIO_UNAVAILABLE");
-        if (!item.exists) {
-          if (item.entity !== null || item.state !== null || item.versions.length)
-            throw new Error("STUDIO_UNAVAILABLE");
-          assignments[index] = { classId: lesson.id, personId, active: false };
-          continue;
-        }
-        if (
-          item.entity?.type !== "class_assignments" ||
-          (item.state !== "active" && item.state !== "inactive") ||
-          item.current.values.state !== item.state
-        )
-          throw new Error("STUDIO_UNAVAILABLE");
-        const versions = item.versions.filter(
-          (entry) =>
-            entry.entity.type === "class_assignments" && entry.entity.id === item.entity?.id,
-        );
-        const version = versions[0]?.version;
-        if (versions.length !== 1 || !version || !Number.isSafeInteger(version) || version < 1)
-          throw new Error("STUDIO_UNAVAILABLE");
-        assignments[index] = {
-          classId: lesson.id,
-          personId,
-          id: item.entity.id,
-          version,
-          active: item.state === "active",
-        };
-      }
-    }),
-  );
-  return { person, roles, assignments };
+  const classes: ClassRecord[] = [];
+  // Profile editing remains available when class assignments are unreadable.
+  if (!accessible || !roles.some((role) => role.active))
+    return { person, roles, classes, assignments: null };
+
+  const rows = await readStudioInstructorClasses(scope, personId, signal);
+  const assignments: InstructorClassAssignment[] = [];
+  const seenClasses = new Set<string>();
+  const seenAssignments = new Set<string>();
+  for (const { lesson, assignment } of rows) {
+    if (!lesson.active || seenClasses.has(lesson.id)) throw new Error("STUDIO_UNAVAILABLE");
+    seenClasses.add(lesson.id);
+    const entry = assignmentProjection.parse(assignment);
+    if (entry.person_id !== personId) throw new Error("STUDIO_UNAVAILABLE");
+    if (entry.id === null) {
+      if (entry.state !== null || entry.version !== null) throw new Error("STUDIO_UNAVAILABLE");
+      assignments.push({ classId: lesson.id, personId, active: false });
+    } else {
+      if (entry.state === null || entry.version === null || seenAssignments.has(entry.id))
+        throw new Error("STUDIO_UNAVAILABLE");
+      seenAssignments.add(entry.id);
+      assignments.push({
+        classId: lesson.id,
+        personId,
+        id: entry.id,
+        version: entry.version,
+        active: entry.state === "active",
+      });
+    }
+    classes.push(lesson);
+  }
+  return { person, roles, classes, assignments };
 }
 export type InstructorEditorState = Awaited<ReturnType<typeof readInstructorEditor>>;

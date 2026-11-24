@@ -160,7 +160,12 @@ export async function mockEarnings(
           : person();
       let items: unknown[] =
         r.view === "instructors"
-          ? [instructor]
+          ? [
+              {
+                ...instructor,
+                ...(r.include_closed_session_count ? { closed_session_count: 3 } : {}),
+              },
+            ]
           : r.view === "earnings"
             ? [
                 {

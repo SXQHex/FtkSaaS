@@ -8,7 +8,6 @@ import type {
   RequestLessonRequestReject,
   RequestLessonRequestOfferAlternative,
   RequestLessonRequestApprove,
-  ReservationView,
 } from "@ftksaas/api-contracts";
 import type { RequestDraft } from "./lesson-requests-view";
 import { readLessonRequest, readRequestSessions, requestInterval } from "./lesson-requests-read";
@@ -168,43 +167,41 @@ function acknowledgedSessionId(related: Mutation["related"] | undefined, reserva
 
 async function approvedReservation(
   intent: RequestIntent,
-  request: LessonRequestView,
+  personId: string,
+  reservationId: string,
   sessionId?: string,
 ) {
-  const sessions = await readRequestSessions(intent.scope, intent.before, undefined, sessionId);
-  if (!sessions.length) throw new Error("LESSON_REQUEST_RESULT_UNAVAILABLE");
+  const sessionBeforeLookup = sessionId
+    ? (await readRequestSessions(intent.scope, intent.before, undefined, sessionId))[0]
+    : undefined;
+  if (sessionId && !sessionBeforeLookup) throw Error("LESSON_REQUEST_RESULT_UNAVAILABLE");
   const backend = await scopedBackend(intent.scope);
-  for (const session of sessions) {
-    const seen = new Set<string>();
-    let cursor: string | undefined;
-    do {
-      const page = await backend.call("reservation_list_v1", {
-        ...common(intent.scope),
-        request_id: uuidv7(),
-        person_id: request.person_id,
-        session_id: session.id,
-        page: { limit: 20, ...(cursor ? { cursor } : {}) },
-      });
-      if (
-        page.items.some(
-          (row) => row.person_id !== request.person_id || row.session_id !== session.id,
-        )
-      )
-        throw new Error("LESSON_REQUEST_RESULT_UNAVAILABLE");
-      const matches = page.items.filter((row) => row.id === request.reservation_id);
-      if (matches.length > 1) throw new Error("LESSON_REQUEST_RESULT_UNAVAILABLE");
-      if (matches[0]) {
-        const reservation: ReservationView = matches[0];
-        if (reservation.state !== "active" || reservation.mode !== "flexible")
-          throw new Error("LESSON_REQUEST_RESULT_UNAVAILABLE");
-        return { status: "available" as const, reservation, session };
-      }
-      cursor = page.next_cursor ?? undefined;
-      if (cursor && seen.has(cursor)) throw new Error("LESSON_REQUEST_RESULT_UNAVAILABLE");
-      if (cursor) seen.add(cursor);
-    } while (cursor);
-  }
-  throw new Error("LESSON_REQUEST_RESULT_UNAVAILABLE");
+  const page = await backend.call("reservation_list_v1", {
+    ...common(intent.scope),
+    request_id: uuidv7(),
+    person_id: personId,
+    reservation_id: reservationId,
+    ...(sessionId ? { session_id: sessionId } : {}),
+    page: { limit: 1 },
+  });
+  const [reservation] = page.items;
+  if (
+    page.items.length !== 1 ||
+    page.next_cursor ||
+    reservation?.id !== reservationId ||
+    reservation.person_id !== personId ||
+    (sessionId && reservation.session_id !== sessionId) ||
+    reservation.state !== "active" ||
+    reservation.mode !== "flexible"
+  )
+    throw Error("LESSON_REQUEST_RESULT_UNAVAILABLE");
+  z.number().int().positive().safe().parse(reservation.version);
+  const confirmedSessionId = z.uuid().parse(reservation.session_id);
+  const session =
+    sessionBeforeLookup ??
+    (await readRequestSessions(intent.scope, intent.before, undefined, confirmedSessionId))[0];
+  if (!session) throw Error("LESSON_REQUEST_RESULT_UNAVAILABLE");
+  return { status: "available" as const, reservation, session };
 }
 export async function readRequestResult(
   intent: RequestIntent,
@@ -243,9 +240,12 @@ export async function readRequestResult(
   const reservationId = z.uuid().parse(request.reservation_id);
   // An ACK can narrow discovery after the fresh request confirms the reservation identity.
   const sessionId = intent.request.session_id ?? acknowledgedSessionId(related, reservationId);
-  const reservation = await approvedReservation(intent, request, sessionId).catch((error) => ({
-    status: visibility(error),
-  }));
+  const reservation = await approvedReservation(
+    intent,
+    request.person_id,
+    reservationId,
+    sessionId,
+  ).catch((error) => ({ status: visibility(error) }));
   const rights = await readProfileRights(intent.scope, request.person_id)
     .then((items) => ({ status: "available" as const, items }))
     .catch((error) => ({ status: visibility(error) }));

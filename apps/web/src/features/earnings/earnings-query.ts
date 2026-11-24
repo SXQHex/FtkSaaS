@@ -5,7 +5,6 @@ import { retainFirstInfinitePage } from "../../lib/cache-invalidation";
 export const earningsKeys = {
   directory: (scope: ClientScope) => ["earnings-directory", scope] as const,
   instructorCatalog: (scope: ClientScope) => ["earnings-instructor-catalog", scope] as const,
-  visibleCounts: (scope: ClientScope) => ["earnings-visible-counts", scope] as const,
   paymentSource: (scope: ClientScope) => ["earnings-payment-source", scope] as const,
   paymentChain: (scope: ClientScope) => ["earnings-payment-chain", scope] as const,
 };
@@ -15,7 +14,6 @@ export async function invalidateEarningsViews(queries: QueryClient, scope: Clien
   const families = [
     earningsKeys.directory(scope),
     earningsKeys.instructorCatalog(scope),
-    earningsKeys.visibleCounts(scope),
     earningsKeys.paymentSource(scope),
     earningsKeys.paymentChain(scope),
     ["earnings-agreement-status", scope],

@@ -440,6 +440,7 @@ export async function mockStudioChain(page: Page, plan: "pro" | "starter") {
                   totals,
                   agreement_ids: [agreement.id],
                   current_agreement_ids: [agreement.id],
+                  ...(r.include_closed_session_count ? { closed_session_count: e ? 1 : 0 } : {}),
                 },
               ]
             : r.view === "earnings" && e
