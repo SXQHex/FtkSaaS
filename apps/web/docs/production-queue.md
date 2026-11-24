@@ -20,7 +20,7 @@ Her teslim ayrı branch ve Draft PR ile başlar. Kod, test ve kabul aynı kaynak
 
 ## Paralel, bağımsız teslim açıkları
 
-[MONO-01 ve MONO-02](remaining-work.md#bağımsız-eski-teslim-kontrolleri-açık) Router/Query iyileştirmesi nedeniyle otomatik kapanmaz. Eski yayımlı adayın gerçek kaynak/ortam uzlaştırması ve kişisel ICS derin bağlantısının kullanıcı rolüne göre doğrulanması ayrı kabul ister.
+[MONO-02](remaining-work.md#monorepo-geçişi) için kesin native merkez okuması yayımlandığında bağlantı çözümlemesi ve kaynak bağlı öğrenci/eğitmen kabulü yapılır.
 
 ## Son kontrol
 

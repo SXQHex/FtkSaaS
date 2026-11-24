@@ -132,6 +132,14 @@ Aynı 1280×720 yerel Chromium fixture’ında, `97176d4f4ff7ed73353d4ec80991726
 
 `products_list_v1` hatası, kapanış kilidi düzeltmesinin development tesliminden sonraki ilk karşılaştırmanın `48ad4019d3f9391c3afc0eba257329c2e1e0ee61` turunda kaydedildi. UTC ve istek kimlikleri development Edge ve veritabanı loglarını ilişkilendirmek için kullanılabilir. [Kapanış düzeltmesi](https://github.com/SXQHex/FtkSaaS/pull/434) · [O10 işletim ölçümü](../../backend/docs/remaining-work.md#o10)
 
+<a id="monorepo-teslim-kabulu"></a>
+
+### Monorepo taşıma kabulü
+
+[PR #359](https://github.com/SXQHex/FtkSaaS/pull/359) head `f4b6fcc8786a7725f0ec622794d51f862717d0ae`, base `9e46e23d719eb2bca83c6550426493184f52f9b5` ve test edilen merge `2be9da8395f240b9eb358e4b92013902a290c86f`. Adayın kaynak artifact'ı ile main birleşimi `73026b7c74086dfa69a3978126728d8d0f08b6f9` aynı `df839e3d51cb68b0ef5b7f593677d6ce89c7fede` Git ağacını taşıyor. [Ortak aday CI](https://github.com/SXQHex/FtkSaaS/actions/runs/44793652331) attempt 1, kalite, core ve 12/12 API shard başarılı. [Frontend CI](https://github.com/SXQHex/FtkSaaS/actions/runs/44793652339) checks, Chromium, Firefox, WebKit ve mobil işlerinde başarılı. [Main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/44803313245) ve [merge doğrulaması](https://github.com/SXQHex/FtkSaaS/actions/runs/44803313184) aynı main SHA'sında geçti. [Cloudflare koşusundaki](https://github.com/SXQHex/FtkSaaS/actions/runs/44803414404) build, sürüm dağıtımı ve yayımlı statik SPA doğrulaması başarılı.
+
+25 Kasım'da `177878c8dc42889243a05fe9a1cb7edbcd916f84` için [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/45493133442) doğrulandı. Yayımlı SPA, doğrudan `/login` isteğinde giriş ekranını gösterdi. Sentetik org/seans kimlikleriyle `/organizasyon/{org_id}/seans/{session_id}` HTTP 200 ile SPA kabuğunu sundu ve uygulama “Sayfa bulunamadı” gösterdi. Bu oturumsuz kontrol rota eksikliğini yeniden üretti. Gerçek merkez ve rol kabulünün önkoşulu [XREQ-074](../../../docs/requests.md#xreq-074).
+
 ## Devam
 
 Kaynak değiştiyse `main` ve aktif dalın tam farkını incele. [İlk açık ve önkoşulu karşılanan iş](production-queue.md#aktif-sıra) ile devam et. Aynı SHA'nın unit/MSW, tarayıcı, kalite, merge/main ve gerekli hosted kanıtlarını birbirinden ayır. Başarısız test için assertion/timeout/politika gevşetme; bilinmeyen ACK için ikinci native writer açma. Yalnız gerçek yeni kaynak veya ortam kanıtıyla kayıt güncelle; mikro adım günlükleri ve tekrar eden kabul metni üretme.

@@ -84,5 +84,5 @@
 
 ## Bağımsız eski teslim kontrolleri (açık)
 
-- [ ] **MONO-01 · Eski kabulun sonlandırılması.** Mevcut ürün `apps/web` ve statik Cloudflare dağıtımı main üzerinde çalışsa da önceki taşıma kaydındaki **adayın ortak CI kabulü ve yayımlı sürüm** eşlemesi uygun son kaynak/ortam kanıtıyla ayrıca kapatılacak. Geçmiş kaydın [aslı](https://github.com/SXQHex/FtkSaaS/blob/8a5efbb0c14ea259246ca9d07f1fb92948007557/apps/web/docs/todo.md#monorepo-geçişi).
-- [ ] **MONO-02 · Kişisel ICS derin linkleri.** Eski konfigürasyondan gelen org + seans linki, yeni SPA'da giriş, doğru merkez/yetki ve öğrenci/eğitmen davranışıyla doğrulanacak. [İstemci protokolü](../../../docs/client-integration.md#statik-spa-transportu).
+- [x] **MONO-01 · Eski kabulün sonlandırılması.** Taşıma adayının ortak CI kabulü ve yayımlı sürümü aynı Git ağacına bağlandı. [Kaynak ve Cloudflare kanıtı](handover.md#monorepo-teslim-kabulu)
+- [ ] **MONO-02 · Kişisel ICS derin linkleri.** Eski org + seans bağlantısı, girişten sonra gerçek merkez ve canlı rolle eşleşen öğrenci/eğitmen ekranına ulaşmalı. Kesin merkez keşfi [XREQ-074](../../../docs/requests.md#xreq-074) önkoşuludur. [İstemci protokolü](../../../docs/client-integration.md#statik-spa-transportu)
