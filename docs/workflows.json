@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "c2e2b2477de0b1f17ebbe6560736b69919c301f0894d9470e9b66b6760252629",
-        "reason": "M09 için onaylanan dört test beklentisi incelendi. Yayın bağlamı isteği, aynı kapsamlı Genel Bakış etiket seçeneği ve oda/eğitmen kesişiminin tek cursor zinciri ile kesin çağrı sayısı doğrulandı."
+        "fingerprint": "325b69e2ba83eae744bebd6e6d937f554e1f2b856a045808ae73b66c854b04b4",
+        "reason": "Main’de onaylanan M09 test beklentileri ile O04 migration geçmişi ve P07 test envanteri birlikte doğrulandı."
       }
     },
     {
@@ -1692,8 +1692,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "585628e47bead0edcf9585e2e96a6657a184c293016f8d60f65974db429b1d74",
-        "reason": "XREQ-073 paylaşılan sözleşme ve test kaynağı incelendi. Bu akışın komutları, mevcut alanları ve yetki koşulları aynı."
+        "fingerprint": "5eb9ec8ca3acb81ff0b9d2926188e535b23d857915a5f70833adbb106fda7b5f",
+        "reason": "Paylaşılan P07 lifecycle testi yalnız hesap imhasında hedef token blokajını doğruluyor."
       }
     },
     {
@@ -1994,6 +1994,7 @@
         "apps/backend/supabase/migrations/20261108160001_account_native_erasure_finalization.sql",
         "apps/backend/database/account-native-residues.sql",
         "apps/backend/supabase/migrations/20261108161621_account_native_residues.sql",
+        "apps/backend/supabase/migrations/20261124211200_account_native_retention_hold.sql",
         "apps/backend/scripts/postgres-restore.mjs",
         "apps/backend/database/account-export-erasure.sql",
         "apps/backend/supabase/migrations/20261108211924_account_export_erasure.sql",
@@ -2039,8 +2040,8 @@
         "platform_operator_access_set_v1"
       ],
       "review": {
-        "fingerprint": "4b20c08594c43afe33a9e419e2cf2245cb0d8707946e85e4e2be52152afbf252",
-        "reason": "Ortak Worker testi public yayın ve uygulama formu sınırlarını aynı assertion gövdeleriyle okur."
+        "fingerprint": "181325381386d19c05a00d61fe119b6ebc6363b19d5c86babc7f8d28673d73c0",
+        "reason": "Native hard delete hedef tek kullanımlık token blokajını ve commit anındaki yokluk kontrolünü kapsar."
       }
     },
     {
@@ -2204,6 +2205,7 @@
         "apps/backend/supabase/migrations/20261108160001_account_native_erasure_finalization.sql",
         "apps/backend/database/account-native-residues.sql",
         "apps/backend/supabase/migrations/20261108161621_account_native_residues.sql",
+        "apps/backend/supabase/migrations/20261124211200_account_native_retention_hold.sql",
         "apps/backend/database/account-export-erasure.sql",
         "apps/backend/supabase/migrations/20261108211924_account_export_erasure.sql",
         "apps/backend/database/settings-offer-duration-required.sql",
@@ -2239,8 +2241,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "3c737bc41d71e03c7ede55bd16b747157d292437287b2650ba5b1b80f0a61ad8",
-        "reason": "İşlemsel e-posta alıcı dizisi bilinmeyen öğe olarak kontrol edilir. Claim, yetki ve teslimat sırası korunur."
+        "fingerprint": "980afc747adfc81fc14a7bf78cfcb301fc036e05269146c072e602ffc0772d6b",
+        "reason": "Mevcut scoped worker izni ve geç blokaj aynı native hazırlık sınırında doğrulandı."
       }
     }
   ]

@@ -222,5 +222,6 @@
   "20261124013200_exact_management_readbacks.sql": "c6c38223f8f7933113ab282fad4b84ba77095713269e66ccde0952562edada12",
   "20261124134857_share_center_configuration_read_locks.sql": "0043835cf1697b984edce74094de9ec823082b8d7759daf423842c20e510c297",
   "20261124150021_share_product_list_read_lock.sql": "1dd215a7f9f32f3f83ae25fe296fdd120dbac39b1ab51f3cf7fe5f6a1821dcfe",
-  "20261124152000_scoped_consumer_followup.sql": "2c51135a186258d4db7a2deff072e1d9048aacc43b22bfecd37d58e3f40aab56"
+  "20261124152000_scoped_consumer_followup.sql": "2c51135a186258d4db7a2deff072e1d9048aacc43b22bfecd37d58e3f40aab56",
+  "20261124211200_account_native_retention_hold.sql": "5b918546bc6e28c6f7d7d82af3ee21e58cef2bdd98e69ba36d1a2fa2e52c074a"
 }

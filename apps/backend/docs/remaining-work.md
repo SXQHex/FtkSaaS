@@ -912,6 +912,8 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 
 **Seçili Auth kalıntıları:** Mevcut imha yolu hedef flow/orphan refresh satırlarını ve native audit’te hedefe ait bilinen kişisel alanları işler. Karma hesap flow’u ve yanlış refresh/session sahipliği işlemi durdurur. [Kaynak ve kabul](00-FtkSaaS-yeni-sohbet-devir.md#auth-kalıntı-ve-yöntem-paketi). Kalan iş, sağlayıcının dış log/kopyaları ve diğer Auth yüzeyleri için saklama ve imha kanıtı ile DB’deki karma geçmiş ve organizasyon kapsamının doğrulanmasıdır.
 
+**Tek kullanımlık Auth token’ları:** Hedef token için kayıt bazlı saklama blokajı ve silme sonrası yokluk kontrolü [yerel kaynak kabulünde](00-FtkSaaS-yeni-sohbet-devir.md#o04-auth-token-hold) doğrulandı. Gerçek Supabase Auth ve ortam kanıtı bekleniyor.
+
 <a id="o05"></a>
 ### O05 — Storage ve export fiziksel imha
 
