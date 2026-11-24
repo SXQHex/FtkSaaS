@@ -1,6 +1,6 @@
 import { invalidateWorkspace } from "../workspace/workspace-query";
 import { invalidateCachedFamilies } from "../../lib/cache-invalidation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { PersonView } from "@ftksaas/api-contracts";
@@ -18,6 +18,7 @@ import type { SettingsViewData } from "./settings-view";
 import {
   teamRoles,
   readTeamPage,
+  readTeamPerson,
   readTeamPermissions,
   prepareTeamPermission,
   writeTeam,
@@ -98,6 +99,8 @@ export function useSettingsTeam({
     [accepted, setAccepted] = useState(false),
     [preparing, setPreparing] = useState(false),
     [error, setError] = useState(false);
+  const selectionRead = useRef<AbortController | null>(null);
+  useEffect(() => () => selectionRead.current?.abort(), [enabled, visible, filterKey]);
   const page = useQuery({
     queryKey: ["settings-team-directory", scope, level, role, state, frame.cursors[frame.index]],
     queryFn: (context) =>
@@ -165,6 +168,41 @@ export function useSettingsTeam({
     setReview(undefined);
     command.reset();
   }
+  async function selectTeamPerson(
+    row: Awaited<ReturnType<typeof readTeamPage>>["records"][number],
+    action: "edit" | "permissions",
+  ) {
+    if (locked || preparing || denied || selectionRead.current) return;
+    const controller = new AbortController();
+    selectionRead.current = controller;
+    setPreparing(true);
+    setError(false);
+    const manager =
+      row.role === "org_manager" || row.role === "center_manager" ? row.role : undefined;
+    try {
+      const selected =
+        row.person ??
+        (await readTeamPerson(
+          scope,
+          row.personId,
+          level === "organization" ? manager : undefined,
+          controller.signal,
+        ));
+      if (controller.signal.aborted) return;
+      if (selected.id !== row.personId && !selected.linked_person_ids?.includes(row.personId))
+        throw Error("TEAM_SOURCE_INVALID");
+      if (action === "edit") setEditor({ person: selected, manager });
+      else {
+        setPermissionKeys(row.role === "center_manager" ? ["sale.discount"] : teamPermissions);
+        setPerson(selected);
+      }
+    } catch (cause) {
+      if (!controller.signal.aborted && !onAccessLost(cause)) setError(true);
+    } finally {
+      selectionRead.current = null;
+      setPreparing(false);
+    }
+  }
   async function changePermission(personId: string, key: string, value: boolean) {
     const permission = visiblePermissions?.find((row) => row.permission === key)?.permission;
     if (
@@ -207,7 +245,7 @@ export function useSettingsTeam({
         rows: records.map((row) => ({
           id: row.id,
           cells: [
-            row.person.display_name,
+            row.name,
             t(($) => $.settings.teamNative.roles[row.role]),
             `${t(($) => $.settings.teamNative.states[row.state])} · ${row.bound === null ? t(($) => $.settings.unknown) : row.bound ? t(($) => $.settings.teamNative.bound) : t(($) => $.settings.teamNative.unbound)}`,
             <div key="actions" className="flex flex-wrap gap-2">
@@ -220,14 +258,7 @@ export function useSettingsTeam({
                   ((row.role === "org_manager" || row.role === "center_manager") &&
                     !canManageManagers)
                 }
-                onPress={() =>
-                  setEditor({
-                    person: row.person,
-                    ...(row.role === "org_manager" || row.role === "center_manager"
-                      ? { manager: row.role }
-                      : {}),
-                  })
-                }
+                onPress={() => void selectTeamPerson(row, "edit")}
               >
                 {t(($) => $.settings.teamNative.edit)}
               </Button>
@@ -237,12 +268,7 @@ export function useSettingsTeam({
                 isDisabled={
                   locked || row.state !== "active" || row.role === "assistant" || level !== "center"
                 }
-                onPress={() => {
-                  setPermissionKeys(
-                    row.role === "center_manager" ? ["sale.discount"] : teamPermissions,
-                  );
-                  setPerson(row.person);
-                }}
+                onPress={() => void selectTeamPerson(row, "permissions")}
               >
                 {t(($) => $.settings.teamNative.selectPermissions)}
               </Button>

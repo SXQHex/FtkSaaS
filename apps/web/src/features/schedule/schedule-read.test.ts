@@ -91,6 +91,41 @@ beforeEach(() => {
 });
 
 describe("native visible calendar range", () => {
+  it("uses the authorized session summary and current capacity in the calendar page", async () => {
+    const current = session();
+    const occurrence = {
+      ...item(current.id, "session"),
+      capacity: current.capacity,
+      session_summary: {
+        class_id: current.class_id,
+        format: current.format,
+        state: current.state,
+        attendance_state: current.attendance_state,
+        assignments: current.assignments,
+        version: current.version,
+      },
+    } satisfies CalendarItem;
+    call.mockResolvedValueOnce(page([occurrence])).mockResolvedValueOnce(current);
+    const result = await readScheduleRange(scope, interval);
+    expect(result.entries).toMatchObject([
+      {
+        type: "session",
+        session: {
+          id: current.id,
+          starts_at: current.starts_at,
+          ends_at: current.ends_at,
+          version: current.version,
+          state: current.state,
+          capacity: current.capacity,
+        },
+      },
+    ]);
+    expect(call).toHaveBeenCalledExactlyOnceWith(
+      "calendar_get_v1",
+      expect.objectContaining({ center_id: scope.centerId, include_session_summary: true }),
+    );
+  });
+
   it("intersects all pages of both native resource reads, including a match on the second pages", async () => {
     call.mockImplementation(async (_operation, request) => {
       expect(request.org_id).toBe(scope.orgId);

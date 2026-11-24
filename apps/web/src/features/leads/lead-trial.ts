@@ -162,7 +162,7 @@ export async function trialOfferIntent(
   scope: ClientScope,
   lead: LeadDetail,
   product: TrialProduct,
-  session: SessionView | undefined,
+  session: Pick<SessionView, "id" | "version"> | undefined,
   category: string,
   reviewed: boolean,
 ): Promise<TrialIntent> {

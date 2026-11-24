@@ -176,6 +176,34 @@ it("the participant page opts into its assigned source without querying unrelate
   );
 });
 
+it("shows only permitted roster names from the reservation page", async () => {
+  const rows = [id(20), id(21)].map((person_id, index) => ({
+    id: id(30 + index),
+    session_id: sid,
+    person_id,
+    mode: "flexible",
+    state: "active",
+    version: 1,
+    ...(index === 0 ? { person_display_name: "Görünür sentetik üye" } : {}),
+  }));
+  call.mockResolvedValueOnce({ items: rows, next_cursor: "next", as_of: entry.created_at });
+  const page = await readSessionParticipants(scope, sid, undefined, "before");
+  expect(page.items.map((row) => row.person?.display_name)).toEqual([
+    "Görünür sentetik üye",
+    undefined,
+  ]);
+  expect(page.next_cursor).toBe("next");
+  expect(call).toHaveBeenCalledExactlyOnceWith(
+    "reservation_list_v1",
+    expect.objectContaining({
+      center_id: scope.centerId,
+      session_id: sid,
+      include_person_display_names: true,
+      page: { limit: 20, sort: "created_at_asc", cursor: "before" },
+    }),
+  );
+});
+
 it("hydrates people only for the first three eligible overview reservations", async () => {
   const rows = ["cancelled", "active", "completed", "active", "active"].map((state, index) => ({
     id: id(20 + index),

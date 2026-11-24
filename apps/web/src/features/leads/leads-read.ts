@@ -1,4 +1,4 @@
-import { BackendError } from "../../lib/backend";
+import { BackendError, queryBackendRead } from "../../lib/backend";
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
@@ -326,14 +326,22 @@ export async function readSourceFollowups(
   cursor?: string,
   context?: AccountReadContext,
 ) {
-  const backend = await scopedBackend(scope, undefined, context),
-    page = await backend.call("crm_followup_list_v1", {
+  const backend = await scopedBackend(scope, undefined, context);
+  const page = await queryBackendRead(
+    backend,
+    "crm_followup_list_v1",
+    {
       ...base(scope),
       request_id: uuidv7(),
       kind,
+      include_person_display_names: true,
       page: { limit: 20, sort: "due_at_asc", ...(cursor ? { cursor } : {}) },
-    });
+    },
+    context?.signal,
+  );
+  if (page.items.length > 20) throw Error("STUDENT_FOLLOWUP_UNAVAILABLE");
   const ids = new Set<string>();
+  const personIds = new Set<string>();
   for (const row of page.items) {
     if (row.kind !== kind || row.center_id !== scope.centerId || ids.has(row.id))
       throw Error("STUDENT_FOLLOWUP_UNAVAILABLE");
@@ -341,23 +349,22 @@ export async function readSourceFollowups(
     z.uuid().parse(row.id);
     z.uuid().parse(row.person_id);
     if (row.lead_id !== null) z.uuid().parse(row.lead_id);
+    if (row.assigned_to !== null) z.uuid().parse(row.assigned_to);
     z.iso.datetime({ offset: true }).parse(row.due_at);
+    if (row.person_display_name === undefined) personIds.add(row.person_id);
+    if (row.assigned_to && row.assigned_display_name === undefined) personIds.add(row.assigned_to);
   }
   if (cursor && cursor === page.next_cursor) throw Error("LEAD_CURSOR_REPEATED");
-  const personIds = [
-    ...new Set(
-      page.items.flatMap((row) => [row.person_id, ...(row.assigned_to ? [row.assigned_to] : [])]),
-    ),
-  ];
   const names = new Map(
     await Promise.all(
-      personIds.map(async (personId) => {
+      [...personIds].map(async (personId) => {
         try {
-          const person = await backend.call("person_get_v1", {
-            ...base(scope),
-            request_id: uuidv7(),
-            person_id: personId,
-          });
+          const person = await queryBackendRead(
+            backend,
+            "person_get_v1",
+            { ...base(scope), request_id: uuidv7(), person_id: personId },
+            context?.signal,
+          );
           if (person.id !== personId) throw Error("LEAD_PERSON_MISMATCH");
           return [personId, person.display_name] as const;
         } catch (cause) {
@@ -372,8 +379,10 @@ export async function readSourceFollowups(
     ...page,
     items: page.items.map((row) => ({
       ...row,
-      name: names.get(row.person_id),
-      assignedName: row.assigned_to ? names.get(row.assigned_to) : null,
+      name: row.person_display_name ?? names.get(row.person_id),
+      assignedName: row.assigned_to
+        ? (row.assigned_display_name ?? names.get(row.assigned_to))
+        : null,
     })),
   };
 }

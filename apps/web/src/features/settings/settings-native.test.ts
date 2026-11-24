@@ -459,6 +459,31 @@ it("team directory reads only one native role page and its actual visible people
   });
   expect(call.mock.calls.some((row) => row[0] === "management_state_get_v1")).toBe(false);
 });
+it("uses a canonical name already authorized on the team page", async () => {
+  call.mockResolvedValueOnce({
+    items: [
+      {
+        id: id(20),
+        person_id: id(21),
+        person_display_name: "Sentetik personel",
+        role: "staff",
+        scope_center_id: scope.centerId,
+        state: "active",
+        version: 4,
+      },
+    ],
+    as_of: at,
+  });
+  const page = await readTeamPage(scope, "staff");
+  expect(page.records[0]).toMatchObject({
+    personId: id(21),
+    name: "Sentetik personel",
+  });
+  expect(call).toHaveBeenCalledExactlyOnceWith(
+    "roles_list_v1",
+    expect.objectContaining({ center_id: scope.centerId, include_person_display_names: true }),
+  );
+});
 const permissionRows = teamPermissions.map((permission, index) => ({
   permission,
   override_exists: index < 2,

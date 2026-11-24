@@ -10,6 +10,36 @@ import type {
   InstructorFinanceEarning,
 } from "@ftksaas/api-contracts";
 const saved = "İşlem kaydedildi; güncel kayıt okundu.";
+test("event detail displays the authorized duty name without a separate profile read", async ({
+  page,
+}) => {
+  const state = await mockEventDetail(page);
+  state.event.duties = [
+    {
+      id: D.debt,
+      person_id: I.instructor,
+      person_display_name: "Sentetik yetkili eğitmen",
+      duty: "instructor",
+      fee_minor: "12000",
+      currency: "TRY",
+      performed: null,
+      verified_at: null,
+      version: 1,
+    },
+  ];
+  state.reads.length = 0;
+  await page.reload();
+  await expect(page.getByText("Sentetik yetkili eğitmen", { exact: true })).toBeVisible();
+  expect(state.reads.find(({ op }) => op === "event_get_v1")?.request).toMatchObject({
+    center_id: I.center,
+    include_management_labels: true,
+  });
+  expect(
+    state.reads.filter(
+      ({ op, request }) => op === "person_get_v1" && request.person_id === I.instructor,
+    ),
+  ).toHaveLength(0);
+});
 test("event registration reads and accepts only the chosen member's own document before renewed review", async ({
   page,
 }) => {

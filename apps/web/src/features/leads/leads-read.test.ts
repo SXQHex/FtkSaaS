@@ -157,6 +157,30 @@ it("rejects a foreign-center student followup before reading any person", async 
   );
   expect(call).toHaveBeenCalledTimes(1);
 });
+it("uses the names already authorized on the CRM followup page", async () => {
+  call.mockResolvedValueOnce({
+    items: [
+      {
+        id: id(8),
+        person_id: id(5),
+        center_id: scope.centerId,
+        lead_id: null,
+        assigned_to: id(6),
+        person_display_name: "Görünür öğrenci",
+        assigned_display_name: "Görünür sorumlu",
+        kind: "renewal_due",
+        due_at: "2026-11-17T12:00:00Z",
+      },
+    ],
+    next_cursor: null,
+  });
+  const page = await readSourceFollowups(scope, "renewal_due");
+  expect(page.items[0]).toMatchObject({ name: "Görünür öğrenci", assignedName: "Görünür sorumlu" });
+  expect(call).toHaveBeenCalledExactlyOnceWith(
+    "crm_followup_list_v1",
+    expect.objectContaining({ center_id: scope.centerId, include_person_display_names: true }),
+  );
+});
 it("does not replace a forbidden student name with a private or invented identity", async () => {
   call.mockImplementation(async (operation) => {
     if (operation === "crm_followup_list_v1")

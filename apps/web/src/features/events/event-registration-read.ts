@@ -22,7 +22,12 @@ export async function readDetailedEvent(
   id: string,
   readContext?: AccountReadContext,
 ): Promise<EventView> {
-  const event = await readEvent(scope, id, true, readContext);
+  const event = await readEvent(
+    scope,
+    id,
+    { paymentSummary: true, managementLabels: true },
+    readContext,
+  );
   if (event.actual_started_at != null)
     z.iso.datetime({ offset: true }).parse(event.actual_started_at);
   if (event.registrations !== undefined) {
