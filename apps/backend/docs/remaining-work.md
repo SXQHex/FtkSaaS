@@ -918,6 +918,8 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 
 **Hosted expiry dilimi:** Gerçek API ile üretilip indirilen dolu CSV, test-owned erken expiry/hold enjeksiyonu sonrası native Cron ile fiziksel olarak temizlendi; ayrı kontrol dosyası korundu. Bu doğal yedi günlük süre veya dolu hesap-silme export kabulü değildir; [sonuç ve açık kapsam](00-FtkSaaS-yeni-sohbet-devir.md#pro-hosted-profil-ve-export-kabulü).
 
+**Native Storage dilimi:** [İzole nesne silme tatbikatı](00-FtkSaaS-yeni-sohbet-devir.md#o03-o10-guncel-isletim-kontrolleri) geçti. Privacy işinde Storage hold ve geçici kopyaların imhası açık.
+
 <a id="o06"></a>
 ### O06 — Bağımsız imha sicili
 
@@ -945,7 +947,7 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 <a id="o08"></a>
 ### O08 — DB/Auth/Storage tam geri dönüş
 
-- [ ] **Durum:** [İki yerel Supabase ortamında sentetik tatbikat geçti](00-FtkSaaS-yeni-sohbet-devir.md#o08-yerel-restore-kabulu), hosted kabul açık · **Tür:** H · **Plan:** Tümü · **Özellik:** F33,F30
+- [ ] **Durum:** [Yerel tatbikat geçti](00-FtkSaaS-yeni-sohbet-devir.md#o08-yerel-restore-kabulu), [ayrı hosted hedef hazır](00-FtkSaaS-yeni-sohbet-devir.md#o03-o10-guncel-isletim-kontrolleri), geri yükleme açık · **Tür:** H · **Plan:** Tümü · **Özellik:** F33,F30
 - **Bağımlılık:** O07
 - **Kabul:** DB/migration/ACL/RLS, Auth UUID/giriş ve Storage bayt/izinleri aynı snapshotla geri döner.
 - **Sınır/olumsuz durum:** Tek SQL veya dosya restore bütün kabul değildir; kaynak hedef ayrıdır.

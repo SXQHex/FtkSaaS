@@ -16,7 +16,18 @@ Hedefe aynı şema ve Edge kaynağı kuruldu. Yükleme sonrasında 241 tablo, 22
 
 Beş scheduler tanımı kapalı durumda eşleştirildi. Hedefte açılan `p06` native Cron işi, yedekten gelen raporu gerçek `ftk_ops_p06` rolüyle tek denemede tamamladı. Edge’den indirilen CSV, hedef DB’deki içerikle eşleşti. Kaynaktaki rapor beklemede kaldı, organizasyon ve Storage yeniden okundu. Kabul oturumları kapatıldı ve iki geçici ortam durduruldu. SHA-256 özetleri ve sonuçlar yerel `.artifacts/o08-pr425-local-restore.json` makbuzunda durur.
 
-Restore guard, yedekten ayrı bir dizindeki imzalı sentetik sicille doğrulandı ve değiştirilmiş snapshot’ı reddetti. O06’nın kalıcı bağımsız checkpoint ve gerçek imha makbuzu, O08’in hosted yedeği ve dış sağlayıcı sırları, O09’un yeniden imha senaryosu ve O10’un pilot RPO/RTO ölçümü açık. [Kalan kabul ölçütleri](remaining-work.md#business-sonrası-ayrı-altyapı-projesi).
+Restore guard, yedekten ayrı bir dizindeki imzalı sentetik sicille doğrulandı ve değiştirilmiş snapshot’ı reddetti. Yerel tatbikatın kaydı [PR #427](https://github.com/SXQHex/FtkSaaS/pull/427) ile main `52c956d3814fab9038e48637a38772d1dbb7e0f7` üzerinde kabul edildi. [Main belge kanıtı](https://github.com/SXQHex/FtkSaaS/actions/runs/45379268466).
+
+<a id="o03-o10-guncel-isletim-kontrolleri"></a>
+### O04–O10 — Native tekrar ve hosted hedef hazırlığı
+
+Aynı main kaynağında P07 lifecycle, export retention, native Auth imha orkestrasyonu, restore guard ve PostgreSQL yükleyici testleri yeni izole Supabase ortamında **74/74** geçti. P07 gerçek native Auth giriş reddini, principal ve bağlı oturumların kaldırılmasını, somut hold ile geç hata rollback’ini ve korunması gereken başka özne/iş kayıtlarını doğruladı. Export kabulü dolu bayt, hold, lease kaybı, rollback ve güvenli tekrar senaryolarını geçti. PostgreSQL testinde geç FK veya değişen checkpoint commit’i engelledi ve hedef bağlantı kapısı kapalı kaldı.
+
+Yerel native Storage’da tatbikatın özel nesnesi indirildi, silindi ve silme tekrarlandı. Ortam yeniden başladıktan sonra eski imzalı URL erişimi reddetti, nesnenin disk baytları yoktu ve kontrol nesnesinin SHA-256 özeti eşleşti. Bütünleşik privacy işinde hold kontrollü Storage imhası ve sağlayıcı kopyalarının doğrulaması [açık kabul kapsamındadır](remaining-work.md#o05).
+
+Kullanıcı onayıyla Frankfurt’ta ücretsiz `ftksaas-ops-recovery` projesi (`fuiidquhnqevrozizdcj`) açıldı. Sağlayıcı `ACTIVE_HEALTHY` durumunu doğruladı. Ön kontrolde uygulama şeması, migration kaydı, Auth kullanıcısı, Storage nesnesi ve Edge işlevi yoktu. Yükleme için hedefle sınırlı CLI erişimi, sentetik DB ve Storage paketi ve bağımsız güncel sicil gerekiyor.
+
+O10 yerel ön ölçümünde 10 organizasyon × 500 aktif öğrenci ve 50 eşzamanlı kullanıcı profili kaydedildi. Liste, detay, haftalık takvim ve CSV iş başlatma karışımı ölçümden önce belirlendi. Starter kotası ilk veri kurulumunu beklenen biçimde reddetti. Disk kapasitesi nedeniyle Business profiliyle yeni yerel koşu başlatılmadı. Pilot gecikme ve RPO/RTO ölçümleri [açık işte](remaining-work.md#o10) duruyor.
 
 <a id="xreq-073-backend-kabulu"></a>
 ## XREQ-073 — Native okuma kabulü
