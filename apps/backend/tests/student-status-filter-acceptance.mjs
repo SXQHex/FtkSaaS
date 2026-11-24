@@ -19,6 +19,8 @@ test('Student status filters selected-center current membership before paginatio
  const read=(b={},u=owner)=>api('people_list_v1',{query:'Synthetic status',page:{limit:1},...b},u);
  const all=async b=>{const ids=[];let cursor;do{const p=await read({...b,page:{limit:1,...(cursor?{cursor}:{})}});ids.push(...p.items.map(x=>x.id));cursor=p.next_cursor;}while(cursor);assert.equal(new Set(ids).size,ids.length);return ids.sort();};
  await t.test('organization reads share the row lock and retain the write fence',async()=>{
+  const room=(await api('room_save_v1',{name:'Synthetic shared lock room',capacity:10})).primary_id;
+  const discipline=(await must(owner,'discipline_save_v1',{org_id:org,name:'Synthetic shared lock discipline',state:'active'},key())).primary_id;
   const reader=await connect();
   const reads=[
    ['people_list_v1',{center_id:center,student_status:'active',page:{limit:1}}],
@@ -28,26 +30,29 @@ test('Student status filters selected-center current membership before paginatio
    ['subscription_get_v1',{}],
    ['settings_get_v1',{scope:'organization'}],
    ['settings_catalog_get_v1',{scope:'organization'}],
+   ['management_state_get_v1',{center_id:center,operation:'availability_exception_save_v1',selector:{operation:'availability_exception_save_v1',key:{resource:{kind:'room',id:room}}}}],
+   ['management_state_get_v1',{center_id:center,operation:'center_discipline_set_v1',selector:{operation:'center_discipline_set_v1',key:{discipline_id:discipline}}}],
   ];
   try{
-   await db.query('begin');
-   await db.query('select id from core.organizations where id=$1 for share',[org]);
-   await reader.query('begin');
-   await reader.query("set local lock_timeout='250ms'");
-   await reader.query("set local request.jwt.claim.role='service_role'");
    for(const [operation,body] of reads){
+    await db.query('begin');
+    await db.query('select id from core.organizations where id=$1 for share',[org]);
+    await reader.query('begin');
+    await reader.query("set local lock_timeout='250ms'");
+    await reader.query("set local request.jwt.claim.role='service_role'");
     const request={client_api_version:1,request_id:key(),org_id:org,...body};
     const {rows:[{result}]}=await reader.query(
      'select private.execute_operation($1,$2,$3,$4,$5,$6) as result',
      [operation,request,owner.id,owner.session_id,Array.from({length:32},key),{verified_aal:'aal1'}],
     );
     assert.equal(result.ok,true,operation+' must finish with another read holding the organization lock');
+    await db.query('rollback');
+    await assert.rejects(
+     db.query('select id from core.organizations where id=$1 for update nowait',[org]),
+     {code:'55P03'},
+    );
+    await reader.query('rollback');
    }
-   await db.query('rollback');
-   await assert.rejects(
-    db.query('select id from core.organizations where id=$1 for update nowait',[org]),
-    {code:'55P03'},
-   );
   }finally{
    await db.query('rollback');
    try{await reader.query('rollback');}finally{await reader.end();}

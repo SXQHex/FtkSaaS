@@ -219,5 +219,6 @@
   "20261124013000_scoped_read_projections.sql": "6ce78242eb01ab9c330a4d3f11ddc98a21c0486c298d63f34463333d3eee3fac",
   "20261124013100_exact_public_finance_and_setup_reads.sql": "f770dfdbb4fa45fedf9412ab7403f533e20625192be86e13899ed586e1c3d43b",
   "20261124012000_share_organization_read_locks.sql": "64692aeae8771e9040bffeee00b219ab1ce2d15d017d312de36e85422ab597b7",
-  "20261124013200_exact_management_readbacks.sql": "c6c38223f8f7933113ab282fad4b84ba77095713269e66ccde0952562edada12"
+  "20261124013200_exact_management_readbacks.sql": "c6c38223f8f7933113ab282fad4b84ba77095713269e66ccde0952562edada12",
+  "20261124134857_share_center_configuration_read_locks.sql": "0043835cf1697b984edce74094de9ec823082b8d7759daf423842c20e510c297"
 }

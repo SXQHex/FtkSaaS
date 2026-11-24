@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "37bc1b21ecbac6855d37d0c972d2558812b06706f9103ce2e1c467aa1743e976",
-        "reason": "Yalnız Platform, Business ve Eğitmen Bugün kesin okuma beklentilerinin kaynak bağlı kalite kayıtları incelendi. Mevcut tenant, yetki, filtre, toplam ve zorunlu yeniden okuma kontrolleri korunur."
+        "fingerprint": "7afe28d4bbf93d9b2efe33d58f96cb8926ed03976a69c01fc8af67ef12d01505",
+        "reason": "Aday test envanteri ve migration sayısı yeni kilit regresyonuyla eşlendi. Transport zarfı, actor ve retry protokolü aynı."
       }
     },
     {
@@ -442,7 +442,8 @@
         "apps/backend/tests/fixtures/web1-review-lifecycle.sql",
         "apps/backend/tests/role-directory-filter-unit.mjs",
         "apps/backend/tests/role-directory-filter-acceptance.mjs",
-        "apps/backend/tests/starter-studio-acceptance.mjs"
+        "apps/backend/tests/starter-studio-acceptance.mjs",
+        "apps/backend/tests/student-status-filter-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -522,7 +523,8 @@
         "apps/backend/supabase/migrations/20261119170002_sql_list_pagination.sql",
         "apps/backend/supabase/migrations/20261124012000_share_organization_read_locks.sql",
         "apps/backend/supabase/migrations/20261124013000_scoped_read_projections.sql",
-        "apps/backend/supabase/migrations/20261124013200_exact_management_readbacks.sql"
+        "apps/backend/supabase/migrations/20261124013200_exact_management_readbacks.sql",
+        "apps/backend/supabase/migrations/20261124134857_share_center_configuration_read_locks.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -550,8 +552,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "bfea39d8fa8a15f91da5cf2e70e7a83f73a81261dc0c0f0e735c7711cf28da67",
-        "reason": "Ekip atama sayfasındaki canonical ad mevcut bağımsız kişi yetkisini ve istek merkezini kullanır. Mevcut atama görünürlüğü ve cursor sözleşmesi korunur."
+        "fingerprint": "f5a200ce6cdb56aa5f39a740df96843e1e0cdb631ca32d5344119013242f605c",
+        "reason": "Merkez disiplini ve kapanış yönetim okumaları mevcut yetki ve sürüm kontrolleriyle paylaşımlı kilit alır. Regresyon her okuma için bağımsız yazma kilidi reddini doğrular."
       }
     },
     {
@@ -789,8 +791,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "836c89a955c7d96a9ce13ec352d5cb6c13d306f37950c10ff9f531060b57d96b",
-        "reason": "XREQ-073 canonical rezervasyon sahibine bağlı kesinleşen yoklama ve iptal kaynağı incelendi."
+        "fingerprint": "9e6aa8e3bb761360444ee285d3b41aff017b2b334b5ab20cd525879db0e203f7",
+        "reason": "Öğrenci dizini regresyonunda paylaşımlı organizasyon kilidinin yazma kilidiyle çakışması her işlem için ayrı doğrulandı."
       }
     },
     {
