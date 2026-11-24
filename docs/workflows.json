@@ -96,6 +96,7 @@
         "apps/backend/scripts/check-migrations.py",
         "apps/backend/scripts/ci/api-suites.json",
         "apps/backend/scripts/ci/api-suites.mjs",
+        "apps/backend/scripts/ci/build-xreq-072-runtime.sh",
         "apps/backend/scripts/ci/candidate-inventory.mjs",
         "apps/backend/scripts/ci/check-quality.mjs",
         "apps/backend/scripts/ci/cleanup.mjs",
@@ -133,6 +134,8 @@
         "apps/backend/scripts/ci/summarize-timings.mjs",
         "apps/backend/scripts/ci/timing-reporter.mjs",
         "apps/backend/scripts/ci/timings.mjs",
+        "apps/backend/scripts/ci/with-xreq-072-runtime.mjs",
+        "apps/backend/scripts/ci/xreq-072-runtime.json",
         "apps/backend/scripts/acceptance/edge-response-lifecycle.mjs",
         "apps/backend/scripts/acceptance/xreq-072-edge-runtime.patch",
         "apps/backend/scripts/db.mjs",
@@ -317,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "b3fad52409cb8bd5bacec789cc5ba4bd365bcaf1d34b23f3e1df2c78bb2c7f1c",
-        "reason": "XREQ-073 kabul envanterindeki hesap ve Platform testi kendi operatör satırına bağlı çalışır."
+        "fingerprint": "098d60ca2ef22aca15a7e5bb0f94ce9903c5cea0a374a5fb66808cecc304f913",
+        "reason": "XREQ-072 paket ve SHA doğrulaması ile XREQ-073 operatör testi ve API kabul envanteri birlikte incelendi."
       }
     },
     {
