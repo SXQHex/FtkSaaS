@@ -51,7 +51,8 @@ test('Schedule reads through real Auth -> Edge -> RPC',async t=>{
  const fold1=await session(c2,'2026-10-25T02:30:00+02:00','2026-10-25T02:50:00+02:00');
  const fold2=await session(c2,'2026-10-25T02:30:00+01:00','2026-10-25T02:50:00+01:00');
  const atEnd=await session(c1,'2026-11-02T21:00:00Z','2026-11-02T22:00:00Z');
- await db.query("insert into core.resource_bookings(id,org_id,center_id,session_id,resource_kind,resource_id,starts_at,ends_at,state) values($1,$2,$3,$4,'room',$5,'2026-11-01T20:30:00Z','2026-11-01T21:30:00Z','active')",[key(),org,c1,s1,room]);
+ const bookRoom=(sid,start,end)=>db.query("insert into core.resource_bookings(id,org_id,center_id,session_id,resource_kind,resource_id,starts_at,ends_at,state) values($1,$2,$3,$4,'room',$5,$6,$7,'active')",[key(),org,c1,sid,room,start,end]);
+ await bookRoom(s1,'2026-11-01T20:30:00Z','2026-11-01T21:30:00Z');
  const policy=key();await db.query("insert into core.policy_versions(id,org_id,scope_center_id,key,effective_at,mandatory,value) values($1,$2,$3,'student_cancel_group',now(),false,$4)",[policy,org,c1,{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'consume',no_show:'consume'}}]);
  const reservations=[];
  async function reservation(s,p,c=c1,state='active'){
@@ -64,6 +65,7 @@ test('Schedule reads through real Auth -> Edge -> RPC',async t=>{
  const cal=(u,b={})=>must(u,'calendar_get_v1',scope({interval,page:{},...b}));
  const list=(u,b={})=>must(u,'reservation_list_v1',scope({page:{},...b}));
  const get=(u,s,b={})=>must(u,'session_get_v1',scope({session_id:s,...b}));
+ const attendance=(u,s,b={})=>must(u,'attendance_get_v1',scope({center_id:c1,session_id:s,...b}));
  const ids=x=>x.items.map(v=>v.id);
  await t.test('member time partitions filter the full authorized set before paging and retain their cutoff',async()=>{
   const p=key(),at=Date.now(),createdSessions=[],createdReservations=[],previousCount=reservations.length;
@@ -139,10 +141,92 @@ test('Schedule reads through real Auth -> Edge -> RPC',async t=>{
   const r=await list(student.u,{center_id:c1,include_self_summary:true});
   const mine=r.items.find(x=>x.id===r1);
   assert.equal(mine.self_summary.title,first.items[0].title);
+  assert.equal(mine.self_summary.session_state,state);
+  assert.equal(mine.self_summary.session_version,version);
+  assert.equal(mine.self_summary.format,format);
+  assert.equal(mine.self_summary.discipline_id,detail.discipline_id);
   assert.equal(mine.self_summary.attendance_result,null);
   assert.equal(mine.self_summary.cancellation.source,'reservation_policy');
   assert.equal(mine.self_summary.cancellation.policy_version_id,policy);
+  assert(!('room_labels' in mine.self_summary));
+  assert(!('instructor_labels' in mine.self_summary));
   assert((await list(cm.u,{center_id:c1,include_self_summary:true})).items.every(x=>x.self_summary===undefined));
+  await db.query("update core.saas_plan_versions set features=array_remove(features,'F08') where id=$1",[plan]);
+  try{
+   await fail(student.u,'session_get_v1',{center_id:c1,session_id:s1},'PLAN_FEATURE_UNAVAILABLE');
+   const limited=(await list(student.u,{center_id:c1,include_self_summary:true})).items.find(x=>x.id===r1).self_summary;
+   assert.equal(limited.title,mine.self_summary.title);
+   for(const field of ['session_version','session_state','format','discipline_id'])assert(!(field in limited));
+  }finally{await db.query("update core.saas_plan_versions set features=array_append(features,'F08') where id=$1",[plan]);}
+ });
+ await t.test('own reservation labels match the currently visible member lesson',async()=>{
+  const tomorrow=Date.now()+86400000;
+  const starts_at=new Date(tomorrow).toISOString(),ends_at=new Date(tomorrow+3600000).toISOString();
+  const sid=await session(c1,starts_at,ends_at,null,[instructor]);
+  let rid;
+  try{
+   await bookRoom(sid,starts_at,ends_at);
+   rid=await reservation(sid,student.p);
+   const discovery=await cal(student.u,{center_id:c1,member_discovery:true,interval:{starts_at,ends_at}});
+   const lesson=discovery.items.find(row=>row.id===sid)?.member_lesson;
+   assert(lesson,'the assigned reader must see the same upcoming lesson');
+   const result=await list(student.u,{center_id:c1,reservation_id:rid,include_self_summary:true});
+   const summary=result.items[0].self_summary;
+   assert.deepEqual(summary.room_labels,['Read room']);
+   assert.deepEqual(summary.instructor_labels,['schedule-instructor']);
+   assert.deepEqual(summary.room_labels,lesson.room_labels);
+   assert.deepEqual(summary.instructor_labels,lesson.instructor_labels);
+   assert.equal(summary.session_version,lesson.version);
+   assert.deepEqual(ids(await list(otherStudent.u,{center_id:c1,reservation_id:rid,include_self_summary:true})),[]);
+  }finally{
+   if(rid){await db.query('delete from core.reservations where id=$1',[rid]);reservations.splice(reservations.indexOf(rid),1);}
+   await db.query('delete from core.resource_bookings where session_id=$1',[sid]);
+   await db.query('delete from core.session_assignments where session_id=$1',[sid]);
+   await db.query('delete from core.sessions where id=$1',[sid]);
+  }
+ });
+ await t.test('calendar management labels match exact active room and permitted instructor reads',async()=>{
+  const roomRead=await must(cm.u,'management_state_get_v1',scope({center_id:c1,operation:'room_save_v1',selector:{operation:'room_save_v1',key:{room_id:room,include_details:true}}}));
+  const personRead=await must(cm.u,'person_get_v1',scope({center_id:c1,person_id:instructor.p}));
+  const options={center_id:c1,include_session_summary:true,include_management_labels:true};
+  const summary=async actor=>(await cal(actor,options)).items.find(row=>row.id===s1).session_summary;
+  assert.equal(roomRead.items[0].state,'active');
+  const visible=await summary(cm.u);
+  assert.deepEqual(visible.room_labels,[{room_id:room,name:roomRead.items[0].current.values.name}]);
+  assert.deepEqual(visible.instructor_labels,[{person_id:instructor.p,name:personRead.display_name}]);
+  const regular=(await cal(cm.u,{...options,include_management_labels:false})).items.find(row=>row.id===s1).session_summary;
+  assert(!('room_labels' in regular));
+  assert(!('instructor_labels' in regular));
+  await fail(cm.u,'calendar_get_v1',{interval,page:{},...options,include_session_summary:false},'VALIDATION_FAILED');
+  const restricted=await summary(student.u);
+  assert(!restricted.room_labels?.some(label=>label.room_id===room));
+  assert(!restricted.instructor_labels?.some(label=>label.person_id===instructor.p));
+  await db.query("update core.rooms set state='inactive' where org_id=$1 and id=$2",[org,room]);
+  try{assert(!(await summary(cm.u)).room_labels?.some(label=>label.room_id===room));}
+  finally{await db.query("update core.rooms set state='active' where org_id=$1 and id=$2",[org,room]);}
+ });
+ await t.test('exact session titles and attendance names preserve the existing read boundaries',async()=>{
+  const options={center_id:c1,include_title:true,include_person_display_names:true};
+  const exact=await get(assistant.u,s1,options);
+  const assistantName=(await must(assistant.u,'person_get_v1',scope({center_id:c1,person_id:assistant.p}))).display_name;
+  assert(exact.person_labels.some(label=>label.person_id===assistant.p&&label.name===assistantName));
+  assert(exact.person_labels.every(label=>[instructor.p,assistant.p].includes(label.person_id)));
+  assert.deepEqual((await get(student.u,s1,options)).person_labels,[]);
+  assert.equal((await get(instructor.u,s1,options)).title,'Class one');
+  assert.equal((await get(student.u,s2,options)).title,'Salsa');
+  assert.equal((await get(instructor.u,s1,{center_id:c1})).title,undefined);
+  await fail(instructor.u,'session_get_v1',{...options,session_id:s2},'NOT_FOUND');
+  const before=await attendance(instructor.u,s1);
+  const named=await attendance(instructor.u,s1,{include_person_display_names:true});
+  assert.deepEqual(named.entries.map(({person_display_name,...entry})=>entry),before.entries);
+  assert(before.entries.every(entry=>!('person_display_name' in entry)));
+  assert.equal(named.session_version,(await get(instructor.u,s1,options)).version);
+  for(const entry of named.entries){
+   const personView=await must(instructor.u,'person_get_v1',scope({center_id:c1,person_id:entry.person_id}));
+   assert.equal(entry.person_display_name,personView.display_name);
+  }
+  assert.equal(named.entries.length,2);
+  await fail(student.u,'attendance_get_v1',{center_id:c1,session_id:s1,include_person_display_names:true},'FORBIDDEN');
  });
  await t.test('assigned instructor and assistant see only authorized program and required roster',async()=>{
   for(const a of [instructor,assistant]){
@@ -153,13 +237,37 @@ test('Schedule reads through real Auth -> Edge -> RPC',async t=>{
   }
  });
  await t.test('active class duty is scoped and requires a current login role',async()=>{
-  const id=key();await db.query("insert into core.class_assignments(id,org_id,center_id,class_id,person_id,duty,state) values($1,$2,$3,$4,$5,'instructor','active')",[id,org,c1,cls,instructor.p]);
-  await db.query("update core.session_assignments set state='inactive' where org_id=$1 and person_id=$2",[org,instructor.p]);
-  assert.equal((await get(instructor.u,s1)).id,s1);
-  assert.deepEqual(ids(await cal(instructor.u,{resource:{kind:'person',id:instructor.p}})),[s1]);
-  await db.query("update core.class_assignments set state='inactive' where id=$1",[id]);
-  await fail(instructor.u,'session_get_v1',{session_id:s1},'NOT_FOUND');
-  await db.query("update core.session_assignments set state='active' where org_id=$1 and person_id=$2",[org,instructor.p]);
+  const id=key();
+  await db.query("insert into core.class_assignments(id,org_id,center_id,class_id,person_id,duty,state) values($1,$2,$3,$4,$5,'instructor','active')",[id,org,c1,cls,instructor.p]);
+  const selection={resource:{kind:'person',id:instructor.p}};
+  const summary=async actor=>(await cal(actor,{...selection,include_session_summary:true})).items.find(row=>row.id===s1)?.session_summary;
+  const changeAssignment=(state,origin)=>db.query('update core.session_assignments set state=$1,origin_class_assignment_id=$2 where org_id=$3 and session_id=$4 and person_id=$5',[state,origin,org,s1,instructor.p]);
+  try{
+   await changeAssignment('inactive',null);
+   assert.equal((await get(instructor.u,s1)).id,s1);
+   const detail=await get(instructor.u,s1);
+   assert.deepEqual(ids(await cal(instructor.u,{resource:{kind:'person',id:instructor.p}})),[s1]);
+   const inherited=await summary(instructor.u);
+   assert.deepEqual(inherited.actor_class_duty,{duty:'instructor'});
+   assert.equal(inherited.version,detail.version);
+   assert.equal((await summary(cm.u)).actor_class_duty,undefined);
+   await fail(instructor.u,'person_get_v1',{center_id:c1,person_id:student.p},'NOT_FOUND');
+   const classAttendance=await attendance(instructor.u,s1,{include_person_display_names:true});
+   assert.equal(classAttendance.entries.find(entry=>entry.reservation_id===r1)?.person_id,student.p);
+   assert(classAttendance.entries.every(entry=>!('person_display_name' in entry)));
+   await db.query("update core.sessions set assignment_mode='inherit' where org_id=$1 and id=$2",[org,s1]);
+   assert.equal(await summary(instructor.u),undefined);
+   await changeAssignment('active',id);
+   assert.deepEqual((await summary(instructor.u)).actor_class_duty,{duty:'instructor'});
+   await db.query("update core.class_assignments set state='inactive' where id=$1",[id]);
+   assert.equal((await summary(instructor.u)).actor_class_duty,undefined);
+   await changeAssignment('inactive',null);
+   await fail(instructor.u,'session_get_v1',{session_id:s1},'NOT_FOUND');
+  }finally{
+   await changeAssignment('active',null);
+   await db.query("update core.sessions set assignment_mode='legacy' where org_id=$1 and id=$2",[org,s1]);
+   await db.query('delete from core.class_assignments where id=$1',[id]);
+  }
  });
  await t.test('center managers and explicitly granted staff cannot expand into another center',async()=>{
   assert.deepEqual(ids(await list(cm.u)).sort(),[r1,r2,r3,cancelled].sort());
@@ -219,6 +327,38 @@ test('Schedule reads through real Auth -> Edge -> RPC',async t=>{
   assert.deepEqual(ids(await cal(student.u,{resource:{kind:'room',id:key()}})),[]);
   assert.deepEqual(ids(await list(cm.u,{person_id:otherStudent.p,session_id:s1,interval})),[r2]);
   assert.deepEqual(ids(await list(owner,{center_id:c2})),[r4]);
+ });
+ await t.test('combined room and person filters narrow the authorized calendar before cursor paging',async()=>{
+  const created=[];
+  const fixture=async (start,end,assigned,roomBooked)=>{
+   const sid=await session(c1,start,end,null,assigned);
+   created.push(sid);
+   if(roomBooked)await bookRoom(sid,start,end);
+   return sid;
+  };
+  try{
+   const personOnly=await fixture('2026-11-01T17:00:00Z','2026-11-01T18:00:00Z',[instructor],false);
+   const roomOnly=await fixture('2026-11-01T18:00:00Z','2026-11-01T19:00:00Z',[],true);
+   const match=await fixture('2026-11-01T22:00:00Z','2026-11-01T23:00:00Z',[instructor],true);
+   const resource={kind:'room',id:room},resource_person_id=instructor.p;
+   assert.deepEqual(ids(await cal(cm.u,{resource:{kind:'person',id:resource_person_id}})),[personOnly,s1,match]);
+   assert.deepEqual(ids(await cal(cm.u,{resource})),[roomOnly,s1,match]);
+   const query={interval,center_id:c1,resource,resource_person_id,page:{limit:1}};
+   const first=await cal(cm.u,query);
+   assert.deepEqual(ids(first),[s1]);
+   assert(first.next_cursor);
+   const second=await cal(cm.u,{...query,page:{limit:1,cursor:first.next_cursor}});
+   assert.deepEqual(ids(second),[match]);
+   assert.equal(second.next_cursor,null);
+   await fail(cm.u,'calendar_get_v1',{...query,resource_person_id:assistant.p,page:{limit:1,cursor:first.next_cursor}},'VALIDATION_FAILED');
+   await fail(cm.u,'calendar_get_v1',{...query,resource:{kind:'person',id:resource_person_id}},'VALIDATION_FAILED');
+   await fail(cm.u,'calendar_get_v1',{...query,resource:null},'VALIDATION_FAILED');
+   assert.deepEqual(ids(await cal(student.u,{...query,page:{}})),[s1]);
+  }finally{
+   await db.query('delete from core.resource_bookings where session_id=any($1)',[created]);
+   await db.query('delete from core.session_assignments where session_id=any($1)',[created]);
+   await db.query('delete from core.sessions where id=any($1)',[created]);
+  }
  });
  await t.test('half-open overlap preserves a session crossing center midnight and excludes touching edges',async()=>{
   const day={starts_at:'2026-11-02T00:00:00+03:00',ends_at:'2026-11-03T00:00:00+03:00'};
