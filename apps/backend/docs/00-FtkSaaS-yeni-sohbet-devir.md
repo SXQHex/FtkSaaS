@@ -28,7 +28,7 @@ Backend `verify` 467 + 150 + 10 testte sıfır hata ve atlama ile geçti. Yerel 
 ## CI503 — Boş runtime yanıtı ve native başlangıç maliyeti
 
 <a id="xreq-072-runtime-adayi"></a>
-### XREQ-072 native Edge Runtime adayı — 24 Kasım 2026
+### XREQ-072 native Edge Runtime kabulü — 24 Kasım 2026
 
 [Kaynak yaması](../scripts/acceptance/xreq-072-edge-runtime.patch), Supabase Edge Runtime [v1.77.9 kaynağına](https://github.com/supabase/edge-runtime/tree/0dd15ef2281b60ea03413ef5d2a60ebb25b0e21d) uygulanır (MIT). `oneshot` ve dış bağlantı token'ı bulunan yol, normal request-end sinyalini dış HTTP yanıtının tamamlanmasına veya istemci iptaline bağlar. Yanıt başlıklarından önce iptal edilen sunucu future'ı aynı bağlantı token'ını kapatır. Token'sız ve diğer supervisor yolları mevcut request-end sinyalini kullanır. Sınırların durdurma yolları kendi supervisor kararlarıyla işler. İncelenen güncel [v1.79.4](https://github.com/supabase/edge-runtime/compare/v1.79.3...v1.79.4) farkı bu yaşam döngüsünü değiştirmiyor.
 
@@ -38,9 +38,11 @@ Resmi Linux amd64 paketi, CLI arşiv özeti doğrulanarak açıldı. İçindeki 
 
 Güncel backend-v1 bundle özeti `76bcf6b6565f162b93e5891ff6890585dcbe6bdb0763b2c351745b9b0fb4caec` ile ayrı metot doğrulama deneyi, eşzamanlılık 2 altında 200/200 beklenen `400 / VALIDATION_FAILED` ve 267516 KiB tepe RSS verdi. Optimize edilmemiş derleyicide büyük bundle varsayılan Rust iş parçacığı yığınını aştı. Bu deneyde yalnız debug süreç yığını `RUST_MIN_STACK=33554432` ile ayarlandı. HTTP yanıtı veritabanına erişmeyen doğrulama yolundan geldi.
 
-Bu kanıt izole Edge ikilisini kapsar. Yerel ortamda Unix soketi açma `Operation not permitted` ile reddedildiği için tam Supabase/DB kabulü GitHub runner'ında çalıştırılmalıdır. Özgün CI çağrısının kesin kapanma nedeni ve hosted ödeme ölçümü kendi kabul kayıtlarında açık kalır.
+Bu ölçümler izole Edge ikilisinden alındı. Yerel ortamda Unix soketi açma `Operation not permitted` ile reddedildiği için tam Supabase/DB kabulü GitHub runner'ında çalıştırıldı. Özgün CI çağrısının kesin kapanma nedeni ve hosted ödeme ölçümü kendi kabul kayıtlarında açık kalır.
 
-Ortak clean, [kaynak ve özetleri sabitlenmiş Linux amd64 paketini](../scripts/ci/xreq-072-runtime.json) GitHub Releases üzerinden indirir. İlk yayın tamamlanana kadar aynı paketin kabul edilmiş Actions artifact'ı kullanılır. Yayın, incelenmiş değişiklik `main`e alındığında doğrulanmış dosyaları GitHub Releases'a taşır. Core ve on iki API shard'ı aynı paketi CLI'nin native doğrulamasıyla kurar ve kurulan ELF özetini denetler. Runtime girdileri değiştiğinde yeni paket üretilip kabul edilmelidir. Kalıcı `supabase.lock`, manuel tarihsel tanı ve hosted teslim bu seçimi kullanmaz. Trusted politika kurulumu ve yeni kaynağın tam kabulü [XREQ-072](../../../docs/requests.md#xreq-072) kapsamında beklenir.
+Ortak clean, [kaynak ve özetleri sabitlenmiş Linux amd64 paketini](../scripts/ci/xreq-072-runtime.json) [GitHub Releases](https://github.com/SXQHex/FtkSaaS/releases/tag/ftk-edge-runtime-v1.77.9-xreq072.1) üzerinden indirir. Core ve on iki API shard'ı aynı paketi Supabase CLI ile native kurar ve kurulan ELF özetini denetler. Runtime girdileri değiştiğinde yeni paket üretilip kabul edilir. Paket seçimi izole CI komutu içindir. Kalıcı `supabase.lock` ve manuel tarihsel tanı kendi sürümlerini kullanır.
+
+[PR #413](https://github.com/SXQHex/FtkSaaS/pull/413), `48ad4019d3f9391c3afc0eba257329c2e1e0ee61` commit'iyle `main`e birleşti. [Aday full-clean](https://github.com/SXQHex/FtkSaaS/actions/runs/45300901829) core, on iki API shard ve kalite kontrollerini tamamladı. [Main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/45302120734) ile [paket yayını](https://github.com/SXQHex/FtkSaaS/actions/runs/45302120713) geçti. Yayımlanan arşiv ve manifestin özetleri kilitle eşleşti. [Sonraki tam CI](https://github.com/SXQHex/FtkSaaS/actions/runs/45302402118/job/138138277293) paketi doğrudan GitHub Releases'tan indirip doğruladı. [Development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/45302197134) kaynak doğrulamasını geçti ve Supabase deploy adımı atlandı.
 
 Yerel optimize ELF `0bdc07081ffb1edf8c122f0d9f06c84ef3b340923e04b10cf0369285e545a0f5` ile 11/11 native kontrol geçti. Tepe RSS 371648 KiB. Supabase CLI 3.0.0 `stack install --frozen --runtime native` arşiv `68644136d1bc326fb357026e902c51e68556d614eb66b8e5a42ca93a40c3b350` içindeki ELF'i kurdu. Runner da kendi paketinin ELF özetini kurulan kopyada doğrular.
 
