@@ -59,6 +59,7 @@ it("hydrates only visible upcoming session intervals, retaining cursor and nativ
   expect(reservations).toHaveBeenCalledWith(scope, person, "current", "upcoming", {
     sort: "starts_at_asc",
     includeSourceSummary: true,
+    includeSelfSummary: true,
     includeAttendance: false,
   });
   expect(discovery).toHaveBeenCalledExactlyOnceWith(scope, {
@@ -92,6 +93,7 @@ it("shares the Query identity through the visible reservation, discovery and hea
     {
       sort: "starts_at_asc",
       includeSourceSummary: true,
+      includeSelfSummary: true,
       includeAttendance: false,
       sessionId: undefined,
     },

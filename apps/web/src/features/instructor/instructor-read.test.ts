@@ -202,6 +202,67 @@ describe("instructor bounded self reads", () => {
       [scope, id(22), true],
     ]);
   });
+  it("accepts an active class duty projected for the signed-in instructor without a detail read", async () => {
+    const item: CalendarItem = {
+      ...calendar,
+      discipline_id: session.discipline_id,
+      capacity: session.capacity,
+      room_labels: [],
+      session_summary: {
+        state: session.state,
+        attendance_state: session.attendance_state,
+        format: session.format,
+        class_id: id(20),
+        assignments: [],
+        actor_class_duty: { duty: "instructor" },
+        version: session.version,
+      },
+    };
+    mock.call.mockResolvedValue({ items: [item], next_cursor: null });
+    expect(
+      (await readInstructorCalendar(scope, id(6), interval)).map(({ item }) => item.id),
+    ).toEqual([session.id]);
+    expect(mock.call).toHaveBeenCalledTimes(1);
+    expect(mock.session).not.toHaveBeenCalled();
+  });
+  it("reads the instructor session title and authorized roster names without directory reads", async () => {
+    mock.session.mockResolvedValue({
+      ...session,
+      title: "Yerel seans",
+      person_labels: [{ person_id: id(6), name: "Eğitmen" }],
+    });
+    mock.call.mockResolvedValue({
+      session_id: session.id,
+      session_version: session.version,
+      closure_state: "open",
+      revision: 0,
+      entries: [
+        {
+          reservation_id: id(20),
+          person_id: id(21),
+          person_display_name: "Katılımcı",
+          version: 1,
+          result: "unmarked",
+          protected: false,
+          eligibility_snapshot: null,
+        },
+      ],
+    });
+    const result = await readInstructorSession(scope, id(6), ["instructor"], session.id);
+    expect(result.header.title).toBe("Yerel seans");
+    expect([...result.names]).toEqual([
+      [id(6), "Eğitmen"],
+      [id(21), "Katılımcı"],
+    ]);
+    expect(mock.session).toHaveBeenCalledExactlyOnceWith(scope, session.id, true, undefined, {
+      include_title: true,
+      include_person_display_names: true,
+    });
+    expect(mock.call).toHaveBeenCalledExactlyOnceWith(
+      "attendance_get_v1",
+      expect.objectContaining({ session_id: session.id, include_person_display_names: true }),
+    );
+  });
   it("distinguishes omitted room labels, no assigned room, and multiple native names", () => {
     expect(instructorRoomLabel(session, "unknown", "unassigned")).toBe("unknown");
     expect(instructorRoomLabel({ ...session, room_labels: [] }, "unknown", "unassigned")).toBe(

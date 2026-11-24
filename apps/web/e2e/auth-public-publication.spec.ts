@@ -17,10 +17,11 @@ test("unavailable route reads only anonymous source and retains center scope acr
   expect(f.calls[0]).toMatchObject({
     slug: "test-studio",
     center_id: publicCalendarId,
-    include_details: true,
-    page: { limit: 1 },
+    mode: "context",
+    page: {},
   });
   expect(f.calls[0]).not.toHaveProperty("include_disciplines");
+  expect(f.calls[0]).not.toHaveProperty("interval");
   await expect(
     page
       .getByRole("navigation", { name: "Sayfa menüsü", exact: true })

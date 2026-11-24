@@ -9,13 +9,17 @@ import {
   readOverviewParticipants,
   type OverviewSession,
 } from "./overview-read";
-const { range, instructors, participants, room } = vi.hoisted(() => ({
+const { range, exact, instructors, participants, room } = vi.hoisted(() => ({
   range: vi.fn(),
+  exact: vi.fn(),
   instructors: vi.fn(),
   participants: vi.fn(),
   room: vi.fn(),
 }));
-vi.mock("../schedule/schedule-read", () => ({ readScheduleRange: range }));
+vi.mock("../schedule/schedule-read", () => ({
+  readScheduleRange: range,
+  readScheduleSession: exact,
+}));
 vi.mock("../session-detail/session-detail-read", () => ({
   readSessionInstructors: instructors,
   readSessionParticipants: async (
@@ -85,6 +89,7 @@ const row = (n: number, state: ReservationView["state"] = "active") => ({
 });
 beforeEach(() => {
   range.mockReset();
+  exact.mockReset();
   instructors.mockReset();
   participants.mockReset();
   room.mockReset();
@@ -120,10 +125,17 @@ it("reads one local day and preserves native lifecycle instead of completing pas
   expect(result.sessions.map((r) => r.session.id)).toEqual([id(8), session.id]);
   expect(result.sessions[0]?.session.state).toBe("planned");
   expect(result.nextId).toBe(session.id);
-  expect(range).toHaveBeenCalledWith(scope, {
-    starts_at: "2026-11-15T21:00:00Z",
-    ends_at: "2026-11-16T21:00:00Z",
-  });
+  expect(range).toHaveBeenCalledWith(
+    scope,
+    {
+      starts_at: "2026-11-15T21:00:00Z",
+      ends_at: "2026-11-16T21:00:00Z",
+    },
+    undefined,
+    undefined,
+    undefined,
+    { managementLabels: true },
+  );
 });
 it("uses safe assigned room labels and refuses a different session version", async () => {
   instructors.mockResolvedValue({
@@ -138,6 +150,44 @@ it("uses safe assigned room labels and refuses a different session version", asy
   instructors.mockResolvedValue({ session: { ...session, version: 3 }, instructors: [] });
   await expect(readOverviewLabels(scope, [entry])).rejects.toThrow("OVERVIEW_SESSION_CHANGED");
 });
+it("uses room and instructor labels from the same authorized session version", async () => {
+  const projected: OverviewSession = {
+    ...entry,
+    item: {
+      ...entry.item,
+      session_summary: {
+        class_id: null,
+        format: "group",
+        state: "planned",
+        attendance_state: "open",
+        version: session.version,
+        assignments: [],
+        room_labels: [{ room_id: id(6), name: "Atanmış salon" }],
+        instructor_labels: [],
+      },
+    },
+  };
+  expect((await readOverviewLabels(scope, [projected])).get(session.id)).toEqual({
+    rooms: ["Atanmış salon"],
+    instructors: [],
+  });
+  expect(instructors).not.toHaveBeenCalled();
+  expect(room).not.toHaveBeenCalled();
+  expect(exact).not.toHaveBeenCalled();
+
+  projected.item.session_summary!.room_labels = undefined;
+  projected.item.session_summary!.instructor_labels = [
+    { person_id: id(7), name: "Yetkili eğitmen" },
+  ];
+  exact.mockResolvedValue({ ...session, room_labels: [{ room_id: id(6), name: "Atanmış salon" }] });
+  expect((await readOverviewLabels(scope, [projected])).get(session.id)).toEqual({
+    rooms: ["Atanmış salon"],
+    instructors: ["Yetkili eğitmen"],
+  });
+  expect(exact).toHaveBeenCalledExactlyOnceWith(scope, session.id, true, undefined);
+  expect(instructors).not.toHaveBeenCalled();
+});
+
 it("restricted room labels stay unknown while transport failure remains an error", async () => {
   instructors.mockResolvedValue({ session, instructors: [] });
   room.mockRejectedValue(
@@ -184,6 +234,7 @@ it("shares the owning Query context through overview sources and subsequent curs
     undefined,
     undefined,
     context,
+    { managementLabels: true },
   );
   expect(instructors).toHaveBeenCalledExactlyOnceWith(scope, session.id, true, context);
   expect(room).toHaveBeenCalledExactlyOnceWith(scope, "room", id(6), context);

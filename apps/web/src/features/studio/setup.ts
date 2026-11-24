@@ -4,7 +4,11 @@ import { BackendError } from "../../lib/backend";
 import { getTemporal } from "../../lib/temporal";
 import type { SubscriptionView } from "@ftksaas/api-contracts";
 import { studioBackend, studioPages, type StudioResources, type StudioScope } from "./studio";
-import { readStudioAvailability, type InstructorRecord } from "./studio-reads";
+import {
+  readStudioAvailability,
+  readStudioAvailabilityByResource,
+  type InstructorRecord,
+} from "./studio-reads";
 
 export type SetupRead<T> = { state: "known"; value: T } | { state: "unavailable" };
 async function readable<T>(read: () => Promise<T>): Promise<SetupRead<T>> {
@@ -122,20 +126,45 @@ export async function readStudioSetup(
         state: value.state,
       };
     }),
-    // Reuse this one account-pinned bearer and cap setup detail reads at four.
-    Promise.all(
-      Array.from({ length: Math.min(4, people.length) }, async () => {
-        while (nextPerson < people.length) {
-          const personId = people[nextPerson++]!;
-          availability.push({
-            personId,
-            rules: await readable(() =>
-              readStudioAvailability(scope, { kind: "person", id: personId }, backend, readContext),
-            ),
-          });
+    (async () => {
+      if (people.length > 1) {
+        const batch = await readable(() =>
+          readStudioAvailabilityByResource(
+            scope,
+            people.map((id) => ({ kind: "person", id })),
+            backend,
+            readContext,
+          ),
+        );
+        if (batch.state === "known") {
+          for (const personId of people)
+            availability.push({
+              personId,
+              rules: { state: "known", value: batch.value.get("person/" + personId)! },
+            });
+          return;
         }
-      }),
-    ),
+      }
+      // Preserve independent readiness evidence if an exact resource in the batch cannot be read.
+      await Promise.all(
+        Array.from({ length: Math.min(4, people.length) }, async () => {
+          while (nextPerson < people.length) {
+            const personId = people[nextPerson++]!;
+            availability.push({
+              personId,
+              rules: await readable(() =>
+                readStudioAvailability(
+                  scope,
+                  { kind: "person", id: personId },
+                  backend,
+                  readContext,
+                ),
+              ),
+            });
+          }
+        }),
+      );
+    })(),
   ]);
   const knownRules = availability.filter((item) => item.rules.state === "known");
   const readyPeople =

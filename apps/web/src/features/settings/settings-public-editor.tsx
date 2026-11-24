@@ -28,7 +28,7 @@ import {
   type SettingsDocumentSource,
 } from "./settings-document";
 import { readPublicForms, readPublicConsentSources } from "./settings-public-reader";
-import { publicCalendarInterval, readPublicCalendar } from "../public-program/public-calendar-read";
+import { readPublicContext } from "../public-program/public-calendar-read";
 type PublicBinding = {
   form_id: string;
   consents: { purpose: string; version: string; required: boolean; content_template_id: string }[];
@@ -106,12 +106,8 @@ export function SettingsPublicEditor({
       const result = await readSettingsDocumentResult(intent, id);
       const page = intent.patch.public_page;
       if (page) {
-        const interval = await publicCalendarInterval();
         const read = (address: string) =>
-          readPublicCalendar(
-            { slug: address, interval, discoveryOnly: true },
-            AbortSignal.timeout(15_000),
-          );
+          readPublicContext({ slug: address }, AbortSignal.timeout(15_000));
         const previous = publicPage?.slug ?? before.scope.orgId;
         const [current, former] = await Promise.all([
           read(page.slug),

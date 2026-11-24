@@ -1,3 +1,4 @@
+import type { ResourceRef } from "@ftksaas/api-contracts";
 import { expect, type Page, type Route } from "@playwright/test";
 import type {
   AgreementVersionView,
@@ -337,7 +338,13 @@ export async function mockStudio(page: Page, origins?: Parameters<typeof mockNat
     if (op === "instructor_agreements_list_v1")
       return send(
         route,
-        list(state.agreements.filter((agreement) => agreement.person_id === r.person_id)),
+        list(
+          state.agreements.filter(({ person_id }) =>
+            Array.isArray(r.person_ids)
+              ? r.person_ids.includes(person_id)
+              : person_id === r.person_id,
+          ),
+        ),
       );
     if (op === "management_state_get_v1") {
       const selector = r.selector as { key: Record<string, unknown> };
@@ -436,37 +443,52 @@ export async function mockStudio(page: Page, origins?: Parameters<typeof mockNat
         );
       if (r.operation === "program_preview_v1") return send(route, list([]));
       if (r.operation === "availability_save_v1") {
-        const resource = k.resource as { id: string; kind: "person" | "room" };
+        const resources = (
+          Array.isArray(k.resources) ? k.resources : [k.resource]
+        ) as ResourceRef[];
         return send(
           route,
           list(
             state.rules
               .filter(
-                (rule) => rule.personId === resource.id && (!k.rule_id || k.rule_id === rule.id),
+                (rule) =>
+                  resources.some(({ kind, id }) => kind === "person" && id === rule.personId) &&
+                  (!k.rule_id || k.rule_id === rule.id),
               )
               .map((rule) =>
                 item("availability_rules", rule.id, rule.version, rule.active, {
                   operation: "availability_save_v1",
-                  values: { rule_id: rule.id, resource, rule: rule.rule },
+                  values: {
+                    rule_id: rule.id,
+                    resource: { kind: "person", id: rule.personId },
+                    rule: rule.rule,
+                  },
                 }),
               ),
           ),
         );
       }
       if (r.operation === "availability_exception_save_v1") {
-        const resource = k.resource as { id: string; kind: "person" | "room" };
+        const resources = (
+          Array.isArray(k.resources) ? k.resources : [k.resource]
+        ) as ResourceRef[];
         return send(
           route,
           list(
             state.closures
-              .filter(
-                (closure) =>
-                  closure.resource.id === resource.id && closure.resource.kind === resource.kind,
+              .filter((closure) =>
+                resources.some(
+                  ({ id, kind }) => closure.resource.id === id && closure.resource.kind === kind,
+                ),
               )
               .map((closure) => ({
                 ...item("availability_exceptions", closure.id, 1, true, {
                   operation: "availability_exception_save_v1",
-                  values: { resource, interval: closure.interval, exception_id: closure.id },
+                  values: {
+                    resource: closure.resource,
+                    interval: closure.interval,
+                    exception_id: closure.id,
+                  },
                 }),
                 state: closure.state,
                 versions: [

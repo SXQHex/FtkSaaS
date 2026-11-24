@@ -260,7 +260,8 @@ test("organization publication address uses versioned settings and closes old ad
   expect(publicReads).toEqual(expect.arrayContaining(["ilk-adres", "yeni-adres"]));
   expect(publicationReadRequests).toHaveLength(2);
   for (const request of publicationReadRequests) {
-    expect(request).toMatchObject({ include_details: true, page: { limit: 1 } });
+    expect(request).toMatchObject({ mode: "context", page: {} });
+    expect(request).not.toHaveProperty("interval");
     expect(request).not.toHaveProperty("include_disciplines");
   }
   await review.getByRole("button", { name: "Vazgeç", exact: true }).click();

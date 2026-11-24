@@ -36,24 +36,26 @@ export async function readStudioSnapshot(
       )
       .map((id) => ({ kind: "person" as const, id })),
   ];
-  const [agreements, programs, closures, setup] = await Promise.all([
-    Promise.all(personIds.map((id) => readStudioAgreements(scope, id, readContext))).catch(
-      (error: unknown) => {
-        if (error instanceof BackendError && error.code === "PLAN_FEATURE_UNAVAILABLE") return null;
-        throw error;
-      },
+  const [agreements, programRows, closures, setup] = await Promise.all([
+    readStudioAgreements(scope, personIds, readContext).catch((error: unknown) => {
+      if (error instanceof BackendError && error.code === "PLAN_FEATURE_UNAVAILABLE") return null;
+      throw error;
+    }),
+    readStudioPrograms(
+      scope,
+      resources.classes.map(({ id }) => id),
+      readContext,
     ),
-    Promise.all(
-      resources.classes.map(async (item) => ({
-        classId: item.id,
-        items: await readStudioPrograms(scope, item.id, readContext),
-      })),
-    ),
-    Promise.all(
-      closureResources.map((resource) => readStudioClosures(scope, resource, readContext)),
-    ),
+    readStudioClosures(scope, closureResources, readContext),
     readStudioSetup(scope, resources, instructors, readPlan, readContext),
   ]);
+  const programs = resources.classes.map(({ id: classId }) => ({
+    classId,
+    items: programRows.filter(
+      ({ current }) =>
+        current?.operation === "program_preview_v1" && current.values.class_id === classId,
+    ),
+  }));
   const agreementsPlanBlocked =
     agreements === null || (setup.plan.state === "known" && setup.plan.value?.plan === "starter");
   return {
@@ -61,10 +63,10 @@ export async function readStudioSnapshot(
     instructors,
     setup,
     agreementsPlanBlocked,
-    agreements: agreementsPlanBlocked ? [] : agreements.flat(),
+    agreements: agreementsPlanBlocked ? [] : agreements,
     programs,
     closureResources,
-    closures: closures.flat(),
+    closures,
   };
 }
 export type StudioSnapshot = Awaited<ReturnType<typeof readStudioSnapshot>>;

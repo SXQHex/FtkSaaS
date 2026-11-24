@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { PublicShell } from "./public-shell";
 import { PublicUnavailableView } from "./public-unavailable-view";
-import { publicCalendarInterval, readPublicCalendar } from "./public-calendar-read";
+import { readPublicContext } from "./public-calendar-read";
 import { Alert, AlertTitle, AlertDescription } from "@ftksaas/ui/components/alert";
 import { Button, LinkButton } from "@ftksaas/ui/components/button";
 import {
@@ -28,11 +28,7 @@ function PublicPublicationPage({ slug, centerId }: { slug: string; centerId?: st
   const [openedAt] = useState(Date.now);
   const publication = useQuery({
     queryKey: ["public-publication-state", slug, centerId, openedAt],
-    queryFn: async ({ signal }) =>
-      readPublicCalendar(
-        { slug, centerId, interval: await publicCalendarInterval(openedAt), discoveryOnly: true },
-        signal,
-      ),
+    queryFn: ({ signal }) => readPublicContext({ slug, centerId }, signal),
     retry: false,
     refetchOnWindowFocus: false,
   });

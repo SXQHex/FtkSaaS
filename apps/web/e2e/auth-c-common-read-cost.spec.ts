@@ -190,6 +190,18 @@ test("C-ortak measures scoped SPA reads, cursor and single-write readback", asyn
               class_id: session.class_id,
               assignments: session.assignments.map(({ person_id, duty }) => ({ person_id, duty })),
               version: session.version,
+              ...("include_management_labels" in request &&
+              request.include_management_labels === true
+                ? {
+                    room_labels: studio.rooms.map(({ id, name }) => ({ room_id: id, name })),
+                    instructor_labels: session.assignments.flatMap(({ person_id, duty }) => {
+                      const person = studio.people.find(({ id }) => id === person_id);
+                      return duty === "instructor" && person
+                        ? [{ person_id, name: person.display_name }]
+                        : [];
+                    }),
+                  }
+                : {}),
             },
           }
         : {}),
