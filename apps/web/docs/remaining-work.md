@@ -82,7 +82,7 @@
 
 <a id="monorepo-geçişi"></a>
 
-## Bağımsız eski teslim kontrolleri (açık)
+## Bağımsız eski teslim kontrolleri (kapalı)
 
 - [x] **MONO-01 · Eski kabulün sonlandırılması.** Taşıma adayının ortak CI kabulü ve yayımlı sürümü aynı Git ağacına bağlandı. [Kaynak ve Cloudflare kanıtı](handover.md#monorepo-teslim-kabulu)
-- [ ] **MONO-02 · Kişisel ICS derin linkleri.** Yayımlı SPA’ya gerçek ICS bağlantısından giriş yaparak öğrenci ve eğitmen ekranlarında canlı merkez ve rol eşleşmesini doğrula. [Kaynak ve ortam](handover.md#mono-02-kaynak-ve-ortam) · [İstemci protokolü](../../../docs/client-integration.md#statik-spa-transportu)
+- [x] **MONO-02 · Kişisel ICS derin linkleri.** Yayımlı SPA’da gerçek ICS bağlantılarından giriş ve öğrenci ile eğitmen ekranlarında canlı merkez ve rol eşleşmesi doğrulandı. [Kaynak ve ortam](handover.md#mono-02-kaynak-ve-ortam) · [İstemci protokolü](../../../docs/client-integration.md#statik-spa-transportu)

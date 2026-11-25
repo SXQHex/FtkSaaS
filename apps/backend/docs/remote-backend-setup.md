@@ -59,7 +59,7 @@ Development CD, kaynak kabulünden sonra personal-calendar dedicated Edge gatewa
 | Ad | Tek seferlik değer |
 |---|---|
 | FTK_CALENDAR_ORIGIN | `https://gwyprhenabtpkbojephw.supabase.co/functions/v1/personal-calendar` |
-| FTK_CALENDAR_SESSION_URL_TEMPLATE | `https://ftksaas-web.vercel.app/organizasyon/{org_id}/seans/{session_id}` |
+| FTK_CALENDAR_SESSION_URL_TEMPLATE | `https://app.fethiyetango.com/organizasyon/{org_id}/seans/{session_id}` |
 | FTK_CALENDAR_SIGNING_KEY | Kriptografik32byte;64 küçük harf hex. Yerelde `openssl rand -hex 32` ile üretip yalnız Supabase'e gir. |
 
 `node scripts/calendar-configuration-plan.mjs` ağ çağrısı yapmadan public adresleri ve anahtar üretme talimatını gösterir; signing key/token/secret değeri yazdırmaz. Bu operatör aracıdır; CD import etmez. Secret değerleri kaynak/CI değişkeni/receipt/sohbet içine girmez. CI gerçek oturumla `calendar_links_get_v1.service_ready=true` kontrolünü zorunlu tutar; eksik veya geçersiz ayarda başarısız olur. Gateway source/version ve yanlış URL404 smoke ayrıca korunur. Bu kontroller gerçek feed/rota/rotate/revoke kabulü değildir; yaşam döngüsü kendi native kullanıcı URL'siyle sınanır. Ortak Vercel/domain/production kurulumu değiştirilmez.
