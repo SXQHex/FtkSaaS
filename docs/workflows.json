@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "4b30a6c011e8814f75679b0b289a5148a868c9f516eadb3775ff1e8f87d5bc60",
-        "reason": "Canlı Auth sağlayıcısının 5xx sonucu yeniden denenebilir TEMPORARY_FAILURE olur. Kimlik ve oturum retleri, ACL, komut kurtarma ve takvim yanıtı korunur."
+        "fingerprint": "30b0b6874146f55ccbec027b11105969a77a544f7487a2a7a9ef2aa6893d880a",
+        "reason": "Migration envanteri davet tick saklama indeksini içerir. Ortak Auth ve komut kurtarma kuralları korunur."
       }
     },
     {
@@ -2325,7 +2325,8 @@
         "apps/backend/supabase/migrations/20261125060500_organization_import_rejected_row_hold_evidence.sql",
         "apps/backend/supabase/migrations/20261125061500_organization_import_directory_erasure.sql",
         "apps/backend/supabase/migrations/20261125062500_crm_import_copy_retention_holds.sql",
-        "apps/backend/supabase/migrations/20261125080144_crm_import_source_storage_erasure.sql"
+        "apps/backend/supabase/migrations/20261125080144_crm_import_source_storage_erasure.sql",
+        "apps/backend/supabase/migrations/20261125131200_index_invitation_tick_retention.sql"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -2340,8 +2341,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "47fbeefc9afc17d9410c4a6f63a71ad054551f670bb565d356354158fd47b22e",
-        "reason": "Özgün CRM dosyasının bayt, satır, sonuç ve canlı blokaj eşliği mevcut Storage makbuzuna bağlandı. Eşlenmemiş sütun, rıza ve eksik dayanak dosyayı korur."
+        "fingerprint": "0dfadc700f4999382020d85ad6a7dd0260e7b68daf5debd30675152df6bd406d",
+        "reason": "Davet worker imzalı tick, tekrar reddi, bir günlük saklama ve en fazla yüz eski satır temizliğini korur. Saklama sorgusu zaman indeksinden yararlanır."
       }
     }
   ]
