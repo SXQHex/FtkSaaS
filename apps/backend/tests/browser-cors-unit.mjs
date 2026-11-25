@@ -42,7 +42,7 @@ test('Edge rejects malformed Auth users, JWT claims and RPC output without expos
  const originalDeno=globalThis.Deno,originalFetch=globalThis.fetch;
  const id='019b0010-1111-7000-8000-000000000001',session='019b0010-1111-7000-8000-000000000002';
  const token=claims=>'header.'+Buffer.from(JSON.stringify(claims)).toString('base64url')+'.signature';
- const call=async(claims,user,rpcReply)=>{
+ const call=async(claims,user,rpcReply,authStatus=200)=>{
   let fetchCalls=0,rpcCalls=0,handler;
   globalThis.Deno={serve:fn=>{handler=fn;},env:{get:name=>({
    FTK_BROWSER_ORIGINS:'https://spa.ftksaas.invalid',
@@ -51,7 +51,7 @@ test('Edge rejects malformed Auth users, JWT claims and RPC output without expos
   })[name]}};
   globalThis.fetch=async(url)=>{
    fetchCalls++;
-   if(url.endsWith('/auth/v1/user'))return Response.json(user);
+   if(url.endsWith('/auth/v1/user'))return Response.json(user,{status:authStatus});
    if(url.endsWith('/rest/v1/rpc/account_get_v1')){rpcCalls++;return Response.json(rpcReply);}
    if(url.endsWith('/rest/v1/rpc/outbox_deliver_v1'))return Response.json({accepted:true});
    throw Error('UNEXPECTED_NETWORK');
@@ -72,6 +72,12 @@ test('Edge rejects malformed Auth users, JWT claims and RPC output without expos
    const result=await call(claim,{id},null);
    assert.equal(result.response.status,401);assert.equal(result.body.error.code,'SESSION_REVOKED');assert.equal(result.rpcCalls,0);
   }
+  const unavailable=await call({sub:id,session_id:session,aal:'aal1'},{message:'private-provider-detail'},null,504);
+  assert.equal(unavailable.response.status,503);assert.equal(unavailable.body.error.code,'TEMPORARY_FAILURE');
+  assert.equal(unavailable.body.error.retryable,true);assert.equal(unavailable.rpcCalls,0);
+  assert(!JSON.stringify(unavailable.body).includes('private-provider-detail'));
+  const denied=await call({sub:id,session_id:session,aal:'aal1'},{message:'invalid session'},null,403);
+  assert.equal(denied.response.status,401);assert.equal(denied.body.error.code,'AUTH_REQUIRED');assert.equal(denied.rpcCalls,0);
   const invalid=await call({sub:id,session_id:session,aal:'aal1'},{id},{ok:true,data:{private_marker:'never-expose'},trace_id:id});
   assert.equal(invalid.response.status,500);assert.equal(invalid.body.error.code,'INTEGRITY_VIOLATION');assert.equal(invalid.rpcCalls,1);
   assert(!JSON.stringify(invalid.body).includes('private_marker'));

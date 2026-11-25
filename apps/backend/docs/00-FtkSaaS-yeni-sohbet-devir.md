@@ -189,6 +189,10 @@ Karma ilk dalga, ayrı ilk okuma tanısı ve 258 migration’lı tekrar arasınd
 
 Tek yerel Supabase ortamında aynı test hesabının gerçek kişi liste RPC’si `EXPLAIN (ANALYZE, BUFFERS)` ile ölçüldü. Sıralama indeksi ve ilişki sorgusunun biçimini değiştirmek RPC süresini düşürmedi. Sıcak ölçümde alan sahipliği denetimini ilgili kişi bağlantısı ve kesin iletişim kaydı kimliklerinden başlatmak, eşit 25 satırlık yanıtta süreyi yaklaşık 85 ms’den 36 ms’ye, buffer isabetini 34.965’ten 3.661’e düşürdü. Kişi detay projeksiyonu aynı içerikle yaklaşık 3,7 ms’den 1,7 ms’ye indi. Ölçüm özeti `.artifacts/o10-503-local-sql-profile.json` dosyasındadır.
 
+Alan sahipliği migration’ı yalnız izole hedefe uygulandı. 259 migration `ea0e427ef280267e22d404a4793d5f28b65766eb` kaynağına içerik düzeyinde eşleşti. Aynı 50 aktörde kişi detayı 50/50 ve p95 13.580 ms, takvim 40/50 ve p95 37.026 ms verdi. Kişi listesi dalgasında 10 HTTP 503, bir HTTP 401 ve 39 istemci zaman aşımı görüldü. Bu koşunun toplam 65 HTTP 503 vakası da tek tek PostgREST `57014` ile eşleşti. HTTP 401 vakasında native Auth kullanıcı doğrulaması upstream HTTP 504 döndürdü ve RPC çağrılmadı. Edge düzeltmesi Auth sağlayıcısının 5xx yanıtını güvenli ve yeniden denenebilir `TEMPORARY_FAILURE` olarak aktarır. Geçersiz oturum reddi korunur. Güncel 165 HTTP 503 ve ayrı 401 vakasının izi `.artifacts/o10-503-vaka-incelemesi.csv` dosyasındadır.
+
+Takvim sorgusunda aynı aktif kapasite değerini tekrar saymak ve eğitmen varlığı için tam planlama snapshot’ı oluşturmak ayrı A/B koşularında incelendi. Mevcut görünürlük ve çıktı eşitliğiyle ikisi birlikte sıcak medyanı 10,45 ms’den 8,08 ms’ye, buffer isabetini 1.056’dan 775’e düşürdü. Gerçek hosted kabul henüz açık. `.artifacts/o10-503-local-calendar-ab.json` bu yerel provanın özetidir.
+
 <a id="o10-yerel-business-on-olcum"></a>
 ### O10 — Yerel Business ön ölçümü
 

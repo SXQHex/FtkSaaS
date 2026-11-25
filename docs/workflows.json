@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "4d8def013511e874014cb445ae97aeeccda40f79aff1363dd2a4861fd7f26f98",
-        "reason": "Yalnız migration envanteri ve kişi alanı kaynak izi güncellendi. Ortak native Auth, canlı yetki ve komut kurtarma protokolü aynı."
+        "fingerprint": "4b30a6c011e8814f75679b0b289a5148a868c9f516eadb3775ff1e8f87d5bc60",
+        "reason": "Canlı Auth sağlayıcısının 5xx sonucu yeniden denenebilir TEMPORARY_FAILURE olur. Kimlik ve oturum retleri, ACL, komut kurtarma ve takvim yanıtı korunur."
       }
     },
     {
@@ -525,7 +525,8 @@
         "apps/backend/supabase/migrations/20261124013000_scoped_read_projections.sql",
         "apps/backend/supabase/migrations/20261124013200_exact_management_readbacks.sql",
         "apps/backend/supabase/migrations/20261124134857_share_center_configuration_read_locks.sql",
-        "apps/backend/supabase/migrations/20261124152000_scoped_consumer_followup.sql"
+        "apps/backend/supabase/migrations/20261124152000_scoped_consumer_followup.sql",
+        "apps/backend/supabase/migrations/20261125124800_calendar_read_projections.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -553,8 +554,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "5de77c7f5c8eb6fba5c147af7cd1bacb08e428b9f878332773a624bac6d40a36",
-        "reason": "Kilit regresyonu mevcut stüdyo okumalarına ek olarak kişi ve takvim sorgularını doğruluyor. Merkez ve rol yetkileri önceki kurallardan okunuyor."
+        "fingerprint": "353c9892ac7477a799c739855ea2f2c4039bb072c7fbc9876d242801566e0d8c",
+        "reason": "Kapasite görünümü aynı sayımları yeniden kullanır. Eğitmen gereksinimi aynı aktif seans ve legacy ders ataması kurallarından okunur."
       }
     },
     {
@@ -654,7 +655,8 @@
         "apps/backend/supabase/migrations/20261124013000_scoped_read_projections.sql",
         "apps/backend/supabase/migrations/20261124152000_scoped_consumer_followup.sql",
         "apps/backend/supabase/migrations/20261124220645_session_read_center_projection.sql",
-        "apps/backend/supabase/migrations/20261125112000_share_person_calendar_read_locks.sql"
+        "apps/backend/supabase/migrations/20261125112000_share_person_calendar_read_locks.sql",
+        "apps/backend/supabase/migrations/20261125124800_calendar_read_projections.sql"
       ],
       "operations": [
         "availability_save_v1",
@@ -677,8 +679,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "c39e85cf93fdcdac269c6903d39f0d0a04acf7acea44ea06d756cfa1ba126056",
-        "reason": "Takvim okuması paylaşımlı organizasyon kilidi alıyor. Görünür kayıtlar, kapsam ve yazma yetkileri önceki kurallarla doğrulanıyor."
+        "fingerprint": "162b1758b3a07f2ef9a35800937aace68e2a514485431f391964291717468ae5",
+        "reason": "Takvimde aktif kapasite ve eğitmen gereksinimi aynı erişim koşulları ve yanıt alanlarıyla daha az sorgu kullanır."
       }
     },
     {
@@ -2106,8 +2108,8 @@
         "platform_operator_access_set_v1"
       ],
       "review": {
-        "fingerprint": "bfd46a83ed454468eafeeaa2a7498777c0a86978796ed13523651c31f511295d",
-        "reason": "Organizasyon imhası scheduler sağlık satırının yalnız son organizasyon alanındaki teknik referansı tanır. Başka alanlarda aynı kapsama ait referanslar imhayı durdurur."
+        "fingerprint": "400e75f862eaa3d8326f5bca14e2320641ecf53e5d98ba3400f67294f449cd70",
+        "reason": "Ortak Edge girişi Auth sağlayıcısı arızasını geçersiz oturumdan ayırır. Platform erişim kapsamı, canlı üyelik ve JWT/MFA kontrolleri korunur."
       }
     },
     {

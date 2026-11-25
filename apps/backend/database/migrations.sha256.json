@@ -257,5 +257,6 @@
   "20261125112000_share_person_calendar_read_locks.sql": "5b242f770fdc1dfbcf8e5d3a4692e02a539b8d679014712b53f4601438e9b7ba",
   "20261125121407_organization_erasure_scheduler_cursor.sql": "fb5c3f9a2049580aec3583bb390852348e496fff655240cf4a4ca4aa96e9b100",
   "20261125080144_crm_import_source_storage_erasure.sql": "47ec6d96939e002505fbaea11082dfc541b40c0b6301810f105993aec9ec86b0",
-  "20261125124000_selective_person_field_policy.sql": "a16fcbed97ff88f1005000f3dfd61f7b1c4d6bb0e173c869751d7fa655bf057e"
+  "20261125124000_selective_person_field_policy.sql": "a16fcbed97ff88f1005000f3dfd61f7b1c4d6bb0e173c869751d7fa655bf057e",
+  "20261125124800_calendar_read_projections.sql": "cc56e5bda35127701cb472417f0f03f03e851f208d380aca759e403b7d9b7524"
 }

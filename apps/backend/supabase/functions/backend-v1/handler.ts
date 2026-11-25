@@ -136,6 +136,7 @@ const handleRequest=async(req:Request):Promise<Response>=>{
   }
   if(!authorization?.startsWith("Bearer "))return failure("AUTH_REQUIRED",401);
   const userResponse=await fetch(base+"/auth/v1/user",{headers:{authorization,apikey:key}});
+  if(userResponse.status>=500)return failure("TEMPORARY_FAILURE",503,true);
   if(!userResponse.ok)return failure("AUTH_REQUIRED",401);
   const user=nativeUser(await responseJson(userResponse));
   if(!user)return failure('AUTH_REQUIRED',401);
