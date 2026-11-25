@@ -12,6 +12,7 @@ import {
   readInstructorAccount,
 } from "./instructor-earnings-read";
 import { AgreementDocumentSheet } from "./agreement-document-sheet";
+import type { AgreementDocumentBinding } from "./agreement-document";
 import { InstructorEarningsView } from "./instructor-earnings-view";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { Button } from "@ftksaas/ui/components/button";
@@ -38,8 +39,12 @@ export function InstructorEarningsContent({
 }) {
   const { t } = useTranslation(),
     router = useRouter();
-  const { center, identity, self } = useInstructorScope(scope, preservePending);
+  const { workspace, center, identity, self } = useInstructorScope(scope, preservePending);
   const [locked, setLocked] = useState(false);
+  const [openDocument, setOpenDocument] = useState<{
+    personId: string;
+    agreement: AgreementDocumentBinding["agreement"];
+  }>();
   const [documentAccessLost, setDocumentAccessLost] = useState(false);
   const loseDocumentAccess = useCallback(
     (cause: unknown) => {
@@ -56,14 +61,28 @@ export function InstructorEarningsContent({
     },
     [router],
   );
-  const changeLock = useCallback(
-    (value: boolean) => {
-      setLocked(value);
-      onLockChange(value);
-    },
-    [onLockChange],
-  );
+  const closeDocument = useCallback(() => {
+    setOpenDocument(undefined);
+    onLockChange(false);
+  }, [onLockChange]);
   const personId = self?.instructor ? identity?.person_id : undefined;
+  const scopeReady = !!center && !!personId && !workspace.isError;
+  const keepDocument =
+    !documentAccessLost &&
+    (workspace.isPending || (scopeReady && openDocument?.personId === personId));
+  if (openDocument && !keepDocument) setOpenDocument(undefined);
+  useEffect(() => {
+    if (!openDocument) onLockChange(false);
+  }, [openDocument, onLockChange]);
+  const documentSheet = openDocument && keepDocument && (
+    <AgreementDocumentSheet
+      binding={{ scope, agreement: openDocument.agreement }}
+      scopeReady={scopeReady}
+      onLockChange={setLocked}
+      onAccessLost={loseDocumentAccess}
+      onClose={closeDocument}
+    />
+  );
   const [now] = useState(() => new Date().toISOString());
   const [selected, setSelected] = useState("all");
   const [agreementId, setAgreementId] = useState("");
@@ -157,16 +176,19 @@ export function InstructorEarningsContent({
   }, [months.error, query.error, payments.error, agreements.error, router]);
   if (!center || !personId || documentAccessLost)
     return (
-      <div className="space-y-4 p-6">
-        <h1 className="text-2xl font-semibold">{t(($) => $.instructorEarnings.title)}</h1>
-        <Alert variant="destructive">
-          <AlertDescription>
-            {!center
-              ? t(($) => $.instructorToday.chooseScope)
-              : t(($) => $.instructorToday.unavailable)}
-          </AlertDescription>
-        </Alert>
-      </div>
+      <>
+        <div className="space-y-4 p-6">
+          <h1 className="text-2xl font-semibold">{t(($) => $.instructorEarnings.title)}</h1>
+          <Alert variant="destructive">
+            <AlertDescription>
+              {!center
+                ? t(($) => $.instructorToday.chooseScope)
+                : t(($) => $.instructorToday.unavailable)}
+            </AlertDescription>
+          </Alert>
+        </div>
+        {documentSheet}
+      </>
     );
   const rows = !query.isError ? query.data?.items : undefined;
   const date = new Intl.DateTimeFormat("tr-TR", { dateStyle: "medium", timeZone: center.timezone });
@@ -181,7 +203,7 @@ export function InstructorEarningsContent({
         ? values.map((row) => formatMinorAmount(row[key], row.currency)).join(" · ")
         : t(($) => $.instructorEarnings.emptyTotals)
       : null;
-  return (
+  const earnings = (
     <InstructorEarningsView
       period={selected === "all" ? "all" : (period?.id ?? "")}
       periods={[
@@ -227,9 +249,15 @@ export function InstructorEarningsContent({
                 key={agreement.id}
                 row={agreement}
                 timezone={center.timezone}
-                scope={scope}
-                onLockChange={changeLock}
-                onAccessLost={loseDocumentAccess}
+                onOpenDocument={() => {
+                  const { id, person_id, discipline_id, version, format } = agreement;
+                  setOpenDocument({
+                    personId,
+                    agreement: { id, person_id, discipline_id, version, format },
+                  });
+                  // Keep the same route tree mounted while workspace evidence is reloaded.
+                  onLockChange(true);
+                }}
               />
             ) : (
               <p>{t(($) => $.instructorEarnings.noAgreement)}</p>
@@ -403,24 +431,25 @@ export function InstructorEarningsContent({
       }
     />
   );
+  return (
+    <>
+      {earnings}
+      {documentSheet}
+    </>
+  );
 }
 
 function InstructorAgreementSummary({
   row,
   timezone,
-  scope,
-  onLockChange,
-  onAccessLost,
+  onOpenDocument,
 }: {
   row: AgreementVersionView;
   timezone: string;
-  scope: ClientScope;
-  onLockChange: (value: boolean) => void;
-  onAccessLost: (cause: unknown) => boolean;
+  onOpenDocument: () => void;
 }) {
   const { t } = useTranslation();
   const terms = useMemo(() => termsDraft(row.terms), [row.terms]);
-  const [documentOpen, setDocumentOpen] = useState(false);
   return (
     <div>
       <p>
@@ -435,17 +464,9 @@ function InstructorAgreementSummary({
           }).format(new Date(row.valid.starts_at)),
         })}
       </p>
-      <Button variant="outline" onPress={() => setDocumentOpen(true)}>
+      <Button variant="outline" onPress={onOpenDocument}>
         {t(($) => $.agreementDocument.open)}
       </Button>
-      {documentOpen && (
-        <AgreementDocumentSheet
-          binding={{ scope, agreement: row }}
-          onLockChange={onLockChange}
-          onAccessLost={onAccessLost}
-          onClose={() => setDocumentOpen(false)}
-        />
-      )}
       <details>
         <summary className="cursor-pointer rounded-sm py-2 focus-visible:outline-2 focus-visible:outline-ring">
           {t(($) => $.instructorEarnings.agreementTerms)}

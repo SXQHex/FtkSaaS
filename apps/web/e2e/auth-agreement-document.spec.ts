@@ -12,7 +12,13 @@ const id = (n: number) => `019a7b00-0000-7000-8000-${String(n).padStart(12, "0")
 const text = common.agreementDocument;
 async function setup(
   page: import("@playwright/test").Page,
-  options: { missing?: boolean; unknown?: boolean; unread?: boolean; denied?: boolean } = {},
+  options: {
+    missing?: boolean;
+    unknown?: boolean;
+    unread?: boolean;
+    denied?: boolean;
+    unreceived?: boolean;
+  } = {},
 ) {
   const native = await mockSessionDetail(page, { existing: true, instructor: true });
   const view: DigitalAgreementView = {
@@ -73,6 +79,7 @@ async function setup(
     if (op === "instructor_account_get_v1") {
       expect(r.person_id).toBe(I.instructor);
       expect(r.center_id).toBe(I.center);
+      if (r.view === "agreements" && documentRead.gate) await documentRead.gate;
       return send({
         view: r.view,
         items: r.view === "agreements" ? [view.agreement] : [],
@@ -111,6 +118,7 @@ async function setup(
       expect(r).not.toHaveProperty("displayed_content");
       expect(r).not.toHaveProperty("displayed_content_hash");
       if (options.denied) return reject("FORBIDDEN");
+      if (options.unreceived) return route.abort("failed");
       effects.add(r.operation_key);
       view.acceptance = {
         id: id(882),
@@ -133,6 +141,7 @@ async function setup(
     }
     if (op === "operation_status_get_v1" && r.operation === "instructor_agreement_accept_v1") {
       receiptKeys.push(r.key);
+      if (options.unreceived) return reject("NOT_FOUND");
       expect(effects.has(r.key)).toBe(true);
       return send({
         operation: r.operation,
@@ -270,6 +279,18 @@ test("native permission loss removes private agreement and financial contents wi
   expect(f.view.acceptance).toBeNull();
 });
 
+async function reauthenticate(otherTab: import("@playwright/test").Page) {
+  await otherTab.goto(`${origin}/account`);
+  await activate(otherTab.getByRole("tab", { name: "Oturumlar", exact: true }));
+  await activate(otherTab.getByRole("button", { name: "Diğerlerini kapat", exact: true }));
+  const reauth = otherTab.getByRole("dialog");
+  await reauth.getByLabel("Parola", { exact: true }).fill("fixture-password");
+  await activate(reauth.getByRole("button", { name: "Devam et", exact: true }));
+  await expect(
+    reauth.getByRole("button", { name: common.sessions.confirmOthers, exact: true }),
+  ).toBeEnabled();
+}
+
 test("an open accepted agreement waits for current evidence after native reauthentication", async ({
   page,
   context,
@@ -285,15 +306,7 @@ test("an open accepted agreement waits for current evidence after native reauthe
     release = resolve;
   });
   try {
-    await otherTab.goto(`${origin}/account`);
-    await activate(otherTab.getByRole("tab", { name: "Oturumlar", exact: true }));
-    await activate(otherTab.getByRole("button", { name: "Diğerlerini kapat", exact: true }));
-    const reauth = otherTab.getByRole("dialog");
-    await reauth.getByLabel("Parola", { exact: true }).fill("fixture-password");
-    await activate(reauth.getByRole("button", { name: "Devam et", exact: true }));
-    await expect(
-      reauth.getByRole("button", { name: common.sessions.confirmOthers, exact: true }),
-    ).toBeEnabled();
+    await reauthenticate(otherTab);
     await page.bringToFront();
     await expect.poll(() => f.documentRead.waiting).toBe(true);
     await expect(f.panel).toBeVisible();
@@ -316,4 +329,36 @@ test("an open accepted agreement waits for current evidence after native reauthe
   await expect(accepted).toBeVisible();
   expect(f.writes).toHaveLength(1);
   await activate(f.panel.getByRole("button", { name: common.memberDocuments.close, exact: true }));
+});
+
+test("an unreceived agreement write stays read-only and dismissible after native reauthentication", async ({
+  page,
+  context,
+}) => {
+  const f = await setup(page, { unreceived: true });
+  await accept(f.panel);
+  const close = f.panel.getByRole("button", { name: common.memberDocuments.close, exact: true });
+  const retry = f.panel.getByRole("button", { name: common.studio.retrySameRequest, exact: true });
+  const readResult = f.panel.getByRole("button", { name: common.finance.readResult, exact: true });
+  await expect(retry).toBeEnabled();
+  await expect(close).toBeDisabled();
+  expect(f.writes).toHaveLength(1);
+
+  const otherTab = await context.newPage();
+  try {
+    await reauthenticate(otherTab);
+    await page.bringToFront();
+    await expect(close).toBeEnabled();
+    await expect(f.panel.getByRole("article")).toBeVisible();
+    await expect(retry).toHaveCount(0);
+    await activate(readResult);
+    await expect.poll(() => f.receiptKeys).toEqual([f.writes[0]!.operation_key]);
+    await expect(close).toBeEnabled();
+    await activate(close);
+    await expect(f.panel).toHaveCount(0);
+    expect(f.writes).toHaveLength(1);
+    expect(f.effects.size).toBe(0);
+  } finally {
+    await otherTab.close();
+  }
 });

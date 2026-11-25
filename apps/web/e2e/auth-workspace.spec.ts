@@ -1,5 +1,6 @@
 import { activate, closeWithDevice, hasTouchInput } from "./device-input.js";
 import { test, expect } from "./test.js";
+import type { Page } from "@playwright/test";
 import {
   closeWorkspaceNavigation,
   openWorkspaceNavigation,
@@ -51,90 +52,94 @@ test("command palette reaches appearance, switches the saved theme and signs out
   await expect(page).toHaveURL(`${origin}/login`);
   await expect(page.locator("html")).not.toHaveAttribute("data-theme");
 });
-for (const colorScheme of ["light", "dark"] as const)
-  test(`ready workspace sidebar and mobile navigation ${colorScheme}`, async ({ page }) => {
-    await mockNative(page);
-    await page.setViewportSize(shellViewports[0]!);
-    await page.emulateMedia({ colorScheme });
-    await page.route("**/functions/v1/backend-v1/organizations_list_v1", (route) =>
-      route.fulfill({
-        json: {
-          ok: true,
-          data: {
-            items: [
-              {
-                id: org,
-                name: "Fixture Studio",
-                state: "active",
-                access_mode: "normal",
-                version: 1,
-                self_context: { person_id: person, subscriber_number: null, centers: [] },
-              },
-            ],
-            next_cursor: null,
-            as_of: "2026-11-14T06:00:00Z",
-          },
-          trace_id: org,
-        } satisfies SuccessOrganizationsList,
-      }),
-    );
-    await page.route("**/functions/v1/backend-v1/centers_list_v1", (route) =>
-      route.fulfill({
-        json: {
-          ok: true,
-          data: {
-            items: [
-              {
-                id: center,
-                name: "Fixture Center",
-                timezone: "Europe/Istanbul",
-                state: "active",
-                accessible: true,
-                version: 1,
-              },
-            ],
-            next_cursor: null,
-            as_of: "2026-11-14T06:00:00Z",
-          },
-          trace_id: org,
-        } satisfies SuccessCentersList,
-      }),
-    );
-    await page.route("**/functions/v1/backend-v1/roles_list_v1", (route) => {
-      expect(route.request().postDataJSON()).toMatchObject({ org_id: org, person_id: person });
-      return route.fulfill({
-        json: {
-          ok: true,
-          data: {
-            items: [
-              {
-                id: person,
-                person_id: person,
-                role: "owner",
-                scope_center_id: null,
-                state: "active",
-                version: 1,
-              },
-            ],
-            next_cursor: null,
-            as_of: "2026-11-14T06:00:00Z",
-          },
-          trace_id: org,
-        } satisfies SuccessRolesList,
-      });
+async function openReadyWorkspace(page: Page, colorScheme: "light" | "dark") {
+  await mockNative(page);
+  await page.setViewportSize(shellViewports[0]!);
+  await page.emulateMedia({ colorScheme });
+  await page.route("**/functions/v1/backend-v1/organizations_list_v1", (route) =>
+    route.fulfill({
+      json: {
+        ok: true,
+        data: {
+          items: [
+            {
+              id: org,
+              name: "Fixture Studio",
+              state: "active",
+              access_mode: "normal",
+              version: 1,
+              self_context: { person_id: person, subscriber_number: null, centers: [] },
+            },
+          ],
+          next_cursor: null,
+          as_of: "2026-11-14T06:00:00Z",
+        },
+        trace_id: org,
+      } satisfies SuccessOrganizationsList,
+    }),
+  );
+  await page.route("**/functions/v1/backend-v1/centers_list_v1", (route) =>
+    route.fulfill({
+      json: {
+        ok: true,
+        data: {
+          items: [
+            {
+              id: center,
+              name: "Fixture Center",
+              timezone: "Europe/Istanbul",
+              state: "active",
+              accessible: true,
+              version: 1,
+            },
+          ],
+          next_cursor: null,
+          as_of: "2026-11-14T06:00:00Z",
+        },
+        trace_id: org,
+      } satisfies SuccessCentersList,
+    }),
+  );
+  await page.route("**/functions/v1/backend-v1/roles_list_v1", (route) => {
+    expect(route.request().postDataJSON()).toMatchObject({ org_id: org, person_id: person });
+    return route.fulfill({
+      json: {
+        ok: true,
+        data: {
+          items: [
+            {
+              id: person,
+              person_id: person,
+              role: "owner",
+              scope_center_id: null,
+              state: "active",
+              version: 1,
+            },
+          ],
+          next_cursor: null,
+          as_of: "2026-11-14T06:00:00Z",
+        },
+        trace_id: org,
+      } satisfies SuccessRolesList,
     });
-    await page.goto(`${origin}/login`);
-    await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
-    await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-    await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
-    await expect(page).toHaveURL(`${origin}/account`);
-    await expect(page.getByRole("button", { name: /Fixture Studio Fixture Center/ })).toContainText(
-      "Fixture Studio",
-    );
-    await expect(page.getByRole("button", { name: /Fixture Account Stüdyo sahibi/ })).toContainText(
-      "Stüdyo sahibi",
-    );
-    await expect(page.locator("main")).toHaveCount(1);
+  });
+  await page.goto(`${origin}/login`);
+  await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
+  await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
+  await expect(page).toHaveURL(`${origin}/account`);
+  await expect(page.getByRole("button", { name: /Fixture Studio Fixture Center/ })).toContainText(
+    "Fixture Studio",
+  );
+  await expect(page.getByRole("button", { name: /Fixture Account Stüdyo sahibi/ })).toContainText(
+    "Stüdyo sahibi",
+  );
+  await expect(page.locator("main")).toHaveCount(1);
+}
+
+for (const colorScheme of ["light", "dark"] as const) {
+  test(`ready workspace sidebar and responsive layout ${colorScheme}`, async ({ page }) => {
+    await openReadyWorkspace(page, colorScheme);
     const rail = page.locator('[data-slot="sidebar-rail"]');
     await expect(rail).toBeVisible();
     expect((await rail.boundingBox())?.width).toBeGreaterThanOrEqual(24);
@@ -162,6 +167,9 @@ for (const colorScheme of ["light", "dark"] as const)
       assertLayoutFit(await readLayoutFit(page));
       await page.screenshot({ path: `.tmp/v67-shell-app-${viewport.width}-${colorScheme}.png` });
     }
+  });
+  test(`ready workspace sidebar and mobile navigation ${colorScheme}`, async ({ page }) => {
+    await openReadyWorkspace(page, colorScheme);
     await page.setViewportSize({ width: 390, height: 844 });
     const toggle = page.getByRole("button", { name: "Menüyü aç veya kapat", exact: true });
     await activate(toggle, "Enter");
@@ -209,6 +217,9 @@ for (const colorScheme of ["light", "dark"] as const)
     await closeWithDevice(close);
     await expect(dialog).toHaveCount(0);
     await expect(toggle).toBeFocused();
+  });
+  test(`ready workspace account reflow ${colorScheme}`, async ({ page }) => {
+    await openReadyWorkspace(page, colorScheme);
     await page.setViewportSize({ width: 640, height: 1000 });
     await page.addStyleTag({
       content:
@@ -217,6 +228,7 @@ for (const colorScheme of ["light", "dark"] as const)
     expect(await page.evaluate("document.documentElement.scrollWidth>innerWidth")).toBe(false);
     expect((await scanAccessibility(page, "workspace-account-reflow")).violations).toEqual([]);
   });
+}
 
 test("Starter self management opens the native owner navigation and removes it after scope revocation", async ({
   page,

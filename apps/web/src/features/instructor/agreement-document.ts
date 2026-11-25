@@ -1,29 +1,43 @@
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 import { BackendError } from "../../lib/backend";
-import { scopedBackend, type ClientScope, type AccountReadContext } from "../../lib/scoped-backend";
+import {
+  scopedBackend,
+  scopedCommandBackend,
+  type ClientScope,
+  type AccountReadContext,
+} from "../../lib/scoped-backend";
 import type { AgreementVersionView, DigitalAgreementView } from "@ftksaas/api-contracts";
+
+type AgreementBackend = Pick<Awaited<ReturnType<typeof scopedBackend>>, "call">;
+
+type AgreementDocumentSource = Pick<
+  AgreementVersionView,
+  "id" | "person_id" | "discipline_id" | "version" | "format"
+>;
 
 export interface AgreementDocumentBinding {
   scope: ClientScope;
-  agreement: AgreementVersionView;
+  agreement: AgreementDocumentSource;
 }
 async function readBoundAgreement(
   scope: ClientScope,
   agreementId: string,
   personId: string,
-  expected?: AgreementVersionView,
+  expected?: AgreementDocumentSource,
   readContext?: AccountReadContext,
+  backend?: AgreementBackend,
 ) {
-  const view = await (
-    await scopedBackend(scope, undefined, readContext)
-  ).call("instructor_agreement_get_v1", {
-    client_api_version: 1,
-    request_id: uuidv7(),
-    org_id: scope.orgId,
-    center_id: scope.centerId,
-    agreement_id: agreementId,
-  });
+  const view = await (backend ?? (await scopedBackend(scope, undefined, readContext))).call(
+    "instructor_agreement_get_v1",
+    {
+      client_api_version: 1,
+      request_id: uuidv7(),
+      org_id: scope.orgId,
+      center_id: scope.centerId,
+      agreement_id: agreementId,
+    },
+  );
   const actual = view.agreement;
   if (
     actual.id !== agreementId ||
@@ -115,6 +129,7 @@ export async function prepareAgreementAcceptance(
   binding: AgreementDocumentBinding,
   before: DigitalAgreementView,
   reviewed: boolean,
+  backend?: AgreementBackend,
 ) {
   if (
     !reviewed ||
@@ -123,7 +138,15 @@ export async function prepareAgreementAcceptance(
     ownServerAcceptance(before, binding.scope.accountId)
   )
     throw Error("AGREEMENT_REVIEW_REQUIRED");
-  const fresh = await readAgreementDocument(binding);
+  const { scope, agreement } = binding;
+  const fresh = await readBoundAgreement(
+    scope,
+    agreement.id,
+    agreement.person_id,
+    agreement,
+    undefined,
+    backend,
+  );
   if (
     !fresh.rendered_document ||
     fresh.document_error ||
@@ -142,24 +165,46 @@ export async function prepareAgreementAcceptance(
   };
 }
 export type AgreementAcceptanceIntent = Awaited<ReturnType<typeof prepareAgreementAcceptance>>;
-export async function acceptAgreementDocument(intent: AgreementAcceptanceIntent) {
+export async function acceptAgreementDocument(
+  intent: AgreementAcceptanceIntent,
+  backend?: AgreementBackend,
+) {
   const { scope, agreement } = intent.binding;
-  const result = await (
-    await scopedBackend(scope)
-  ).call("instructor_agreement_accept_v1", {
-    client_api_version: 1,
-    request_id: uuidv7(),
-    org_id: scope.orgId,
-    center_id: scope.centerId,
-    agreement_id: agreement.id,
-    expected_version: agreement.version,
-    source_content_hash: intent.sourceHash,
-    rendered_document_id: intent.documentId,
-    operation_key: intent.key,
-  });
+  const result = await (backend ?? (await scopedBackend(scope))).call(
+    "instructor_agreement_accept_v1",
+    {
+      client_api_version: 1,
+      request_id: uuidv7(),
+      org_id: scope.orgId,
+      center_id: scope.centerId,
+      agreement_id: agreement.id,
+      expected_version: agreement.version,
+      source_content_hash: intent.sourceHash,
+      rendered_document_id: intent.documentId,
+      operation_key: intent.key,
+    },
+  );
   if (result.primary_id !== agreement.id) throw Error("AGREEMENT_ACCEPTANCE_ACK_UNAVAILABLE");
   return result;
 }
+export async function prepareScopedAgreementAcceptance(
+  binding: AgreementDocumentBinding,
+  view: DigitalAgreementView,
+  reviewed: boolean,
+) {
+  const command = await scopedCommandBackend(binding.scope);
+  await command.currentSession();
+  try {
+    const intent = await prepareAgreementAcceptance(binding, view, reviewed, command.backend);
+    return {
+      intent,
+      write: () => command.write((backend) => acceptAgreementDocument(intent, backend)),
+    };
+  } finally {
+    await command.currentSession();
+  }
+}
+
 export async function readAgreementAcceptanceReceipt(intent: AgreementAcceptanceIntent) {
   const { scope, agreement } = intent.binding;
   const result = await (

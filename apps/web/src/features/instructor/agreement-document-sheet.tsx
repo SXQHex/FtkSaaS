@@ -12,15 +12,19 @@ import { Field, FieldGroup, FieldLabel, FieldError } from "@ftksaas/ui/component
 import { Checkbox } from "@ftksaas/ui/components/checkbox";
 import { Button } from "@ftksaas/ui/components/button";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
-import { readIntoCurrentQuery } from "../../lib/cache-invalidation";
+import {
+  capturePrivateReadback,
+  privateQueryRevision,
+  readIntoCurrentQuery,
+} from "../../lib/cache-invalidation";
 import { PrivateSessionRevision } from "../auth/private-session-revision";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { EventCommandNotice } from "../events/event-command-notice";
 import {
   readAgreementDocument,
   ownServerAcceptance,
-  prepareAgreementAcceptance,
-  acceptAgreementDocument,
+  prepareScopedAgreementAcceptance,
+  type AgreementAcceptanceIntent,
   readAgreementAcceptanceReceipt,
   readAgreementAcceptanceResult,
   type AgreementDocumentBinding,
@@ -28,11 +32,13 @@ import {
 
 export function AgreementDocumentSheet({
   binding,
+  scopeReady,
   onClose,
   onLockChange,
   onAccessLost,
 }: {
   binding: AgreementDocumentBinding;
+  scopeReady: boolean;
   onClose: () => void;
   onLockChange: (value: boolean) => void;
   onAccessLost: (cause: unknown) => boolean;
@@ -41,10 +47,17 @@ export function AgreementDocumentSheet({
     id = useId();
   const queries = useQueryClient();
   const sessionRevision = useContext(PrivateSessionRevision);
+  const queryRevision = privateQueryRevision(queries);
   const checkbox = useRef<HTMLInputElement>(null);
+  const prepared = useRef<Awaited<ReturnType<typeof prepareScopedAgreementAcceptance>> | undefined>(
+    undefined,
+  );
+  const [commandRevision, setCommandRevision] = useState<number>();
   const [reviewedDocument, setReviewedDocument] = useState<{ revision: number; id: string }>(),
     [preparing, setPreparing] = useState(false),
-    [error, setError] = useState<"review" | "source">();
+    [validation, setValidation] = useState<{ revision: number; kind: "review" | "source" }>();
+  const error =
+    scopeReady && validation?.revision === sessionRevision ? validation.kind : undefined;
   const queryKey = [
     "instructor-agreement-document",
     binding.scope.accountId,
@@ -57,29 +70,53 @@ export function AgreementDocumentSheet({
   const query = useQuery({
     queryKey,
     queryFn: (readContext) => readAgreementDocument(binding, readContext),
+    enabled: scopeReady,
     retry: false,
     staleTime: 0,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
   useEffect(() => {
-    if (query.error) onAccessLost(query.error);
-  }, [query.error, onAccessLost]);
+    if (scopeReady && query.error) onAccessLost(query.error);
+  }, [scopeReady, query.error, onAccessLost]);
+  function assertDocumentScope() {
+    if (!scopeReady || queryRevision !== privateQueryRevision(queries))
+      throw new Error("PRIVATE_QUERY_CHANGED");
+  }
   const command = useMemberCommand({
-    write: acceptAgreementDocument,
-    readReceipt: readAgreementAcceptanceReceipt,
-    readResult: (intent, receiptId) =>
-      readIntoCurrentQuery(queries, queryKey, () =>
+    write: async (intent: AgreementAcceptanceIntent) => {
+      assertDocumentScope();
+      if (prepared.current?.intent.key !== intent.key) throw new Error("PRIVATE_QUERY_CHANGED");
+      try {
+        return await prepared.current.write();
+      } catch (cause) {
+        if (cause instanceof Error && cause.message === "ACCOUNT_CHANGED")
+          throw new Error("PRIVATE_QUERY_CHANGED");
+        throw cause;
+      }
+    },
+    readReceipt: async (intent) => {
+      assertDocumentScope();
+      return readAgreementAcceptanceReceipt(intent);
+    },
+    readResult: async (intent, receiptId) => {
+      assertDocumentScope();
+      return readIntoCurrentQuery(queries, queryKey, () =>
         readAgreementAcceptanceResult(intent, receiptId),
-      ),
+      );
+    },
     onAccessLost,
   });
-  const locked = preparing || command.locked;
+  // Only receipt recovery survives a handoff. The user can dismiss it if
+  // the old request has no readable receipt.
+  const carriedCommand = commandRevision !== undefined && commandRevision !== sessionRevision;
+  const locked = preparing || (carriedCommand ? command.busy : command.locked);
   useEffect(() => {
     onLockChange(locked);
     return () => onLockChange(false);
   }, [locked, onLockChange]);
-  const view = query.isSuccess && query.fetchStatus === "idle" ? query.data : undefined;
+  const view =
+    scopeReady && query.isSuccess && query.fetchStatus === "idle" ? query.data : undefined;
   const document = view?.rendered_document;
   const reviewed =
     !!document &&
@@ -88,19 +125,32 @@ export function AgreementDocumentSheet({
   const accepted = view ? ownServerAcceptance(view, binding.scope.accountId) : false;
   const disabled = locked || command.state !== "ready" || !document || accepted;
   async function accept() {
-    if (disabled || !view) return;
+    if (disabled || !view || queryRevision !== privateQueryRevision(queries)) return;
     if (!reviewed) {
-      setError("review");
+      setValidation({ revision: sessionRevision, kind: "review" });
       checkbox.current?.focus();
       return;
     }
+    const assertCurrent = capturePrivateReadback(queries);
     setPreparing(true);
-    setError(undefined);
+    setValidation(undefined);
     try {
-      await command.start(await prepareAgreementAcceptance(binding, view, reviewed));
+      const next = await prepareScopedAgreementAcceptance(binding, view, reviewed);
+      assertCurrent();
+      prepared.current = next;
+      setCommandRevision(sessionRevision);
+      await command.start(next.intent);
     } catch (cause) {
-      if (!onAccessLost(cause)) {
-        setError("source");
+      try {
+        assertCurrent();
+      } catch {
+        return;
+      }
+      if (
+        !(cause instanceof Error && cause.message === "ACCOUNT_CHANGED") &&
+        !onAccessLost(cause)
+      ) {
+        setValidation({ revision: sessionRevision, kind: "source" });
         setReviewedDocument(undefined);
       }
     } finally {
@@ -108,10 +158,14 @@ export function AgreementDocumentSheet({
     }
   }
   async function reload() {
-    if (locked) return;
+    if (locked || !scopeReady || queryRevision !== privateQueryRevision(queries)) return;
     setReviewedDocument(undefined);
-    setError(undefined);
-    command.reset();
+    setValidation(undefined);
+    if (!command.locked) {
+      prepared.current = undefined;
+      setCommandRevision(undefined);
+      command.reset();
+    }
     await query.refetch();
   }
   return (
@@ -140,8 +194,10 @@ export function AgreementDocumentSheet({
         }}
       >
         <FieldGroup>
-          {!view && !query.isError && <p role="status">{t(($) => $.memberDocuments.loading)}</p>}
-          {query.isError && (
+          {!view && (!scopeReady || !query.isError) && (
+            <p role="status">{t(($) => $.memberDocuments.loading)}</p>
+          )}
+          {scopeReady && query.isError && (
             <Alert role="alert" variant="destructive">
               <AlertDescription>{t(($) => $.agreementDocument.unavailable)}</AlertDescription>
             </Alert>
@@ -180,7 +236,7 @@ export function AgreementDocumentSheet({
                   setReviewedDocument(
                     value ? { revision: sessionRevision, id: document.id } : undefined,
                   );
-                  setError(undefined);
+                  setValidation(undefined);
                 }}
               />
               <FieldLabel id={id + "-label"} htmlFor={id + "-review"}>
@@ -195,21 +251,24 @@ export function AgreementDocumentSheet({
                 : t(($) => $.agreementDocument.changed)}
             </FieldError>
           )}
-          {(command.state !== "saved" || accepted) && (
-            <EventCommandNotice
-              command={command}
-              onReload={() => {
-                void reload();
-              }}
-            />
-          )}
+          {scopeReady &&
+            (commandRevision === sessionRevision || view || query.isError) &&
+            (command.state !== "saved" || accepted) && (
+              <EventCommandNotice
+                command={command}
+                retryAvailable={commandRevision === sessionRevision}
+                onReload={() => {
+                  void reload();
+                }}
+              />
+            )}
         </FieldGroup>
       </form>
       <SheetFooter>
         <Button type="button" variant="outline" isDisabled={locked} onPress={onClose}>
           {t(($) => $.memberDocuments.close)}
         </Button>
-        {(query.isError || error === "source") && (
+        {scopeReady && (query.isError || error === "source") && (
           <Button
             type="button"
             variant="outline"

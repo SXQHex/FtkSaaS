@@ -43,10 +43,12 @@ export function EventCommandNotice({
   command,
   onReload,
   receiptAvailable = true,
+  retryAvailable = true,
 }: {
   command: Pick<ReturnType<typeof useMemberCommand>, "state" | "busy" | "retry" | "readReceipt">;
   onReload: () => void;
   receiptAvailable?: boolean;
+  retryAvailable?: boolean;
 }) {
   const { t } = useTranslation();
   if (command.state === "ready") return null;
@@ -72,18 +74,19 @@ export function EventCommandNotice({
               {t(($) => $.finance.readResult)}
             </Button>
           )}
-          {(command.state === "unknown" || (!receiptAvailable && command.state === "pending")) && (
-            <Button
-              variant="outline"
-              size="sm"
-              isDisabled={command.busy}
-              onPress={() => {
-                void command.retry();
-              }}
-            >
-              {t(($) => $.studio.retrySameRequest)}
-            </Button>
-          )}
+          {retryAvailable &&
+            (command.state === "unknown" || (!receiptAvailable && command.state === "pending")) && (
+              <Button
+                variant="outline"
+                size="sm"
+                isDisabled={command.busy}
+                onPress={() => {
+                  void command.retry();
+                }}
+              >
+                {t(($) => $.studio.retrySameRequest)}
+              </Button>
+            )}
           {["saved", "stale", "rejected"].includes(command.state) && (
             <Button variant="outline" size="sm" isDisabled={command.busy} onPress={onReload}>
               {t(($) => $.profile.loadCurrent)}
