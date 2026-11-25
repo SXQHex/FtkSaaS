@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "18c58d574b4d07ca399dbb91b5df9f0df3c4c494490d546ca71b7b70688c78ec",
-        "reason": "CRM geçici kopya imhası mevcut worker bağlı kapsamı ve DB saklama blokajı kuralını kullanır."
+        "fingerprint": "3fa19f1bf611d65e1da2d90bec1f5f29c5004cca7a9c5a52dd58a37c42e31a2a",
+        "reason": "Mevcut CSV ayrıştırma sözleşmesi ve derlenmiş Edge davranışı korunuyor. Tam sütun eşliği seçeneğini yalnız özgün CRM imha incelemesi kullanıyor."
       }
     },
     {
@@ -1332,7 +1332,8 @@
         "apps/backend/tests/starter-studio-acceptance.mjs",
         "apps/backend/tests/report-finance-tracking-unit.mjs",
         "apps/backend/tests/report-finance-tracking-acceptance.mjs",
-        "apps/backend/tests/intake-crm-work-acceptance.mjs"
+        "apps/backend/tests/intake-crm-work-acceptance.mjs",
+        "apps/backend/tests/p07-crm-import-source-fixture.mjs"
       ],
       "sources": [
         "apps/backend/database/studio-calendar-import-results-report-retry.sql",
@@ -1371,7 +1372,8 @@
         "apps/backend/database/crm-funnel-and-directory.sql",
         "apps/backend/supabase/migrations/20261118212300_crm_funnel_and_directory.sql",
         "apps/backend/supabase/migrations/20261118213000_studio_calendar_import_results_report_retry.sql",
-        "apps/backend/supabase/migrations/20261119170003_sql_report_pagination.sql"
+        "apps/backend/supabase/migrations/20261119170003_sql_report_pagination.sql",
+        "apps/backend/supabase/migrations/20261125080144_crm_import_source_storage_erasure.sql"
       ],
       "operations": [
         "report_get_v1",
@@ -1385,8 +1387,8 @@
         "import_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "95b395241e4fc53623191168ba2e86a6c0a89108463cf07a83f010125944de5e",
-        "reason": "CRM aktarımı tamamlandıktan sonra başvurunun canlı kişi ve irtibat bağı saklama blokajında doğrulanır."
+        "fingerprint": "bf6de6b6880aefb55d40a95c510b71c22e228fec337f89f19a9ad6f38db60df8",
+        "reason": "CRM başvurusu ve kalıcı kaynak sonucu korunuyor. Özgün dosyaya özel imha, eksiksiz eşleme ve onay kanıtı yokluğunu güncel P07 yetkisiyle sınar."
       }
     },
     {
@@ -1962,7 +1964,8 @@
         "apps/backend/tests/p07-organization-sale-fixture.mjs",
         "apps/backend/tests/p07-organization-directory-fixture.mjs",
         "apps/backend/tests/p07-organization-import-fixture.mjs",
-        "apps/backend/tests/p07-crm-import-hold-fixture.mjs"
+        "apps/backend/tests/p07-crm-import-hold-fixture.mjs",
+        "apps/backend/tests/p07-crm-import-source-fixture.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -2071,7 +2074,9 @@
         "apps/backend/supabase/migrations/20261125055500_organization_linked_import_storage_attestation.sql",
         "apps/backend/supabase/migrations/20261125060500_organization_import_rejected_row_hold_evidence.sql",
         "apps/backend/supabase/migrations/20261125061500_organization_import_directory_erasure.sql",
-        "apps/backend/supabase/migrations/20261125062500_crm_import_copy_retention_holds.sql"
+        "apps/backend/supabase/migrations/20261125062500_crm_import_copy_retention_holds.sql",
+        "apps/backend/supabase/migrations/20261125080144_crm_import_source_storage_erasure.sql",
+        "apps/backend/supabase/migrations/20261125064500_organization_settled_student_sale_erasure.sql"
       ],
       "operations": [
         "account_delete_preview_v1",
@@ -2096,8 +2101,8 @@
         "platform_operator_access_set_v1"
       ],
       "review": {
-        "fingerprint": "6ed2836bde992c173286c1eeef8e6467f87ebb669f09b5e03d3d63d7ee032f23",
-        "reason": "P07 CRM kopya temizliği aynı organizasyondaki gerçek iş ve yeniden uygulama ilişkisine bağlı blokajları uygular."
+        "fingerprint": "b47aff24a26782ff8a1d3354af086d2f50e30a5d988512e7e10037c0d058ac6d",
+        "reason": "Yerel ücretli satış ve CRM kabulü doğrulandı. Kalıcı AB R2 koşusu karşı bucket okumasını sentetik makbuzdan önce reddeder."
       }
     },
     {
@@ -2204,7 +2209,8 @@
         "apps/backend/tests/p07-storage-erasure-unit.mjs",
         "apps/backend/tests/native-erasure-restore-fixture.mjs",
         "apps/backend/tests/ops-pilot-unit.mjs",
-        "apps/backend/tests/p07-crm-import-hold-fixture.mjs"
+        "apps/backend/tests/p07-crm-import-hold-fixture.mjs",
+        "apps/backend/tests/p07-crm-import-source-fixture.mjs"
       ],
       "sources": [
         "apps/backend/database/automation-results.sql",
@@ -2311,7 +2317,8 @@
         "apps/backend/supabase/migrations/20261125055500_organization_linked_import_storage_attestation.sql",
         "apps/backend/supabase/migrations/20261125060500_organization_import_rejected_row_hold_evidence.sql",
         "apps/backend/supabase/migrations/20261125061500_organization_import_directory_erasure.sql",
-        "apps/backend/supabase/migrations/20261125062500_crm_import_copy_retention_holds.sql"
+        "apps/backend/supabase/migrations/20261125062500_crm_import_copy_retention_holds.sql",
+        "apps/backend/supabase/migrations/20261125080144_crm_import_source_storage_erasure.sql"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -2326,8 +2333,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "bcae15c49b3dd88a5a2a4df3ad7a70cc32c5329ba2f1c27fa4afb380d75b80e4",
-        "reason": "P06 expiry ve P07 kopya imhası CRM başvurusunun sonradan kurulan kayıt bağlarına ait blokajları korur."
+        "fingerprint": "47fbeefc9afc17d9410c4a6f63a71ad054551f670bb565d356354158fd47b22e",
+        "reason": "Özgün CRM dosyasının bayt, satır, sonuç ve canlı blokaj eşliği mevcut Storage makbuzuna bağlandı. Eşlenmemiş sütun, rıza ve eksik dayanak dosyayı korur."
       }
     }
   ]

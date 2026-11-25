@@ -14,10 +14,12 @@ import {verifyBillingHistoryErasure} from './p07-billing-history-fixture.mjs';
 import {verifySignedDocumentErasure} from './p07-signed-document-erasure-fixture.mjs';
 import {verifyOrganizationPaidSaleRetention} from './p07-organization-sale-fixture.mjs';
 import {verifyCrmImportCopyHolds} from './p07-crm-import-hold-fixture.mjs';
+import {verifyCrmImportSourceErasure} from './p07-crm-import-source-fixture.mjs';
 import {seedPublishedInvoice,verifyArchivedInvoiceRemoval,verifyPublishedInvoiceArchive} from './p07-invoice-archive-fixture.mjs';
 
 export async function verifyOrganizationErasure(t){
  const r2Pilot=r2ErasurePilot();
+ await r2Pilot?.verifyBucketIsolation();
  const signingContext={current:null};
  const {DB_URL,API_URL,SERVICE_ROLE_KEY}=context().env;
  const {platform,plan}=await fixturePlatform(),owner=await authUser('erasure-owner'),control=await authUser('erasure-control');
@@ -51,7 +53,7 @@ export async function verifyOrganizationErasure(t){
   const [{request_id:requestId}]=await rows('select request_id from private.p07_privacy_jobs where id=$1',[jobId]);
   await assert.rejects(readOrganizationErasureReceipt({db,requestId,orgId:org}),/ORGANIZATION_ERASURE_RECEIPT_INCOMPLETE/);
   const {role,client:worker}=await login('ftk_p07_privacy_worker');
-  const {client:attestor}=await login('ftk_p07_storage_attestor');
+  const {role:attestorRole,client:attestor}=await login('ftk_p07_storage_attestor');
   await db.query('insert into private.p07_privacy_worker_scopes values($1,$2)',[role,org]);
   await db.query('insert into private.organization_projected_contact_erasure_scopes values($1,$2)',[role,org]);
   await db.query('insert into private.organization_managed_file_erasure_scopes(db_role,request_id) values($1,$2)',[role,requestId]);
@@ -227,10 +229,12 @@ export async function verifyOrganizationErasure(t){
     signingContext,controlId:restoreControlId,dbUrl:DB_URL});
    t.diagnostic(JSON.stringify(mixed));
   });
-  await t.test('a terminated, fully collected learner sale retains the financial graph until archive eligibility',
-   verifyOrganizationPaidSaleRetention);
+  await t.test('a terminated, fully collected learner sale archives minimal evidence before deleting its live graph',
+   ()=>verifyOrganizationPaidSaleRetention({worker,attestor,workerRole:role,attestorRole,claim}));
   await t.test('CRM import copies honor holds on the reviewed applicant, contact and lead',
    nested=>verifyCrmImportCopyHolds(nested,{workerRole:role,claim,execute,controlOrg:otherOrg}));
+  await t.test('CRM original CSV erasure requires verified source, results and no consent evidence',
+   nested=>verifyCrmImportSourceErasure(nested,{worker,attestor,workerRole:role,attestorRole,claim,execute}));
  }finally{
   for(const session of sessions)await session.end();
   for(const role of roles){

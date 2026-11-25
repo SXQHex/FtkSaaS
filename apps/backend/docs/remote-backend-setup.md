@@ -313,9 +313,11 @@ Snapshot project_ref ve tables dizisi içerir; tablolar schema/table/rows biçim
 Bu modül hukuki onay veya purge kanıtı üretmez. İmzalama anahtarı yalnız doğrulanmış silme sonucunu kaydeden orkestratöre verilmelidir. Sicil dizini/anahtar ve rollback'i engelleyen güncel head checkpoint'i restore kapsamının dışında, ayrı yetki ve yedeklemeyle işletilmelidir. Yerel test dosyaları üretim sicili kurulumu değildir. Saklama/expiry, anahtar yönetimi ve bağımsız kalıcı depolama kabulü henüz açıktır.
 
 <a id="bagimsiz-arsiv-ve-sicil-taslagi"></a>
-### Bağımsız arşiv ve sicil kurulum taslağı
+### Bağımsız arşiv ve sicil kurulumu
 
 Sentetik pilota ayrılan özel Cloudflare R2 hedefleri `ftksaas-ops-pilot-retention-archive` ve `ftksaas-ops-pilot-erasure-register` bucket’larıdır. Pilot Standard sınıfı ve varsayılan konumla çalışır. Sentetik pilot iki bucket’la sınırlı ortak yazıcı ve ayrı ortak salt okunur S3 kimliği kullanır. Restore işlemi bu kimlikle sicil bucket’ından okur. Saklama kuralı yönetimi bucket veri erişiminden ayrı yetkidedir. Arşivin bölgesi ve gerçek kayıtlar için ayrılacak erişimler veri taşınmadan önce onaylanır. [R2 yetkileri](https://developers.cloudflare.com/r2/api/tokens/) · [R2 bölge seçimi](https://developers.cloudflare.com/r2/reference/data-location/).
+
+Kalıcı teknik kabul hedefleri AB yargı bölgesinde özel `ftksaas-ops-retention-archive` ve `ftksaas-ops-erasure-register` bucket’larıdır. Her bucket için bir nesne yazıcısı ve ayrı bir salt okunur kimlik kullanılır. Restore yalnız sicil okuyucusuyla çalışır. Kural yönetimi ve imza anahtarı veri erişim kimliklerinden ve uygulama yedeğinden bağımsız tutulur. GİB kapsamındaki e-belgenin yasal muhafazası, özgün mali mühür veya elektronik imza korunarak Türkiye’de yürütülür. Kişiyle ilişkilendirilebilen sicil kimlikleri dahil gerçek verinin R2’ye aktarımı için KVKK m.9 dayanağı ve ilgili saklama yetkisi doğrulanır. Teknik kabul sentetik verilerle yürütülür. [GİB e-belge muhafazası](https://gib.gov.tr/mevzuat/kanun/434/teblig/7902) · [KVKK yurt dışına aktarım](https://www.kvkk.gov.tr/Icerik/2053/Yurtdisina-Aktarim).
 
 | Amaç | İçerik ve işlem |
 | --- | --- |
@@ -334,17 +336,21 @@ Yetkili kaynak DB oturumu talebi, organizasyonu ve önceden onaylanan sicil kiml
 
 Sentetik R2 kabulünü yerel izole P07 koşusuna eklemek için `FTK_O06_R2_PILOT_CREDENTIALS` değişkenine sahibine özel izinli (`0600`) JSON dosyasının tam yolunu ver. Dosyadaki alanlar `endpoint`, `writer` ve `reader` olur. Son iki nesne ayrı `accessKeyId` ve `secretAccessKey` değerleri taşır. İkisi yalnız iki pilot bucket’ıyla sınırlıdır. Yerel P07 kabulü aynı gerçek DB ve Storage makbuzunu R2’ye yayımlar, eski ETag’i reddeder, iki bucket’ta salt okunur kimlikle yazmayı reddeder ve arşivde sentetik dosyanın checksum’ını doğrular. Sicil anahtarı rotasyonundan sonra eski checkpoint’i ve üç silme öncesi izdüşümü reddeder, temiz izdüşümü kapalı PostgreSQL hedefine yükler. Çıktı yalnız doğrulanmış makbuz özetlerini taşır. Komut backend dizininden `node --test --test-concurrency=1 tests/p07-lifecycle-acceptance.mjs` biçimindedir. Bu koşu için izole native stack hazır olmalıdır.
 
+Kalıcı AB hedeflerinin sentetik kabulünde aynı komuta `.eu.r2.cloudflarestorage.com` uç noktası ve `registerWriter`, `registerReader`, `archiveWriter`, `archiveReader` alanları olan ayrı `0600` dosya verilir. Her alan kendi `accessKeyId` ve `secretAccessKey` değerlerini taşır ve yalnız ait olduğu bucket’a erişir. Kabul iki okuyucunun yazma reddini, iki bucket’ın karşılıklı erişim reddini ve açıkça seçilmiş kilitli sentetik kapsamda arşivin ve imzalı makbuzun değiştirilemediğini sınar.
+
 Gerçek S3 kilit reddi sınanırken `FTK_O06_R2_PILOT_PROJECT_REF` değişkeni `ftkpilot` ile başlayan 20 küçük harfli, bu koşuya özel değeri taşır. Sicil bucket’ında `erasure/<ref>/receipts/`, arşiv bucket’ında `archive/<ref>/` öneki için geçici nesne kilidi kurulur. Böylece makbuz nesnesi mevcut ETag ile yeniden yazılmak istendiğinde provider kilidi devreye girer. `current.json` koşullu güncellenebilir. Hazırlık ve test sonunda geçici kural, diğer bucket ayarları korunarak uzlaştırılır.
 
-**O04–O05 arşiv alanı incelemesi.** Onaya girecek kayıtlar, teknik sözleşmedeki saklama sınıflarıyla eşlenir. Bu tablo alan seçimini ve sentetik test girdisini tarif eder. Gerçek kayıt veya dosya taşımak için somut dayanak, süre başlangıcı ve hedef erişim sahibi ayrı kaydedilir.
+**O04–O05 sentetik kabul kapsamı.** Onaylı alanlar teknik sözleşmedeki saklama sınıflarıyla eşlenir. Gerçek kayıt veya dosya taşımadan önce her sınıf için dayanak, süre başlangıcı ve bitişi, erişim sahibi ve varsa saklama blokajı kaydedilir. Müşteri işletmesine ait kayıtlar için veri sorumlusunun yazılı talimatı ve saklama amacı doğrulanır. Geçici uzun saklama süreleri teknik sözleşmede tutulur.
 
-| Canlı kaynak | İncelenecek arşiv sınırı |
+| Canlı kaynak | Onaylı sentetik arşiv kapsamı |
 | --- | --- |
-| `private.platform_invoices` ve fatura nesnesi | Yayınlanmış faturanın özgün baytları ile fatura numarası, düzenleme tarihi ve checksum. Taslaklarda ayrı saklama dayanağı aranır. Özgün ve arşiv kopyası checksum ile doğrulanır. |
-| `core.saas_payment_verifications` ve bağlı abonelik kayıtları | Tutar, para birimi, işlem ve doğrulama zamanı, kesin durum ve mutabakat için gereken abonelik/fatura referansları. `reference` içindeki serbest metin ayrıca sınıflandırılır. Müşteri işletmesi kayıtlarında sözleşmede aranan talimat ve saklama amacı doğrulanır. |
-| Öğrenci satışı ve tahsilatı · `core.sales`, `core.debts`, `core.cash_movements`, `core.debt_allocations` | Onay incelemesinde satış, borç, tahsilat ve tahsis kimlikleri ile aralarındaki bağlar, tutar, para birimi, işlem zamanı, kapanış durumu ve gerekli denetim işlem kimliği eşlenir. Hak hareketi ve hizmet ifası varsa süre başlangıcı ile bu kanıtlara bağ ayrı belirlenir. |
+| `private.platform_invoices` ve fatura nesnesi | Yayımlanmış faturanın özgün baytları, fatura numarası, düzenleme tarihi ve SHA-256 özeti. Taslaklarda ayrı saklama dayanağı aranır. Özgün ve arşiv kopyası SHA-256 ile doğrulanır. |
+| `core.saas_payment_verifications` ve bağlı abonelik kayıtları | Tutar, para birimi, işlem ve doğrulama zamanı, kesin durum ve mutabakat için gereken abonelik/fatura referansları. |
+| Öğrenci satışı, tahsilatı ve iadesi · `core.sales`, `core.debts`, `core.cash_movements`, `core.debt_allocations` | Satış, borç, tahsilat, iade ve tahsis kimlikleri ile gerekli bağları, tutar, para birimi, işlem zamanı ve kesin durum. Hizmet ifasını ispatlamak için gereken hak hareketi veya hizmet kaydı ile denetim işlem kimliği ilgili kayda bağlanır. |
 | `core.document_acceptances`, bağlı sürüm ve dosya | Kabul edilen sürümün metni veya dosyası, içerik özeti, kabul zamanı ve kabulü ispatlamak için gereken özne/işlem referansları. `context` içinden yalnız ilgili belge türünün kabulünü ispatlayan alanlar seçilir. |
-| `core.audit_events` | Kritik olay kimliği, zaman, işlem türü, gerekli nesne/özne referansları. Ham `diff` ve serbest `reason` alanları olay bazında değerlendirilir. |
+| `core.audit_events` | Kritik olay kimliği, zaman, işlem türü, sonuç ve gerekli aktör/hedef referansları. Ham `diff` ve serbest `reason` yalnız somut ispat ihtiyacı belgelenirse tutulur. |
+
+CRM’nin özgün aktarım CSV’si, kaynak ve sonuç eşliği doğrulandığında varsayılan olarak imha edilir. Varsa doğrulanmış onay kanıtı önce kişi veya iletişim adresi, kanal, kapsam, kaynak, zaman, metin sürümü ve İYS referansıyla kaydedilir. CSV’deki `izin=true` alanı tek başına onay kanıtı sayılmaz. Özgün dosya yalnız doğrulanabilir tek kanıtın gerekli satırı güvenilir biçimde ayrılamadığında veya dosyaya özgü belgeli blokaj bulunduğunda süreli tutulur. Ticari elektronik ileti onay kayıtları için saklama süresi onayın sona ermesinden itibaren üç yıldır. [Ticari ileti kayıtları](https://www.kvkk.gov.tr/Icerik/7122/2021-584).
 
 Karma tatbikatta onaylı arşiv kaydı doğrulandıktan sonra aynı isteğin canlı kopyaları temizlenir. Arşiv kararı bekleyen kayıt, doğrulanamayan dosya özeti veya etkin hold birleşik imha makbuzunu durdurur. Bu durumların her biri ücretli sentetik organizasyonda ayrıca sınanır.
 
@@ -443,7 +449,7 @@ Daha eski bir öğrenci importu için [`recoverLegacyImportEvidence`](../scripts
 
 CSV’nin aynı talebe ait silme makbuzu, tamamlanmış P06 işi ve dizin arşiv onayı varsa aynı dizin işlemi import işini, satırları, önizlemeyi, kuyruk ve kaynak eşlemesini kaldırır. Önizleme isteğinin audit olayı üretmeyen kanonik işlem kaydı, yalnız aynı işe bağlıysa tanınır. Aktif, saklama blokajlı, mali kayıt üreten veya bağı doğrulanamayan importlar işlemi durdurur. Kalan dosya üst verisinde merkez ve kişi bağı kaldırılır. Storage makbuzu için dosya kimliği ve checksum tutulur. Ham CSV, kaynak anahtarı ve eşleme arşiv içeriğine girmez.
 
-CRM geçici kopyalarında başvuruya sonradan bağlanan kişi, onun irtibatı veya aynı merkeze bağlı CRM kaydı üzerinde blokaj varsa P06 olağan expiry ve P07 imha adımları o kapsamı korur. Bağ, P06 kaynak kaydı ve mevcut başvuru üzerinden doğrulanır. Özgün CRM CSV’si ve başvuruya taşınmış rıza kanıtı için saklama kararı ayrı gerekir.
+CRM geçici kopyalarında başvuruya sonradan bağlanan kişi, onun irtibatı veya aynı merkeze bağlı CRM kaydı üzerinde blokaj varsa P06 olağan expiry ve P07 imha adımları o kapsamı korur. Bağ, P06 kaynak kaydı ve mevcut başvuru üzerinden doğrulanır. Özgün dosya ve onay kanıtının kararı [onaylı arşiv kapsamına](#bagimsiz-arsiv-ve-sicil-taslagi) bağlıdır.
 
 Yetkili işletim bağlantısında yalnız sayım al. Sorgu, `ftksaas-imports` nesnelerini beklenen organizasyon/dosya yolu, dosya amacı ve P06 sahiplik kaydı ile eşler. Hazır kaynakları, eşleşmesi belirsiz nesneleri ve süresi dolmuş bekleyen yüklemeleri tespit eder. Hesap blokajı organizasyonlar arasında, kayıt ve organizasyon blokajı kendi kapsamlarında geçerlidir.
 

@@ -27,18 +27,28 @@ export function r2ErasurePilot(credentialsFile=process.env.FTK_O06_R2_PILOT_CRED
   if(!info.isFile()||(info.mode&0o077)!==0||info.size>16384)throw Error('PRIVATE_R2_CREDENTIALS_FILE_REQUIRED');
   config=JSON.parse(fs.readFileSync(fd,'utf8'));
  }finally{fs.closeSync(fd);}
- if(!config?.writer||!config.reader||config.writer.accessKeyId===config.reader.accessKeyId
-  ||config.writer.secretAccessKey===config.reader.secretAccessKey)
+ const permanent=Boolean(config?.registerWriter||config?.registerReader||config?.archiveWriter||config?.archiveReader);
+ const registerWriter=permanent?config.registerWriter:config?.writer;
+ const registerReader=permanent?config.registerReader:config?.reader;
+ const archiveWriter=permanent?config.archiveWriter:registerWriter;
+ const archiveReader=permanent?config.archiveReader:registerReader;
+ const roles=permanent?[registerWriter,registerReader,archiveWriter,archiveReader]:[registerWriter,registerReader];
+ if(roles.some(role=>!role)
+  ||new Set(roles.map(role=>role.accessKeyId)).size!==roles.length
+  ||new Set(roles.map(role=>role.secretAccessKey)).size!==roles.length)
   throw Error('DISTINCT_R2_PILOT_IDENTITIES_REQUIRED');
+ if(permanent&&!/^https:\/\/[a-f0-9]{32}\.eu\.r2\.cloudflarestorage\.com$/.test(config.endpoint))
+  throw Error('EU_R2_ACCEPTANCE_ENDPOINT_REQUIRED');
 
  const coordinationDir=fs.mkdtempSync(path.join(path.dirname(credentialsFile),'.o06-r2-'));
  const suffix=Array.from({length:12},()=>String.fromCharCode(97+randomInt(26))).join('');
  const sourceProjectRef=protectedRef??('ftkpilot'+suffix);
- const archive='ftksaas-ops-pilot-retention-archive';
- const options={endpoint:config.endpoint,bucket:'ftksaas-ops-pilot-erasure-register',workDirectory:coordinationDir};
+ const archive=permanent?'ftksaas-ops-retention-archive':'ftksaas-ops-pilot-retention-archive';
+ const register=permanent?'ftksaas-ops-erasure-register':'ftksaas-ops-pilot-erasure-register';
+ const options={endpoint:config.endpoint,bucket:register,workDirectory:coordinationDir};
  const credential=(role,readOnly,bucket=options.bucket)=>createR2S3ObjectStore({...options,bucket,
   accessKeyId:role.accessKeyId,secretAccessKey:role.secretAccessKey,readOnly});
- const writer=credential(config.writer,false),reader=credential(config.reader,true);
+ const writer=credential(registerWriter,false),reader=credential(registerReader,true);
  const {privateKey,publicKey}=generateKeyPairSync('ed25519');
  const initialSigning={privateKeyPem:privateKey.export({type:'pkcs8',format:'pem'}),publicKeyPem:publicKey.export({type:'spki',format:'pem'})};
  const state={sourceProjectRef,coordinationDir,trustedPublicKeyPem:initialSigning.publicKeyPem};
@@ -48,11 +58,19 @@ export function r2ErasurePilot(credentialsFile=process.env.FTK_O06_R2_PILOT_CRED
   initialSigning,
   writer:createR2ErasureState({...state,store:writer}),
   reader:createR2ErasureState({...state,store:reader}),
-  archiveWriter:credential(config.writer,false,archive),
-  archiveReader:credential(config.reader,true,archive),
+  archiveWriter:credential(archiveWriter,false,archive),
+  archiveReader:credential(archiveReader,true,archive),
+  async verifyBucketIsolation(){
+   if(!permanent)return;
+   const probe='pilot-checks/'+sourceProjectRef+'/credential-scope.json';
+   for(const role of [registerWriter,registerReader])
+    await assert.rejects(()=>credential(role,true,archive).get(probe),/R2_S3_FORBIDDEN/);
+   for(const role of [archiveWriter,archiveReader])
+    await assert.rejects(()=>credential(role,true,register).get(probe),/R2_S3_FORBIDDEN/);
+  },
   async beginConfigured({databaseUrl,requestId,orgId}){
    const configFile=path.join(coordinationDir,'operator.json');
-   fs.writeFileSync(configFile,JSON.stringify({databaseUrl,...state,endpoint:config.endpoint,bucket:options.bucket,writer:config.writer}),
+   fs.writeFileSync(configFile,JSON.stringify({databaseUrl,...state,endpoint:config.endpoint,bucket:register,writer:registerWriter}),
     {flag:'wx',mode:0o600});
    try{return await beginConfiguredOrganizationR2Erasure({configFile,requestId,orgId});}
    finally{fs.unlinkSync(configFile);}
@@ -64,7 +82,7 @@ export function r2ErasurePilot(credentialsFile=process.env.FTK_O06_R2_PILOT_CRED
    const probe=Buffer.from('{"synthetic":"denied write"}');
    const unexpected='"'+(previous.etag==='"'+'0'.repeat(32)+'"'?'1':'0').repeat(32)+'"';
    await assert.rejects(async()=>writer.put(current,probe,{ifMatch:unexpected}),/R2_ERASURE_PRECONDITION_FAILED/);
-   const permissionProbe=credential(config.reader,false);
+   const permissionProbe=credential(registerReader,false);
    await assert.rejects(async()=>permissionProbe.put('pilot-checks/'+sourceProjectRef+'/read-only.json',probe,{ifNoneMatch:'*'}),/R2_S3_FORBIDDEN/);
    assert.deepEqual(await reader.get(current),previous);
    if(protectedRef){
@@ -75,14 +93,16 @@ export function r2ErasurePilot(credentialsFile=process.env.FTK_O06_R2_PILOT_CRED
     assert(original?.etag);
     await assert.rejects(async()=>writer.put(ledger,original.bytes,{ifMatch:original.etag}),/R2_ERASURE_OBJECT_LOCKED/);
    }
-   const archiveStore=credential(config.writer,false,archive);
+   const archiveStore=credential(archiveWriter,false,archive);
    const bytes=Buffer.from('FtkSaaS synthetic archival readback');
-   const key='pilot-checks/'+sourceProjectRef+'/archived-evidence';
+   const key='archive/'+sourceProjectRef+'/archived-evidence';
    assert.deepEqual(await writeR2ImmutableEvidence({store:archiveStore,key,bytes,expectedSha256:sha256(bytes)}),
     {sha256:sha256(bytes),bytes:bytes.length});
-   const archiveReader=credential(config.reader,true,archive);
-   assert.deepEqual((await archiveReader.get(key))?.bytes,bytes);
-   const archivePermissionProbe=credential(config.reader,false,archive);
+   const archived=await credential(archiveReader,true,archive).get(key);
+   assert.deepEqual(archived?.bytes,bytes);
+   if(protectedRef&&permanent)
+    await assert.rejects(()=>archiveStore.put(key,bytes,{ifMatch:archived.etag}),/R2_ERASURE_OBJECT_LOCKED/);
+   const archivePermissionProbe=credential(archiveReader,false,archive);
    await assert.rejects(async()=>archivePermissionProbe.put('pilot-checks/'+sourceProjectRef+'/read-only.json',probe,{ifNoneMatch:'*'}),/R2_S3_FORBIDDEN/);
   }
  };

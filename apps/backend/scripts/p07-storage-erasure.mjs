@@ -1,4 +1,5 @@
 import {createHash} from 'node:crypto';
+import {parseImportCsv} from '../supabase/functions/backend-v1/import-file.ts';
 
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 const allowedMime={
@@ -6,12 +7,13 @@ const allowedMime={
  'ftksaas-documents':['text/plain','application/pdf']
 };
 
-async function verifyBytes(response,expected,mime){
+async function verifyBytes(response,expected,mime,collect){
  if(!response.ok||!response.body||response.headers.get('content-type')?.split(';')[0]!==mime){
   await response.body?.cancel();
   throw Error('STORAGE_TARGET_UNCONFIRMED');
  }
  const reader=response.body.getReader(),hash=createHash('sha256');
+ const chunks=collect?[]:null;
  let length=0;
  try{
   while(true){
@@ -20,12 +22,25 @@ async function verifyBytes(response,expected,mime){
    length+=value.byteLength;
    if(length>expected.bytes)throw Error('STORAGE_TARGET_UNCONFIRMED');
    hash.update(value);
+   chunks?.push(value);
   }
  }catch{
   await reader.cancel();
   throw Error('STORAGE_TARGET_UNCONFIRMED');
  }
  if(length!==expected.bytes||hash.digest('hex')!==expected.checksum)throw Error('STORAGE_TARGET_UNCONFIRMED');
+ return chunks===null?undefined:Buffer.concat(chunks,length);
+}
+
+const ordinaryCrmFields=new Set(['source_key','display_name','phone','email','consents']);
+function ordinaryCrmImportRows(bytes,mapping){
+ if(mapping?.kind!=='crm_applications'||!Array.isArray(mapping.columns)
+  ||mapping.columns.some(column=>!ordinaryCrmFields.has(column?.target)))return null;
+ try{
+  const rows=parseImportCsv(new TextDecoder('utf-8',{fatal:true}).decode(bytes),mapping,5000,true);
+  if(rows.some(row=>row.error_code!==null||row.payload.consents?.length!==0))return null;
+  return rows.map(({row_number,payload})=>({row_number,payload}));
+ }catch{return null;}
 }
 
 async function readJson(response){
@@ -50,11 +65,21 @@ export async function eraseExpiredImportObject({db,attestor,request,fileId,apiUr
  const prepared=(await db.query('select private.p07_storage_erasure_prepare($1,$2) result',args)).rows[0].result;
  if(['unbound','held','absent','unconfirmed','completed'].includes(prepared?.state))return{state:prepared.state};
  const linked=prepared?.linked_import_attestation===true&&prepared.bucket_id==='ftksaas-imports';
+ const crmMapping=linked?prepared.crm_import_mapping:undefined;
  const witness=phase=>attestor.query('select private.p07_linked_import_storage_witness($1,$2,$3,$4,$5)',
   [...args,phase,prepared.checksum,prepared.bytes]);
- await deletePreparedStorageObject({origin,serviceKey,prepared,fileId,fetcher,readbackOnly:linked&&prepared.state==='readback',
-  beforeDelete:linked?()=>witness('authorize'):undefined,
+ const authorize=async bytes=>{
+  if(!crmMapping)return witness('authorize');
+  const rows=ordinaryCrmImportRows(bytes,crmMapping);
+  if(rows===null)return false;
+  await attestor.query('select private.p07_crm_import_storage_authorize($1,$2,$3,$4,$5)',
+   [...args,prepared.checksum,prepared.bytes,JSON.stringify(rows)]);
+ };
+ const erased=await deletePreparedStorageObject({origin,serviceKey,prepared,fileId,fetcher,
+  readbackOnly:linked&&prepared.state==='readback',inspectSource:crmMapping!==undefined,
+  beforeDelete:linked?authorize:undefined,
   acknowledge:linked?()=>witness('acknowledge'):undefined});
+ if(erased===false)return{state:'held'};
  const proof=(await attestor.query('select private.p07_storage_erasure_confirm($1,$2) result',args)).rows[0].result;
  if(proof?.state!=='completed')throw Error('STORAGE_PROOF_UNCONFIRMED');
  return{state:'completed'};
@@ -73,7 +98,7 @@ export async function erasePreparedDocumentObject({apiUrl,serviceKey,prepared,fe
   readbackOnly:prepared.state==='readback'});
 }
 
-async function deletePreparedStorageObject({origin,serviceKey,prepared,fileId,fetcher,invoice=false,beforeDelete,acknowledge,readbackOnly=false}){
+async function deletePreparedStorageObject({origin,serviceKey,prepared,fileId,fetcher,invoice=false,beforeDelete,acknowledge,readbackOnly=false,inspectSource=false}){
  const objectKey=prepared?.object_key,segments=typeof objectKey==='string'?objectKey.split('/'):[];
  // Older deployed import preparations predate the explicit bucket and MIME.
  const legacy=!invoice&&prepared?.bucket_id===undefined&&prepared?.mime===undefined;
@@ -93,8 +118,8 @@ async function deletePreparedStorageObject({origin,serviceKey,prepared,fileId,fe
   method:'GET',headers:{...headers,'cache-control':'no-cache'},redirect:'error',signal:AbortSignal.timeout(8000)
  });
  if(!readbackOnly){
-  await verifyBytes(await download(),prepared,mime);
-  if(beforeDelete)await beforeDelete();
+  const verified=await verifyBytes(await download(),prepared,mime,inspectSource);
+  if(beforeDelete&&await beforeDelete(verified)===false)return false;
   let removed;
   try{
    removed=await fetcher(endpoint+bucket+'/'+objectKey,{
