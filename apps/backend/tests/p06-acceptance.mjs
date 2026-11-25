@@ -44,6 +44,34 @@ test('P06 actual Auth/private CSV/preview/ledger/report/recovery/scoped worker a
   await assert.rejects(worker.query('select * from core.people'),/permission denied/);await assert.rejects(worker.query('select * from private.p06_jobs'),/permission denied/);
   const human=await call(owner,'import_rows_process_v1',scope({job_id:key(),lease_token:'x'.repeat(64)}),key());assert.equal(human.result.error.code,'FORBIDDEN');
  });
+ await t.test('report enqueue shares the organization lock and preserves its write fence',async()=>{
+  const transaction=await connect();
+  try{
+   await db.query('begin');
+   await db.query('select id from core.organizations where id=$1 for share',[org]);
+   await transaction.query('begin');
+   await transaction.query("set local lock_timeout='250ms'");
+   await transaction.query("set local request.jwt.claim.role='service_role'");
+   const request=scope({client_api_version:1,request_id:key(),operation_key:key(),report:'collections_debts',filters});
+   const enqueue=async()=> (await transaction.query(
+    'select api_v1.report_export_start_v1($1,$2,$3,$4,$5) as response',
+    [request,owner.id,owner.session_id,Array.from({length:64},key),{verified_aal:'aal1'}],
+   )).rows[0].response;
+   const started=await enqueue();
+   assert.equal(started.ok,true);
+   assert.equal((await enqueue()).data.job_id,started.data.job_id);
+   const {rows:[outbox]}=await transaction.query(
+    "select count(*)::int as jobs from core.outbox_jobs where org_id=$1 and id=$2 and kind='p06.report' and state='pending'",
+    [org,started.data.job_id],
+   );
+   assert.equal(outbox.jobs,1);
+   await db.query('rollback');
+   await assert.rejects(db.query('select id from core.organizations where id=$1 for update nowait',[org]),{code:'55P03'});
+  }finally{
+   await db.query('rollback');
+   try{await transaction.query('rollback');}finally{await transaction.end();}
+  }
+ });
  const csv='source_key,display_name,opening_debt_minor,currency\r\n'+Array.from({length:27},(_,i)=>`r${i},"Synthetic ${i}",100,TRY`).join('\r\n')+'\r\ninvalid,"Bad amount",bad,TRY\r\n';
  await t.test('actual bytes/checksum and strict CSV precede an idempotent technical job',async()=>{
   const wrong=await upload(csv,'0'.repeat(64));const before=(await rows('select count(*)::int n from core.import_jobs where org_id=$1',[org]))[0].n;

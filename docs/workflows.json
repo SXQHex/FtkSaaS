@@ -321,8 +321,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "f968582baa3adab894ce718138ac855bba0d3b3cd42470289764b02cee9c65e2",
-        "reason": "İki hesap dizini görünümü aynı kanonik merkez kümesini kullanır. Test envanteri ve migration parmak izi güncellendi."
+        "fingerprint": "7bcf74d5aaaf7fe70fcad6127e890d41cadc44c9d7b9b5d561e61ca88a7b9987",
+        "reason": "P06 native rapor başlatma, paylaşımlı organizasyon kilidi altında idempotent iş kaydını ve dış yazma kilidini doğruluyor."
       }
     },
     {
@@ -529,7 +529,8 @@
         "apps/backend/supabase/migrations/20261124013200_exact_management_readbacks.sql",
         "apps/backend/supabase/migrations/20261124134857_share_center_configuration_read_locks.sql",
         "apps/backend/supabase/migrations/20261124152000_scoped_consumer_followup.sql",
-        "apps/backend/supabase/migrations/20261125124800_calendar_read_projections.sql"
+        "apps/backend/supabase/migrations/20261125124800_calendar_read_projections.sql",
+        "apps/backend/supabase/migrations/20261125213301_hide_erased_organization_from_account_directory.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -557,8 +558,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "ed1f5f3f48a00043d6cb533871a936e302e1b717ae70d01ddd89a9722e21df9a",
-        "reason": "Merkez yöneticisi ve merkez dışı kullanıcı için hesap bağlantısı sınırı ortak native testte doğrulanır."
+        "fingerprint": "d2463b64ad2750b3b725739f182b9c7533adf8665ccc88396ca91cf517e73a57",
+        "reason": "Organizasyon dizini eşleşen DB ve Storage imha makbuzuyla tamamlanan organizasyonu ve kendi kişi bağını göstermiyor."
       }
     },
     {
@@ -1384,7 +1385,8 @@
         "apps/backend/supabase/migrations/20261118212300_crm_funnel_and_directory.sql",
         "apps/backend/supabase/migrations/20261118213000_studio_calendar_import_results_report_retry.sql",
         "apps/backend/supabase/migrations/20261119170003_sql_report_pagination.sql",
-        "apps/backend/supabase/migrations/20261125080144_crm_import_source_storage_erasure.sql"
+        "apps/backend/supabase/migrations/20261125080144_crm_import_source_storage_erasure.sql",
+        "apps/backend/supabase/migrations/20261125213056_report_enqueue_shared_organization_lock.sql"
       ],
       "operations": [
         "report_get_v1",
@@ -1398,8 +1400,8 @@
         "import_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "bf6de6b6880aefb55d40a95c510b71c22e228fec337f89f19a9ad6f38db60df8",
-        "reason": "CRM başvurusu ve kalıcı kaynak sonucu korunuyor. Özgün dosyaya özel imha, eksiksiz eşleme ve onay kanıtı yokluğunu güncel P07 yetkisiyle sınar."
+        "fingerprint": "f21e4a1b2648f4001c653c4dd5be28f65ad91e3f9a460b6421a05406725fb294",
+        "reason": "Rapor başlatma organizasyon için paylaşımlı kilit kullanıyor. İş makbuzu, tekil tekrar ve yetki kontrolleri aynı işlemde korunuyor."
       }
     },
     {
@@ -2088,7 +2090,8 @@
         "apps/backend/supabase/migrations/20261125061500_organization_import_directory_erasure.sql",
         "apps/backend/supabase/migrations/20261125062500_crm_import_copy_retention_holds.sql",
         "apps/backend/supabase/migrations/20261125080144_crm_import_source_storage_erasure.sql",
-        "apps/backend/supabase/migrations/20261125064500_organization_settled_student_sale_erasure.sql"
+        "apps/backend/supabase/migrations/20261125064500_organization_settled_student_sale_erasure.sql",
+        "apps/backend/supabase/migrations/20261125213301_hide_erased_organization_from_account_directory.sql"
       ],
       "operations": [
         "account_delete_preview_v1",
@@ -2113,8 +2116,8 @@
         "platform_operator_access_set_v1"
       ],
       "review": {
-        "fingerprint": "400e75f862eaa3d8326f5bca14e2320641ecf53e5d98ba3400f67294f449cd70",
-        "reason": "Ortak Edge girişi Auth sağlayıcısı arızasını geçersiz oturumdan ayırır. Platform erişim kapsamı, canlı üyelik ve JWT/MFA kontrolleri korunur."
+        "fingerprint": "2dffb0cdfabf1c3a056171fda0bdac002663eff86517ee57e4fa49b9e5403ddc",
+        "reason": "Tamamlanan fiziksel DB ve dosya imhasından sonra organizasyon dizinde görünmüyor. Bekleyen iş ve kontrol organizasyonunun erişimi sürüyor."
       }
     },
     {
@@ -2347,8 +2350,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "12f3f66005ce363a68827ad5ed9d444be6258b0bb23c5a61d4b83f3dd2e932a6",
-        "reason": "O10 pilotunda 50 native oturumun ağ öncesi doğrulanmasını ve başarısız isteklerin güvenli HTTP/iz kaydını inceledik. Dalga kapsamı ve yerel mutabakat kuralları korunur."
+        "fingerprint": "30cb7c91749f8d9346d0006dbdb5c8c1ff5c773ba458f7a236f8dd2e675973ff",
+        "reason": "Rapor kuyruğuna aynı anahtarla tek iş giriyor. Organizasyon kapatma kilidi ve P06 worker işleyişi korunuyor."
       }
     }
   ]
