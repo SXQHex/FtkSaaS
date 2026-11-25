@@ -983,13 +983,13 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 <a id="o08"></a>
 ### O08 — DB/Auth/Storage tam geri dönüş
 
-- [ ] **Durum:** [İzole hosted DB/Auth/Storage geri yüklemesi](00-FtkSaaS-yeni-sohbet-devir.md#o08-hosted-sentetik-restore) ve [kişisel takvim yapılandırması](00-FtkSaaS-yeni-sohbet-devir.md#o08-hosted-takvim-konfigurasyonu) doğrulandı, tam yapılandırma kabulü açık · **Tür:** H · **Plan:** Tümü · **Özellik:** F33,F30
+- [ ] **Durum:** [İzole hosted DB/Auth/Storage geri yüklemesi](00-FtkSaaS-yeni-sohbet-devir.md#o08-hosted-sentetik-restore) ve [kişisel takvim yapılandırması](00-FtkSaaS-yeni-sohbet-devir.md#o08-hosted-takvim-konfigurasyonu) doğrulandı. [Canlı Auth kurtarması](00-FtkSaaS-yeni-sohbet-devir.md#o08-hosted-auth-recovery) geçti, tam yapılandırma karşılaştırması açık · **Tür:** H · **Plan:** Tümü · **Özellik:** F33,F30
 - **Bağımlılık:** O07
 - **Kabul:** DB/migration/ACL/RLS, Auth UUID/giriş ve Storage bayt/izinleri aynı snapshotla geri döner.
 - **Sınır/olumsuz durum:** Tek SQL veya dosya restore bütün kabul değildir; kaynak hedef ayrıdır.
 - **Doğrulama senaryosu:** DB mutabakatı, gerçek giriş, Storage checksum; Edge/config/secret envanteri ve worker binding doğrulaması.
 - **Kaynak alanı:** restore runbook ve mevcut araçlar
-- **Kalan:** Beş worker’ın [gerçek Cron kabulü](00-FtkSaaS-yeni-sohbet-devir.md#o08-o10-hedef-on-kontrol) tamamlandı. [Tam restore prosedüründe](remote-backend-setup.md#managed-restore-prosedürünün-sınırı) öngörülen dış sağlayıcı yapılandırmasını ve gereken sırların hedefte yeniden sağlanmasını [hazırlanan karşılaştırmayla](remote-backend-setup.md#izole-restore-on-kontrol) doğrula.
+- **Kalan:** Beş worker’ın [gerçek Cron kabulü](00-FtkSaaS-yeni-sohbet-devir.md#o08-o10-hedef-on-kontrol) tamamlandı. [Tam restore yapılandırma karşılaştırmasını](remote-backend-setup.md#izole-restore-on-kontrol) tamamla. Auth kurtarma kanıtı hazır. İzole davet çıkışı ve Resend olay webhook’u için hedefte beklenen ayarı ve sırların yeniden sağlanmasını doğrula.
 
 <a id="o09"></a>
 ### O09 — Backup non-resurrection kabulü
