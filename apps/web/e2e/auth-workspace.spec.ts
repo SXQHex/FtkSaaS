@@ -20,6 +20,20 @@ const org = "019a7b00-0000-7000-8000-000000000003",
   center = "019a7b00-0000-7000-8000-000000000004",
   person = "019a7b00-0000-7000-8000-000000000005";
 
+// These members are read in the browser. The E2E runner compiles with Node libraries.
+type HitTarget = {
+  closest(selectors: string): HitTarget | null;
+};
+
+type WorkspacePopover = {
+  getAnimations(): readonly { pending: boolean; playState: string }[];
+  contains(target: HitTarget): boolean;
+  ownerDocument: {
+    documentElement: { clientWidth: number; clientHeight: number };
+    elementFromPoint(x: number, y: number): HitTarget | null;
+  };
+};
+
 const shellViewports = [
   { width: 1440, height: 900 },
   { width: 390, height: 844 },
@@ -195,14 +209,14 @@ for (const colorScheme of ["light", "dark"] as const) {
       const popover = page.locator('[data-slot="dropdown-menu-content"]');
       await expect
         .poll(() =>
-          popover.evaluate((element) =>
+          popover.evaluate((element: WorkspacePopover) =>
             element
               .getAnimations()
               .some((animation) => animation.pending || animation.playState === "running"),
           ),
         )
         .toBe(false);
-      const outside = await popover.evaluate((element) => {
+      const outside = await popover.evaluate((element: WorkspacePopover) => {
         const { ownerDocument } = element;
         const { clientWidth, clientHeight } = ownerDocument.documentElement;
         return [0.85, 0.15]
