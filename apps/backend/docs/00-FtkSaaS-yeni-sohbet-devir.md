@@ -178,9 +178,22 @@ Aynı makbuzla yapılan salt okunur doğrulamada organizasyon adı, owner adı v
 
 İki özgün Auth UUID’siyle native giriş geçti. Silinmiş organizasyon dizinde ve `self_context` içinde görünmedi. `organization_get_v1` ve `people_list_v1` eski kapsamı `NOT_FOUND` ile reddetti. Kontrol organizasyonu yetkili hesapla okundu. Silinmiş özel nesne okunamadı, iki kontrol nesnesinin baytları eşleşti ve anonim erişim reddedildi. İki test oturumu kapatıldı, etkin Cron ve worker sayısı sıfırdı. Açılış sonrası aynı sicil başı tekrar doğrulandı. Özetler `.artifacts/o09-managed-release/acceptance.json` ve `.artifacts/o09-managed-release/guard-after-open.json` dosyalarındadır.
 
+<a id="o10-hosted-kurtarma-olcumu"></a>
+
+**O10 hosted kurtarma ölçümü.** Sentetik recovery projesinden DB, Auth ve iki özel Storage nesnesinin ortak kurtarma noktası alındı. Kaynakta yetkili Edge okuması geçtikten sonra projenin duraklatılması olayı başlattı. Bağımsız HTTPS gözlemi erişim kaybını iki HTTP 503 ile doğruladı. Aynı snapshot, bağımsız AB R2 sicilinden doğrulandı ve geçici hosted hedefe yüklendi.
+
+| 25 Kasım 2026, UTC | Gözlem |
+|---|---|
+| 23:06:24.330 | DB/Auth/Storage ortak kurtarma noktası |
+| 23:09:24.777 | Simüle olayın başlatılması |
+| 23:11:01.018 | İlk bağımsız erişim kaybı gözlemi |
+| 23:16:59.603 | Hosted geri dönüş ve son bağımsız sicil doğrulaması |
+
+Geçici hedefte 36 tabloda 101 DB kaydı geri yüklendi. İki özgün UUID ile native Auth girişi, JWT zorunluluğu, yetkisiz kapsam retleri ve iki Storage nesnesinin baytları doğrulandı. Beş kısıtlı worker rolü ve kapalı Cron tanımı kaynakla eşleşti. Geri yüklenen raporun CSV’si kaynakla eşleşti. Yeni P06 raporu tek denemede tamamlandı ve aynı işlem anahtarı aynı işi döndürdü. RPO **3 dakika 0,447 saniye**, RTO **5 dakika 58,585 saniye** ölçüldü. Kanıt `.artifacts/o10-timed-recovery/timed-acceptance.json` dosyasındadır.
+
 Kullanıcının açık onayıyla izole `ftksaas-ops-recovery` projesine kalıcı O10 fixture’ı yüklendi. Türkçe adlar [FtkSaaS-DummyData kaynağından](https://github.com/SXQHex/FtkSaaS-DummyData/tree/5de39a32a7e4e69a7c9434528d7fb6855e6fb5ae) üretildi. 10 Business stüdyosunun her birinde 500 aktif öğrenci, özel öğrenci numarası ve beş ölçüm aktörü doğrulandı. Ölçülecek 50 borç, rezervasyon ve yoklama girdisi aktörün aynı öğrencisine bağlı. Stüdyoların merkez, salon ve dersleri ayrıdır. İletişim ve Auth adresleri test için ayrılmış `.invalid` adresleridir.
 
-58 tabloda 25.080 satırı kapsayan geri alma provası sonrası aynı paket tek transaction ile kalıcı yüklendi. Hedefteki önceki sentetik organizasyon ve üç Auth hesabı korundu. Her yeni stüdyoda bir yöneticiyle native giriş, öğrenci listesi, abone numarası ve takvim okuması geçti. Başka bir stüdyonun öğrencisi için 10 isteğin tamamı reddedildi. Güvenli özetler `.artifacts/o10-dummydata-hosted-transfer-load.json` ve `.artifacts/o10-dummydata-hosted-auth-readback.json` dosyalarındadır. Kalıcı stüdyolar, öğrenci ve ölçüm hesabı kimlikleri sonraki koşularda yeniden kullanılır. Süresi geçen seanslar ve tüketilen işlem girdileri yeniden hazırlanır. Yük, kuyruk ve finans ölçümü ile aynı tatbikatın RPO/RTO kanıtı [O10](remaining-work.md#o10) kapsamında açık.
+58 tabloda 25.080 satırı kapsayan geri alma provası sonrası aynı paket tek transaction ile kalıcı yüklendi. Hedefteki önceki sentetik organizasyon ve üç Auth hesabı korundu. Her yeni stüdyoda bir yöneticiyle native giriş, öğrenci listesi, abone numarası ve takvim okuması geçti. Başka bir stüdyonun öğrencisi için 10 isteğin tamamı reddedildi. Güvenli özetler `.artifacts/o10-dummydata-hosted-transfer-load.json` ve `.artifacts/o10-dummydata-hosted-auth-readback.json` dosyalarındadır. Kalıcı stüdyolar, öğrenci ve ölçüm hesabı kimlikleri sonraki koşularda yeniden kullanılır. Süresi geçen seanslar ve tüketilen işlem girdileri yeniden hazırlanır. Yük, kuyruk ve finans ölçümü [O10](remaining-work.md#o10) kapsamında açık.
 
 İlk hosted ölçüm dalgasında 50 isteğin 30’u başarılı oldu. Sağlayıcı logları 19 HTTP 503 gösterdi. Bir istek zaman aşımına uğradı ve log kimliği alınamadı. Başarılı cevapların işlem bazındaki kısmi p95 ölçümleri yaklaşık 37–41 saniye aralığındaydı. 12 rapor komutundan sekizi makbuz ve bekleyen iş kaydı oluşturdu, dört komutun DB’de kaydı bulunmadı. Takip eden dalgalar gönderilmedi. Güvenli tanı ve mutabakat `.artifacts/o10-dummydata-first-hosted-wave.json` dosyasındadır.
 
@@ -243,7 +256,7 @@ Davet Cron adayı, yakın tarihli gerçek tick makbuzundan sonra boş kontrolde 
 <a id="o10-yerel-business-on-olcum"></a>
 ### O10 — Yerel Business ön ölçümü
 
-10 sentetik organizasyonda 5.000 aktif öğrenci ve 50 ayrı native Auth kullanıcısıyla, her işlem için 100 örnekten oluşan 400 karışık loopback isteği çalıştı. İstek hatası görülmedi. p95 süreleri kişi listesinde 6.205 ms, kişi detayında 5.711 ms, haftalık takvimde 5.932 ms ve CSV işini başlatmada 5.856 ms oldu. Dört süre de kendi pilot hedefini aştı. 100 rapor işi, organizasyona bağlı native worker ile tek denemede işlendi. CSV checksum’ları eşleşti ve abonelik tahsilatı toplamı ile kayıt sayısı korundu. Kritik yazma iş yükü, hosted pilot gecikmesi ve pilot RPO/RTO kabulü açık.
+10 sentetik organizasyonda 5.000 aktif öğrenci ve 50 ayrı native Auth kullanıcısıyla, her işlem için 100 örnekten oluşan 400 karışık loopback isteği çalıştı. İstek hatası görülmedi. p95 süreleri kişi listesinde 6.205 ms, kişi detayında 5.711 ms, haftalık takvimde 5.932 ms ve CSV işini başlatmada 5.856 ms oldu. Dört süre de kendi pilot hedefini aştı. 100 rapor işi, organizasyona bağlı native worker ile tek denemede işlendi. CSV checksum’ları eşleşti ve abonelik tahsilatı toplamı ile kayıt sayısı korundu. Kritik yazma iş yükü ve hosted pilot gecikmesi bu yerel ölçümün ardından açık kaldı.
 
 #### O10 — Edge gecikmesi tanısı
 
@@ -271,7 +284,7 @@ Seri native program ve seans yaşam döngüsü testleri **47/47** geçti. Busine
 | Rezervasyon iptali | 3.580 | 2.000 |
 | Yoklama kapatma | 3.946 | 2.000 |
 
-Dört işlemden birer örnek aynı anahtarla tekrarlandı. 50 tahsilatın toplamı 50.000 kuruştu, ilgili 50 borç kapandı, 50 rezervasyon iptal edildi ve 50 yoklama için birer hak tüketildi. SaaS abonelik tahsilatlarının mutabakatı korundu. Dört p95 hedefi aşıldı. Tam hosted iş karışımı ve ölçülmüş RPO/RTO açık. Güvenli sonuç `.artifacts/o08-o10-operations-followup.json` makbuzundadır.
+Dört işlemden birer örnek aynı anahtarla tekrarlandı. 50 tahsilatın toplamı 50.000 kuruştu, ilgili 50 borç kapandı, 50 rezervasyon iptal edildi ve 50 yoklama için birer hak tüketildi. SaaS abonelik tahsilatlarının mutabakatı korundu. Dört p95 hedefi aşıldı. Tam hosted iş karışımı bu yerel ölçümün ardından açık kaldı. Güvenli sonuç `.artifacts/o08-o10-operations-followup.json` makbuzundadır.
 
 Aynı izole hosted projede tek geri yüklenmiş sentetik kullanıcıyla küçük bir karşılaştırma yapıldı. On eşzamanlı istekte 30 kişi listesi okumasının istemci p95’i 892 ms, sağlayıcının `x-envoy-upstream-service-time` başlığı p95’i 707 ms oldu. Seri 10 okumada bu değerler 1.203 ve 1.030 ms idi. Sağlayıcı Edge logunda 40 okumanın `execution_time_ms` p95’i 771 ms, RPC’ye gitmeyen 40 yöntem kontrolünün p95’i 103 ms oldu. Ölçüm tek organizasyon ve tek oturum kapsamındadır. Hosted kabulü için 10 organizasyon × 500 öğrenci, 50 ayrı kullanıcı ve kritik yazma karışımı gerekir. Hedefte üç Auth kullanıcısı ve iki Storage nesnesi korundu. Ölçüm özeti `.artifacts/o10-isolated-latency-diagnostic.json` dosyasındadır. [Supabase Edge log alanları](https://supabase.com/docs/guides/observability/log-field-reference).
 
