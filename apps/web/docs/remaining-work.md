@@ -8,7 +8,7 @@
 
 <a id="router-query-birlesik"></a>
 
-## Router + Query birleşik veri yaşam döngüsü (açık)
+## Router + Query birleşik veri yaşam döngüsü (kapalı)
 
 **Hedef:** Var olan Vite/React/TanStack mimarisini koruyarak güvenli, tenant kapsamlı, doğru, iptal edilebilir ve ölçülmüş en az API isteğiyle çalışan SPA. _Yeni state store, ikinci cache, genel event bus, bütün mutation'ları yeniden yazma veya ölçümsüz backend API tasarımı yapılmaz._
 
@@ -62,7 +62,7 @@
 - [x] **D01.** Özel cache, oturum geçişi ve kapsam yalıtımı.
 - [x] **D02.** Tek native yazma, makbuz ve taze sonuç doğrulaması.
 - [x] **D03.** Aynı adayda unit/MSW, statik kalite kontrolleri ve 12 Desktop Chromium shard.
-- [ ] **D04.** Aynı Playwright envanteri [dört cihaz profilinde](../scripts/browser-profiles.mjs) ayrı başarılı olmalı. Desktop Chromium ve 13,6 inç MacBook Air ekranıyla Desktop WebKit masaüstü girdilerini kullanır. Pixel 7 Mobile Chromium ve iPhone 15 Mobile WebKit dokunma kontrollerini kullanır. Masaüstü klavye erişilebilirliği, mobil dokunma ve kaydırma ile mevcut yetki, yazma ve readback kontrolleri korunur. Güvenilir CI matrisi ancak açık inceleme ve politika kurulumu ile geri getirilir.
+- [x] **D04.** Dört Ubuntu tarayıcı profilinin otomatik kabulü tamamlandı. [Kaynak, CI ve yayın kanıtı](handover.md#d-birlesik-kabul).
 - [x] **D05.** Main kabulü, Cloudflare yayını ve ilgili gerçek sağlayıcı kontrolleri.
 
 [Birleşik regresyon, kaynak ve yayın kanıtı](handover.md#d-birlesik-kabul).
@@ -85,4 +85,4 @@
 ## Bağımsız eski teslim kontrolleri (açık)
 
 - [x] **MONO-01 · Eski kabulün sonlandırılması.** Taşıma adayının ortak CI kabulü ve yayımlı sürümü aynı Git ağacına bağlandı. [Kaynak ve Cloudflare kanıtı](handover.md#monorepo-teslim-kabulu)
-- [ ] **MONO-02 · Kişisel ICS derin linkleri.** Eski org + seans rotasının frontend uygulaması ve regresyonları hazır. Kapanış için aday CI ve yayımlı SPA'da gerçek ICS bağlantısından giriş yaparak öğrenci ve eğitmen ekranlarında canlı merkez ve rol eşleşmesi doğrulanır. [Kaynak ve ortam](handover.md#mono-02-kaynak-ve-ortam) · [İstemci protokolü](../../../docs/client-integration.md#statik-spa-transportu)
+- [ ] **MONO-02 · Kişisel ICS derin linkleri.** Yayımlı SPA’ya gerçek ICS bağlantısından giriş yaparak öğrenci ve eğitmen ekranlarında canlı merkez ve rol eşleşmesini doğrula. [Kaynak ve ortam](handover.md#mono-02-kaynak-ve-ortam) · [İstemci protokolü](../../../docs/client-integration.md#statik-spa-transportu)
