@@ -2037,6 +2037,7 @@
         "apps/backend/supabase/migrations/20261124224225_organization_contact_erasure.sql",
         "apps/backend/supabase/migrations/20261124224526_p07_storage_import_erasure.sql",
         "apps/backend/scripts/p07-storage-erasure.mjs",
+        "apps/backend/scripts/legacy-import-erasure-evidence.mjs",
         "apps/backend/supabase/migrations/20261124230652_organization_export_and_source_erasure.sql",
         "apps/backend/supabase/migrations/20261124230835_organization_operational_erasure.sql",
         "apps/backend/supabase/migrations/20261124233740_organization_import_copy_erasure.sql",
@@ -2089,8 +2090,8 @@
         "platform_operator_access_set_v1"
       ],
       "review": {
-        "fingerprint": "cd91cb780cf4d6eb0c429d3a784afea06bf88cabcbafc6c195c2cfa8db680ccc",
-        "reason": "Karma import bağımsız makbuz sayımlarıyla ve kapanmış ücretli satışın finans sınırıyla incelendi."
+        "fingerprint": "69bcfa4f13399e5e842da452e24fb30c2256f8b0a3d9a8ee8aa07f86b43714d8",
+        "reason": "Eski öğrenci importunda checksum, özgün P06 eşlemesi ve uygulanmış önizleme eşleşmeden satır kanıtı yazılmaz."
       }
     },
     {
@@ -2285,6 +2286,7 @@
         "apps/backend/supabase/migrations/20261124224225_organization_contact_erasure.sql",
         "apps/backend/supabase/migrations/20261124224526_p07_storage_import_erasure.sql",
         "apps/backend/scripts/p07-storage-erasure.mjs",
+        "apps/backend/scripts/legacy-import-erasure-evidence.mjs",
         "apps/backend/supabase/migrations/20261124230652_organization_export_and_source_erasure.sql",
         "apps/backend/supabase/migrations/20261124230835_organization_operational_erasure.sql",
         "apps/backend/supabase/migrations/20261124233740_organization_import_copy_erasure.sql",
@@ -2315,8 +2317,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "15e86f12068646d3ba51f0a65273c8b8438877d6587071dc3e0f7c1b3463567e",
-        "reason": "P07 karma satır, saklama, Storage makbuzu ve restore kabulü mevcut testler korunarak eşlendi."
+        "fingerprint": "816c44d3e8c42cd1de2a6267ae6c339589faa167885ec190eb504fce5884b06d",
+        "reason": "Eski P06 satırlarının özeti checksum ve canlı claim ile geri kurulur. Kaynak ve Storage kapsamı commit boyunca sabitlenir."
       }
     }
   ]

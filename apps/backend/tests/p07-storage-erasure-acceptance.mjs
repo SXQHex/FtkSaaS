@@ -4,6 +4,7 @@ import pg from 'pg';
 import {preparationFixture} from './starter-preparation-fixture.mjs';
 import {authUser,context,must} from './api-client.mjs';
 import {eraseExpiredImportObject} from '../scripts/p07-storage-erasure.mjs';
+import {recoverLegacyImportEvidence} from '../scripts/legacy-import-erasure-evidence.mjs';
 import {tick as buildReports} from '../scripts/p06-worker.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
 import {verifyErasureReceiptRestore} from './native-erasure-restore-fixture.mjs';
@@ -111,13 +112,20 @@ export async function verifyNativeStorageErasure(){
   const mixedColumns=['source_key','display_name','person_ref'];
   const mixedBytes=Buffer.from(mixedColumns.join(',')+'\r\napplied,Synthetic accepted row,\r\nrejected,,'+rejectedPerson.toUpperCase()+'\r\n,,\r\n');
   const mixed=await pendingImport('synthetic mixed source',mixedBytes,mixedColumns);
+  const legacy=await pendingImport('synthetic previously scrubbed source',mixedBytes,mixedColumns);
   const pending=await pendingImport('synthetic pending source');
   preservedControls.add(pending.file.path);
-  for(const item of [processed,mixed]){
+  for(const item of [processed,mixed,legacy]){
    const apply=await must(owner,'preview_get_v1',{org_id:org,center_id:center,preview_id:item.previewId});
    await must(owner,'import_apply_v1',{org_id:org,center_id:center,preview:{id:apply.id,token:apply.token}},key());
    await runP06();
   }
+  // Reproduce the persisted state left by copy erasure before rejected-row witnesses existed.
+  const legacyCopies=await copies(legacy);
+  await db.query("update core.import_rows set payload='{}',version=version+1 where job_id=$1 and payload<>'{}'",[legacy.jobId]);
+  await db.query('delete from private.p06_previews where preview_id=$1',[legacy.previewId]);
+  await db.query('delete from private.preview_payloads where preview_id=$1',[legacy.previewId]);
+  await db.query('delete from private.p06_contexts where receipt_id=any($1::uuid[])',[legacyCopies.contexts.map(row=>row.receipt_id)]);
   const processingBefore=await rowPayload(processed.jobId);
   const mixedRows=()=>q('select id,payload,state,source_key,created_references from core.import_rows where job_id=$1 order by row_number',[mixed.jobId]);
   const mixedBefore=await mixedRows();
@@ -146,7 +154,7 @@ export async function verifyNativeStorageErasure(){
   const contactId=key();
   await db.query("insert into core.person_contacts(id,org_id,person_id,kind,value) values($1,$2,$3,'email',$4)",
    [contactId,org,rejectedPerson,'rehearsal-'+contactId+'@ftksaas.invalid']);
-  const objectIds=[target.objectId,ready.objectId,processed.file.objectId,mixed.file.objectId];
+  const objectIds=[target.objectId,ready.objectId,processed.file.objectId,mixed.file.objectId,legacy.file.objectId];
   const before={
    contacts:await q('select id from core.person_contacts where id=$1',[contactId]),
    objects:await q('select id from storage.objects where id=any($1::uuid[])',[[...objectIds,control.objectId]]),
@@ -170,7 +178,7 @@ export async function verifyNativeStorageErasure(){
   const invoke=(fileId,fetcher)=>eraseExpiredImportObject({db:worker,attestor,request,fileId,serviceKey:SERVICE_ROLE_KEY,apiUrl:API_URL,fetcher});
   const proof=()=>q('select file_id,object_id,removed_bytes,checksum from private.p07_storage_erasures where request_id=$1',[requestId]);
   assert.deepEqual(await invoke(target.id),{state:'unbound'});
-  for(const file of [target,unknown,control,ready,linked,processed.file,mixed.file,pending.file]){
+  for(const file of [target,unknown,control,ready,linked,processed.file,mixed.file,legacy.file,pending.file]){
    await db.query('insert into private.p07_storage_erasure_scopes(db_role,request_id,file_id,provider_origin,attestor_role) values($1,$2,$3,$4,$5)',[role,requestId,file.id,new URL(API_URL).origin,attestorRole]);
   }
   const approvalSql=`insert into private.organization_import_source_erasure_approvals
@@ -182,6 +190,7 @@ export async function verifyNativeStorageErasure(){
   await assert.rejects(invoke(processed.file.id),/FORBIDDEN/);
   await db.query(approvalSql,approvalValues(mixed.file,mixed.jobId));
   await assert.rejects(invoke(mixed.file.id),/FORBIDDEN/);
+  await db.query(approvalSql,approvalValues(legacy.file,legacy.jobId));
   await db.query(approvalSql,approvalValues(pending.file,pending.jobId));
   await db.query(approvalSql,approvalValues(linked,linkedJobId));
   await assert.rejects(invoke(control.id),/FORBIDDEN/);
@@ -416,6 +425,78 @@ export async function verifyNativeStorageErasure(){
   const denial=await denied.json();
   assert.equal(denial.ok,false);
   assert.equal(denial.error.code,'SERVICE_UNAVAILABLE');
+  const recover=(fileId,overrides={})=>recoverLegacyImportEvidence({
+   db,request,fileId,apiUrl:API_URL,serviceKey:SERVICE_ROLE_KEY,...overrides
+  });
+  const legacyWitnesses=()=>q(`select r.state,r.version,e.person_reference_sha256
+   from private.organization_import_rejected_row_evidence e join core.import_rows r on r.id=e.import_row_id
+   where e.request_id=$1 and e.file_id=$2 order by r.row_number`,[requestId,legacy.file.id]);
+  const rejectBeforeRead=async(fileId,options={})=>{
+   let reads=0;
+   await assert.rejects(recover(fileId,{...options,fetcher:async()=>{reads++;throw Error('Unexpected Storage read');}}),
+    /IMPORT_EVIDENCE_SOURCE_UNCONFIRMED/);
+   assert.equal(reads,0);
+  };
+  const pristineLegacyWitness={state:'invalid',version:'1',person_reference_sha256:null};
+  await assert.rejects(invoke(legacy.file.id),/FORBIDDEN/);
+  await assert.rejects(recover(legacy.file.id,{db:worker}),/permission denied/);
+  await rejectBeforeRead(pending.file.id);
+  const [{lease_hash:claimHash}]=await q('select lease_hash from private.p07_privacy_jobs where id=$1',[job_id]);
+  await db.query('update private.p07_privacy_jobs set lease_hash=null,operation_key=null where id=$1',[job_id]);
+  try{
+   await rejectBeforeRead(legacy.file.id,{request:{job_id,org_id:org}});
+  }finally{
+   await db.query('update private.p07_privacy_jobs set lease_hash=$2,operation_key=$3 where id=$1',
+    [job_id,claimHash,request.operation_key]);
+  }
+  await rejectBeforeRead(legacy.file.id,{apiUrl:'https://'+'a'.repeat(20)+'.supabase.co'});
+  await assert.rejects(recover(legacy.file.id,{fetcher:async()=>new Response('x'.repeat(mixedBytes.length),{
+   headers:{'content-type':'text/csv'}
+  })}),/IMPORT_EVIDENCE_SOURCE_UNCONFIRMED/);
+  const [{mapping:legacyMapping}]=await q('select mapping from core.import_jobs where id=$1',[legacy.jobId]);
+  const hiddenReference={...legacyMapping,columns:legacyMapping.columns.filter(column=>column.target!=='person_ref')};
+  const setMapping=mapping=>db.query('update core.import_jobs set mapping=$2 where id=$1',[legacy.jobId,mapping]);
+  const setWorkerMapping=mapping=>db.query("update private.p06_jobs set request=jsonb_set(request,'{mapping}',$2) where job_id=$1",
+   [legacy.jobId,mapping]);
+  try{
+   await setMapping(hiddenReference);
+   await rejectBeforeRead(legacy.file.id);
+   await setWorkerMapping(hiddenReference);
+   await rejectBeforeRead(legacy.file.id);
+  }finally{
+   await setMapping(legacyMapping);
+   await setWorkerMapping(legacyMapping);
+  }
+  try{
+   await assert.rejects(recover(legacy.file.id,{fetcher:async(url,options)=>{
+    const response=await fetch(url,options);
+    await setMapping({...legacyMapping,delimiter:';'});
+    return response;
+   }}),/IMPORT_EVIDENCE_SOURCE_UNCONFIRMED/);
+  }finally{await setMapping(legacyMapping);}
+  assert.deepEqual(await legacyWitnesses(),[pristineLegacyWitness]);
+  const [legacyRejected]=await q("select id,source_key from core.import_rows where job_id=$1 and row_number=2",[legacy.jobId]);
+  await db.query("update core.import_rows set source_key='wrong synthetic key' where id=$1",[legacyRejected.id]);
+  try{await assert.rejects(recover(legacy.file.id),/IMPORT_EVIDENCE_ROWS_UNCONFIRMED/);}
+  finally{await db.query('update core.import_rows set source_key=$2 where id=$1',[legacyRejected.id,legacyRejected.source_key]);}
+  assert.deepEqual(await legacyWitnesses(),[pristineLegacyWitness]);
+  await retainRejected('core.people',rejectedPerson);
+  try{
+   assert.deepEqual(await recover(legacy.file.id),{recovered:1});
+   assert.deepEqual(await recover(legacy.file.id),{recovered:0});
+   assert.deepEqual(await legacyWitnesses(),[
+    {state:'invalid',version:'2',person_reference_sha256:createHash('sha256').update(requestId+':'+rejectedPerson).digest('hex')},
+    pristineLegacyWitness
+   ]);
+   assert.deepEqual(await invoke(legacy.file.id),{state:'held'});
+   assert.equal(await byteHash(await read(legacy.file)),legacy.file.checksum);
+  }finally{await releaseRejected();}
+  assert.deepEqual(await invoke(legacy.file.id),{state:'completed'});
+  assert.deepEqual((await proof()).filter(p=>p.file_id===legacy.file.id),
+   [{file_id:legacy.file.id,object_id:legacy.file.objectId,removed_bytes:String(legacy.file.size),checksum:legacy.file.checksum}]);
+  for(const response of [await read(legacy.file),await fetch(legacy.file.downloadUrl),await legacy.file.write()]){
+   assert.equal(response.ok,false);await response.body?.cancel();
+  }
   await verifyErasureReceiptRestore({
    db,dbUrl:DB_URL,requestId,orgId:org,contactId,objectIds,controlId:control.objectId,exportId:report.file_id,before
   });
