@@ -1307,8 +1307,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "0c313112e9a8e50ae469e3dad101d5456ae0acf16a320a602d416f37781d0f03",
-        "reason": "Worker girişi klasik ve yeni kiplerin aynı tam public yanıt assertion gövdelerini çalıştırır."
+        "fingerprint": "008d9cd78e003cd1e30641b94be93ba3358fac0603f324721555c6b6ed74fb2e",
+        "reason": "Geliştirme takvim kurulum şablonu doğrulanmış yayımlı SPA adresini kullanır. S15 tarayıcı doğrulaması gerçek ICS giriş dönüşünde seans, merkez ve canlı rolü denetler. Takvim kapsamı, native doğrulama ve geçici bağlantı yaşam döngüsü korunur."
       }
     },
     {
