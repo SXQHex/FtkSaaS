@@ -76,7 +76,11 @@ jobs:
         with:
           node-version-file: 'source/.nvmrc'
       - if: needs.selection.outputs.setup == 'true'
-        run: corepack enable
+        run: |
+          if [[ "$(node -p 'process.versions.node.split(".")[0]')" -ge 25 ]]; then
+            npm install --global corepack@0.36.0
+          fi
+          corepack enable
       - if: needs.selection.outputs.setup == 'true'
         run: pnpm --filter @ftksaas/backend... --filter ftksaas install --frozen-lockfile
         working-directory: source
@@ -126,7 +130,11 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: 'source/.nvmrc'
-      - run: corepack enable
+      - run: |
+          if [[ "$(node -p 'process.versions.node.split(".")[0]')" -ge 25 ]]; then
+            npm install --global corepack@0.36.0
+          fi
+          corepack enable
       - run: pnpm --filter @ftksaas/backend... --filter ftksaas install --frozen-lockfile
         working-directory: source
       - name: Selected API shard

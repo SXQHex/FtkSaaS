@@ -1,5 +1,12 @@
 # Güncel kaynak ve kabul
 
+<a id="backend-arac-zinciri-node26"></a>
+## Backend ve kök araç zinciri — Node 26 LTS
+
+25 Kasım 2026’da yükseltme adayı main `f622f8e4954148e51051a35ae99e9c86e9ba8d4f` üzerine alındı. [Taban SHA’nın main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/45517163690) başarılı. Yükseltme adayı [workspace pinlerini](../../../docs/monorepo.md#sürüm-ve-paket-yönetimi) Node 26 LTS’ye taşır. pnpm’in yayın yaşı denetimi CLI 3.4.0’ı reddetti ve denetimden geçen son Supabase CLI 3.3.0 seçildi. [XREQ-072 arşivi ve ELF doğrulaması](#xreq-072-runtime-adayi) adayda aynı kaynakla korunuyor.
+
+Son tabanda kalite, belge, workspace tip kontrolü, Actionlint ve yerel seans, takvim ve e-posta testleri (50/50) geçti. Yükseltme dalının ilk tabanında frozen kurulum, frontend birim testleri (1194/1194) ve üretim derlemesi geçti. İlk tabandaki backend verify içinde 623 test geçti ve Linux `/proc` bekleyen mevcut gözlemci testi macOS’ta başarısız oldu. Yeni CLI ile yamalı Linux amd64 ikilisinin kurulum doğrulaması [`ubuntu-latest` kullanan aday full clean’de](../../../.github/workflows/clean-suite.yml) yapılır.
+
 <a id="o03-o10-isletim-kaniti"></a>
 ## O03–O10 — Saklama, imha ve kurtarma kabulü
 

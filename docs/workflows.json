@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "a053ba45e01c36d7a810c1959a32dc97470edc0358fc5bcec3aeea307ff355ba",
-        "reason": "Migration envanteri ve ortak native sözleşme kapsamı doğrulandı."
+        "fingerprint": "c023eb73e2dc78c049936ecf2ec3a75112648571cb1fb661e768beabc9cd5518",
+        "reason": "Node LTS ve pnpm pinleri güncellendi. Frozen kurulum ve API kapsamı korunuyor. Onaylı inceleme kaydı yalnız pnpm sürüm beklentisine bağlı."
       }
     },
     {
@@ -2266,8 +2266,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "f2f972d97a832193a8ee928732804b537b0cb03782f9c48577134b94e0e4c552",
-        "reason": "Terminal importun kaynak eşliği, saklama blokajları ve exact worker bağlantısı incelendi."
+        "fingerprint": "fc9c163b9de3b8e9d334dacd4c96934a78180e521219f9d4cb14f58528a7ec46",
+        "reason": "Standard Webhooks güncellemesi yerleşik imza doğrulama sınırını ve Resend yanıt sözleşmesini koruyor."
       }
     }
   ]
