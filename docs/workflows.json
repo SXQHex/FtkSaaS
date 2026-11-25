@@ -321,8 +321,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "93da7844bb0f739b4482d44ae9804375d680eb2937af615c3f0589f5753b4fc5",
-        "reason": "Hesap profil seçicisi mevcut canlı doğrulamadan sonra aynı kimlik alanlarını tek projeksiyondan okur. Davet tekrar ve health kabul kapsamı güncellendi."
+        "fingerprint": "c3bb3e3b1aa75074da09c4b0092bc1ed03ea1ca9b1dbec49bbd4d27794c70bf5",
+        "reason": "Hesap ve davet kabulü incelendi. API envanterinde davet testinin kaynak parmak izi güncellendi; sahiplik, seri çalışma ve kontrol kuralları aynı."
       }
     },
     {
