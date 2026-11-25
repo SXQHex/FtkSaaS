@@ -251,5 +251,6 @@
   "20261125054500_organization_linked_import_source_erasure.sql": "bf5d552a50b949dd05bbedaed14e537c09f1d924e02cf9493233dfae4f9275a0",
   "20261125055500_organization_linked_import_storage_attestation.sql": "a9e273d0f4170adecc121551755d4f9c756629f0bd12fbd21c4255444ab3d1ac",
   "20261125060500_organization_import_rejected_row_hold_evidence.sql": "c9fa85409327b753d6d88da013c4384e040ed28c2fc31e56b67f287864c9a8fc",
-  "20261125061500_organization_import_directory_erasure.sql": "e8c44954356fe60b177ce8612b34d0300bd3d013421a99d8d3188174b99b1607"
+  "20261125061500_organization_import_directory_erasure.sql": "e8c44954356fe60b177ce8612b34d0300bd3d013421a99d8d3188174b99b1607",
+  "20261125062500_crm_import_copy_retention_holds.sql": "767f47b3fc53f36397ab1fba8af2c7dca8d2705a0bcd81a972f4e420d76a9b17"
 }

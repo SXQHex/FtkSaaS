@@ -13,6 +13,7 @@ import {verifySettledBillingErasure} from './p07-billing-archive-fixture.mjs';
 import {verifyBillingHistoryErasure} from './p07-billing-history-fixture.mjs';
 import {verifySignedDocumentErasure} from './p07-signed-document-erasure-fixture.mjs';
 import {verifyOrganizationPaidSaleRetention} from './p07-organization-sale-fixture.mjs';
+import {verifyCrmImportCopyHolds} from './p07-crm-import-hold-fixture.mjs';
 import {seedPublishedInvoice,verifyArchivedInvoiceRemoval,verifyPublishedInvoiceArchive} from './p07-invoice-archive-fixture.mjs';
 
 export async function verifyOrganizationErasure(t){
@@ -228,6 +229,8 @@ export async function verifyOrganizationErasure(t){
   });
   await t.test('a terminated, fully collected learner sale retains the financial graph until archive eligibility',
    verifyOrganizationPaidSaleRetention);
+  await t.test('CRM import copies honor holds on the reviewed applicant, contact and lead',
+   nested=>verifyCrmImportCopyHolds(nested,{workerRole:role,claim,execute,controlOrg:otherOrg}));
  }finally{
   for(const session of sessions)await session.end();
   for(const role of roles){

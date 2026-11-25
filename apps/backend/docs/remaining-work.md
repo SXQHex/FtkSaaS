@@ -940,7 +940,7 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 - **Sınır/olumsuz durum:** Metadata silmek bayt silmek değildir; izinli hold ve retry sınırları korunur.
 - **Doğrulama senaryosu:** Dosya/download kalıntısı, kesinti/retry ve expiry; checksum/envanter ile kanıt.
 - **Kaynak alanı:** Storage/export/temp executor; ilgili acceptance
-- **Kalan:** Özgün dosya veya satır eşliği doğrulanamayan eski import dosyaları, diğer işleme/aktarım kopyaları ve aktif kullanıma bağlı belge dosyaları için gerekli saklama kararı ile bayt ve indirme yokluğu kabulü. Fatura, yüklemeli imzalı belge, güncel/geçmiş logo ve satış önizlemesi içeren [karma R2 tatbikatında dosya makbuzu](00-FtkSaaS-yeni-sohbet-devir.md#o06-r2-pilot) tamamlandı.
+- **Kalan:** Özgün dosya veya satır eşliği doğrulanamayan eski import dosyaları, CRM kaynak CSV’si, diğer işleme/aktarım kopyaları ve aktif kullanıma bağlı belge dosyaları için gerekli saklama kararı ile bayt ve indirme yokluğu kabulü. Fatura, yüklemeli imzalı belge, güncel/geçmiş logo ve satış önizlemesi içeren [karma R2 tatbikatında dosya makbuzu](00-FtkSaaS-yeni-sohbet-devir.md#o06-r2-pilot) tamamlandı.
 
 **DB export dilimi:** Hesap silme talebinde exact rol/hesap bağlantısı, tam report/job/file sahipliği, hold ve canlı lease kontrolüyle yalnız geçici DB export baytları kaldırılır. Olağan expiry de aynı hold/proof yolunu bounded100 dosyalık adımlarda kullanır; gerçek boyut/hash ve değişmez minimal kanıt atomiktir. Kaynak import dosyaları, tenant belge/kişi/finans ve rapor metadata'sı korunur. Bu alt aşama genel exports/Storage/backup veya privacy tamamlandı anlamına gelmez. Kaynak/native/CI/hosted ayrımı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#pro-export-saklama-ve-imha-paketi) tutulur.
 
@@ -948,7 +948,7 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 
 **Native Storage dilimi:** [Yerel disk baytı](00-FtkSaaS-yeni-sohbet-devir.md#o03-o10-guncel-isletim-kontrolleri) ve [ayrı hosted hedefte eski imzalı URL ile yönetici okumasının reddi](00-FtkSaaS-yeni-sohbet-devir.md#o08-hosted-sentetik-restore) doğrulandı. Privacy işinde Storage hold ve geçici kopyaların imhası açık.
 
-**Geçici takip kopyaları:** Önizleme ve işlem bağlamı kopyalarının hold kontrollü expiry temizliği [aday, main ve development kabulünü](00-FtkSaaS-yeni-sohbet-devir.md#o05-gecici-takip-kopyalari) geçti. Bir sonraki Storage kabulünün [nesne envanteri](00-FtkSaaS-yeni-sohbet-devir.md#o05-storage-envanter-kabul) ve [doğrulama sınırı](remote-backend-setup.md#o05-storage-on-kontrolu) kayıtlıdır.
+**Geçici takip kopyaları:** Önizleme ve işlem bağlamı kopyalarının hold kontrollü expiry temizliği [aday, main ve development kabulünü](00-FtkSaaS-yeni-sohbet-devir.md#o05-gecici-takip-kopyalari) geçti. [CRM aktarım kopyalarındaki bağlı kayıt blokajları](00-FtkSaaS-yeni-sohbet-devir.md#o05-crm-import-kopyasi) izole native kabulü geçti. Bir sonraki Storage kabulünün [nesne envanteri](00-FtkSaaS-yeni-sohbet-devir.md#o05-storage-envanter-kabul) ve [doğrulama sınırı](remote-backend-setup.md#o05-storage-on-kontrolu) kayıtlıdır.
 
 **Süresi dolmuş import yüklemeleri:** Bağlı P07 worker, tamamlanmamış import yüklemesinin bağımsız Storage bağını, güncel blokajı ve bayt özetini doğrular. Ayrı attestor, API ile silme ve yetkili nesne yokluğu doğrulandıktan sonra değişmez makbuzu yazar. [Native aday ve development teslimi](00-FtkSaaS-yeni-sohbet-devir.md#o04-o07-kapanis-tatbikati) doğrulandı. Hazır iş belgeleri, kaynak dosyalar ve diğer geçici aktarım yüzeylerinin kabulü açık.
 

@@ -443,6 +443,8 @@ Daha eski bir öğrenci importu için [`recoverLegacyImportEvidence`](../scripts
 
 CSV’nin aynı talebe ait silme makbuzu, tamamlanmış P06 işi ve dizin arşiv onayı varsa aynı dizin işlemi import işini, satırları, önizlemeyi, kuyruk ve kaynak eşlemesini kaldırır. Önizleme isteğinin audit olayı üretmeyen kanonik işlem kaydı, yalnız aynı işe bağlıysa tanınır. Aktif, saklama blokajlı, mali kayıt üreten veya bağı doğrulanamayan importlar işlemi durdurur. Kalan dosya üst verisinde merkez ve kişi bağı kaldırılır. Storage makbuzu için dosya kimliği ve checksum tutulur. Ham CSV, kaynak anahtarı ve eşleme arşiv içeriğine girmez.
 
+CRM geçici kopyalarında başvuruya sonradan bağlanan kişi, onun irtibatı veya aynı merkeze bağlı CRM kaydı üzerinde blokaj varsa P06 olağan expiry ve P07 imha adımları o kapsamı korur. Bağ, P06 kaynak kaydı ve mevcut başvuru üzerinden doğrulanır. Özgün CRM CSV’si ve başvuruya taşınmış rıza kanıtı için saklama kararı ayrı gerekir.
+
 Yetkili işletim bağlantısında yalnız sayım al. Sorgu, `ftksaas-imports` nesnelerini beklenen organizasyon/dosya yolu, dosya amacı ve P06 sahiplik kaydı ile eşler. Hazır kaynakları, eşleşmesi belirsiz nesneleri ve süresi dolmuş bekleyen yüklemeleri tespit eder. Hesap blokajı organizasyonlar arasında, kayıt ve organizasyon blokajı kendi kapsamlarında geçerlidir.
 
 ```sql
