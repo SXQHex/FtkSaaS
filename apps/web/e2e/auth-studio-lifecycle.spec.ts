@@ -1,6 +1,7 @@
 import { activate, attemptOutsideDismissal } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { scanAccessibility } from "./accessibility.js";
+import { assertLayoutFit, readLayoutFit } from "./layout.js";
 import { mockStudio, openStudio, studioIds as I } from "./studio-fixture.js";
 
 for (const code of ["FORBIDDEN", "NOT_FOUND"] as const) {
@@ -46,6 +47,17 @@ for (const code of ["FORBIDDEN", "NOT_FOUND"] as const) {
     ).toBeVisible();
     expect(state.writes.filter(({ payload }) => payload.action === "retire")).toHaveLength(1);
     expect(state.rules[0]?.active).toBe(false);
+
+    const viewport = page.viewportSize()!;
+    try {
+      await page.setViewportSize({ width: 320, height: 480 });
+      await expect(async () => assertLayoutFit(await readLayoutFit(page))).toPass({
+        timeout: 5_000,
+      });
+      await expect(dialog.getByRole("button", { name: "Vazgeç", exact: true })).toBeEnabled();
+    } finally {
+      await page.setViewportSize(viewport);
+    }
   });
 }
 

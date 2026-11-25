@@ -291,6 +291,10 @@ test("an open accepted agreement waits for current evidence after native reauthe
     const reauth = otherTab.getByRole("dialog");
     await reauth.getByLabel("Parola", { exact: true }).fill("fixture-password");
     await activate(reauth.getByRole("button", { name: "Devam et", exact: true }));
+    await expect(
+      reauth.getByRole("button", { name: common.sessions.confirmOthers, exact: true }),
+    ).toBeEnabled();
+    await page.bringToFront();
     await expect.poll(() => f.documentRead.waiting).toBe(true);
     await expect(f.panel).toBeVisible();
     await expect(f.panel.getByText(common.memberDocuments.loading, { exact: true })).toBeVisible();

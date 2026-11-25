@@ -6,6 +6,7 @@ import {
   publicDisciplineId,
   otherDisciplineId,
   publicForm,
+  mockPublicCalendar,
 } from "./public-calendar-fixture.js";
 const reload = async (page: import("@playwright/test").Page) => {
   await page.reload();
@@ -73,9 +74,9 @@ test("published event occupancy and instructors remain independent from private 
 test("an open bound form alone supplies public application links while preserving center scope", async ({
   page,
 }) => {
-  const state = await prepare(page);
+  const state = await mockPublicCalendar(page);
   state.packet.application = { state: "open", form: structuredClone(publicForm) };
-  await reload(page);
+  await page.goto(`/public/test-studio/calendar?center_id=${id}`);
   const href = `/public/test-studio/apply?center_id=${id}`;
   await expect(page.getByRole("link", { name: "Başvur", exact: true }).first()).toHaveAttribute(
     "href",

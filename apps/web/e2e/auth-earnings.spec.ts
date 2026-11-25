@@ -52,11 +52,25 @@ test("payment refreshes historical period and person cursor pages after native r
       exact: true,
     }),
   );
-  await page.getByRole("combobox", { name: "Eğitmen", exact: true }).selectOption(I.instructor);
-  await expect(page.getByRole("combobox", { name: "Eğitmen", exact: true })).toHaveValue(
-    I.instructor,
-  );
+  const instructor = page.getByRole("combobox", { name: "Eğitmen", exact: true });
+  const [filtered] = await Promise.all([
+    page.waitForResponse((response) => {
+      if (
+        !response.url().endsWith("/backend-v1/instructor_finance_directory_get_v1") ||
+        response.request().method() !== "POST"
+      )
+        return false;
+      const request = response.request().postDataJSON();
+      return request.view === "instructors" && request.person_id === I.instructor;
+    }),
+    instructor.selectOption(I.instructor),
+  ]);
+  expect(await filtered.json()).toMatchObject({ ok: true });
+  await expect(instructor).toHaveValue(I.instructor);
   await expect(page.getByRole("row").filter({ hasText: "Örnek Eğitmen" })).toBeVisible();
+  if (hasTouchInput(page)) {
+    await activate(page.getByRole("heading", { name: "Hakediş", exact: true }));
+  }
   const entries = page.getByRole("tab", { name: "Satırlar", exact: true });
   await activate(entries);
   await expect(entries).toHaveAttribute("aria-selected", "true");
