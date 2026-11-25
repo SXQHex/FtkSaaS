@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "07e8bd30871c2c03e52d2d4262665cfbba930327f495d4f6f150bb21247b6d1d",
-        "reason": "Ortak sözleşme ve 252 migration envanteri kaynakla eşlendi."
+        "fingerprint": "4f95de213f3ea28f9ae801cdc032d69b62ffaca5a5a9255c5bdb40498a85d8ef",
+        "reason": "Kapanıştaki özgün CSV imha kanıtı mevcut alım ve kaynak protokolüyle aynı sınırda kalır."
       }
     },
     {
@@ -1958,7 +1958,8 @@
         "apps/backend/tests/p07-signed-document-erasure-fixture.mjs",
         "apps/backend/tests/p07-organization-media-fixture.mjs",
         "apps/backend/tests/p07-organization-sale-fixture.mjs",
-        "apps/backend/tests/p07-organization-directory-fixture.mjs"
+        "apps/backend/tests/p07-organization-directory-fixture.mjs",
+        "apps/backend/tests/p07-organization-import-fixture.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -2065,7 +2066,8 @@
         "apps/backend/supabase/migrations/20261125053500_organization_erasure_abandoned_previews.sql",
         "apps/backend/supabase/migrations/20261125054500_organization_linked_import_source_erasure.sql",
         "apps/backend/supabase/migrations/20261125055500_organization_linked_import_storage_attestation.sql",
-        "apps/backend/supabase/migrations/20261125060500_organization_import_rejected_row_hold_evidence.sql"
+        "apps/backend/supabase/migrations/20261125060500_organization_import_rejected_row_hold_evidence.sql",
+        "apps/backend/supabase/migrations/20261125061500_organization_import_directory_erasure.sql"
       ],
       "operations": [
         "account_delete_preview_v1",
@@ -2090,8 +2092,8 @@
         "platform_operator_access_set_v1"
       ],
       "review": {
-        "fingerprint": "69bcfa4f13399e5e842da452e24fb30c2256f8b0a3d9a8ee8aa07f86b43714d8",
-        "reason": "Eski öğrenci importunda checksum, özgün P06 eşlemesi ve uygulanmış önizleme eşleşmeden satır kanıtı yazılmaz."
+        "fingerprint": "9172c1afc6bea8145110a24adbf9f11be59bed48da275023a646997e5a6d35c4",
+        "reason": "Doğrulanmış öğrenci importunun DB kayıtları arşiv onayı, güncel blokaj kontrolü ve aynı birleşik imha makbuzuna bağlanır."
       }
     },
     {
@@ -2302,7 +2304,8 @@
         "apps/backend/supabase/migrations/20261125053500_organization_erasure_abandoned_previews.sql",
         "apps/backend/supabase/migrations/20261125054500_organization_linked_import_source_erasure.sql",
         "apps/backend/supabase/migrations/20261125055500_organization_linked_import_storage_attestation.sql",
-        "apps/backend/supabase/migrations/20261125060500_organization_import_rejected_row_hold_evidence.sql"
+        "apps/backend/supabase/migrations/20261125060500_organization_import_rejected_row_hold_evidence.sql",
+        "apps/backend/supabase/migrations/20261125061500_organization_import_directory_erasure.sql"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -2317,8 +2320,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "816c44d3e8c42cd1de2a6267ae6c339589faa167885ec190eb504fce5884b06d",
-        "reason": "Eski P06 satırlarının özeti checksum ve canlı claim ile geri kurulur. Kaynak ve Storage kapsamı commit boyunca sabitlenir."
+        "fingerprint": "d57644e0ea35fbcd66bf223bc3fe6c0d381508273ae52e2a02b1ebef95db1a26",
+        "reason": "Terminal P06 işi Storage makbuzundan sonra dizin arşiviyle atomik kaldırılır; açık ve mali izli işler korunur."
       }
     }
   ]

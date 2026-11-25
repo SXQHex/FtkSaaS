@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {seedOrganizationMedia,verifyOrganizationMediaErasure} from './p07-organization-media-fixture.mjs';
 import {verifyOrganizationSaleErasure} from './p07-organization-sale-fixture.mjs';
 import {verifyOrganizationDirectoryErasure} from './p07-organization-directory-fixture.mjs';
+import {seedOrganizationStudentImport} from './p07-organization-import-fixture.mjs';
 import {readMixedErasureProjection,verifyOrganizationProjectionRestore} from './native-organization-erasure-restore-fixture.mjs';
 import {verifySettledBillingErasure} from './p07-billing-archive-fixture.mjs';
 import {verifyBillingHistoryErasure} from './p07-billing-history-fixture.mjs';
@@ -9,6 +10,7 @@ import {seedPublishedInvoice,verifyArchivedInvoiceRemoval,verifyPublishedInvoice
 import {readSignedDocumentArchiveScope,archiveSignedDocuments,eraseArchivedSignedDocuments} from '../scripts/organization-db-archive.mjs';
 import {preparationFixture} from './starter-preparation-fixture.mjs';
 import {readOrganizationErasureReceipt} from '../scripts/organization-erasure-receipt.mjs';
+import {eraseExpiredImportObject} from '../scripts/p07-storage-erasure.mjs';
 import {beginBoundR2PilotErasure} from './r2-erasure-pilot-fixture.mjs';
 import {context as testContext,must} from './api-client.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
@@ -98,6 +100,7 @@ export async function verifySignedDocumentErasure({worker,attestor,workerRole,cl
   };
 
   const media=await seedOrganizationMedia(f);
+  const roster=await seedOrganizationStudentImport(f);
   const [{org_id:controlOrg}]=await rows('select org_id from core.people where id=$1',[controlId]);
   const sharedPerson=key(),sharedLink=key();
   await db.query("insert into core.people(id,org_id,display_name,state) values($1,$2,'Synthetic shared login', 'active')",
@@ -106,7 +109,7 @@ export async function verifySignedDocumentErasure({worker,attestor,workerRole,cl
    [sharedLink,controlOrg,f.account.id,sharedPerson]);
   const sharedMembership=async()=>(await must(owner,'organizations_list_v1',{page:{}})).items.find(row=>row.id===controlOrg)?.self_context?.person_id;
   assert.equal(await sharedMembership(),sharedPerson);
-  const restoreIds={orgId:org,ownerPerson:f.person,studentPerson,controlId:sharedPerson,controlLink:sharedLink};
+  const restoreIds={orgId:org,ownerPerson:f.person,studentPerson,controlId:sharedPerson,controlLink:sharedLink,roster};
   const before=await readMixedErasureProjection(db,restoreIds);
   const previousEvidence=await r2Pilot?.reader.withRestoreEvidence('0'.repeat(64),({trust,ledgerBytes})=>({trust,ledgerBytes}));
   const studentAccount=await must(student,'account_get_v1');
@@ -134,6 +137,7 @@ export async function verifySignedDocumentErasure({worker,attestor,workerRole,cl
   await db.query('insert into private.organization_projected_contact_erasure_scopes values($1,$2)',[workerRole,org]);
   await db.query('insert into private.organization_live_database_erasure_scopes(db_role,request_id,org_id) values($1,$2,$3)',[workerRole,requestId,org]);
   await db.query('insert into private.organization_managed_file_erasure_scopes(db_role,request_id) values($1,$2)',[workerRole,requestId]);
+  await db.query('insert into private.organization_import_copy_erasure_scopes(db_role,request_id) values($1,$2)',[workerRole,requestId]);
   const reclaim=async()=>{
    await db.query("update private.p07_privacy_jobs set lease_until=clock_timestamp()-interval '1 second',next_attempt_at=clock_timestamp()-interval '1 second' where id=$1",[jobId]);
    return claim(org,jobId);
@@ -143,6 +147,14 @@ export async function verifySignedDocumentErasure({worker,attestor,workerRole,cl
    return reclaim();
   };
   let request=await claim(org,jobId);
+  const [{session_user:attestorRole}]=(await attestor.query('select session_user')).rows;
+  await db.query(`insert into private.p07_storage_erasure_scopes(db_role,request_id,file_id,provider_origin,attestor_role)
+   values($1,$2,$3,$4,$5)`,[workerRole,requestId,roster.fileId,apiUrl,attestorRole]);
+  await db.query(`insert into private.organization_import_source_erasure_approvals
+   (request_id,org_id,file_id,import_job_id,approval_id,checksum) values($1,$2,$3,$4,$5,$6)`,
+  [requestId,org,roster.fileId,roster.jobId,key(),roster.checksum]);
+  request=await releaseAndClaim(request);
+  assert.deepEqual(await eraseExpiredImportObject({db:worker,attestor,request,fileId:roster.fileId,apiUrl,serviceKey}),{state:'completed'});
   const store=r2Pilot?.archiveWriter??localArchive(),reader=r2Pilot?.archiveReader??store;
   const sourceProjectRef=r2Pilot?.sourceProjectRef??'ftknativereceipttest';
   const scopeTarget={db,requestId,orgId:org,sourceProjectRef,store,reader,readSource};
@@ -296,7 +308,7 @@ export async function verifySignedDocumentErasure({worker,attestor,workerRole,cl
   if(r2Pilot)await assert.rejects(r2Pilot.reader.withRestoreEvidence('0'.repeat(64),()=>assert.fail('unclosed scope allowed restore')),
    /R2_ERASURE_PENDING/);
   request=await reclaim();
-  const directory=await verifyOrganizationDirectoryErasure({db,worker,attestor,request,requestId,org,terminationReason,reader,store,sourceProjectRef});
+  const directory=await verifyOrganizationDirectoryErasure({db,worker,attestor,request,requestId,org,terminationReason,reader,store,sourceProjectRef,roster});
   await execute(request);
   const [{database}]=await rows(liveDatabase,[requestId]);
   assert.equal(database.state,'completed',JSON.stringify(database));
@@ -315,6 +327,8 @@ export async function verifySignedDocumentErasure({worker,attestor,workerRole,cl
   assert.equal(receipt.database.directory_archive_sha256,directory.directory_archive_sha256);
   assert.equal(receipt.database.sale_archive_sha256,saleProof.sale_archive_sha256);
   assert(receipt.entry.subject_ids.includes(studentPerson));
+  assert([roster.importedPerson,roster.fileId,roster.objectId,roster.jobId,roster.previewId,...roster.rowIds]
+   .every(id=>receipt.entry.subject_ids.includes(id)));
   assert.equal((await must(owner,'account_get_v1')).id,media.accountId);
   assert.equal(await sharedMembership(),sharedPerson);
   assert.equal((await must(student,'account_get_v1')).id,studentAccount.id);
@@ -326,5 +340,8 @@ export async function verifySignedDocumentErasure({worker,attestor,workerRole,cl
    billing_archive_sha256:finance.archiveSha256,billing_history_archive_sha256:history.archiveSha256,
    ...saleProof,...mediaProof,...directory,mixed_restore_verified:true,shared_login_membership_preserved:true,
    erased_subjects:receipt.entry.subject_ids.length,...restore};
- }finally{await db.end();}
+ }finally{
+  await db.query('delete from private.organization_import_copy_erasure_scopes where db_role=$1 and request_id in (select id from core.privacy_requests where org_id=$2)',[workerRole,org]);
+  await db.end();
+ }
 }

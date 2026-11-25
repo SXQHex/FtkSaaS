@@ -159,7 +159,7 @@ export async function verifyPaidErasureRestore({db,dbUrl,requestId,ids,before,r2
  return {paid_restore_verified:true,...proof};
 }
 
-export async function readMixedErasureProjection(db,{orgId,ownerPerson,studentPerson,controlId,controlLink}){
+export async function readMixedErasureProjection(db,{orgId,ownerPerson,studentPerson,controlId,controlLink,roster}){
  const list=[
   ['core','account_links','select id from core.account_links where (org_id=$1 and person_id<>$2) or id=$3 order by id',
    [orgId,ownerPerson,controlLink]],
@@ -179,7 +179,11 @@ export async function readMixedErasureProjection(db,{orgId,ownerPerson,studentPe
    where scope_key='organization:'||$1 or scope_key like 'center:'||$1||':%' order by id`,[orgId]],
   ['private','settings_media_assets',"select id from private.settings_media_assets where scope_key='organization:'||$1 order by id",[orgId]],
   ['storage','objects',"select id from storage.objects where split_part(name,'/',1)=$1 order by id",[orgId]],
-  ['core','people','select id,org_id,display_name from core.people where id=any($1::uuid[]) order by id',[[studentPerson,controlId]]]
+  ['core','import_jobs','select id from core.import_jobs where org_id=$1 order by id',[orgId]],
+  ['core','import_rows','select id from core.import_rows where org_id=$1 order by id',[orgId]],
+  ['core','previews','select id from core.previews where org_id=$1 and id=$2',[orgId,roster.previewId]],
+  ['core','people','select id,org_id,display_name from core.people where id=any($1::uuid[]) order by id',
+   [[studentPerson,roster.importedPerson,controlId]]]
  ];
  const tables=[];
  for(const [schema,table,sql,args] of list)tables.push({schema,table,rows:(await db.query(sql,args)).rows});

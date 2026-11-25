@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `1f82730a292aaa82b45356ff0b1f0ddf1da7ba7c03946b7d0f5b0aa74e71ff62`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `01e3069e855de1d07f689bfda9041eeb8fe801198c54fb965414046d859dd2bb`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 252. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 253. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -260,3 +260,4 @@ Sıralı migration: 252. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261125054500_organization_linked_import_source_erasure.sql](../apps/backend/supabase/migrations/20261125054500_organization_linked_import_source_erasure.sql) | `bf5d552a50b949dd05bbedaed14e537c09f1d924e02cf9493233dfae4f9275a0` |
 | [20261125055500_organization_linked_import_storage_attestation.sql](../apps/backend/supabase/migrations/20261125055500_organization_linked_import_storage_attestation.sql) | `a9e273d0f4170adecc121551755d4f9c756629f0bd12fbd21c4255444ab3d1ac` |
 | [20261125060500_organization_import_rejected_row_hold_evidence.sql](../apps/backend/supabase/migrations/20261125060500_organization_import_rejected_row_hold_evidence.sql) | `c9fa85409327b753d6d88da013c4384e040ed28c2fc31e56b67f287864c9a8fc` |
+| [20261125061500_organization_import_directory_erasure.sql](../apps/backend/supabase/migrations/20261125061500_organization_import_directory_erasure.sql) | `e8c44954356fe60b177ce8612b34d0300bd3d013421a99d8d3188174b99b1607` |
