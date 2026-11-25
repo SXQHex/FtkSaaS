@@ -167,6 +167,27 @@ test('Student status filters selected-center current membership before paginatio
   assert.equal((await directory(op,{query:'directory-linked'})).items[0].access_detail.can_resend,false);
   const links=await directory(linkOp,{query:'directory-manager',status:'active'});assert.equal(links.items.length,1);assert.equal(links.items[0].entity.id,managerLink);assert.equal(links.items[0].access_detail.kind,'account_link');assert.equal(links.access_summary.filtered,1);
   const text=JSON.stringify([links,sent]);for(const secret of [managerAccount.id,managerUser.id,managerUser.jwt,linkedAccount.id,linked.id,linked.jwt,'dir-0@ftksaas.invalid'])assert(!text.includes(secret));assert(!text.includes('provider_reference'));assert(!text.includes('sealed_token'));
+  const aliasUser=await authUser('directory-alias-linked');
+  const aliasAccount=await must(aliasUser,'account_get_v1');
+  const canonical=(await api('person_create_v1',{display_name:'directory-alias-linked',contacts:[]})).primary_id;
+  const alias=key(),aliasLink=key();
+  await db.query("insert into core.people(id,org_id,display_name,state,merged_into_id) values($1,$2,'Historical access alias','merged',$3)",[alias,org,canonical]);
+  await relation(alias,center,'active');
+  await db.query("insert into core.account_links(id,org_id,person_id,account_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[aliasLink,org,canonical,aliasAccount.id]);
+  const aliasQuery={query:'directory-alias-linked'};
+  const personView=await directory(linkOp,{...aliasQuery,view:'people',status:'linked'},{limit:1},managerUser);
+  assert.deepEqual(personView.items.map(item=>({link:item.entity.id,person:item.access_detail.person_id})),[{link:aliasLink,person:canonical}]);
+  assert.deepEqual(personView.access_summary,{total:1,filtered:1,by_state:[{state:'linked',count:1}]});
+  const legacyView=await directory(linkOp,{...aliasQuery,status:'active'},{limit:1},managerUser);
+  assert.deepEqual(legacyView.items.map(item=>item.entity.id),[aliasLink]);
+  for(const selectorKey of [{...aliasQuery,view:'people',status:'linked'},{...aliasQuery,status:'active'}]){
+   const selector={operation:linkOp,key:{directory:'center',...selectorKey}};
+   const otherCenter=await api('management_state_get_v1',{center_id:other,operation:linkOp,selector,page:{limit:1}});
+   assert.deepEqual(otherCenter.items,[]);
+   const denied=await call(member,'management_state_get_v1',{org_id:org,center_id:center,operation:linkOp,selector,page:{limit:1}});
+   assert.equal(denied.result.ok,false);
+   assert.equal(denied.result.error.code,'FORBIDDEN');
+  }
   const inviter=await authUser('directory-inviter'),inviterAccount=await must(inviter,'account_get_v1'),inviterPerson=(await api('person_create_v1',{display_name:'Directory inviter',contacts:[]})).primary_id;
   await db.query("insert into core.account_links(id,org_id,person_id,account_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[key(),org,inviterPerson,inviterAccount.id]);await api('role_assign_v1',{person_id:inviterPerson,role:'staff',scope:{center_id:center}});await api('student_activate_v1',{person_id:ids[1]});
   const hiddenName=await directory(op,{}, {},inviter);assert.equal(hiddenName.items.length,1);assert.equal(hiddenName.items[0].access_detail.display_name,null);assert.deepEqual(hiddenName.items[0].access_detail.delivery,{visibility:'restricted'});
