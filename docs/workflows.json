@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "3fa19f1bf611d65e1da2d90bec1f5f29c5004cca7a9c5a52dd58a37c42e31a2a",
-        "reason": "Mevcut CSV ayrıştırma sözleşmesi ve derlenmiş Edge davranışı korunuyor. Tam sütun eşliği seçeneğini yalnız özgün CRM imha incelemesi kullanıyor."
+        "fingerprint": "5da627dde25d0f78fbe3c3cab284ee3f758a742ae78f9ae4537c9434e2c22834",
+        "reason": "Aday envanterinde yalnız genişletilen okuma kilidi testinin kaynak özeti güncellendi. Test sahipliği ve çalıştırma kuralları korundu."
       }
     },
     {
@@ -553,8 +553,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "f28f19ac81bd14c72c71277949689e9f13a0883c570904b218c1b4bdb68238f8",
-        "reason": "Stüdyo kaynak seçicileri canlı merkez, plan ve mevcut kaynak sürümleriyle incelendi."
+        "fingerprint": "5de77c7f5c8eb6fba5c147af7cd1bacb08e428b9f878332773a624bac6d40a36",
+        "reason": "Kilit regresyonu mevcut stüdyo okumalarına ek olarak kişi ve takvim sorgularını doğruluyor. Merkez ve rol yetkileri önceki kurallardan okunuyor."
       }
     },
     {
@@ -566,6 +566,7 @@
       "tests": [
         "apps/backend/tests/program-session-lifecycle.test.mjs",
         "apps/backend/tests/schedule-reads.test.mjs",
+        "apps/backend/tests/student-status-filter-acceptance.mjs",
         "apps/backend/tests/availability-policies.test.mjs",
         "apps/backend/tests/starter-plan-gates-acceptance.mjs",
         "apps/backend/tests/starter-attendance-protection.test.mjs",
@@ -652,7 +653,8 @@
         "apps/backend/supabase/migrations/20261119170000_shared_center_authorization.sql",
         "apps/backend/supabase/migrations/20261124013000_scoped_read_projections.sql",
         "apps/backend/supabase/migrations/20261124152000_scoped_consumer_followup.sql",
-        "apps/backend/supabase/migrations/20261124220645_session_read_center_projection.sql"
+        "apps/backend/supabase/migrations/20261124220645_session_read_center_projection.sql",
+        "apps/backend/supabase/migrations/20261125112000_share_person_calendar_read_locks.sql"
       ],
       "operations": [
         "availability_save_v1",
@@ -675,8 +677,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "ccbd5e479ee98114ae54fbf41f115ab4f9c309d135c319c78ee77f84b169e3bf",
-        "reason": "Yetkili kesin seans okuması opt-in gerçek merkezini, mevcut sürüm ve kapsamla döndürüyor."
+        "fingerprint": "c39e85cf93fdcdac269c6903d39f0d0a04acf7acea44ea06d756cfa1ba126056",
+        "reason": "Takvim okuması paylaşımlı organizasyon kilidi alıyor. Görünür kayıtlar, kapsam ve yazma yetkileri önceki kurallarla doğrulanıyor."
       }
     },
     {
@@ -777,7 +779,8 @@
         "apps/backend/database/person-membership-date.sql",
         "apps/backend/supabase/migrations/20261124012000_share_organization_read_locks.sql",
         "apps/backend/supabase/migrations/20261124013000_scoped_read_projections.sql",
-        "apps/backend/supabase/migrations/20261124152000_scoped_consumer_followup.sql"
+        "apps/backend/supabase/migrations/20261124152000_scoped_consumer_followup.sql",
+        "apps/backend/supabase/migrations/20261125112000_share_person_calendar_read_locks.sql"
       ],
       "operations": [
         "account_access_send_v1",
@@ -796,8 +799,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "7e1de918bd6960c4d6b3939e9338fc0a7885b1a1888cd6d81d448dd168665c05",
-        "reason": "Ortak native test kendi rezervasyonu ve hesap bağı kaybı kapsamını kesin seans okumasında doğruluyor. Kişi dizini sözleşmesi aynı."
+        "fingerprint": "b19eb172bc083e0782d36a0b8df5ba0be2d245d800d5e6dc16f44712b1ada22f",
+        "reason": "Kişi detayı diğer yetkili okumalarla aynı organizasyon kilidini paylaşabiliyor. Canlı kişi ve merkez kapsamı ile özel alan erişimi mevcut kurallara bağlı."
       }
     },
     {
@@ -926,8 +929,8 @@
         "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "6e92147544bb9212bfdf67f8c4a34cdbafc8a4389300bbe7dc7edbb65bde3fab",
-        "reason": "Ortak program testi yalnız yetkili program listesini genişletiyor. Satış ve hak koşulları aynı."
+        "fingerprint": "fcc62a261798bff027bdca51022d983ec05c06c8f4bdbc16f3c08eeb9efc51d6",
+        "reason": "Katalog okumasının paylaşımlı kilit kontrolü korunuyor. Genişletilen regresyon kişi ve takvim okumalarını da kapsıyor."
       }
     },
     {
