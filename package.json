@@ -2,9 +2,9 @@
   "name": "ftksaas",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@12.15.0",
+  "packageManager": "pnpm@12.23.0",
   "engines": {
-    "node": ">=24.22.1 <25"
+    "node": ">=26.13.1 <27"
   },
   "scripts": {
     "verify": "turbo run verify",
@@ -27,7 +27,7 @@
     "knip": "pnpm --filter @ftksaas/web exec knip --directory ../.."
   },
   "devDependencies": {
-    "turbo": "2.11.10"
+    "turbo": "2.11.13"
   },
   "knip": {
     "workspaces": {

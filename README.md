@@ -18,6 +18,7 @@ Dans ve fitness stüdyolarının organizasyon, merkez, ders, öğrenci, üyelik 
 Node sürümü `.nvmrc`, pnpm sürümü `package.json` içinde sabittir. Tek lockfile kullanılır.
 
 ```sh
+npm install --global corepack@0.36.0
 corepack enable
 pnpm install --frozen-lockfile
 pnpm check:quality

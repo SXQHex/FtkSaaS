@@ -1,5 +1,12 @@
 # Güncel kaynak ve kabul
 
+<a id="backend-arac-zinciri-node26"></a>
+## Backend ve kök araç zinciri — Node 26 LTS
+
+25 Kasım 2026’da yükseltme adayı main `f622f8e4954148e51051a35ae99e9c86e9ba8d4f` üzerine alındı. [Taban SHA’nın main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/45517163690) başarılı. Yükseltme adayı [workspace pinlerini](../../../docs/monorepo.md#sürüm-ve-paket-yönetimi) Node 26 LTS’ye taşır. Supabase CLI 3.4.0 ve yayımladığı sekiz platform paketi için [yalnız bu tam sürüme bağlı yayın yaşı istisnası](../../../pnpm-workspace.yaml) onaylandı. Bu paketlerin tamamı 25 Kasım 2026 18.55.55 TRT itibarıyla normal 24 saat eşiğini karşılar. [XREQ-072 arşivi ve ELF doğrulaması](#xreq-072-runtime-adayi) adayda aynı kaynakla korunuyor.
+
+Son tabanda kalite, belge, workspace tip kontrolü, Actionlint ve yerel seans, takvim ve e-posta testleri (50/50) geçti. Yükseltme dalının ilk tabanında frozen kurulum, frontend birim testleri (1194/1194) ve üretim derlemesi geçti. İlk tabandaki backend verify içinde 623 test geçti ve Linux `/proc` bekleyen mevcut gözlemci testi macOS’ta başarısız oldu. İlk adayın [`ubuntu-latest` full clean koşusunda](https://github.com/SXQHex/FtkSaaS/actions/runs/45520304685) yamalı Linux amd64 runtime paketi, core ve on iki API shard başarılıydı. Ayrı [Workflow validators koşusunda](https://github.com/SXQHex/FtkSaaS/actions/runs/45520304759/job/138890171702) Zizmor, lockfile dışı Corepack kurulumunu reddetti. Yeni aday [sürümü ve SHA256 değeri sabit Corepack arşivini](../scripts/ci/install-corepack.sh) doğrulayarak kurar. Corepack düzeltmesi sonrası [3.3.0 kullanan aday full clean](https://github.com/SXQHex/FtkSaaS/actions/runs/45521988366) başarılı. Birleşik 3.4.0 adayında [yerel Auth sağlayıcıları](../supabase/config.toml) `enabled` anahtarına taşındı ve `db:advisors` yerel hedef varsayılanını kullanıyor. Frozen kurulum, kalite, belge ve tip denetimleri geçti. CLI yapılandırmayı sıfır uyarıyla doğruladı. Yerel native Auth sağlayıcı ayarları, kayıt testi (7/7) ve advisor komutu geçti. Yeni CLI ile yamalı ELF kurulumu 3.4.0 adayının full clean koşusunda doğrulanır.
+
 <a id="o03-o10-isletim-kaniti"></a>
 ## O03–O10 — Saklama, imha ve kurtarma kabulü
 

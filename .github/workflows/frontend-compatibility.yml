@@ -43,7 +43,10 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: '.nvmrc'
-      - run: corepack enable
+      - run: |
+          set -euo pipefail
+          corepack_bin="$(bash "$GITHUB_WORKSPACE/apps/backend/scripts/ci/install-corepack.sh" "$RUNNER_TEMP/corepack")"
+          PATH="$corepack_bin:$PATH" corepack enable --install-directory "$(dirname "$(command -v node)")" pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec turbo run typecheck --filter=@ftksaas/web --filter=@ftksaas/ui
       - run: pnpm --filter @ftksaas/web test:isolation

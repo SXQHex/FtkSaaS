@@ -32,6 +32,7 @@ Node için yayımlanmış güncel LTS yaması; ayrı LTS kanalı olmayan ortak a
 Komutlar repo kökünden:
 
 ```sh
+npm install --global corepack@0.36.0
 corepack enable
 pnpm install --frozen-lockfile
 pnpm generate

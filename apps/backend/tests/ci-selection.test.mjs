@@ -211,7 +211,7 @@ test('workspace and lock changes retain broad backend coverage and pinned frozen
  for(const f of ['ci-fast','clean-suite','cd-development']){
   const s=fs.readFileSync('.github/workflows/'+f+'.yml','utf8');assert(s.includes('corepack enable'));const install='pnpm --filter @ftksaas/backend... --filter ftksaas install --frozen-lockfile';assert(s.includes(install));assert(!s.includes('npm ci'));
  }
- const p=JSON.parse(fs.readFileSync('package.json'));assert.equal(p.packageManager,'pnpm@12.15.0');assert(!fs.existsSync('package-lock.json'));
+ const p=JSON.parse(fs.readFileSync('package.json'));assert.equal(p.packageManager,'pnpm@12.23.0');assert(!fs.existsSync('package-lock.json'));
  const turbo=JSON.parse(fs.readFileSync('turbo.json'));assert.equal(turbo.tasks['test:clean'].cache,false);assert.equal(turbo.tasks.verify.cache,false);
 });
 

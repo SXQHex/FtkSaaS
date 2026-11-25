@@ -10,7 +10,7 @@
     "dev:start": "node scripts/start-dev.mjs",
     "dev:stop": "supabase stop",
     "dev:health": "node scripts/health.mjs",
-    "db:advisors": "supabase db advisors --local --type all --level warn --fail-on error",
+    "db:advisors": "supabase db advisors --type all --level warn --fail-on error",
     "dev:info": "node scripts/dev-info.mjs",
     "test:api": "node --test --test-concurrency=2 tests/cross-center-settlement.test.mjs tests/api-acceptance.test.mjs tests/event-payment.test.mjs tests/event-cancellation.test.mjs tests/registry.test.mjs tests/person-registry.test.mjs tests/room-role-registry.test.mjs tests/availability-policies.test.mjs tests/schedule-reads.test.mjs tests/program-session-lifecycle.test.mjs tests/starter-attendance-protection.test.mjs tests/instructor-earnings.test.mjs tests/p01-catalog-entitlement-reads.test.mjs tests/p01-lesson-requests.test.mjs tests/p01-waitlist-workers.test.mjs",
     "dev:seed": "node scripts/dev-seed.mjs",
@@ -26,16 +26,16 @@
   },
   "type": "module",
   "devDependencies": {
-    "@babel/parser": "7.29.11",
+    "@babel/parser": "8.1.3",
     "@ftksaas/api-contracts": "workspace:*",
     "@ftksaas/typescript-config": "workspace:*",
     "ajv": "8.20.0",
     "ajv-formats": "3.0.1",
     "esbuild": "0.28.2",
     "json-schema-to-typescript": "16.0.0",
-    "nodemailer": "10.1.1",
-    "standardwebhooks": "1.1.1",
-    "supabase": "3.0.0",
+    "nodemailer": "10.6.1",
+    "standardwebhooks": "1.3.0",
+    "supabase": "3.4.0",
     "typescript": "catalog:"
   },
   "dependencies": {
@@ -44,6 +44,6 @@
   },
   "private": true,
   "engines": {
-    "node": ">=24.22.1 <25"
+    "node": ">=26.13.1 <27"
   }
 }
