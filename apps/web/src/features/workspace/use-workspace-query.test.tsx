@@ -2,6 +2,7 @@ import { memo, type ReactNode } from "react";
 import { act, render, renderHook, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { expect, it, vi } from "vitest";
+import { clearPrivateQueries } from "../../lib/cache-invalidation";
 import { PrivateSessionRevision } from "../auth/private-session-revision";
 import { useWorkspaceQuery, workspaceKeys } from "./workspace-query";
 import * as workspaceSource from "./workspace";
@@ -57,5 +58,15 @@ it("reattaches an unchanged feature observer to the workspace rebuilt by a new s
     queries.setQueryData(key, { ...workspace, selected: { id: "org-a", name: "New workspace" } }),
   );
   expect(await screen.findByText("New workspace")).toBeVisible();
+
+  await act(async () => {
+    clearPrivateQueries(queries);
+    queries.setQueryData(key, {
+      ...workspace,
+      selected: { id: "org-a", name: "Revalidated workspace" },
+    });
+  });
+  expect(await screen.findByText("Revalidated workspace")).toBeVisible();
+  expect(screen.queryByText("New workspace")).not.toBeInTheDocument();
   expect(read).not.toHaveBeenCalled();
 });
