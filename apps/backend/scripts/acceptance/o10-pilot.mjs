@@ -8,6 +8,8 @@ const validDeployment=id=>typeof id==='string'&&id.startsWith(pilotProject+'_')&
 const mixed=['people_list_v1','person_get_v1','calendar_get_v1','report_export_start_v1'];
 const writes=['collection_record_v1','reservation_create_v1','reservation_cancel_v1','attendance_close_v1'];
 const operations=[...mixed,...writes];
+const failureKinds=new Set(['http_error','invalid_json','operation_rejected','unexpected_response','timeout','transport_error']);
+const safeErrorCodes=new Set(JSON.parse(readFileSync(new URL('../../../../packages/api-contracts/schema/contract.json',import.meta.url),'utf8')).$defs.SafeError.properties.code.enum);
 const targetMs=operation=>mixed.slice(0,2).includes(operation)?1000:2000;
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const validMs=value=>Number.isFinite(value)&&value>=0;
@@ -20,8 +22,8 @@ export function pilotPlan(){
  })));
 }
 
-// invoke returns {ok, provider_request_id}. ok includes native business result
-// validation. Persist each completed wave even if a later wave cannot start.
+// The adapter validates the business result and may supply failure metadata.
+// Persist each completed wave even if a later wave cannot start.
 export async function capturePilot({sourceSha,projectRef,deploymentId,actors,activeStudents,invoke,saveWave}){
  if(!/^[0-9a-f]{40}$/.test(sourceSha)||projectRef!==pilotProject||!validDeployment(deploymentId)
   ||typeof invoke!=='function'||typeof saveWave!=='function')throw Error('PILOT_SOURCE_TARGET_AND_ADAPTER_REQUIRED');
@@ -36,13 +38,21 @@ export async function capturePilot({sourceSha,projectRef,deploymentId,actors,act
   const started_at=new Date().toISOString();
   const samples=await Promise.all(wave.map(async slot=>{
    const requestId=newUuidV7(),started=performance.now();
-   let ok=false,providerId=null;
+   let ok=false,providerId=null,failure;
    try{
     const result=await invoke({slot,actor:actors[slot.actor],requestId});
     ok=result?.ok===true;
     if(uuid.test(result?.provider_request_id))providerId=result.provider_request_id.toLowerCase();
-   }catch{ /* Record transport failure without serializing the provider error. */ }
-   return {...slot,request_id:requestId,ok,provider_id:providerId,client_ms:performance.now()-started};
+    if(!ok){
+     const status=result?.http_status;
+     failure={kind:failureKinds.has(result?.failure_kind)?result.failure_kind:'unexpected_response',
+      http_status:Number.isInteger(status)&&status>=100&&status<=599?status:null};
+     if(safeErrorCodes.has(result?.error_code))failure.error_code=result.error_code;
+    }
+   }catch(error){
+    failure={kind:error?.name==='TimeoutError'?'timeout':'transport_error',http_status:null};
+   }
+   return {...slot,request_id:requestId,ok,provider_id:providerId,client_ms:performance.now()-started,...(failure?{failure}:{})};
   }));
   await saveWave({run_id:runId,source_sha:sourceSha,project_ref:projectRef,deployment_id:deploymentId,started_at,finished_at:new Date().toISOString(),samples});
   if(samples.some(row=>!row.ok||!row.provider_id))throw Error('PILOT_INCOMPLETE_WAVE_RECONCILE_BEFORE_RETRY');

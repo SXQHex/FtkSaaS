@@ -2347,8 +2347,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "470f981288a71f1669f7a61d5c6369c7eebc2766bde8de1f064dc437317217af",
-        "reason": "Otuz saniyelik Cron kontrolü vadesi gelen davet ve işlemsel e-posta işlerini geçirir. Taze imzalı makbuzla boş HTTP çağrısı atlanır ve stale işareti izlenir."
+        "fingerprint": "12f3f66005ce363a68827ad5ed9d444be6258b0bb23c5a61d4b83f3dd2e932a6",
+        "reason": "O10 pilotunda 50 native oturumun ağ öncesi doğrulanmasını ve başarısız isteklerin güvenli HTTP/iz kaydını inceledik. Dalga kapsamı ve yerel mutabakat kuralları korunur."
       }
     }
   ]

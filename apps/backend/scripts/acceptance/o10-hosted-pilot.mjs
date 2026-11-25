@@ -45,11 +45,20 @@ function expected(operation,data,actor,booking){
 export async function runHostedPilot(config,directory){
  if(config?.projectRef!==project||!Array.isArray(config.actors)||config.actors.length!==50||!config.publishableKey?.startsWith('sb_publishable_'))
   throw Error('PILOT_PRIVATE_FIXTURE_REQUIRED');
+ const currentTime=Date.now();
  for(const a of config.actors){
   if(![a.account,a.org,a.center,a.student,a.debt,a.sale,a.booking_session,a.attendance_session].every(id=>uuid.test(id))
    ||!Number.isSafeInteger(a.close_version)||a.close_version<1||!Number.isFinite(Date.parse(a.occurred_at))
    ||Date.parse(a.week?.ends_at)-Date.parse(a.week?.starts_at)!==604800000||typeof a.access_token!=='string'||!a.access_token)
    throw Error('PILOT_PRIVATE_FIXTURE_INVALID');
+  // Decoded claims are a preflight filter. Native Auth still verifies each session.
+  const segments=a.access_token.split('.');
+  let claims;
+  try{claims=JSON.parse(Buffer.from(segments[1],'base64url').toString('utf8'));}
+  catch{throw Error('PILOT_AUTH_SCOPE_MISMATCH');}
+  if(segments.length!==3||claims?.iss!==origin+'/auth/v1'||claims?.sub!==a.account||!Number.isSafeInteger(claims?.exp))
+   throw Error('PILOT_AUTH_SCOPE_MISMATCH');
+  if(claims.exp*1000<=currentTime)throw Error('PILOT_ACTOR_SESSION_EXPIRED');
  }
  // Separate network/auth preparation from measurement. A key is a public
  // project key and all business calls use the actor's confirmed native session.
@@ -68,18 +77,26 @@ export async function runHostedPilot(config,directory){
    const booking=bookings.get(slot.actor),operationKey=keys[slot.wave][slot.actor];
    const body={client_api_version:1,request_id:requestId,org_id:actor.org,center_id:actor.center,
     ...pilotBody(slot.operation,actor,booking),...(operationKey?{operation_key:operationKey}:{})};
+   const deadline=AbortSignal.timeout(60000);
    const response=await fetch(origin+'/functions/v1/backend-v1/'+slot.operation,{
-    method:'POST',headers:headers(actor),body:JSON.stringify(body),redirect:'error',signal:AbortSignal.timeout(60000)
+    method:'POST',headers:headers(actor),body:JSON.stringify(body),redirect:'error',signal:deadline
    });
-   const provider_request_id=response.headers.get('sb-request-id');
-   const result=await response.json();
-   const ok=response.ok&&result.ok===true&&expected(slot.operation,result.data,actor,booking);
+   const evidence={provider_request_id:response.headers.get('sb-request-id'),http_status:response.status};
+   let result;
+   try{result=await response.json();}
+   catch(error){
+    const failure_kind=deadline.aborted?'timeout':error instanceof SyntaxError?'invalid_json':'transport_error';
+    return {ok:false,...evidence,failure_kind};
+   }
+   const ok=response.ok&&result?.ok===true&&expected(slot.operation,result.data,actor,booking);
    if(ok&&operationKey){
     const {primary_id,version,job_id}=result.data;
     receipts.push({wave:slot.wave,actor:slot.actor,request_id:requestId,primary_id,version,job_id});
     if(slot.operation==='reservation_create_v1')bookings.set(slot.actor,{id:primary_id,version});
    }
-   return {ok,provider_request_id};
+   if(ok)return {ok,...evidence};
+   const failure_kind=!response.ok?'http_error':result?.ok===false?'operation_rejected':'unexpected_response';
+   return {ok,...evidence,failure_kind,error_code:result?.error?.code};
   },
   saveWave:async wave=>{
    const number=wave.samples[0].wave;
