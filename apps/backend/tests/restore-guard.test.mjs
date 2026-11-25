@@ -152,6 +152,70 @@ test('stale, conflicting and interrupted key rotation leaves the original regist
 }));
 const {guardedRestore}=await import('../scripts/guarded-restore.mjs');
 async function restoreFixture(run){const dir=fs.mkdtempSync(path.join(os.tmpdir(),'guarded-restore-'));try{const x=fixture();const file=path.join(dir,'ledger.json');fs.writeFileSync(file,x.ledgerBytes,{mode:0o600});return await run(x,file);}finally{fs.rmSync(dir,{recursive:true,force:true});}}
+test('file checkpoint publication cannot advance during restore commit from a separate register copy',()=>restoreFixture(async({snapshotBytes},archiveFile)=>{
+ const checkpointDir=fs.mkdtempSync(path.join(os.tmpdir(),'guarded-restore-checkpoint-'));
+ const lockDir=fs.mkdtempSync(path.join(os.tmpdir(),'guarded-restore-lock-'));
+ try{
+  const checkpointFile=path.join(checkpointDir,'current.json');
+  const checkpointLockFile=path.join(lockDir,'checkpoint.lock');
+  const registerFile=path.join(path.dirname(archiveFile),'live.json');
+  const args=appendArgs(registerFile);
+  const first=appendErasure(args);
+  const firstBytes=fs.readFileSync(registerFile);
+  fs.writeFileSync(archiveFile,firstBytes,{mode:0o600});
+  const publication={registerFile,checkpointFile,checkpointLockFile,sourceProjectRef:args.sourceProjectRef,publicKeyPem:pem,now};
+  const initial=publishErasureCheckpoint({...publication,expected:null,head:first});
+  const head=appendErasure({...args,expectedHead:first.sha256,expectedSequence:first.sequence,
+   entry:{...args.entry,request_id:other,subject_ids:[other]}});
+  const publishNext=()=>publishErasureCheckpoint({...publication,expected:initial,head,previousLedgerBytes:firstBytes});
+  const trust={...initial,snapshot_sha256:sha256(snapshotBytes)};
+  const restore={registerFile:archiveFile,checkpointFile,checkpointLockFile,trust,snapshotBytes,now};
+  fs.writeFileSync(checkpointLockFile,'publisher holds lock',{mode:0o600});
+  await assert.rejects(guardedRestore({...restore,transaction:{
+   prepare:async()=>assert.fail('An active checkpoint writer must fence preparation'),
+   commit:async()=>assert.fail('An active checkpoint writer must fence commit'),
+   rollback:async()=>assert.fail('Conflicting lock should fail before preparation')
+  }}),/RESTORE_CHECKPOINT_BUSY/);
+  assert.equal(fs.readFileSync(checkpointLockFile,'utf8'),'publisher holds lock');
+  fs.unlinkSync(checkpointLockFile);
+  const result=await guardedRestore({...restore,transaction:{
+   prepare:async()=>assert(fs.existsSync(checkpointLockFile)),
+   commit:async()=>assert.throws(publishNext,{code:'EEXIST'}),
+   rollback:async()=>assert.fail('Restore should retain its pinned checkpoint through commit')
+  }});
+  assert.equal(result.ledger_sequence,first.sequence);
+  assert.equal(publishNext().ledger_sequence,head.sequence);
+  assert(!fs.existsSync(checkpointLockFile));
+  await assert.rejects(guardedRestore({...restore,transaction:{
+   prepare:async()=>assert.fail('Archived trust reached the loader'),
+   commit:async()=>assert.fail('Archived trust reached commit'),
+   rollback:async()=>assert.fail('Stale checkpoint should fail before preparation')
+  }}),/CURRENT_CHECKPOINT_CHANGED/);
+ }finally{
+  fs.rmSync(checkpointDir,{recursive:true,force:true});
+  fs.rmSync(lockDir,{recursive:true,force:true});
+ }
+}));
+test('checkpoint lock cleanup failure identifies committed rows and releases the register lock',()=>restoreFixture(async({snapshotBytes},registerFile)=>{
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'guarded-restore-cleanup-'));
+ try{
+  fs.unlinkSync(registerFile);
+  const args=appendArgs(registerFile),head=appendErasure(args);
+  const checkpointFile=path.join(dir,'checkpoint.json');
+  const initial=publishErasureCheckpoint({registerFile,checkpointFile,sourceProjectRef:args.sourceProjectRef,
+   publicKeyPem:pem,expected:null,head,now});
+  const trust={...initial,snapshot_sha256:sha256(snapshotBytes)};
+  await assert.rejects(guardedRestore({registerFile,checkpointFile,trust,snapshotBytes,now,transaction:{
+   prepare:async()=>{},
+   commit:async()=>{
+    fs.unlinkSync(checkpointFile+'.lock');
+    fs.mkdirSync(checkpointFile+'.lock');
+   },
+   rollback:async()=>assert.fail('A committed restore cannot be rolled back')
+  }}),/RESTORE_POST_COMMIT_CLEANUP_FAILED/);
+  assert(!fs.existsSync(registerFile+'.lock'));
+ }finally{fs.rmSync(dir,{recursive:true,force:true});}
+}));
 test('guarded adapter receives frozen validated snapshot under register lock',()=>restoreFixture(async(x,file)=>{let called=false;const result=await guardedRestore({...x,registerFile:file,apply:async(snapshot,proof)=>{called=true;assert(fs.existsSync(file+'.lock'));assert(Object.isFrozen(snapshot.tables[0].rows[0]));assert.equal(snapshot.tables[0].rows[0].id,other);assert.equal(proof.snapshot_sha256,x.trust.snapshot_sha256);}});assert(called);assert.equal(result.result,'validated_snapshot_adapter_completed');assert(!fs.existsSync(file+'.lock'));}));
 test('erased snapshot cannot invoke restore adapter',()=>restoreFixture(async(x,file)=>{const unsafe=fixture({id:erased});let called=false;await assert.rejects(guardedRestore({...unsafe,registerFile:file,apply:async()=>{called=true;}}),/ERASED_SUBJECT_PRESENT/);assert.equal(called,false);assert(!fs.existsSync(file+'.lock'));}));
 test('adapter failure propagates and releases only its own lock',()=>restoreFixture(async(x,file)=>{await assert.rejects(guardedRestore({...x,registerFile:file,apply:async()=>{throw Error('SYNTHETIC_RESTORE_FAILURE')}}),/SYNTHETIC_RESTORE_FAILURE/);assert(!fs.existsSync(file+'.lock'));fs.writeFileSync(file+'.lock','writer');await assert.rejects(guardedRestore({...x,registerFile:file,apply:async()=>{}}),/EEXIST/);assert.equal(fs.readFileSync(file+'.lock','utf8'),'writer');}));

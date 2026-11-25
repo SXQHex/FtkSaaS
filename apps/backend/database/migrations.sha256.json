@@ -230,5 +230,7 @@
   "20261124224225_organization_contact_erasure.sql": "592e0f08fb45010d4d1346af8fc129b66f651ca8c370eb5a667d67b8d061d610",
   "20261124224526_p07_storage_import_erasure.sql": "a198587bebbeecb1e33f2b372807edc75fb95aa6967c55c78b469295be0fc925",
   "20261124230652_organization_export_and_source_erasure.sql": "227d944f40b36d03009fa96433a8a53f8d3b40a4eeeedf3b39c561f440251427",
-  "20261124230835_organization_operational_erasure.sql": "af4aecf877911100b3a27781edd131e88f69c935039b49ea6c4499e27234e9ca"
+  "20261124230835_organization_operational_erasure.sql": "af4aecf877911100b3a27781edd131e88f69c935039b49ea6c4499e27234e9ca",
+  "20261124233740_organization_import_copy_erasure.sql": "e918bf468ea3a9099c751ab58401993acac3cde5cff8be2a53f40ddf28d3a463",
+  "20261124233946_organization_projected_contact_erasure.sql": "e9b251fdb46fc8eddc3c4ac76aa69dc2adcbfe719aad5b1ab0be8627100609bc"
 }

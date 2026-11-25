@@ -50,8 +50,10 @@ export async function verifyErasureReceiptRestore({db,dbUrl,requestId,orgId,cont
  const privateKeyPem=privateKey.export({type:'pkcs8',format:'pem'}),publicKeyPem=publicKey.export({type:'spki',format:'pem'});
  const registerDir=fs.mkdtempSync(path.join(os.tmpdir(),'native-erasure-ledger-'));
  const checkpointDir=fs.mkdtempSync(path.join(os.tmpdir(),'native-erasure-checkpoint-'));
+ const lockDir=fs.mkdtempSync(path.join(os.tmpdir(),'native-erasure-lock-'));
  const registerFile=path.join(registerDir,'ledger.json');
  const checkpoint={checkpointFile:path.join(checkpointDir,'current.json'),sourceProjectRef};
+ const checkpointLockFile=path.join(lockDir,'checkpoint.lock');
  const database='ftk_restore_'+key().replaceAll('-','');
  url.pathname='/'+database;
  let created=false;
@@ -59,7 +61,11 @@ export async function verifyErasureReceiptRestore({db,dbUrl,requestId,orgId,cont
   const entry={request_id:requestId,kind:'organization',subject_ids:[contactId,...objectIds,exportId],completed_at:completedAt};
   const registration={entry,file:registerFile,privateKeyPem,publicKeyPem,sourceProjectRef,expectedHead:null,expectedSequence:0};
   const head=appendErasure(registration);
-  publishErasureCheckpoint({...checkpoint,registerFile,head,publicKeyPem,expected:null});
+  publishErasureCheckpoint({...checkpoint,checkpointLockFile,registerFile,head,publicKeyPem,expected:null});
+  fs.chmodSync(checkpoint.checkpointFile,0o400);
+  fs.chmodSync(checkpointDir,0o500);
+  assert.equal(fs.statSync(checkpoint.checkpointFile).mode&0o777,0o400);
+  assert.throws(()=>fs.closeSync(fs.openSync(checkpoint.checkpointFile,'r+')),{code:'EACCES'});
   assert.deepEqual(appendErasure({...registration,expectedHead:head.sha256,expectedSequence:head.sequence}),{...head,replayed:true});
 
   const [identity]=await query(`select (pg_control_system()).system_identifier::text as system_identifier,
@@ -78,9 +84,9 @@ export async function verifyErasureReceiptRestore({db,dbUrl,requestId,orgId,cont
   const target={database,...identity,tables:[
    {schema:'core',table:'person_contacts'},{schema:'storage',table:'objects'},{schema:'private',table:'p06_export_files'}
   ]};
-  const load=snapshotBytes=>{
-   const readCheckpoint=async()=>({...readErasureCheckpoint(checkpoint),snapshot_sha256:sha256(snapshotBytes)});
-   return readCheckpoint().then(trust=>restorePostgresSnapshot({connectionString:url.href,target,registerFile,snapshotBytes,trust,readCheckpoint}));
+  const load=async snapshotBytes=>{
+   const trust={...readErasureCheckpoint(checkpoint),snapshot_sha256:sha256(snapshotBytes)};
+   return restorePostgresSnapshot({connectionString:url.href,target,registerFile,snapshotBytes,trust,checkpointFile:checkpoint.checkpointFile,checkpointLockFile});
   };
   await db.query('alter database "'+database+'" allow_connections false');
   await assert.rejects(load(snapshot(before.contacts,objects,exports)),/ERASED_SUBJECT_PRESENT/);
@@ -101,7 +107,9 @@ export async function verifyErasureReceiptRestore({db,dbUrl,requestId,orgId,cont
   assert.deepEqual(await connect('select file_id from private.p06_export_files'),[]);
  }finally{
   if(created)await db.query('drop database "'+database+'"');
+  fs.chmodSync(checkpointDir,0o700);
   fs.rmSync(registerDir,{recursive:true,force:true});
   fs.rmSync(checkpointDir,{recursive:true,force:true});
+  fs.rmSync(lockDir,{recursive:true,force:true});
  }
 }

@@ -46,19 +46,34 @@ function rotationMessage(previous,next){
  return Buffer.from(canonical({purpose:'erasure-checkpoint-key-rotation-v1',previous,next}));
 }
 
+export function resolveErasureCheckpointFile(registerFile,checkpointFile){
+ if(typeof registerFile!=='string'||typeof checkpointFile!=='string'
+  ||!path.isAbsolute(registerFile)||!path.isAbsolute(checkpointFile))throw Error('INDEPENDENT_CHECKPOINT_REQUIRED');
+ const registerDir=fs.realpathSync(path.dirname(registerFile)),checkpointDir=fs.realpathSync(path.dirname(checkpointFile));
+ const relative=path.relative(registerDir,checkpointDir);
+ if(!relative||(!path.isAbsolute(relative)&&relative!=='..'&&!relative.startsWith('..'+path.sep)))throw Error('INDEPENDENT_CHECKPOINT_REQUIRED');
+ return path.join(checkpointDir,path.basename(checkpointFile));
+}
+
+export function resolveErasureCheckpointLock(checkpoint,lockFile=checkpoint+'.lock'){
+ if(typeof lockFile!=='string'||!path.isAbsolute(lockFile))throw Error('INVALID_CHECKPOINT_LOCK');
+ const lock=path.join(fs.realpathSync(path.dirname(lockFile)),path.basename(lockFile));
+ if([checkpoint,checkpoint+'.pending',checkpoint+'.next'].includes(lock))throw Error('INVALID_CHECKPOINT_LOCK');
+ return lock;
+}
+
 export function signErasureCheckpointRotation({previous,head,publicKeyPem,previousPrivateKeyPem}){
  const next={...previous,ledger_sha256:head.sha256,ledger_sequence:head.sequence,ledger_public_key_pem:publicKeyPem};
  return sign(null,rotationMessage(previous,next),createPrivateKey(previousPrivateKeyPem)).toString('base64');
 }
 
 export function publishErasureCheckpoint({
- registerFile,checkpointFile,sourceProjectRef,expected,head,publicKeyPem,previousLedgerBytes,rotationSignature,now=Date.now()
+ registerFile,checkpointFile,checkpointLockFile,sourceProjectRef,expected,head,publicKeyPem,previousLedgerBytes,rotationSignature,now=Date.now()
 }){
- if(!path.isAbsolute(registerFile)||!path.isAbsolute(checkpointFile))throw Error('INDEPENDENT_CHECKPOINT_REQUIRED');
- const registerDir=fs.realpathSync(path.dirname(registerFile)),checkpointDir=fs.realpathSync(path.dirname(checkpointFile));
- if(registerDir===checkpointDir||checkpointDir.startsWith(registerDir+path.sep))throw Error('INDEPENDENT_CHECKPOINT_REQUIRED');
- const register=path.join(registerDir,path.basename(registerFile)),checkpoint=path.join(checkpointDir,path.basename(checkpointFile));
- const registerLock=register+'.lock',checkpointLock=checkpoint+'.lock',pending=checkpoint+'.pending',staging=checkpoint+'.next';
+ const checkpoint=resolveErasureCheckpointFile(registerFile,checkpointFile),checkpointDir=path.dirname(checkpoint);
+ const register=path.join(fs.realpathSync(path.dirname(registerFile)),path.basename(registerFile));
+ const registerLock=register+'.lock',checkpointLock=resolveErasureCheckpointLock(checkpoint,checkpointLockFile);
+ const pending=checkpoint+'.pending',staging=checkpoint+'.next';
  const registerFd=fs.openSync(registerLock,'wx',0o600);
  let checkpointFd;
  try{

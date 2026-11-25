@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "7947fee7f4f5d919ec40833416a981dc53df6fd297ef7729309b5ce390c9a187",
-        "reason": "D04 için onaylanan sekiz kaynak parmak izi Ubuntu runner ve dört profilin tam 2/2/4/4 shard beklentilerini günceller. Native API, yetki, işlem sonucu ve ilgili kapsam denetimleri korunur."
+        "fingerprint": "eca934814c3ac1fbae7740373c50d565605c772e21f87480f9168912773eb690",
+        "reason": "Migration envanteri ve ortak native sözleşme kapsamı doğrulandı. D04 için onaylanan sekiz kaynak parmak izi Ubuntu runner ve dört profilin tam 2/2/4/4 shard beklentilerini günceller. Native API, yetki, işlem sonucu ve ilgili kapsam denetimleri korunur."
       }
     },
     {
@@ -1694,8 +1694,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "b48dbcf8d360ea80bd2dfa295c3b69eb60ebc91c92f424be5bd601374257bc8f",
-        "reason": "Ortak P07 native kabulünde abonelik ve finans kanıtı ile operasyonel imha sınırı incelendi."
+        "fingerprint": "a0e928b0f320700e398f17fe2d7e6ebf6f7a87f5780d99e103506be1b8972d25",
+        "reason": "P07 native kabulünde ortak hesap ve başka organizasyonun iletişim kaydı koruması incelendi."
       }
     },
     {
@@ -2026,7 +2026,9 @@
         "apps/backend/supabase/migrations/20261124224526_p07_storage_import_erasure.sql",
         "apps/backend/scripts/p07-storage-erasure.mjs",
         "apps/backend/supabase/migrations/20261124230652_organization_export_and_source_erasure.sql",
-        "apps/backend/supabase/migrations/20261124230835_organization_operational_erasure.sql"
+        "apps/backend/supabase/migrations/20261124230835_organization_operational_erasure.sql",
+        "apps/backend/supabase/migrations/20261124233740_organization_import_copy_erasure.sql",
+        "apps/backend/supabase/migrations/20261124233946_organization_projected_contact_erasure.sql"
       ],
       "operations": [
         "account_delete_preview_v1",
@@ -2051,8 +2053,8 @@
         "platform_operator_access_set_v1"
       ],
       "review": {
-        "fingerprint": "8f2ce93ff765c5f32ad61ac5b1a80c2d3ffcd48543c95eff1aa78b1e05129bbb",
-        "reason": "Davet ve CRM minimizasyonu, bağlı kaynakların korunması ve gerçek makbuzla restore kabulü incelendi."
+        "fingerprint": "242c5a7d6518e808c1a4883433fb0db620d203989016fb4f111099aeb8b70a3c",
+        "reason": "Organizasyon kopyaları, gerçek imha makbuzları ve PostgreSQL commit ile ortak checkpoint kilidi incelendi."
       }
     },
     {
@@ -2247,7 +2249,9 @@
         "apps/backend/supabase/migrations/20261124224526_p07_storage_import_erasure.sql",
         "apps/backend/scripts/p07-storage-erasure.mjs",
         "apps/backend/supabase/migrations/20261124230652_organization_export_and_source_erasure.sql",
-        "apps/backend/supabase/migrations/20261124230835_organization_operational_erasure.sql"
+        "apps/backend/supabase/migrations/20261124230835_organization_operational_erasure.sql",
+        "apps/backend/supabase/migrations/20261124233740_organization_import_copy_erasure.sql",
+        "apps/backend/supabase/migrations/20261124233946_organization_projected_contact_erasure.sql"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -2262,8 +2266,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "5d2ef2902581ddbd5c592f0a6dbfd897a23d26e5e4e73da3390c0ca6d8c1d51d",
-        "reason": "Organizasyon kapsamı, exact worker bağlantısı ve export ile Storage makbuzlarının gerçek checkpoint girdisi incelendi."
+        "fingerprint": "f2f972d97a832193a8ee928732804b537b0cb03782f9c48577134b94e0e4c552",
+        "reason": "Terminal importun kaynak eşliği, saklama blokajları ve exact worker bağlantısı incelendi."
       }
     }
   ]
