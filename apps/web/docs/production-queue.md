@@ -6,9 +6,9 @@ Cache doğruluğu ve oturum kapsamı [kabul edildi](remaining-work.md#final-cach
 
 ## Aktif sıra
 
-| Öncelik | Teslim dilimi                                                    | Kontrol noktası                                                       |
-| ------- | ---------------------------------------------------------------- | --------------------------------------------------------------------- |
-| 1       | [D04](remaining-work.md#d--regresyon-güvenlik-ve-yayın-kapanışı) | İncelenmiş CI politikasıyla dört tarayıcı profilinin bağımsız kabulü. |
+| Öncelik | Teslim dilimi                                | Kontrol noktası                                      |
+| ------- | -------------------------------------------- | ---------------------------------------------------- |
+| 1       | [MONO-02](remaining-work.md#monorepo-geçişi) | Yayımlı SPA’da gerçek öğrenci ve eğitmen ICS kabulü. |
 
 Her teslim ayrı branch ve Draft PR ile başlar. Kod, test ve kabul aynı kaynak SHA'sına bağlıdır. Merge ve production değişikliği açık yetkiye bağlıdır.
 
@@ -17,10 +17,6 @@ Her teslim ayrı branch ve Draft PR ile başlar. Kod, test ve kabul aynı kaynak
 ## Bağımsız tip güvenliği sırası
 
 [TS01–TS06 kapandı](remaining-work.md#frontend-tip-guvenligi).
-
-## Paralel, bağımsız teslim açıkları
-
-[MONO-02](remaining-work.md#monorepo-geçişi) frontend PR’ının kaynak kontrolleri ve yayımlı SPA kabulü sıradadır.
 
 ## Son kontrol
 
