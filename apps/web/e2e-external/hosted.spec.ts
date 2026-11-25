@@ -1,3 +1,4 @@
+import { activate, hasTouchInput } from "../e2e/device-input.js";
 import { test, expect } from "../e2e/test.js";
 
 const origin = "https://app.fethiyetango.com";
@@ -12,16 +13,22 @@ test("G-PRO-04 hosted SPA keeps direct routes and accessible keyboard controls",
   expect((await page.goto(`${origin}/login`))?.status()).toBe(200);
   const signIn = page.getByRole("heading", { name: "Hesabına giriş yap", exact: true });
   await expect(signIn).toBeVisible();
-  await page.getByLabel("E-posta", { exact: true }).focus();
-  await page.keyboard.press("Tab");
-  await expect(page.getByRole("link", { name: "Parolamı unuttum" })).toBeFocused();
-  await page.keyboard.press("Tab");
-  await expect(page.getByLabel("Parola", { exact: true })).toBeFocused();
+  if (hasTouchInput(page)) {
+    const password = page.getByLabel("Parola", { exact: true });
+    await activate(password);
+    await expect(password).toBeFocused();
+  } else {
+    await page.getByLabel("E-posta", { exact: true }).focus();
+    await page.keyboard.press("Tab");
+    await expect(page.getByRole("link", { name: "Parolamı unuttum" })).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(page.getByLabel("Parola", { exact: true })).toBeFocused();
+  }
 
   const documentStart = await page.evaluate("performance.timeOrigin");
   const signup = page.getByRole("link", { name: "Kayıt ol", exact: true });
-  await signup.focus();
-  await signup.press("Enter");
+  if (!hasTouchInput(page)) await signup.focus();
+  await activate(signup, "Enter");
   await expect(page).toHaveURL(`${origin}/signup`);
   await expect(page.getByRole("heading", { name: "Hesabını oluştur", exact: true })).toBeVisible();
   expect(await page.evaluate("performance.timeOrigin")).toBe(documentStart);
@@ -43,7 +50,7 @@ test("P01.3 hosted Google start uses the public Web1 callback without a real acc
   );
   // Read the upstream redirect explicitly and stop before Google's interactive page.
   await page.route("**/auth/v1/authorize?*", (route) => route.abort());
-  await page.getByRole("button", { name: "Google ile devam et", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Google ile devam et", exact: true }));
   const url = new URL((await authorize).url());
   expect(url.origin).toBe(authOrigin);
   expect(url.searchParams.get("provider")).toBe("google");

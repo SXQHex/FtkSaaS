@@ -81,6 +81,7 @@ export function EventSheet({
       }}
       isDismissable={!locked}
       isKeyboardDismissDisabled={locked}
+      showCloseButton={!locked}
     >
       <SheetHeader>
         <SheetTitle>{editing ? t(($) => $.events.editor.edit) : t(($) => $.events.add)}</SheetTitle>

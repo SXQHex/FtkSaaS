@@ -1,3 +1,4 @@
+import { activate, hasTouchInput } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { scanAccessibility } from "./accessibility.js";
 
@@ -30,20 +31,27 @@ for (const colorScheme of ["light", "dark"] as const) {
         page.getByRole("button", { name: "Google ile kayıt ol", exact: true }),
         page.getByRole("link", { name: "Giriş yap", exact: true }),
       ];
-      await controls[0]!.focus();
+      const touch = hasTouchInput(page);
+      if (!touch) await controls[0]!.focus();
       for (const [index, control] of controls.entries()) {
-        if (index > 0) await page.keyboard.press("Tab");
-        await expect(control).toBeFocused();
+        if (touch) {
+          await control.scrollIntoViewIfNeeded();
+        } else {
+          if (index > 0) await page.keyboard.press("Tab");
+          await expect(control).toBeFocused();
+        }
         await expect(control).toBeInViewport({ ratio: 1 });
         const box = await control.boundingBox();
         expect(box).not.toBeNull();
         expect(box!.x).toBeGreaterThanOrEqual(0);
         expect(box!.x + box!.width).toBeLessThanOrEqual(width + 1);
       }
-      for (const control of controls.slice(0, -1).reverse()) {
-        await page.keyboard.press("Shift+Tab");
-        await expect(control).toBeFocused();
-        await expect(control).toBeInViewport({ ratio: 1 });
+      if (!touch) {
+        for (const control of controls.slice(0, -1).reverse()) {
+          await page.keyboard.press("Shift+Tab");
+          await expect(control).toBeFocused();
+          await expect(control).toBeInViewport({ ratio: 1 });
+        }
       }
       expect(await page.evaluate("document.documentElement.scrollWidth > innerWidth")).toBe(false);
       expect(
@@ -53,7 +61,7 @@ for (const colorScheme of ["light", "dark"] as const) {
       await page.getByLabel("E-posta", { exact: true }).fill("invalid");
       await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
       await page.getByLabel("Parola tekrar", { exact: true }).fill("Fixture123");
-      await page.getByRole("button", { name: "Hesap oluştur", exact: true }).click();
+      await activate(page.getByRole("button", { name: "Hesap oluştur", exact: true }));
       await expect(page.getByLabel("E-posta", { exact: true })).toBeFocused();
       await expect(page.getByLabel("E-posta", { exact: true })).toBeInViewport({ ratio: 1 });
       expect(

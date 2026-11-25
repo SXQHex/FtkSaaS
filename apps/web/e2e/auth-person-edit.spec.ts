@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import type { RequestPersonUpdate } from "@ftksaas/api-contracts";
 import { test, expect } from "./test.js";
 import { mockMemberLifecycle } from "./member-lifecycle-fixture.js";
@@ -107,7 +108,7 @@ async function setup(
     }
     return route.fallback();
   });
-  await page.getByRole("button", { name: text.title, exact: true }).click();
+  await activate(page.getByRole("button", { name: text.title, exact: true }));
   const panel = page.getByRole("dialog", { name: text.title, exact: true });
   await expect(
     panel.getByRole("textbox", { name: common.people.fullName, exact: true }),
@@ -131,13 +132,14 @@ async function review(
   await panel
     .getByRole("textbox", { name: common.people.fullName, exact: true })
     .fill("Yeni sentetik kişi");
-  await panel.getByRole("button", { name: text.review, exact: true }).click();
+  await activate(panel.getByRole("button", { name: text.review, exact: true }));
   const dialog = page.getByRole("dialog", { name: text.review, exact: true });
   await expect(dialog).toBeVisible();
   await expect(dialog.getByRole("button", { name: text.apply, exact: true })).toBeDisabled();
-  await dialog
-    .getByRole("checkbox", { name: common.settings.acceptReview, exact: true })
-    .press("Space");
+  await activate(
+    dialog.getByRole("checkbox", { name: common.settings.acceptReview, exact: true }),
+    "Space",
+  );
   return dialog;
 }
 test("person details preserve native/unknown fields and save local name/contact separately from student status", async ({
@@ -153,13 +155,13 @@ test("person details preserve native/unknown fields and save local name/contact 
     "",
   );
   await f.panel.getByRole("textbox", { name: "E-posta 2", exact: true }).fill("");
-  await f.panel.getByRole("button", { name: text.addEmail, exact: true }).click();
+  await activate(f.panel.getByRole("button", { name: text.addEmail, exact: true }));
   await f.panel.getByRole("textbox", { name: "E-posta 4", exact: true }).fill("new@example.test");
   const dialog = await review(page, f.panel);
   expect(f.writes).toHaveLength(0);
   await expect(dialog).toContainText("local@example.test");
   await expect(dialog).toContainText("new@example.test");
-  await dialog.getByRole("button", { name: text.apply, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: text.apply, exact: true }));
   await expect(dialog.getByRole("status")).toContainText(text.states.saved);
   expect(f.writes).toHaveLength(1);
   expect(f.committed.size).toBe(1);
@@ -174,12 +176,12 @@ test("person details preserve native/unknown fields and save local name/contact 
       { kind: "email", value: "new@example.test" },
     ],
   });
-  await dialog.getByRole("button", { name: common.settings.discard, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: common.settings.discard, exact: true }));
   await page.reload();
   await expect(
     page.getByRole("heading", { name: "Yeni sentetik kişi", exact: true }),
   ).toBeVisible();
-  await page.getByRole("button", { name: text.title, exact: true }).click();
+  await activate(page.getByRole("button", { name: text.title, exact: true }));
   await expect(page.getByRole("textbox", { name: "E-posta 3", exact: true })).toHaveValue(
     "new@example.test",
   );
@@ -188,7 +190,7 @@ test("person details preserve native/unknown fields and save local name/contact 
     f.panel.getByRole("button", { name: "Takvim bağlantısı oluştur", exact: true }),
   ).toHaveCount(0);
   expect(f.calendarCalls).toEqual([]);
-  await f.panel.getByRole("button", { name: common.memberProfile.close, exact: true }).click();
+  await activate(f.panel.getByRole("button", { name: common.memberProfile.close, exact: true }));
   await expect(f.panel).toBeHidden();
 });
 test("lost person update reply recovers its receipt without repeating the mutation", async ({
@@ -196,12 +198,12 @@ test("lost person update reply recovers its receipt without repeating the mutati
 }) => {
   const f = await setup(page, { unknown: true });
   const dialog = await review(page, f.panel);
-  await dialog.getByRole("button", { name: text.apply, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: text.apply, exact: true }));
   await expect(dialog.getByRole("status")).toContainText(text.states.unknown);
   await expect(
     dialog.getByRole("button", { name: common.settings.discard, exact: true }),
   ).toBeDisabled();
-  await dialog.getByRole("button", { name: common.finance.readResult, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: common.finance.readResult, exact: true }));
   await expect(dialog.getByRole("status")).toContainText(text.states.saved);
   expect(f.writes).toHaveLength(1);
   expect(f.receipts).toHaveLength(1);
@@ -212,9 +214,9 @@ test("ACK read failure rereads only the person; it never rewrites or asks for an
 }) => {
   const f = await setup(page, { unread: true });
   const dialog = await review(page, f.panel);
-  await dialog.getByRole("button", { name: text.apply, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: text.apply, exact: true }));
   await expect(dialog.getByRole("status")).toContainText(text.states["saved-unread"]);
-  await dialog.getByRole("button", { name: common.finance.readResult, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: common.finance.readResult, exact: true }));
   await expect(dialog.getByRole("status")).toContainText(text.states.saved);
   expect(f.writes).toHaveLength(1);
   expect(f.receipts).toHaveLength(0);
@@ -224,13 +226,13 @@ test("stale person version requires closing and reviewing fresh fields before a 
 }) => {
   const f = await setup(page, { stale: true });
   let dialog = await review(page, f.panel);
-  await dialog.getByRole("button", { name: text.apply, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: text.apply, exact: true }));
   await expect(dialog.getByRole("status")).toContainText(text.states.stale);
-  await dialog.getByRole("button", { name: common.settings.discard, exact: true }).click();
-  await f.panel.getByRole("button", { name: common.memberProfile.close, exact: true }).click();
-  await page.getByRole("button", { name: text.title, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: common.settings.discard, exact: true }));
+  await activate(f.panel.getByRole("button", { name: common.memberProfile.close, exact: true }));
+  await activate(page.getByRole("button", { name: text.title, exact: true }));
   dialog = await review(page, page.getByRole("dialog", { name: text.title, exact: true }));
-  await dialog.getByRole("button", { name: text.apply, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: text.apply, exact: true }));
   await expect(dialog.getByRole("status")).toContainText(text.states.saved);
   expect(f.writes).toHaveLength(2);
   expect(f.writes[1]!.expected_version).toBe(f.writes[0]!.expected_version + 1);
@@ -243,7 +245,7 @@ test("native write denial never reports saved person details or creates relation
   const f = await setup(page, { denied: true });
   const name = f.person.display_name;
   const dialog = await review(page, f.panel);
-  await dialog.getByRole("button", { name: text.apply, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: text.apply, exact: true }));
   await expect(dialog.getByRole("status")).toContainText(text.states.rejected);
   await expect(page.getByText(text.states.saved, { exact: true })).toHaveCount(0);
   expect(f.writes).toHaveLength(1);

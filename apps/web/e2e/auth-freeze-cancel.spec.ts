@@ -1,3 +1,4 @@
+import { activate, attemptOutsideDismissal } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import type {
@@ -184,11 +185,13 @@ async function setup(
   await page.goto(origin + "/login");
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(origin + "/account");
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/people/${I.instructor}`);
-  await page.getByRole("button", { name: common.memberProfile.cancelFreeze, exact: true }).click();
+  await activate(
+    page.getByRole("button", { name: common.memberProfile.cancelFreeze, exact: true }),
+  );
   const panel = page.getByRole("dialog", {
     name: common.memberProfile.titles.cancelFreeze,
     exact: true,
@@ -197,13 +200,16 @@ async function setup(
   return { studio, writes, previews, receipts, shortening, row, panel, record };
 }
 async function review(state: Awaited<ReturnType<typeof setup>>) {
-  await state.panel.getByRole("button", { name: common.memberProfile.review, exact: true }).click();
+  await activate(
+    state.panel.getByRole("button", { name: common.memberProfile.review, exact: true }),
+  );
 }
 async function approve(state: Awaited<ReturnType<typeof setup>>) {
-  await state.panel
-    .getByRole("checkbox", { name: common.memberProfile.accepted, exact: true })
-    .press("Space");
-  await state.panel.getByRole("button", { name: "Uygula", exact: true }).click();
+  await activate(
+    state.panel.getByRole("checkbox", { name: common.memberProfile.accepted, exact: true }),
+    "Space",
+  );
+  await activate(state.panel.getByRole("button", { name: "Uygula", exact: true }));
 }
 test("mobile planned freeze cancellation reviews exact native extension removal and preserves interval and booked rights", async ({
   page,
@@ -232,7 +238,9 @@ test("mobile planned freeze cancellation reviews exact native extension removal 
     starts_at: state.record.starts_at,
     planned_end: state.record.planned_end,
   });
-  await state.panel.getByRole("button", { name: common.memberProfile.close, exact: true }).click();
+  await activate(
+    state.panel.getByRole("button", { name: common.memberProfile.close, exact: true }),
+  );
   await expect(
     page.getByText(common.memberProfile.freezeStates.cancelled, { exact: true }),
   ).toBeVisible();
@@ -259,12 +267,12 @@ test("unknown freeze cancellation keeps the intent across receipt failure and re
   await review(state);
   await approve(state);
   await expect(state.panel.getByText(common.finance.unknownWrite, { exact: true })).toBeVisible();
-  await page.keyboard.press("Escape");
+  await attemptOutsideDismissal(state.panel);
   await expect(state.panel).toBeVisible();
-  await state.panel.getByRole("button", { name: common.finance.readResult, exact: true }).click();
+  await activate(state.panel.getByRole("button", { name: common.finance.readResult, exact: true }));
   await expect.poll(() => state.receipts.length).toBe(1);
   await expect(state.panel.getByText(common.finance.unknownWrite, { exact: true })).toBeVisible();
-  await state.panel.getByRole("button", { name: common.finance.readResult, exact: true }).click();
+  await activate(state.panel.getByRole("button", { name: common.finance.readResult, exact: true }));
   await expect(
     state.panel.getByText(common.memberProfile.freezeSaved, { exact: true }),
   ).toBeVisible();
@@ -284,7 +292,7 @@ test("acknowledged freeze cancellation recovers current rights without another w
   await expect(
     state.panel.getByRole("button", { name: common.finance.retrySame, exact: true }),
   ).toHaveCount(0);
-  await state.panel.getByRole("button", { name: common.finance.readResult, exact: true }).click();
+  await activate(state.panel.getByRole("button", { name: common.finance.readResult, exact: true }));
   await expect(
     state.panel.getByText(common.memberProfile.freezeSaved, { exact: true }),
   ).toBeVisible();

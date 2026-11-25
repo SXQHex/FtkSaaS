@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { expect, test } from "./test.js";
 import { scanAccessibility } from "./accessibility.js";
 
@@ -38,13 +39,13 @@ test("supports React Aria pointer and keyboard presses", async ({ page }) => {
   const button = page.getByRole("button", { name: "Test Et", exact: true });
   const status = page.getByRole("status");
   await expect(status).toHaveText("Tıklama sayısı: 0");
-  await button.click();
+  await activate(button);
   await expect(status).toHaveText("Tıklama sayısı: 1");
   await button.focus();
   await expect(button).toBeFocused();
-  await button.press("Enter");
+  await activate(button, "Enter");
   await expect(status).toHaveText("Tıklama sayısı: 2");
-  await button.press("Space");
+  await activate(button, "Space");
   await expect(status).toHaveText("Tıklama sayısı: 3");
   await page.reload();
   await expect(status).toHaveText("Tıklama sayısı: 0");

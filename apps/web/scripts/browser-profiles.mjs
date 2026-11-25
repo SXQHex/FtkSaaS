@@ -1,23 +1,17 @@
 export const browserProfiles = {
-  chromium: { device: "Desktop Chrome", engine: "chromium" },
-  "mobile-chromium": { device: "Pixel 7", engine: "chromium" },
-  "mobile-webkit": { device: "iPhone 14", engine: "webkit" },
-  webkit: { device: "Desktop Safari", engine: "webkit" },
+  chromium: { device: "Desktop Chrome", engine: "chromium", shards: 2 },
+  "mobile-chromium": { device: "Pixel 7", engine: "chromium", shards: 2 },
+  "mobile-webkit": { device: "iPhone 15", engine: "webkit", shards: 4 },
+  webkit: {
+    device: "Desktop Safari",
+    engine: "webkit",
+    shards: 4,
+    // 13.6-inch MacBook Air Retina screen in CSS pixels at DPR 2.
+    screen: { width: 1280, height: 832 },
+  },
 };
 
-export const browserShards = [1, 2, 3];
-
-export const browserMatrix = Object.entries(browserProfiles).flatMap(([profile, { engine }]) =>
-  browserShards.map((shard) => ({ profile, engine, shard })),
+export const browserMatrix = Object.entries(browserProfiles).flatMap(
+  ([profile, { engine, shards }]) =>
+    Array.from({ length: shards }, (_, index) => ({ profile, engine, shard: index + 1 })),
 );
-
-// Temporary refactoring acceptance: run the full selected Playwright inventory
-// on Desktop Chromium only. Restore browserMatrix after refactoring is complete.
-// Do not delete the other profiles or their tests.
-export const refactoringBrowserShards = Array.from({ length: 12 }, (_, index) => index + 1);
-
-export const refactoringBrowserMatrix = refactoringBrowserShards.map((shard) => ({
-  profile: "chromium",
-  engine: "chromium",
-  shard,
-}));

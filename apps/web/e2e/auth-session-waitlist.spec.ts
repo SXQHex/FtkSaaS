@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import type { WaitlistEntryView, SeatOfferView } from "@ftksaas/api-contracts";
@@ -153,7 +154,7 @@ async function setup(
   });
   await page.reload();
   await expect(page.getByRole("heading", { name: "Sentetik seans", exact: true })).toBeVisible();
-  await page.getByRole("tab", { name: "Bekleme listesi", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Bekleme listesi", exact: true }));
   return {
     writes,
     restore: () => {
@@ -164,26 +165,26 @@ async function setup(
 const saved = "İşlem kaydedildi ve güncel sonuç okundu.";
 async function confirm(page: Page) {
   const dialog = page.getByRole("dialog");
-  await dialog.getByRole("checkbox").press("Space");
-  await dialog.getByRole("button", { name: "Onayla", exact: true }).click();
+  await activate(dialog.getByRole("checkbox"), "Space");
+  await activate(dialog.getByRole("button", { name: "Onayla", exact: true }));
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
-  await dialog.getByRole("button", { name: "Kapat", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Kapat", exact: true }));
 }
 test("completed mobile waitlist joins and leaves through native versions and keeps actual reservation source", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 320, height: 950 });
   const state = await setup(page);
-  await page.getByRole("button", { name: "Listeye ekle", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Listeye ekle", exact: true }));
   const dialog = page.getByRole("dialog");
-  await dialog.getByRole("button", { name: "Ara", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Ara", exact: true }));
   await dialog.getByLabel("Üye", { exact: true }).selectOption(I.self);
-  await dialog.getByRole("checkbox").press("Space");
-  await dialog.getByRole("button", { name: "Bekleme listesine ekle", exact: true }).click();
+  await activate(dialog.getByRole("checkbox"), "Space");
+  await activate(dialog.getByRole("button", { name: "Bekleme listesine ekle", exact: true }));
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   expect((await scanAccessibility(page, "session-waitlist-join-mobile")).violations).toEqual([]);
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await page.getByRole("button", { name: "Listeden çıkar — Örnek öğrenci", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
+  await activate(page.getByRole("button", { name: "Listeden çıkar — Örnek öğrenci", exact: true }));
   await confirm(page);
   expect(state.writes.map((row) => row.operation)).toEqual([
     "waitlist_join_v1",
@@ -192,7 +193,7 @@ test("completed mobile waitlist joins and leaves through native versions and kee
   await expect(page.getByText("Ayrıldı", { exact: true })).toBeVisible();
   expect(await page.evaluate("document.documentElement.scrollWidth>innerWidth")).toBe(false);
   expect((await scanAccessibility(page, "session-waitlist-left-mobile")).violations).toEqual([]);
-  await page.getByRole("tab", { name: "Katılımcılar", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Katılımcılar", exact: true }));
   await expect(page.getByText(/Satın alınmış paket · 7 ders · Aktif/)).toBeVisible();
 });
 for (const action of ["accept", "reject"] as const)
@@ -200,12 +201,12 @@ for (const action of ["accept", "reject"] as const)
     page,
   }) => {
     const state = await setup(page, { offered: true });
-    await page
-      .getByRole("button", {
+    await activate(
+      page.getByRole("button", {
         name: action === "accept" ? "Teklifi kabul et" : "Teklifi reddet",
         exact: true,
-      })
-      .click();
+      }),
+    );
     await confirm(page);
     expect(state.writes).toHaveLength(1);
     expect(state.writes[0]).toMatchObject({
@@ -226,19 +227,18 @@ test("directory denial is not empty and unknown join recovers without rewrite", 
   ).toBeVisible();
   await expect(page.getByText("Bu sayfada bekleyen kayıt yok.", { exact: true })).toHaveCount(0);
   state.restore();
-  await page
-    .getByRole("tabpanel")
-    .getByRole("button", { name: "Yeniden oku", exact: true })
-    .click();
-  await page.getByRole("button", { name: "Listeye ekle", exact: true }).click();
+  await activate(
+    page.getByRole("tabpanel").getByRole("button", { name: "Yeniden oku", exact: true }),
+  );
+  await activate(page.getByRole("button", { name: "Listeye ekle", exact: true }));
   const dialog = page.getByRole("dialog");
-  await dialog.getByRole("button", { name: "Ara", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Ara", exact: true }));
   await dialog.getByLabel("Üye", { exact: true }).selectOption(I.self);
-  await dialog.getByRole("checkbox").press("Space");
-  await dialog.getByRole("button", { name: "Bekleme listesine ekle", exact: true }).click();
-  await dialog.getByRole("button", { name: "İşlem sonucunu oku", exact: true }).click();
+  await activate(dialog.getByRole("checkbox"), "Space");
+  await activate(dialog.getByRole("button", { name: "Bekleme listesine ekle", exact: true }));
+  await activate(dialog.getByRole("button", { name: "İşlem sonucunu oku", exact: true }));
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
   await expectGridButtonTarget(
     page.getByRole("grid", { name: "Bekleme listesi", exact: true }).getByRole("button", {
       name: "Listeden çıkar — Örnek öğrenci",

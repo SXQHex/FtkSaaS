@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "acf6e1291779471849b2d4fc125fbdb92161a4b89cbe01222fd4bf1a6638a666",
-        "reason": "Node LTS ve pnpm pinleri ile yerel Auth sağlayıcı anahtarları güncellendi. Frozen kurulum, API kapsamı ve pnpm sürüm beklentisine ait inceleme kaydı doğrulandı."
+        "fingerprint": "7340f0cba1ffee321e62a44e81cd67750157ccb6ff3e987c30904f506d1bbbf4",
+        "reason": "Node LTS ve pnpm pinleri ile yerel Auth sağlayıcı anahtarları güncellendi. Frozen kurulum, API kapsamı ve pnpm sürüm beklentisine ait inceleme kaydı doğrulandı. D04 için onaylanan sekiz kaynak parmak izi Ubuntu runner ve 2/2/4/4 shard beklentilerini kapsar."
       }
     },
     {

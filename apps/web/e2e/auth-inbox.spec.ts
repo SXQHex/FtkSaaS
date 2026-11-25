@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
@@ -390,7 +391,7 @@ async function fixture(
   await page.goto(`${origin}/login`);
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   if (member) {
@@ -401,7 +402,7 @@ async function fixture(
     );
     const initialReads = state.lists.length;
     await page.evaluate("document.documentElement.dataset.inboxNavigationProbe='member'");
-    await bell.press("Enter");
+    await activate(bell, "Enter");
     await expect(page).toHaveURL(`${origin}/inbox?org=${I.org}&center=${I.center}&view=member`);
     await expect(page.getByRole("button", { name: memberTitle, exact: true })).toBeVisible();
     await expect(page.locator("html")).toHaveAttribute("data-inbox-navigation-probe", "member");
@@ -426,14 +427,14 @@ test("inbox shows native copy safely, enables native discovery, and restores mob
   await expect(
     page.getByRole("button", { name: "Seçilenleri okundu yap", exact: true }),
   ).toBeDisabled();
-  await page.getByRole("button", { name: "Örnek bildirim", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Örnek bildirim", exact: true }));
   await expect(page.getByRole("heading", { name: "Örnek bildirim", exact: true })).toBeFocused();
   await expect(page.locator("aside img")).toHaveCount(0);
   await expect(page.getByRole("complementary", { name: "İleti ayrıntısı" })).toContainText(
     "Gecikti",
   );
   await expect(page.getByRole("button", { name: "Yanıtla", exact: true })).toHaveCount(0);
-  await page.getByRole("button", { name: "Gelen kutusu", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Gelen kutusu", exact: true }));
   await expect(page.getByRole("button", { name: "Örnek bildirim", exact: true })).toBeFocused();
   expect(state.writes).toHaveLength(0);
 });
@@ -446,12 +447,12 @@ test("participant sees a native session change notice and retains its exact read
   const bell = page.getByRole("link", { name: "Bildirimler", exact: true });
   await expect(bell).toHaveAttribute("aria-current", "page");
   await expect(page.getByRole("button", { name: changeTitle, exact: true })).toBeVisible();
-  await page.getByRole("radio", { name: "Okunmamış", exact: true }).click();
-  await page.getByRole("button", { name: changeTitle, exact: true }).click();
+  await activate(page.getByRole("radio", { name: "Okunmamış", exact: true }));
+  await activate(page.getByRole("button", { name: changeTitle, exact: true }));
   await expect(page.getByRole("complementary", { name: "İleti ayrıntısı" })).toContainText(
     changeBody,
   );
-  await page.getByRole("button", { name: "Okundu yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Okundu yap", exact: true }));
   await expect(
     page.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),
   ).toBeVisible();
@@ -463,10 +464,10 @@ test("participant sees a native session change notice and retains its exact read
   await expect(page.getByRole("button", { name: "Okunmadı yap", exact: true })).toBeDisabled();
   await expect(bell).toHaveAccessibleDescription("0 okunmamış bildirim");
   await expect(bell.locator("..").locator('[data-slot="badge"]')).toHaveCount(0);
-  await page.getByRole("button", { name: "Bildirimler", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Bildirimler", exact: true }));
   await expect(page.getByText("Bu kapsamda görünür ileti yok.", { exact: true })).toBeVisible();
   await page.reload();
-  await page.getByRole("button", { name: changeTitle, exact: true }).click();
+  await activate(page.getByRole("button", { name: changeTitle, exact: true }));
   await expect(page.getByRole("button", { name: "Okunmadı yap", exact: true })).toBeEnabled();
   expect(state.writes).toHaveLength(1);
   const listsBefore = state.lists.length;
@@ -479,9 +480,9 @@ test("member all-read covers the entire inbox and recovers the receipt without a
   page,
 }) => {
   const state = await fixture(page, "participant", { allUnreadUnknown: true });
-  await page.getByRole("radio", { name: "Okunmamış", exact: true }).click();
-  await page.getByRole("button", { name: "Tümünü okundu yap", exact: true }).click();
-  await page.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await activate(page.getByRole("radio", { name: "Okunmamış", exact: true }));
+  await activate(page.getByRole("button", { name: "Tümünü okundu yap", exact: true }));
+  await activate(page.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
   await expect(
     page.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),
   ).toBeVisible();
@@ -500,10 +501,10 @@ test("member change notice opens the exact reservation and rechecks access on re
   const state = await fixture(page, "participant", { crossCenter: true });
   const participant = state.participant!;
   const sessionId = participant.reservations[1]!.session_id;
-  await page.getByRole("button", { name: changeTitle, exact: true }).click();
+  await activate(page.getByRole("button", { name: changeTitle, exact: true }));
   const target = page.getByRole("link", { name: "Kaynak işlemine git", exact: true });
   await expect(target).toHaveCount(0);
-  await page.getByRole("button", { name: "Kaynağı aç", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Kaynağı aç", exact: true }));
   const path = `/member/reservations?org=${I.org}&center=${sourceCenter}&session=${sessionId}`;
   await expect(target).toHaveAttribute("href", path);
   expect(participant.reads).toContainEqual(
@@ -517,7 +518,7 @@ test("member change notice opens the exact reservation and rechecks access on re
       }),
     }),
   );
-  await target.press("Enter");
+  await activate(target, "Enter");
   await expect(page).toHaveURL(`${origin}${path}`);
   await expect(page.getByText("Sentetik gelecek ders", { exact: true })).toBeVisible();
   await expect(page.getByText(/18 Kas 2026/).first()).toBeVisible();
@@ -547,7 +548,7 @@ test("member change notice opens the exact reservation and rechecks access on re
   const readCount = participant.reads.filter(
     (row) => row.operation === "reservation_list_v1",
   ).length;
-  await page.getByRole("button", { name: changeTitle, exact: true }).click();
+  await activate(page.getByRole("button", { name: changeTitle, exact: true }));
   await expect(page.getByText("Kaynak şu anda erişilebilir değil.", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Kaynağı aç", exact: true })).toHaveCount(0);
   expect(participant.reads.filter((row) => row.operation === "reservation_list_v1")).toHaveLength(
@@ -558,12 +559,12 @@ test("member offer notice opens only the exact offer and rejects a foreign owner
   page,
 }) => {
   const state = await fixture(page, "member-offer");
-  await page.getByRole("button", { name: "Yeni yer teklifi", exact: true }).click();
-  await page.getByRole("button", { name: "Kaynağı aç", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Yeni yer teklifi", exact: true }));
+  await activate(page.getByRole("button", { name: "Kaynağı aç", exact: true }));
   const target = page.getByRole("link", { name: "Kaynak işlemine git", exact: true });
   const path = `/member/reservations?org=${I.org}&center=${I.center}&offer=${sourceId}`;
   await expect(target).toHaveAttribute("href", path);
-  await target.press("Enter");
+  await activate(target, "Enter");
   await expect(page).toHaveURL(`${origin}${path}`);
   await expect(page.getByRole("button", { name: "Teklifi kabul et", exact: true })).toBeEnabled();
   await expect(page.getByText("Teklifin gerçek seansı", { exact: true })).toBeVisible();
@@ -571,8 +572,8 @@ test("member offer notice opens only the exact offer and rejects a foreign owner
   await page.goBack();
   await expect(page.getByRole("heading", { name: "Bildirimler", exact: true })).toBeVisible();
   state.foreignOffer = true;
-  await page.getByRole("button", { name: "Yeni yer teklifi", exact: true }).click();
-  await page.getByRole("button", { name: "Kaynağı aç", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Yeni yer teklifi", exact: true }));
+  await activate(page.getByRole("button", { name: "Kaynağı aç", exact: true }));
   await expect(page.getByText("Kaynak şu anda erişilebilir değil.", { exact: true })).toBeVisible();
   await expect(target).toHaveCount(0);
   await page.goForward();
@@ -590,12 +591,12 @@ test("member private lesson response opens only its request and rereads after re
   const state = await fixture(page, "member-request");
   const lessons = state.privateLessons!;
   const requestId = lessons.requests[1]!.id;
-  await page.getByRole("button", { name: "Özel ders yanıtı", exact: true }).click();
-  await page.getByRole("button", { name: "Kaynağı aç", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Özel ders yanıtı", exact: true }));
+  await activate(page.getByRole("button", { name: "Kaynağı aç", exact: true }));
   const target = page.getByRole("link", { name: "Kaynak işlemine git", exact: true });
   const path = `/member/private-lessons?org=${I.org}&center=${I.center}&request=${requestId}`;
   await expect(target).toHaveAttribute("href", path);
-  await target.press("Enter");
+  await activate(target, "Enter");
   await expect(page).toHaveURL(`${origin}${path}`);
   await expect(page.getByText("Özel ders · Örnek Eğitmen", { exact: true })).toHaveCount(1);
   await expect(
@@ -615,8 +616,8 @@ test("member private lesson response opens only its request and rereads after re
 
 test("inbox unknown write recovers its exact receipt and never marks twice", async ({ page }) => {
   const state = await fixture(page, "unknown");
-  await page.getByRole("button", { name: "Örnek bildirim", exact: true }).click();
-  await page.getByRole("button", { name: "Okundu yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Örnek bildirim", exact: true }));
+  await activate(page.getByRole("button", { name: "Okundu yap", exact: true }));
   await expect(page.getByText(/Sonuç bilinmiyor/)).toBeVisible();
   const all = page.getByRole("radio", { name: "Tümü", exact: true, includeHidden: true });
   await expect(all).toBeDisabled();
@@ -625,7 +626,7 @@ test("inbox unknown write recovers its exact receipt and never marks twice", asy
   } else {
     await expect(all).toBeHidden();
   }
-  await page.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await activate(page.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
   await expect(
     page.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),
   ).toBeVisible();
@@ -636,10 +637,10 @@ test("inbox acknowledged result failure retries only the original result read", 
   page,
 }) => {
   const state = await fixture(page, "unread");
-  await page.getByRole("button", { name: "Örnek bildirim", exact: true }).click();
-  await page.getByRole("button", { name: "Okundu yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Örnek bildirim", exact: true }));
+  await activate(page.getByRole("button", { name: "Okundu yap", exact: true }));
   await expect(page.getByText(/güncel sonuç henüz okunamadı/)).toBeVisible();
-  await page.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await activate(page.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
   await expect(
     page.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),
   ).toBeVisible();
@@ -656,14 +657,14 @@ test("inbox source denial remains unknown and recovers only on explicit retry", 
   ).toBeVisible();
   await expect(page.getByText("Bu kapsamda görünür ileti yok.", { exact: true })).toHaveCount(0);
   state.denied = false;
-  await page.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Yeniden dene", exact: true }));
   await expect(page.getByRole("button", { name: "Örnek bildirim", exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(0);
 });
 test("inbox changed native version is reread before any new writer", async ({ page }) => {
   const state = await fixture(page, "stale");
-  await page.getByRole("button", { name: "Örnek bildirim", exact: true }).click();
-  await page.getByRole("button", { name: "Okundu yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Örnek bildirim", exact: true }));
+  await activate(page.getByRole("button", { name: "Okundu yap", exact: true }));
   await expect(page.getByText(/Önizleme veya kaynak değişti/)).toBeVisible();
   expect(state.writes).toHaveLength(0);
 });
@@ -681,11 +682,12 @@ test("inbox explicit selection uses atomic batch and reverse read remains a sepa
   page,
 }) => {
   const state = await fixture(page, "batch");
-  await page.getByRole("checkbox", { name: "Seç: Örnek bildirim", exact: true }).focus();
-  await page.keyboard.press("Space");
-  await page.getByRole("checkbox", { name: "Seç: İkinci bildirim", exact: true }).focus();
-  await page.keyboard.press("Space");
-  await page.getByRole("button", { name: /Seçilenleri okundu yap/ }).click();
+  await activate(page.getByRole("checkbox", { name: "Seç: Örnek bildirim", exact: true }), "Space");
+  await activate(
+    page.getByRole("checkbox", { name: "Seç: İkinci bildirim", exact: true }),
+    "Space",
+  );
+  await activate(page.getByRole("button", { name: /Seçilenleri okundu yap/ }));
   await expect(
     page.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),
   ).toBeVisible();
@@ -700,8 +702,8 @@ test("inbox explicit selection uses atomic batch and reverse read remains a sepa
   await expect(
     page.getByRole("checkbox", { name: "Seç: Örnek bildirim", exact: true }),
   ).not.toBeChecked();
-  await page.getByRole("button", { name: "Örnek bildirim", exact: true }).click();
-  await page.getByRole("button", { name: "Okunmadı yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Örnek bildirim", exact: true }));
+  await activate(page.getByRole("button", { name: "Okunmadı yap", exact: true }));
   await expect.poll(() => state.writes.length).toBe(2);
   await expect(
     page.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),
@@ -721,8 +723,8 @@ test("inbox archives, deletes with confirmation, and restores the exact selected
   const select = page.getByRole("checkbox", { name: "Seç: Örnek bildirim", exact: true });
   const saved = page.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true });
 
-  await select.press("Space");
-  await page.getByRole("button", { name: "Seçilenleri arşivle", exact: true }).click();
+  await activate(select, "Space");
+  await activate(page.getByRole("button", { name: "Seçilenleri arşivle", exact: true }));
   await expect(saved).toBeVisible();
   await expect(message).toHaveCount(0);
   expect(state.writes[0]).toMatchObject({
@@ -730,35 +732,35 @@ test("inbox archives, deletes with confirmation, and restores the exact selected
     notifications: [{ id, expected_version: 7 }],
   });
   expect(state.writes[0]).not.toHaveProperty("read");
-  await page.getByRole("radio", { name: "Arşiv", exact: true }).click();
+  await activate(page.getByRole("radio", { name: "Arşiv", exact: true }));
   await expect(message).toBeVisible();
-  await select.press("Space");
-  await page.getByRole("button", { name: "Seçilenleri sil", exact: true }).click();
+  await activate(select, "Space");
+  await activate(page.getByRole("button", { name: "Seçilenleri sil", exact: true }));
   const dialog = page.getByRole("alertdialog");
   const cancel = dialog.getByRole("button", { name: "Vazgeç", exact: true });
   await expect(cancel).toBeFocused();
-  await cancel.click();
+  await activate(cancel);
   expect(state.writes).toHaveLength(1);
-  await page.getByRole("button", { name: "Seçilenleri sil", exact: true }).click();
-  await dialog.getByRole("button", { name: "Silinenler’e taşı", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Seçilenleri sil", exact: true }));
+  await activate(dialog.getByRole("button", { name: "Silinenler’e taşı", exact: true }));
   await expect(saved).toBeVisible();
   await expect(message).toHaveCount(0);
-  await page.getByRole("radio", { name: "Silinenler", exact: true }).click();
+  await activate(page.getByRole("radio", { name: "Silinenler", exact: true }));
   await expect(message).toBeVisible();
-  await page.getByRole("button", { name: "Taşımayı geri al", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Taşımayı geri al", exact: true }));
   await expect(message).toHaveCount(0);
-  await page.getByRole("radio", { name: "Arşiv", exact: true }).click();
+  await activate(page.getByRole("radio", { name: "Arşiv", exact: true }));
   await expect(message).toBeVisible();
   expect(state.writes[2]).toMatchObject({
     visibility: "archived",
     notifications: [{ id, expected_version: 9 }],
   });
-  await select.press("Space");
-  await page.getByRole("button", { name: "Gelen kutusuna taşı", exact: true }).click();
+  await activate(select, "Space");
+  await activate(page.getByRole("button", { name: "Gelen kutusuna taşı", exact: true }));
   await expect(message).toHaveCount(0);
-  await page.getByRole("radio", { name: "Silinenler", exact: true }).click();
+  await activate(page.getByRole("radio", { name: "Silinenler", exact: true }));
   await expect(message).toHaveCount(0);
-  await page.getByRole("radio", { name: "Okunmamış", exact: true }).click();
+  await activate(page.getByRole("radio", { name: "Okunmamış", exact: true }));
   await expect(message).toBeVisible();
   expect(state.read).toBe(false);
   expect(state.secondVisibility).toBe("inbox");
@@ -781,14 +783,14 @@ test("inbox bulk selection undoes only changed read states using confirmed versi
     page.getByRole("checkbox", { name: "Seç: İkinci bildirim", exact: true }),
   ).toBeVisible();
   await expect(selectPage).toBeEnabled();
-  await selectPage.press("Space");
+  await activate(selectPage, "Space");
   await expect(
     page.getByRole("checkbox", { name: "Seç: İkinci bildirim", exact: true }),
   ).toBeChecked();
-  await page.getByRole("button", { name: /Seçilenleri okundu yap/ }).click();
+  await activate(page.getByRole("button", { name: /Seçilenleri okundu yap/ }));
   const undo = page.getByRole("button", { name: "Okuma değişikliğini geri al", exact: true });
   await expect(undo).toBeEnabled();
-  await undo.click();
+  await activate(undo);
   await expect.poll(() => state.writes.length).toBe(2);
   await expect(
     page.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),
@@ -802,8 +804,8 @@ test("inbox bulk selection undoes only changed read states using confirmed versi
   await expect(undo).toHaveCount(0);
 
   await expect(selectPage).toBeEnabled();
-  await selectPage.press("Space");
-  await page.getByRole("button", { name: "Seçilenleri okunmadı yap", exact: true }).click();
+  await activate(selectPage, "Space");
+  await activate(page.getByRole("button", { name: "Seçilenleri okunmadı yap", exact: true }));
   await expect(undo).toBeEnabled();
   expect(state.writes[2]).toMatchObject({
     read: false,
@@ -813,7 +815,7 @@ test("inbox bulk selection undoes only changed read states using confirmed versi
     ],
   });
   state.secondVersion++;
-  await undo.click();
+  await activate(undo);
   await expect(undo).toHaveCount(0);
   await expect(page.getByRole("alert").filter({ hasText: /değişti/i })).toBeVisible();
   expect(state.writes).toHaveLength(3);
@@ -823,15 +825,14 @@ test("inbox native search and pending filter reset explicit selection and preser
   page,
 }) => {
   const state = await fixture(page, "batch");
-  await page.getByRole("checkbox", { name: "Seç: Örnek bildirim", exact: true }).focus();
-  await page.keyboard.press("Space");
+  await activate(page.getByRole("checkbox", { name: "Seç: Örnek bildirim", exact: true }), "Space");
   await page.getByRole("searchbox", { name: "İletilerde ara", exact: true }).fill("İkinci");
   expect(state.lists.some((r) => r.query === "İkinci")).toBe(false);
-  await page.getByRole("button", { name: "Ara", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Ara", exact: true }));
   await expect(page.getByRole("button", { name: "İkinci bildirim", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: /Seçilenleri okundu yap/ })).toBeDisabled();
   await expect(page.getByRole("radio", { name: "Tümü", exact: true })).toContainText("90");
-  await page.getByRole("radio", { name: "İşlem bekleyen", exact: true }).click();
+  await activate(page.getByRole("radio", { name: "İşlem bekleyen", exact: true }));
   await expect.poll(() => state.lists.at(-1)?.work_state).toBe("pending");
   expect(state.lists.at(-1)).toMatchObject({
     query: "İkinci",
@@ -845,9 +846,9 @@ test("inbox reads exact live source in returned center before offering existing 
   page,
 }) => {
   const state = await fixture(page, "source");
-  await page.getByRole("button", { name: "Örnek bildirim", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Örnek bildirim", exact: true }));
   expect(state.sourceReads).toHaveLength(0);
-  await page.getByRole("button", { name: "Kaynağı aç", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Kaynağı aç", exact: true }));
   const source = page.getByRole("region", { name: "Kaynak ayrıntısı", exact: true });
   await expect(source).toContainText("Tamamlandı");
   await expect(source).toContainText("<img> kaynak metni");
@@ -863,11 +864,11 @@ test("inbox hides a previously available source flow when its explicit reread lo
   page,
 }) => {
   const state = await fixture(page, "source");
-  await page.getByRole("button", { name: "Örnek bildirim", exact: true }).click();
-  await page.getByRole("button", { name: "Kaynağı aç", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Örnek bildirim", exact: true }));
+  await activate(page.getByRole("button", { name: "Kaynağı aç", exact: true }));
   await expect(page.getByRole("link", { name: "Kaynak işlemine git", exact: true })).toBeVisible();
   state.sourceDenied = true;
-  await page.getByRole("button", { name: "Kaynağı aç", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Kaynağı aç", exact: true }));
   await expect(page.getByText("Kaynak şu anda erişilebilir değil.", { exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: "Kaynak işlemine git", exact: true })).toHaveCount(0);
   expect(state.writes).toHaveLength(0);

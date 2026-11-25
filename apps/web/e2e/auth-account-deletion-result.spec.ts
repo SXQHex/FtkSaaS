@@ -1,3 +1,4 @@
+import { activate, hasTouchInput } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { captureAuth, mockNative, origin } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
@@ -26,7 +27,7 @@ async function login(page: import("@playwright/test").Page) {
 async function submitLogin(page: import("@playwright/test").Page) {
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
 }
 for (const lostAck of [false, true])
   test(`deletion explicit confirmation, revoked sessions and owned status ${lostAck}`, async ({
@@ -103,18 +104,18 @@ for (const lostAck of [false, true])
     });
     await login(page);
     await expect(page).toHaveURL(`${origin}/account`);
-    await page.getByRole("tab", { name: "Güvenlik", exact: true }).click();
-    await page.getByRole("button", { name: "Silme önizlemesini aç", exact: true }).click();
+    await activate(page.getByRole("tab", { name: "Güvenlik", exact: true }));
+    await activate(page.getByRole("button", { name: "Silme önizlemesini aç", exact: true }));
     const dialog = page.getByRole("dialog");
     await expect(dialog.getByRole("button", { name: "Hesabı sil", exact: true })).toBeVisible();
-    await dialog.getByRole("button", { name: "Hesabı sil", exact: true }).click();
+    await activate(dialog.getByRole("button", { name: "Hesabı sil", exact: true }));
     await expect(dialog.getByText("Devam etmek için SİL yaz.", { exact: true })).toBeVisible();
     await expect(dialog.getByLabel("Onaylamak için SİL yaz", { exact: true })).toBeFocused();
     expect(applies).toBe(0);
     await dialog.getByLabel("Onaylamak için SİL yaz", { exact: true }).fill("SİL");
     await dialog.getByLabel("Parola", { exact: true }).fill("Fixture123");
     expect((await scanAccessibility(page, "account-delete-confirmation")).violations).toEqual([]);
-    await dialog.getByRole("button", { name: "Hesabı sil", exact: true }).click();
+    await activate(dialog.getByRole("button", { name: "Hesabı sil", exact: true }));
     await expect(page).toHaveURL(`${origin}/account/deletion`);
     expect(applies).toBe(1);
     if (!lostAck) {
@@ -133,10 +134,10 @@ for (const lostAck of [false, true])
         page.getByRole("button", { name: "Aynı isteği kurtar", exact: true }),
       ).toBeVisible();
       expect(applies).toBe(1);
-      await page.getByRole("link", { name: "Girişe dön", exact: true }).click();
+      await activate(page.getByRole("link", { name: "Girişe dön", exact: true }));
       await submitLogin(page);
       await expect(page).toHaveURL(`${origin}/account/deletion`);
-      await page.getByRole("button", { name: "Aynı isteği kurtar", exact: true }).click();
+      await activate(page.getByRole("button", { name: "Aynı isteği kurtar", exact: true }));
       await expect(page.getByRole("button", { name: "Durumu yenile", exact: true })).toBeVisible();
       expect(keys).toHaveLength(2);
       expect(keys[1]).toBe(keys[0]);
@@ -144,7 +145,7 @@ for (const lostAck of [false, true])
     }
     await expect(page.getByRole("alert")).toContainText("Durum okunamadı");
     const readsBefore = native.account;
-    await page.getByRole("button", { name: "Durumu yenile", exact: true }).click();
+    await activate(page.getByRole("button", { name: "Durumu yenile", exact: true }));
     await expect(page.getByText("Silme süreci kısmen tamamlandı.", { exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Silme tamamlandı", exact: true })).toHaveCount(
       0,
@@ -152,14 +153,16 @@ for (const lostAck of [false, true])
     await expect(page.getByText("Yedekler", { exact: true })).toBeVisible();
     expect(native.account).toBe(readsBefore);
     const refresh = page.getByRole("button", { name: "Durumu yenile", exact: true });
-    await refresh.focus();
-    await page.keyboard.press("Tab");
-    await expect(page.getByRole("link", { name: "Girişe dön", exact: true })).toBeFocused();
-    await page.keyboard.press("Shift+Tab");
-    await expect(refresh).toBeFocused();
+    if (!hasTouchInput(page)) {
+      await refresh.focus();
+      await page.keyboard.press("Tab");
+      await expect(page.getByRole("link", { name: "Girişe dön", exact: true })).toBeFocused();
+      await page.keyboard.press("Shift+Tab");
+      await expect(refresh).toBeFocused();
+    }
     const reads = statuses,
       writes = applies;
-    await page.keyboard.press("Enter");
+    await activate(refresh, "Enter");
     await expect.poll(() => statuses).toBe(reads + 1);
     await expect(refresh).toBeEnabled();
     expect(applies).toBe(writes);

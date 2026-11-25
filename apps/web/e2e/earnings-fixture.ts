@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { expect, type Page } from "@playwright/test";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
@@ -337,7 +338,7 @@ export async function mockEarnings(
   await page.goto(`${origin}/login`);
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await page.clock.setFixedTime(new Date("2026-11-17T12:00:00Z"));
@@ -347,12 +348,12 @@ export async function mockEarnings(
 }
 export async function fillEarningsPayment(page: Page) {
   const row = page.getByRole("row").filter({ hasText: "Örnek Eğitmen" });
-  await row.getByRole("button", { name: "Ödeme kaydet", exact: true }).click();
+  await activate(row.getByRole("button", { name: "Ödeme kaydet", exact: true }));
   const dialog = page.getByRole("dialog");
   await dialog.getByRole("combobox", { name: "Para birimi", exact: true }).selectOption("TRY");
   const check = dialog.getByRole("checkbox").first();
   await check.focus();
-  await check.press("Space");
+  await activate(check, "Space");
   await expect(check).toBeChecked();
   await dialog.getByLabel("Tutar · TRY", { exact: true }).fill("100,00");
   await dialog.getByLabel("Tarih", { exact: true }).fill("2026-11-16T14:00");

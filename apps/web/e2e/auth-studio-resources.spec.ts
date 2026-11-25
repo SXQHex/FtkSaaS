@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { scanAccessibility } from "./accessibility.js";
 import { mockStudio, openStudio, studioIds } from "./studio-fixture.js";
@@ -8,13 +9,13 @@ test("Studio resource: a class rename preserves its enabled waitlist without res
   const state = await mockStudio(page);
   state.lessons[0]!.waitlist = true;
   await openStudio(page);
-  await page.getByRole("tab", { name: "Dersler ve salonlar", exact: true }).click();
-  await page.getByRole("button", { name: "Başlangıç grubu", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Dersler ve salonlar", exact: true }));
+  await activate(page.getByRole("button", { name: "Başlangıç grubu", exact: true }));
   const dialog = page.getByRole("dialog");
   const name = dialog.locator("#class-name");
   await expect(name).toBeEditable();
   await name.fill("Yenilenen grup adı");
-  await dialog.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Kaydet", exact: true }));
   await expect(dialog).toHaveCount(0);
   expect(state.writes).toHaveLength(1);
   expect(state.writes[0]!.payload).toMatchObject({
@@ -47,14 +48,14 @@ test("Studio resource: split availability retries only the unknown step and pres
   };
   state.rules.push(structuredClone(old));
   await openStudio(page);
-  await page.getByRole("tab", { name: "Uygunluk", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Uygunluk", exact: true }));
   await page.locator("#availability-instructor").selectOption(studioIds.instructor);
   await page.locator("#availability-period").selectOption(JSON.stringify(["2026-11-01", null]));
   const monday = page.locator('input[id^="availability-monday-"][id$="-from"]');
   await expect(monday).toHaveValue("18:00:00");
   await monday.fill("19:00:00");
   state.nextWrite = "unknown";
-  await page.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Kaydet", exact: true }));
   const retry = page.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true });
   await expect(retry).toBeVisible();
   await expect(page.locator("#availability-instructor")).toBeDisabled();
@@ -65,7 +66,7 @@ test("Studio resource: split availability retries only the unknown step and pres
   expect((await scanAccessibility(page, "studio-availability-unknown-step")).violations).toEqual(
     [],
   );
-  await retry.click();
+  await activate(retry);
   await expect(
     page.getByText(
       "Uygunluk kuralları güncel kaynaktan okundu. Mevcut seanslar otomatik değiştirilmedi.",
@@ -151,21 +152,21 @@ test("Studio room availability preserves its resource across a lost acknowledgem
     return route.fallback();
   });
   await openStudio(page);
-  await page.getByRole("tab", { name: "Uygunluk", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Uygunluk", exact: true }));
   const resource = page.getByLabel("Kaynak", { exact: true });
   await resource.selectOption(`room:${studioIds.room}`);
   await page.locator("#availability-valid-from").fill("2026-11-16");
   await page.locator("#availability-valid-until").fill("2026-11-30");
-  await page.getByRole("switch", { name: "Pazartesi", exact: true }).press("Space");
+  await activate(page.getByRole("switch", { name: "Pazartesi", exact: true }), "Space");
   await expect(page.getByRole("switch", { name: "Pazartesi", exact: true })).toBeChecked();
-  await page.getByRole("button", { name: "Saat aralığı ekle", exact: true }).first().click();
+  await activate(page.getByRole("button", { name: "Saat aralığı ekle", exact: true }).first());
   await page.locator('input[id^="availability-monday-"][id$="-from"]').fill("11:00:00");
   await page.locator('input[id^="availability-monday-"][id$="-to"]').fill("12:00:00");
-  await page.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Kaydet", exact: true }));
   const retry = page.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true });
   await expect(retry).toBeVisible();
   await expect(resource).toBeDisabled();
-  await retry.click();
+  await activate(retry);
   await expect(
     page.getByText(
       "Uygunluk kuralları güncel kaynaktan okundu. Mevcut seanslar otomatik değiştirilmedi.",

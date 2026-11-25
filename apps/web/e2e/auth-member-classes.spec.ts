@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 
@@ -493,11 +494,11 @@ async function fixture(
   return state;
 }
 async function book(page: Page) {
-  await page.getByRole("button", { name: "Kayıt ol", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Kayıt ol", exact: true }));
   const d = page.getByRole("dialog");
-  await d.getByRole("radio").first().press("Space");
-  await d.getByRole("checkbox", { name: review, exact: true }).press("Space");
-  await d.getByRole("button", { name: "Kaydı onayla", exact: true }).click();
+  await activate(d.getByRole("radio").first(), "Space");
+  await activate(d.getByRole("checkbox", { name: review, exact: true }), "Space");
+  await activate(d.getByRole("button", { name: "Kaydı onayla", exact: true }));
   return d;
 }
 test("member discovery shows safe labels and one semantic menu across a narrow viewport", async ({
@@ -511,7 +512,7 @@ test("member discovery shows safe labels and one semantic menu across a narrow v
   ).toHaveAttribute("aria-current", "page");
   expect(state.writes).toHaveLength(0);
   expect(state.reads.filter((row) => row.op === "calendar_get_v1")).toHaveLength(1);
-  await page.getByRole("button", { name: "Sonraki hafta", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Sonraki hafta", exact: true }));
   await expect.poll(() => state.reads.filter((row) => row.op === "calendar_get_v1").length).toBe(2);
 });
 test("member classes use the saved Sunday week and move the same native session after reread", async ({
@@ -532,9 +533,9 @@ test("member classes use the saved Sunday week and move the same native session 
   state.row.ends_at = "2026-11-17T17:00:00Z";
   state.row.member_lesson.version += 1;
   state.row.member_lesson.room_labels = ["Yeni salon"];
-  await page.getByRole("button", { name: "Listeyi yenile", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Listeyi yenile", exact: true }));
   await expect(original).toHaveCount(0);
-  await days.getByRole("radio", { name: "17 Kasım 2026 Salı", exact: true }).click();
+  await activate(days.getByRole("radio", { name: "17 Kasım 2026 Salı", exact: true }));
   await expect(original).toHaveCount(1);
   const card = page.getByRole("listitem").filter({ hasText: state.row.title });
   await expect(card.getByText("19:00", { exact: true })).toBeVisible();
@@ -546,30 +547,30 @@ test("member booking requires an explicit right and review, then rereads native 
   page,
 }) => {
   const state = await fixture(page);
-  await page.getByRole("button", { name: "Kayıt ol", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Kayıt ol", exact: true }));
   const d = page.getByRole("dialog");
-  await d.getByRole("button", { name: "Kaydı onayla", exact: true }).click();
+  await activate(d.getByRole("button", { name: "Kaydı onayla", exact: true }));
   await expect(d.getByRole("alert")).toBeFocused();
   expect(state.writes).toHaveLength(0);
-  await d.getByRole("radio").first().press("Space");
-  await d.getByRole("checkbox", { name: review, exact: true }).press("Space");
-  await d.getByRole("button", { name: "Kaydı onayla", exact: true }).click();
+  await activate(d.getByRole("radio").first(), "Space");
+  await activate(d.getByRole("checkbox", { name: review, exact: true }), "Space");
+  await activate(d.getByRole("button", { name: "Kaydı onayla", exact: true }));
   await expect(page.getByText(saved, { exact: true })).toBeVisible();
   expect(state.writes[0]!.op).toBe("reservation_create_v1");
   await expect(d.getByRole("button", { name: "Kaydı onayla", exact: true })).toBeDisabled();
-  await d.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(d.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(
     page.getByText("Kayıtlısın", { exact: true }).filter({ visible: true }),
   ).toBeVisible();
 });
 test("closing an unsubmitted booking leaves the warm weekly class list alone", async ({ page }) => {
   const state = await fixture(page);
-  await page.getByRole("button", { name: "Kayıt ol", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Kayıt ol", exact: true }));
   const dialog = page.getByRole("dialog");
   await expect(dialog.getByRole("radio").first()).toBeVisible();
   const calendarReads = () => state.reads.filter(({ op }) => op === "calendar_get_v1").length;
   const readsBeforeClose = calendarReads();
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(dialog).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Kayıt ol", exact: true })).toBeVisible();
   expect(calendarReads()).toBe(readsBeforeClose);
@@ -580,7 +581,7 @@ test("member unknown booking recovers from the same receipt and never repeats th
 }) => {
   const state = await fixture(page, { unknown: true });
   await book(page);
-  await page.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await activate(page.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
   await expect(page.getByText(saved, { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(1);
 });
@@ -594,7 +595,7 @@ test("member acknowledged booking with a different package link retries only the
       exact: true,
     }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await activate(page.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
   await expect(page.getByText(saved, { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(1);
 });
@@ -630,21 +631,21 @@ test("member category-full waitlist uses its native category, then supports expl
   page,
 }) => {
   const state = await fixture(page, { category: true });
-  await page.getByRole("button", { name: "Kayıt ol", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Kayıt ol", exact: true }));
   let d = page.getByRole("dialog");
   await d.getByLabel("Rezervasyon kategorisi", { exact: true }).selectOption("male");
-  await d.getByRole("checkbox", { name: review, exact: true }).press("Space");
-  await d.getByRole("button", { name: "Sıraya gir", exact: true }).click();
+  await activate(d.getByRole("checkbox", { name: review, exact: true }), "Space");
+  await activate(d.getByRole("button", { name: "Sıraya gir", exact: true }));
   await expect(page.getByText(saved, { exact: true })).toBeVisible();
   expect(state.writes[0]).toMatchObject({
     op: "waitlist_join_v1",
     request: { booking_category: "male" },
   });
-  await d.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await page.getByRole("button", { name: "Sıradan çık", exact: true }).click();
+  await activate(d.getByRole("button", { name: "Vazgeç", exact: true }));
+  await activate(page.getByRole("button", { name: "Sıradan çık", exact: true }));
   d = page.getByRole("dialog");
-  await d.getByRole("checkbox", { name: review, exact: true }).press("Space");
-  await d.getByRole("button", { name: "Sıradan çık", exact: true }).click();
+  await activate(d.getByRole("checkbox", { name: review, exact: true }), "Space");
+  await activate(d.getByRole("button", { name: "Sıradan çık", exact: true }));
   await expect(page.getByText(saved, { exact: true })).toBeVisible();
   expect(state.entry!.state).toBe("left");
 });
@@ -653,13 +654,13 @@ for (const accept of [true, false])
     page,
   }) => {
     const state = await fixture(page, { full: true, offer: true });
-    await page.getByRole("button", { name: "Teklifi gör", exact: true }).click();
+    await activate(page.getByRole("button", { name: "Teklifi gör", exact: true }));
     const d = page.getByRole("dialog");
     await expect(d.getByText(/Teklifin son geçerlilik zamanı/)).toBeVisible();
-    await d.getByRole("checkbox", { name: review, exact: true }).press("Space");
-    await d
-      .getByRole("button", { name: accept ? "Teklifi kabul et" : "Teklifi reddet", exact: true })
-      .click();
+    await activate(d.getByRole("checkbox", { name: review, exact: true }), "Space");
+    await activate(
+      d.getByRole("button", { name: accept ? "Teklifi kabul et" : "Teklifi reddet", exact: true }),
+    );
     await expect(page.getByText(saved, { exact: true })).toBeVisible();
     expect(state.writes[0]).toMatchObject({
       op: accept ? "seat_offer_accept_v1" : "seat_offer_reject_v1",
@@ -675,11 +676,11 @@ test("member reservation cancellation keeps its native reason/version and refres
   let d = await book(page);
   await expect(page.getByText(saved, { exact: true })).toBeVisible();
   expect(state.row.capacity.remaining).toBe(remaining - 1);
-  await d.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await page.getByRole("button", { name: "İptal et", exact: true }).click();
+  await activate(d.getByRole("button", { name: "Vazgeç", exact: true }));
+  await activate(page.getByRole("button", { name: "İptal et", exact: true }));
   const a = page.getByRole("alertdialog");
   await a.getByLabel("Gerekçe", { exact: true }).fill("Katılamayacağım");
-  await a.getByRole("button", { name: "İptal et", exact: true }).click();
+  await activate(a.getByRole("button", { name: "İptal et", exact: true }));
   await expect(
     page.getByText("Rezervasyon iptal edildi; güncel rezervasyon, seans ve haklar okundu.", {
       exact: true,
@@ -695,17 +696,17 @@ test("member discovery denial stays unknown until explicit retry", async ({ page
   ).toBeVisible();
   await expect(page.getByText("Bu gün ders yok.", { exact: true })).toHaveCount(0);
   state.denied = false;
-  await page.getByRole("button", { name: "Listeyi yenile", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Listeyi yenile", exact: true }));
   await expect(page.getByText("Öğrenciye açık tango", { exact: true })).toBeVisible();
 });
 
 const documentReview = "Belgeyi okudum, bu işlem için kabul ediyorum.";
 async function openDocument(page: Page, options: Parameters<typeof fixture>[1] = {}) {
   const state = await fixture(page, { documents: true, ...options });
-  await page.getByRole("button", { name: "Kayıt ol", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Kayıt ol", exact: true }));
   const d = page.getByRole("dialog");
-  await d.getByRole("radio").first().press("Space");
-  await d.getByRole("button", { name: "Ders koşulları belgesini oku", exact: true }).click();
+  await activate(d.getByRole("radio").first(), "Space");
+  await activate(d.getByRole("button", { name: "Ders koşulları belgesini oku", exact: true }));
   return { state, d };
 }
 test("member document acceptance reads stored text and requires a new booking review without auto booking", async ({
@@ -719,21 +720,21 @@ test("member document acceptance reads stored text and requires a new booking re
     }),
   ).toBeVisible();
   expect(await page.evaluate(() => Object.hasOwn(globalThis, "documentExecuted"))).toBe(false);
-  await d.getByRole("checkbox", { name: review, exact: true }).press("Space");
-  await d.getByRole("button", { name: "Kaydı onayla", exact: true }).click();
+  await activate(d.getByRole("checkbox", { name: review, exact: true }), "Space");
+  await activate(d.getByRole("button", { name: "Kaydı onayla", exact: true }));
   expect(state.writes).toHaveLength(0);
-  await d.getByRole("button", { name: "Belgeyi kabul et", exact: true }).click();
+  await activate(d.getByRole("button", { name: "Belgeyi kabul et", exact: true }));
   await expect(d.getByRole("checkbox", { name: documentReview, exact: true })).toHaveAttribute(
     "aria-invalid",
     "true",
   );
-  await d.getByRole("checkbox", { name: documentReview, exact: true }).press("Space");
-  await d.getByRole("button", { name: "Belgeyi kabul et", exact: true }).click();
+  await activate(d.getByRole("checkbox", { name: documentReview, exact: true }), "Space");
+  await activate(d.getByRole("button", { name: "Belgeyi kabul et", exact: true }));
   await expect(d.getByText("Kabul edildi", { exact: true })).toBeVisible();
   await expect(d.getByRole("checkbox", { name: review, exact: true })).not.toBeChecked();
   expect(state.writes.map((r) => r.op)).toEqual(["document_accept_v1"]);
-  await d.getByRole("checkbox", { name: review, exact: true }).press("Space");
-  await d.getByRole("button", { name: "Kaydı onayla", exact: true }).click();
+  await activate(d.getByRole("checkbox", { name: review, exact: true }), "Space");
+  await activate(d.getByRole("button", { name: "Kaydı onayla", exact: true }));
   await expect.poll(() => state.reservation?.state).toBe("active");
   expect(state.writes.map((r) => r.op)).toEqual(["document_accept_v1", "reservation_create_v1"]);
 });
@@ -741,28 +742,28 @@ test("member unknown document acceptance locks context and recovers the native r
   page,
 }) => {
   const { state, d } = await openDocument(page, { documentUnknown: true });
-  await d.getByRole("checkbox", { name: documentReview, exact: true }).press("Space");
-  await d.getByRole("button", { name: "Belgeyi kabul et", exact: true }).click();
+  await activate(d.getByRole("checkbox", { name: documentReview, exact: true }), "Space");
+  await activate(d.getByRole("button", { name: "Belgeyi kabul et", exact: true }));
   await expect(
     d.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }),
   ).toBeVisible();
   await expect(d.getByLabel("Kayıt türü", { exact: true })).toBeDisabled();
   await expect(d.getByRole("button", { name: "Vazgeç", exact: true })).toBeDisabled();
   await expect(d.getByRole("button", { name: "Kaydı onayla", exact: true })).toBeDisabled();
-  await d.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await activate(d.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
   await expect(d.getByText("Kabul edildi", { exact: true })).toBeVisible();
   expect(state.writes.map((r) => r.op)).toEqual(["document_accept_v1"]);
 });
 test("member acknowledged document acceptance rereads only its result", async ({ page }) => {
   const { state, d } = await openDocument(page, { documentAckUnread: true });
-  await d.getByRole("checkbox", { name: documentReview, exact: true }).press("Space");
-  await d.getByRole("button", { name: "Belgeyi kabul et", exact: true }).click();
+  await activate(d.getByRole("checkbox", { name: documentReview, exact: true }), "Space");
+  await activate(d.getByRole("button", { name: "Belgeyi kabul et", exact: true }));
   await expect(
     d.getByText("İşlem kaydedildi, güncel sonuç henüz okunamadı. Yalnız sonucu yeniden oku.", {
       exact: true,
     }),
   ).toBeVisible();
-  await d.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await activate(d.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
   await expect(d.getByText("Kabul edildi", { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(1);
   expect(state.reads.filter((r) => r.op === "operation_status_get_v1")).toHaveLength(0);
@@ -774,14 +775,14 @@ test("a denied requirements refresh hides the document but preserves acceptance 
   const body = d.getByText(initialDocumentText, { exact: true });
   await expect(body).toBeVisible();
   state.documentSummaryDenied = true;
-  await d.getByRole("checkbox", { name: documentReview, exact: true }).press("Space");
-  await d.getByRole("button", { name: "Belgeyi kabul et", exact: true }).click();
+  await activate(d.getByRole("checkbox", { name: documentReview, exact: true }), "Space");
+  await activate(d.getByRole("button", { name: "Belgeyi kabul et", exact: true }));
   const retry = d.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true });
   await expect(retry).toBeVisible();
   await expect(body).toHaveCount(0);
   await expect(d.getByRole("button", { name: "Belgeyi kabul et", exact: true })).toHaveCount(0);
   state.documentSummaryDenied = false;
-  await retry.click();
+  await activate(retry);
   await expect(d.getByText("Kabul edildi", { exact: true })).toBeVisible();
   expect(state.writes.map(({ op }) => op)).toEqual(["document_accept_v1"]);
 });
@@ -794,7 +795,7 @@ test("member document content failure exposes explicit retry and never offers ac
   ).toBeVisible();
   await expect(d.getByRole("button", { name: "Belgeyi kabul et", exact: true })).toHaveCount(0);
   expect(state.writes).toHaveLength(0);
-  await d.getByRole("button", { name: "Belgeleri yeniden yükle", exact: true }).click();
+  await activate(d.getByRole("button", { name: "Belgeleri yeniden yükle", exact: true }));
   await expect(d.getByRole("button", { name: "Belgeyi kabul et", exact: true })).toBeVisible();
 });
 
@@ -810,8 +811,8 @@ test("reopening a member document waits for a fresh body before offering accepta
       ({ op, request }) => op === "document_requirements_get_v1" && request.content_file_id,
     ).length;
   await expect(original).toBeVisible();
-  await reviewDocument.press("Space");
-  await d.getByRole("button", { name: "Belgeyi kapat", exact: true }).click();
+  await activate(reviewDocument, "Space");
+  await activate(d.getByRole("button", { name: "Belgeyi kapat", exact: true }));
   await expect(original).toHaveCount(0);
   const previousReads = contentReads();
   state.documentText = "Yeniden açılan belge için güncel sentetik metin.";
@@ -820,7 +821,7 @@ test("reopening a member document waits for a fresh body before offering accepta
     release = resolve;
   });
   try {
-    await d.getByRole("button", { name: "Ders koşulları belgesini oku", exact: true }).click();
+    await activate(d.getByRole("button", { name: "Ders koşulları belgesini oku", exact: true }));
     await expect.poll(contentReads).toBeGreaterThan(previousReads);
     await expect(d.getByText("Belgeler yükleniyor…", { exact: true })).toBeVisible();
     await expect(original).toHaveCount(0);
@@ -839,15 +840,15 @@ test("member offer exposes actual flexible-right document contexts without chang
   page,
 }) => {
   const state = await fixture(page, { offer: true, full: true, documents: true });
-  await page.getByRole("button", { name: "Teklifi gör", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Teklifi gör", exact: true }));
   const d = page.getByRole("dialog");
-  await d.getByRole("radio").first().press("Space");
-  await d.getByRole("button", { name: "Ders koşulları belgesini oku", exact: true }).click();
-  await d.getByRole("checkbox", { name: documentReview, exact: true }).press("Space");
-  await d.getByRole("button", { name: "Belgeyi kabul et", exact: true }).click();
+  await activate(d.getByRole("radio").first(), "Space");
+  await activate(d.getByRole("button", { name: "Ders koşulları belgesini oku", exact: true }));
+  await activate(d.getByRole("checkbox", { name: documentReview, exact: true }), "Space");
+  await activate(d.getByRole("button", { name: "Belgeyi kabul et", exact: true }));
   await expect(d.getByText("Kabul edildi", { exact: true })).toBeVisible();
-  await d.getByRole("checkbox", { name: review, exact: true }).press("Space");
-  await d.getByRole("button", { name: "Teklifi kabul et", exact: true }).click();
+  await activate(d.getByRole("checkbox", { name: review, exact: true }), "Space");
+  await activate(d.getByRole("button", { name: "Teklifi kabul et", exact: true }));
   await expect.poll(() => state.entry?.state).toBe("converted");
   const write = state.writes.find((r) => r.op === "seat_offer_accept_v1")!;
   expect(write.request).not.toHaveProperty("source_sale_id");

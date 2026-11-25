@@ -1,3 +1,4 @@
+import { hasTouchInput, activate, submitWithDevice } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { scanAccessibility } from "./accessibility.js";
 
@@ -18,9 +19,9 @@ for (const colorScheme of ["light", "dark"] as const) {
         p { margin-bottom: 2em !important; }`,
       });
       const resend = page.getByRole("button", { name: "Yeniden gönder" });
-      await resend.focus();
-      await page.keyboard.press("Enter");
+      await activate(resend, "Enter");
       const email = page.getByLabel("E-posta", { exact: true });
+      const touch = hasTouchInput(page);
       await expect(email).toBeFocused();
       const controls = [
         page.getByRole("link", { name: "F FtkSaaS" }),
@@ -28,26 +29,38 @@ for (const colorScheme of ["light", "dark"] as const) {
         resend,
         page.getByRole("link", { name: "Girişe dön" }),
       ];
-      await controls[0]!.focus();
+      if (!touch) await controls[0]!.focus();
       for (const [index, control] of controls.entries()) {
-        if (index > 0) await page.keyboard.press("Tab");
-        await expect(control).toBeFocused();
+        if (touch) {
+          await control.scrollIntoViewIfNeeded();
+        } else {
+          if (index > 0) await page.keyboard.press("Tab");
+          await expect(control).toBeFocused();
+        }
         await expect(control).toBeInViewport({ ratio: 1 });
         const box = await control.boundingBox();
         expect(box).not.toBeNull();
         expect(box!.x).toBeGreaterThanOrEqual(0);
         expect(box!.x + box!.width).toBeLessThanOrEqual(width + 1);
       }
-      for (const control of controls.slice(0, -1).reverse()) {
-        await page.keyboard.press("Shift+Tab");
-        await expect(control).toBeFocused();
-        await expect(control).toBeInViewport({ ratio: 1 });
+      if (!touch) {
+        for (const control of controls.slice(0, -1).reverse()) {
+          await page.keyboard.press("Shift+Tab");
+          await expect(control).toBeFocused();
+          await expect(control).toBeInViewport({ ratio: 1 });
+        }
       }
       await email.fill("invalid");
-      await page.keyboard.press("Enter");
-      await expect(email).toBeFocused();
+      await submitWithDevice(resend);
+      if (!touch) {
+        await expect(email).toBeFocused();
+      }
       await expect(email).toHaveAttribute("aria-invalid", "true");
       await expect(email).toHaveAccessibleDescription("Geçerli bir e-posta adresi gir.");
+      if (touch) {
+        await email.tap();
+        await expect(email).toBeFocused();
+      }
       expect(await page.evaluate("document.documentElement.scrollWidth > innerWidth")).toBe(false);
       expect(
         (await scanAccessibility(page, "verification-expanded-invalid-email")).violations,

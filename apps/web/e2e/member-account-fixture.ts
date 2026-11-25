@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { expect, type Page } from "@playwright/test";
 import type { PersonalCalendarLink } from "@ftksaas/api-contracts";
 import { mockOwnReservations } from "./member-reservations-fixture.js";
@@ -185,10 +186,11 @@ export async function mockMemberAccount(
       });
     return route.fallback();
   });
-  await page
-    .getByRole("navigation", { name: "Üye menüsü", exact: true })
-    .getByRole("link", { name: "Hesabım", exact: true })
-    .click();
+  await activate(
+    page
+      .getByRole("navigation", { name: "Üye menüsü", exact: true })
+      .getByRole("link", { name: "Hesabım", exact: true }),
+  );
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Takvim bağlantısı oluştur", exact: true }),
@@ -203,9 +205,9 @@ export async function mockMemberAccount(
   };
 }
 export async function confirmCalendar(page: Page, name: string) {
-  await page.getByRole("button", { name, exact: true }).click();
+  await activate(page.getByRole("button", { name, exact: true }));
   const dialog = page.getByRole("dialog");
-  await dialog.getByRole("checkbox").press("Space");
-  await dialog.getByRole("button", { name, exact: true }).click();
+  await activate(dialog.getByRole("checkbox"), "Space");
+  await activate(dialog.getByRole("button", { name, exact: true }));
   return dialog;
 }

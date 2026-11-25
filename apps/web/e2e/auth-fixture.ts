@@ -1,3 +1,4 @@
+import { activate, hasTouchInput } from "./device-input.js";
 import type { AxeResults } from "axe-core";
 import type { UserIdentity } from "@supabase/supabase-js";
 import { createHash } from "node:crypto";
@@ -21,26 +22,26 @@ import type {
 } from "@ftksaas/api-contracts";
 export const origin = "http://127.0.0.1:4175";
 
-export async function openWorkspaceNavigation(page: Page, activation: "click" | "tap" = "click") {
+export async function openWorkspaceNavigation(page: Page) {
   const navigation = page.getByRole("navigation", { name: "Ana menü", exact: true });
   const open = page
     .getByRole("button", { name: "Menüyü aç veya kapat", exact: true })
     .and(page.locator('[aria-controls="workspace-sidebar"]'));
   await expect(navigation.or(open).first()).toBeVisible();
-  if (!(await navigation.isVisible())) await open[activation]();
+  if (!(await navigation.isVisible())) await activate(open);
   await expect(navigation).toBeVisible();
   return navigation;
 }
 
 export async function clickWorkspaceLink(page: Page, name: string) {
   const navigation = await openWorkspaceNavigation(page);
-  await navigation.getByRole("link", { name, exact: true }).click();
+  await activate(navigation.getByRole("link", { name, exact: true }));
 }
 
 export async function closeWorkspaceNavigation(page: Page) {
   const close = page.getByRole("button", { name: "Menüyü kapat", exact: true });
   if (await close.isVisible()) {
-    await close.click();
+    await activate(close);
     await expect(close).toBeHidden();
   }
 }
@@ -55,6 +56,22 @@ export async function checkLockedWorkspaceScope(page: Page, checkSwitcher: () =>
   // The closed drawer does not mount its switcher at the mobile breakpoint.
   await expect(page.getByRole("dialog").last()).toBeVisible();
   await expect(page.getByRole("navigation", { name: "Ana menü", exact: true })).toBeHidden();
+  if (hasTouchInput(page)) {
+    const trigger = page.locator('button[aria-controls="workspace-sidebar"]');
+    if (!(await trigger.isVisible()) || !(await trigger.isEnabled())) return;
+    const canReachTrigger = await trigger.evaluate((button) => {
+      const { left, top, width, height } = button.getBoundingClientRect();
+      const hit = button.ownerDocument.elementFromPoint(left + width / 2, top + height / 2);
+      return button.contains(hit);
+    });
+    if (!canReachTrigger) return;
+    // Some sheets leave the header visible. If touch can open the drawer,
+    // check the same disabled scope switcher inside the native layout.
+    await openWorkspaceNavigation(page);
+    await checkSwitcher();
+    await closeWorkspaceNavigation(page);
+    return;
+  }
   await page.setViewportSize({ ...viewport, width: 1024 });
   try {
     await checkSwitcher();
@@ -66,7 +83,7 @@ export async function checkLockedWorkspaceScope(page: Page, checkSwitcher: () =>
 export async function openWorkspaceSearch(page: Page) {
   const search = page.getByRole("button", { name: "Ara… Ctrl K", exact: true });
   await expect(page.getByRole("main").getByRole("heading", { level: 1 })).toBeVisible();
-  if (await page.evaluate("matchMedia('(min-width: 641px)').matches")) await search.click();
+  if (hasTouchInput(page) || (await search.isVisible())) await activate(search);
   else await page.keyboard.press("Control+k");
 }
 const id = "019a7b00-0000-7000-8000-000000000001";
@@ -923,5 +940,22 @@ export async function mockNative(page: Page, mfa = false, origins = { app: origi
     if (url.origin !== origins.app) return route.abort("blockedbyclient");
     await route.continue();
   });
-  return calls;
+  return Object.assign(calls, {
+    async seedSession(destination: string) {
+      const target = new URL(destination);
+      expect(target.origin).toBe(origins.app);
+      const storageKey = `sb-${new URL(origins.auth).hostname.split(".")[0]}-auth-token`;
+      const expiresAt = Math.floor(Date.now() / 1000) + 3600;
+      const seed = JSON.stringify({
+        destination: target.href,
+        key: storageKey,
+        value: JSON.stringify({ ...session(), expires_at: expiresAt }),
+      });
+      await page.addInitScript(`(({ destination, key, value }) => {
+        if (location.href !== destination || sessionStorage.getItem(key)) return;
+        localStorage.setItem(key, value);
+        sessionStorage.setItem(key, "seeded");
+      })(${seed})`);
+    },
+  });
 }

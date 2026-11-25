@@ -1,5 +1,7 @@
+import { activate, attemptOutsideDismissal } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { scanAccessibility } from "./accessibility.js";
+import { assertLayoutFit, readLayoutFit } from "./layout.js";
 import { mockStudio, openStudio, studioIds as I } from "./studio-fixture.js";
 
 for (const code of ["FORBIDDEN", "NOT_FOUND"] as const) {
@@ -22,32 +24,40 @@ for (const code of ["FORBIDDEN", "NOT_FOUND"] as const) {
       } else await route.fallback();
     });
     await openStudio(page);
-    await page.getByRole("tab", { name: "Uygunluk", exact: true }).click();
+    await activate(page.getByRole("tab", { name: "Uygunluk", exact: true }));
     await page.getByLabel("Kaynak", { exact: true }).selectOption(I.instructor);
     await page
       .getByLabel("Geçerlilik dönemi", { exact: true })
       .selectOption(JSON.stringify(["2026-11-01", null]));
-    await page.getByRole("button", { name: "Kalıcı kuralı kapat", exact: true }).click();
-    await page
-      .getByRole("menuitem")
-      .filter({ hasText: /18:00:00/ })
-      .click();
+    await activate(page.getByRole("button", { name: "Kalıcı kuralı kapat", exact: true }));
+    await activate(page.getByRole("menuitem").filter({ hasText: /18:00:00/ }));
     const dialog = page.getByRole("alertdialog");
     await expect(dialog.getByText(/Pazartesi, Çarşamba/)).toBeVisible();
     await dialog.getByLabel("İşlem gerekçesi", { exact: false }).fill("Kural artık kullanılmıyor");
-    await dialog.getByRole("button", { name: "Kalıcı kuralı kapat", exact: true }).click();
+    await activate(dialog.getByRole("button", { name: "Kalıcı kuralı kapat", exact: true }));
     const retry = dialog.getByRole("button", { name: "Listeyi yeniden yükle", exact: true });
     await expect(retry).toBeVisible();
     await expect(dialog.getByText(/Pazartesi, Çarşamba/)).toHaveCount(0);
     await expect(
       dialog.getByRole("button", { name: "Kalıcı kuralı kapat", exact: true }),
     ).toBeDisabled();
-    await retry.click();
+    await activate(retry);
     await expect(
       dialog.getByText("İşlem kaydedildi; güncel bilgiler yüklendi.", { exact: true }),
     ).toBeVisible();
     expect(state.writes.filter(({ payload }) => payload.action === "retire")).toHaveLength(1);
     expect(state.rules[0]?.active).toBe(false);
+
+    const viewport = page.viewportSize()!;
+    try {
+      await page.setViewportSize({ width: 320, height: 480 });
+      await expect(async () => assertLayoutFit(await readLayoutFit(page))).toPass({
+        timeout: 5_000,
+      });
+      await expect(dialog.getByRole("button", { name: "Vazgeç", exact: true })).toBeEnabled();
+    } finally {
+      await page.setViewportSize(viewport);
+    }
   });
 }
 
@@ -65,27 +75,24 @@ test("Studio lifecycle: explicit last-rule retirement, same-key recovery, versio
   const originalRule = structuredClone(state.rules[0]!.rule);
   const originalClosure = structuredClone(state.closures[0]!.interval);
   await openStudio(page);
-  await page.getByRole("tab", { name: "Uygunluk", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Uygunluk", exact: true }));
   await page.getByLabel("Kaynak", { exact: true }).selectOption(I.instructor);
   await page
     .getByLabel("Geçerlilik dönemi", { exact: true })
     .selectOption(JSON.stringify(["2026-11-01", null]));
-  await page.getByRole("button", { name: "Kalıcı kuralı kapat", exact: true }).click();
-  await page
-    .getByRole("menuitem")
-    .filter({ hasText: /18:00:00/ })
-    .click();
+  await activate(page.getByRole("button", { name: "Kalıcı kuralı kapat", exact: true }));
+  await activate(page.getByRole("menuitem").filter({ hasText: /18:00:00/ }));
   const dialog = page.getByRole("alertdialog");
   await expect(dialog.getByRole("button", { name: "Vazgeç", exact: true })).toBeFocused();
   await expect(dialog.getByText(/Pazartesi, Çarşamba/)).toBeVisible();
   await dialog.getByLabel("İşlem gerekçesi", { exact: false }).fill("Son kural kontrollü kapatma");
   state.nextWrite = "unknown";
-  await dialog.getByRole("button", { name: "Kalıcı kuralı kapat", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Kalıcı kuralı kapat", exact: true }));
   await expect(dialog.getByRole("button", { name: /Aynı isteği/ })).toBeVisible();
-  await page.keyboard.press("Escape");
+  await attemptOutsideDismissal(dialog);
   await expect(dialog).toBeVisible();
   await expect(dialog.getByRole("button", { name: "Vazgeç", exact: true })).toBeDisabled();
-  await dialog.getByRole("button", { name: /Aynı isteği/ }).click();
+  await activate(dialog.getByRole("button", { name: /Aynı isteği/ }));
   await expect(
     dialog.getByText("İşlem kaydedildi; güncel bilgiler yüklendi.", { exact: true }),
   ).toBeVisible();
@@ -96,20 +103,19 @@ test("Studio lifecycle: explicit last-rule retirement, same-key recovery, versio
   expect(state.rules[0]?.active).toBe(false);
   expect(state.rules[0]?.rule).toEqual(originalRule);
   expect((await scanAccessibility(page, "studio-retired-rule-result")).violations).toEqual([]);
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(page.getByRole("button", { name: "Kalıcı kuralı kapat", exact: true })).toHaveCount(
     0,
   );
-  await page.getByRole("tab", { name: "Kapanışlar", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Kapanışlar", exact: true }));
   const row = page
     .getByRole("grid", { name: "Kapanışlar ve izinler", exact: true })
     .getByRole("row")
     .filter({ hasText: /20\.11\.2026/ });
-  await row.getByRole("button").click();
-  await page
-    .getByRole("dialog")
-    .getByRole("button", { name: "Kapanışı iptal et", exact: true })
-    .click();
+  await activate(row.getByRole("button"));
+  await activate(
+    page.getByRole("dialog").getByRole("button", { name: "Kapanışı iptal et", exact: true }),
+  );
   await expect(dialog.getByRole("button", { name: "Vazgeç", exact: true })).toBeFocused();
   await dialog.getByLabel("İşlem gerekçesi", { exact: false }).fill("Kapanış kontrollü iptal");
   await page.setViewportSize({ width: 320, height: 900 });
@@ -120,7 +126,7 @@ test("Studio lifecycle: explicit last-rule retirement, same-key recovery, versio
   expect((await scanAccessibility(page, "studio-cancel-closure-mobile-dark")).violations).toEqual(
     [],
   );
-  await dialog.getByRole("button", { name: "Kapanışı iptal et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Kapanışı iptal et", exact: true }));
   await expect(
     dialog.getByText("İşlem kaydedildi; güncel bilgiler yüklendi.", { exact: true }),
   ).toBeVisible();
@@ -130,7 +136,7 @@ test("Studio lifecycle: explicit last-rule retirement, same-key recovery, versio
   expect(state.centerVersion).toBe(8);
   expect(state.closures[0]?.state).toBe("cancelled");
   expect(state.closures[0]?.interval).toEqual(originalClosure);
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(
     page
       .getByRole("grid", { name: "Kapanışlar ve izinler", exact: true })

@@ -1,3 +1,4 @@
+import { activate, attemptOutsideDismissal } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import { mockOwnReservations } from "./member-reservations-fixture.js";
@@ -152,13 +153,14 @@ async function setup(page: Page, mode: "normal" | "unknown" | "denied" | "expire
 }
 async function submit(page: Page, label: string) {
   const dialog = page.getByRole("dialog");
-  await dialog
-    .getByRole("checkbox", {
+  await activate(
+    dialog.getByRole("checkbox", {
       name: "Hak kaynağını ve iptal koşullarını inceledim, işlemi onaylıyorum.",
       exact: true,
-    })
-    .press("Space");
-  await dialog.getByRole("button", { name: label, exact: true }).click();
+    }),
+    "Space",
+  );
+  await activate(dialog.getByRole("button", { name: label, exact: true }));
   return dialog;
 }
 test("own waiting directory discovers sessions without reservations and leaves with exact native version", async ({
@@ -167,27 +169,27 @@ test("own waiting directory discovers sessions without reservations and leaves w
   await page.setViewportSize({ width: 320, height: 950 });
   const state = await setup(page);
   await expect(page.getByText("Rezervasyonsuz bekleme dersi", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Sıradan çık", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Sıradan çık", exact: true }));
   const dialog = await submit(page, "Sıradan çık");
   await expect(
     dialog.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),
   ).toBeVisible();
   expect(state.writes).toHaveLength(1);
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(page.getByText("Rezervasyonsuz bekleme dersi", { exact: true })).toHaveCount(0);
 });
 test("own unknown leave locks dismissal and reads receipt without repeating writer", async ({
   page,
 }) => {
   const state = await setup(page, "unknown");
-  await page.getByRole("button", { name: "Sıradan çık", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Sıradan çık", exact: true }));
   const dialog = await submit(page, "Sıradan çık");
   await expect(
     dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }),
   ).toBeVisible();
-  await page.keyboard.press("Escape");
+  await attemptOutsideDismissal(dialog);
   await expect(dialog).toBeVisible();
-  await dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
   await expect(
     dialog.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),
   ).toBeVisible();
@@ -200,7 +202,7 @@ for (const action of ["accept", "reject"] as const)
     const state = await setup(page),
       label = action === "accept" ? "Teklifi kabul et" : "Teklifi reddet";
     await expect(page.getByText("Bilinmeyen seanstaki teklif", { exact: true })).toBeVisible();
-    await page.getByRole("button", { name: label, exact: true }).click();
+    await activate(page.getByRole("button", { name: label, exact: true }));
     const dialog = await submit(page, label);
     await expect(
       dialog.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),

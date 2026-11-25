@@ -1,3 +1,4 @@
+import { activate, attemptOutsideDismissal } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import type { CashSummary, FinanceView, MemberPageSummary } from "@ftksaas/api-contracts";
@@ -242,7 +243,7 @@ async function setup(
   await page.goto(`${origin}/login`);
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   const centerPath = `${origin}/o/${I.org}/c/${I.center}`;
@@ -255,20 +256,20 @@ async function setup(
   }
   if (options.directoryReadback)
     await expect(page.getByText("TRY ₺1.000,00", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Üye bazlı finans", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Üye bazlı finans", exact: true }));
   await page.getByLabel("Üye", { exact: true }).selectOption(I.instructor);
   await page.getByLabel("Para birimi", { exact: true }).fill("TRY");
-  await page.getByRole("button", { name: "Finansı getir", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Finansı getir", exact: true }));
   await expect.poll(() => reads.length).toBeGreaterThan(0);
   await expect(page.getByRole("grid", { name: "Hareketler", exact: true })).toBeVisible();
   return { studio, writes, reads, corrections, previews, directoryReads };
 }
 async function fillCollection(page: Page) {
-  await page.getByRole("button", { name: "Tahsilat al", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Tahsilat al", exact: true }));
   const panel = page.getByRole("dialog");
   await expect(panel).toHaveAccessibleName("Tahsilat al");
   await panel.getByLabel("Tutar (para biriminin alt birimi)", { exact: true }).fill("40000");
-  await panel.getByRole("radio", { name: "Havale", exact: true }).click();
+  await activate(panel.getByRole("radio", { name: "Havale", exact: true }));
   await panel.getByLabel("İşlem referansı", { exact: true }).fill("SYNTHETIC-REF");
   await panel.getByLabel("İşlem tarihi ve saati", { exact: true }).fill("2026-11-15T14:30");
   return panel;
@@ -331,13 +332,13 @@ test("mobile collection uses explicit authority, reference and timezone then rer
   });
   await expect(page.getByRole("button", { name: "Tahsilat al", exact: true })).toBeEnabled();
   expect((await scanAccessibility(page, "finance-person-scope")).violations).toEqual([]);
-  await page.getByRole("button", { name: "Tahsilat al", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Tahsilat al", exact: true }));
   const panel = page.getByRole("dialog");
   await expect(panel).toHaveAccessibleName("Tahsilat al");
   const template = panel.getByRole("combobox", { name: "Hazırlık şablonu" });
   await template.selectOption({ label: "TRY havale · Merkez" });
   await expect(template.locator("option").filter({ hasText: "USD havale" })).toHaveCount(0);
-  await panel.getByRole("button", { name: "Taslağa uygula", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Taslağa uygula", exact: true }));
   await expect(panel.getByRole("radio", { name: "Havale", exact: true })).toBeChecked();
   const reference = panel.getByLabel("İşlem referansı", { exact: true });
   await expect(reference).toHaveValue("");
@@ -346,7 +347,7 @@ test("mobile collection uses explicit authority, reference and timezone then rer
   await panel.getByLabel("İşlem tarihi ve saati", { exact: true }).fill("2026-11-15T14:30");
   const amount = panel.getByLabel("Tutar (para biriminin alt birimi)", { exact: true });
   await amount.fill("0");
-  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Etkiyi incele", exact: true }));
   await expect(amount).toHaveAttribute("aria-invalid", "true");
   await expect(amount).toBeFocused();
   await expect(
@@ -356,19 +357,19 @@ test("mobile collection uses explicit authority, reference and timezone then rer
   await amount.fill("40000");
   await expect(amount).toHaveAttribute("aria-invalid", "false");
   await reference.clear();
-  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Etkiyi incele", exact: true }));
   await expect(reference).toBeFocused();
   await expect(panel.getByRole("button", { name: "Tahsilatı kaydet", exact: true })).toHaveCount(0);
   expect(state.writes).toHaveLength(0);
   await reference.fill("SYNTHETIC-REF");
   expect((await scanAccessibility(page, "collection-editor")).violations).toEqual([]);
-  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Etkiyi incele", exact: true }));
   await expect(panel.getByRole("button", { name: "Tahsilatı kaydet", exact: true })).toBeDisabled();
   expect(state.writes).toHaveLength(0);
-  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+  await activate(panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }), "Space");
   await expect(panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true })).toBeChecked();
   expect((await scanAccessibility(page, "collection-review")).violations).toEqual([]);
-  await panel.getByRole("button", { name: "Tahsilatı kaydet", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Tahsilatı kaydet", exact: true }));
   await expect(
     panel.getByText("Tahsilat ve güncel finans doğrulandı.", { exact: true }),
   ).toBeVisible();
@@ -380,8 +381,8 @@ test("mobile collection uses explicit authority, reference and timezone then rer
     occurred_at: "2026-11-15T11:30:00Z",
     payment: { method: "bank_transfer", reference: "SYNTHETIC-REF" },
   });
-  await panel.getByRole("button", { name: "Kapat", exact: true }).click();
-  await page.getByRole("tab", { name: /Açık borçlar/ }).click();
+  await activate(panel.getByRole("button", { name: "Kapat", exact: true }));
+  await activate(page.getByRole("tab", { name: /Açık borçlar/ }));
   await expect(
     page
       .getByRole("grid", { name: "Açık borçlar", exact: true })
@@ -398,7 +399,7 @@ test("finance read does not enable collection when native writer authority is de
   ).toBeVisible();
   await expect(page.getByRole("button", { name: "Tahsilat al", exact: true })).toBeDisabled();
   await expect(page.getByRole("radio", { name: "Tahsilat", exact: true })).toBeDisabled();
-  await page.getByRole("tab", { name: /Açık borçlar/ }).click();
+  await activate(page.getByRole("tab", { name: /Açık borçlar/ }));
   await expect(page.getByRole("grid", { name: "Açık borçlar", exact: true })).toBeVisible();
   expect(state.writes).toEqual([]);
 });
@@ -407,30 +408,30 @@ test("an unknown collection keeps the frozen key after receipt validation failur
 }) => {
   const state = await setup(page, { unknown: true });
   const panel = await fillCollection(page);
-  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
-  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
-  await panel.getByRole("button", { name: "Tahsilatı kaydet", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Etkiyi incele", exact: true }));
+  await activate(panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }), "Space");
+  await activate(panel.getByRole("button", { name: "Tahsilatı kaydet", exact: true }));
   await expect(
     panel.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }),
   ).toBeEnabled();
-  await panel.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
   await expect(
     panel.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }),
   ).toBeEnabled();
-  await page.keyboard.press("Escape");
+  await attemptOutsideDismissal(panel);
   await expect(panel).toBeVisible();
-  await panel.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }));
   await expect(
     panel.getByText("Tahsilat ve güncel finans doğrulandı.", { exact: true }),
   ).toBeVisible();
   expect(state.writes).toHaveLength(2);
   expect(state.writes[0]!.operation_key).toBe(state.writes[1]!.operation_key);
   expect(state.writes[0]!.amount_minor).toBe(state.writes[1]!.amount_minor);
-  await panel.getByRole("button", { name: "Kapat", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Kapat", exact: true }));
 });
 
 async function fillCorrection(page: Page, amount = "10000") {
-  await page.getByRole("button", { name: "Düzelt", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Düzelt", exact: true }));
   const panel = page.getByRole("dialog");
   await expect(panel).toHaveAccessibleName("Tahsilatı düzelt");
   await expect(panel.getByLabel("Düzeltme farkı (alt birim)", { exact: true })).toBeEnabled();
@@ -447,7 +448,7 @@ test("native correction previews a directed difference and rereads the linked ch
   const panel = await fillCorrection(page);
   await expect(panel.getByRole("radio", { name: "Nakit", exact: true })).toBeDisabled();
   expect((await scanAccessibility(page, "correction-editor")).violations).toEqual([]);
-  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Etkiyi incele", exact: true }));
   await expect(
     panel.getByRole("button", { name: "Düzeltmeyi uygula", exact: true }),
   ).toBeDisabled();
@@ -462,13 +463,13 @@ test("native correction previews a directed difference and rereads the linked ch
     },
     reason: "Sentetik tahsilat farkı",
   });
-  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+  await activate(panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }), "Space");
   expect((await scanAccessibility(page, "correction-review")).violations).toEqual([]);
-  await panel.getByRole("button", { name: "Düzeltmeyi uygula", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Düzeltmeyi uygula", exact: true }));
   await expect(
     panel.getByText("Bağlı düzeltme ve güncel finans doğrulandı.", { exact: true }),
   ).toBeVisible();
-  await panel.getByRole("button", { name: "Kapat", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Kapat", exact: true }));
   expect(state.writes).toHaveLength(0);
   expect(state.corrections).toHaveLength(1);
   await expect(
@@ -481,7 +482,7 @@ test("native correction previews a directed difference and rereads the linked ch
       .getByRole("grid", { name: "Hareketler", exact: true })
       .getByText("₺100,00", { exact: true }),
   ).toBeVisible();
-  await page.getByRole("tab", { name: /Açık borçlar/ }).click();
+  await activate(page.getByRole("tab", { name: /Açık borçlar/ }));
   await expect(
     page
       .getByRole("grid", { name: "Açık borçlar", exact: true })
@@ -494,13 +495,13 @@ test("a full collection correction restores the same debt in the cached profile 
   const state = await setup(page, { withCollection: true, openProfileFirst: true });
   const documentStartedAt = await page.evaluate(() => performance.timeOrigin);
   const panel = await fillCorrection(page, "40000");
-  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
-  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
-  await panel.getByRole("button", { name: "Düzeltmeyi uygula", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Etkiyi incele", exact: true }));
+  await activate(panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }), "Space");
+  await activate(panel.getByRole("button", { name: "Düzeltmeyi uygula", exact: true }));
   await expect(
     panel.getByText("Bağlı düzeltme ve güncel finans doğrulandı.", { exact: true }),
   ).toBeVisible();
-  await panel.getByRole("button", { name: "Kapat", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Kapat", exact: true }));
   expect(state.previews).toEqual([
     expect.objectContaining({
       cash_movement_id: cashId,
@@ -517,37 +518,37 @@ test("a full collection correction restores the same debt in the cached profile 
 test("blocked correction has no apply action", async ({ page }) => {
   const state = await setup(page, { withCollection: true, blocked: true });
   const panel = await fillCorrection(page);
-  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Etkiyi incele", exact: true }));
   await expect(
     panel.getByText("Bu düzeltme uygulanamıyor. Koşulları kontrol edip yeni önizleme al.", {
       exact: true,
     }),
   ).toBeVisible();
-  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+  await activate(panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }), "Space");
   await expect(
     panel.getByRole("button", { name: "Düzeltmeyi uygula", exact: true }),
   ).toBeDisabled();
   expect(state.corrections).toHaveLength(0);
-  await panel.getByRole("button", { name: "Kapat", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Kapat", exact: true }));
 });
 test("unknown correction keeps the reviewed capability/key after a failed receipt read", async ({
   page,
 }) => {
   const state = await setup(page, { withCollection: true, correctionUnknown: true });
   const panel = await fillCorrection(page);
-  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
-  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
-  await panel.getByRole("button", { name: "Düzeltmeyi uygula", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Etkiyi incele", exact: true }));
+  await activate(panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }), "Space");
+  await activate(panel.getByRole("button", { name: "Düzeltmeyi uygula", exact: true }));
   await expect(
     panel.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }),
   ).toBeEnabled();
-  await panel.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
   await expect(
     panel.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }),
   ).toBeEnabled();
-  await page.keyboard.press("Escape");
+  await attemptOutsideDismissal(panel);
   await expect(panel).toBeVisible();
-  await panel.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }));
   await expect(
     panel.getByText("Bağlı düzeltme ve güncel finans doğrulandı.", { exact: true }),
   ).toBeVisible();
@@ -556,7 +557,7 @@ test("unknown correction keeps the reviewed capability/key after a failed receip
   expect(state.corrections[0]!.preview).toEqual(state.corrections[1]!.preview);
   expect(state.previews).toHaveLength(1);
   expect(state.writes).toHaveLength(0);
-  await panel.getByRole("button", { name: "Kapat", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Kapat", exact: true }));
 });
 
 test("a stale correction apply cannot be repeated until a fresh preview and approval", async ({
@@ -564,9 +565,9 @@ test("a stale correction apply cannot be repeated until a fresh preview and appr
 }) => {
   const state = await setup(page, { withCollection: true, stale: true });
   const panel = await fillCorrection(page);
-  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
-  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
-  await panel.getByRole("button", { name: "Düzeltmeyi uygula", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Etkiyi incele", exact: true }));
+  await activate(panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }), "Space");
+  await activate(panel.getByRole("button", { name: "Düzeltmeyi uygula", exact: true }));
   await expect(
     panel.getByText("Önizleme güncel değil veya süresi doldu. Geri dönüp yeni önizleme al.", {
       exact: true,
@@ -576,8 +577,8 @@ test("a stale correction apply cannot be repeated until a fresh preview and appr
     panel.getByRole("button", { name: "Düzeltmeyi uygula", exact: true }),
   ).toBeDisabled();
   expect(state.corrections).toHaveLength(1);
-  await panel.getByRole("button", { name: "Geri", exact: true }).click();
-  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Geri", exact: true }));
+  await activate(panel.getByRole("button", { name: "Etkiyi incele", exact: true }));
   await expect(
     panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }),
   ).not.toBeChecked();
@@ -587,7 +588,7 @@ test("a stale correction apply cannot be repeated until a fresh preview and appr
   expect(state.previews).toHaveLength(2);
   expect(state.corrections).toHaveLength(1);
   expect(state.writes).toHaveLength(0);
-  await panel.getByRole("button", { name: "Kapat", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Kapat", exact: true }));
 });
 
 test("personal collection verifies the directory first page before returning to its totals", async ({
@@ -599,9 +600,9 @@ test("personal collection verifies the directory first page before returning to 
   });
   const state = await setup(page, { directoryReadback: () => readback });
   const panel = await fillCollection(page);
-  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
-  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
-  await panel.getByRole("button", { name: "Tahsilatı kaydet", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Etkiyi incele", exact: true }));
+  await activate(panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }), "Space");
+  await activate(panel.getByRole("button", { name: "Tahsilatı kaydet", exact: true }));
   try {
     await expect.poll(() => state.directoryReads.length).toBe(2);
     expect(state.directoryReads.at(-1)?.page).toEqual({ limit: 20, sort: "created_at_asc" });
@@ -614,8 +615,8 @@ test("personal collection verifies the directory first page before returning to 
   await expect(
     panel.getByText("Tahsilat ve güncel finans doğrulandı.", { exact: true }),
   ).toBeVisible();
-  await panel.getByRole("button", { name: "Kapat", exact: true }).click();
-  await page.getByRole("button", { name: "Merkez finansına dön", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Kapat", exact: true }));
+  await activate(page.getByRole("button", { name: "Merkez finansına dön", exact: true }));
   await expect(page.getByText("TRY ₺600,00", { exact: true })).toBeVisible();
   await expect(page.getByText("TRY ₺1.000,00", { exact: true })).toHaveCount(0);
   expect(state.directoryReads).toHaveLength(2);

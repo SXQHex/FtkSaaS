@@ -1,3 +1,4 @@
+import { activate, hasTouchInput, scrollTouchRegion, submitWithDevice } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { captureAuth, mockNative, origin } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
@@ -65,39 +66,51 @@ for (const colorScheme of ["light", "dark"] as const)
       await page.goto("/login");
       await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
       await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-      await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+      await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
       await expect(page).toHaveURL(`${origin}/account`);
-      await page.getByRole("tab", { name: "Güvenlik", exact: true }).click();
+      await activate(page.getByRole("tab", { name: "Güvenlik", exact: true }));
       const trigger = page.getByRole("button", { name: "Silme önizlemesini aç", exact: true });
-      await trigger.click();
+      await activate(trigger);
       const dialog = page.getByRole("dialog", { name: "Hesap silme önizlemesi", exact: true });
       await expect(dialog.getByRole("alert")).toContainText("Önizleme alınamadı");
       const retry = dialog.getByRole("button", { name: "Yeniden dene", exact: true });
-      await expect(retry).toBeFocused();
-      await page.keyboard.press("Enter");
+      const touch = hasTouchInput(page);
+      if (!touch) {
+        await expect(retry).toBeFocused();
+      }
+      await submitWithDevice(retry);
       await expect(dialog.getByRole("alert")).toContainText(
         "Önce stüdyo sahipliğini devretmelisin",
       );
       const close = dialog.getByRole("button", { name: "Kapat", exact: true });
-      await expect(close).toBeFocused();
+      if (!touch) {
+        await expect(close).toBeFocused();
+      }
       await page.addStyleTag({
         content: `html{zoom:${scale}} *{line-height:1.5!important;letter-spacing:.12em!important;word-spacing:.16em!important} p{margin-bottom:2em!important}`,
       });
       await close.scrollIntoViewIfNeeded();
       await expect(close).toBeInViewport({ ratio: 1 });
       const headerClose = dialog.getByRole("button", { name: "Önizlemeyi kapat", exact: true });
-      await page.keyboard.press("Tab");
-      await expect(headerClose).toBeFocused();
+      if (touch) {
+        await headerClose.scrollIntoViewIfNeeded();
+      } else {
+        await page.keyboard.press("Tab");
+        await expect(headerClose).toBeFocused();
+      }
       await expect(headerClose).toBeInViewport({ ratio: 1 });
       const effectsRegion = dialog.getByRole("region", {
         name: "Önizleme etkileri ve engeller",
         exact: true,
       });
-      await page.keyboard.press("Tab");
-      await expect(effectsRegion).toBeFocused();
+      if (!touch) {
+        await page.keyboard.press("Tab");
+        await expect(effectsRegion).toBeFocused();
+      }
       if (scale === 2) {
         expect(await effectsRegion.evaluate((el) => el.scrollHeight > el.clientHeight)).toBe(true);
-        await page.keyboard.press("PageDown");
+        if (touch) await scrollTouchRegion(effectsRegion, "down");
+        else await page.keyboard.press("PageDown");
         await expect.poll(() => effectsRegion.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
         // WebKit animates keyboard scrolling. Let the first gesture finish before reversing it.
         await effectsRegion.evaluate(
@@ -116,18 +129,30 @@ for (const colorScheme of ["light", "dark"] as const)
               view.requestAnimationFrame(sample);
             }),
         );
-        await expect(effectsRegion).toBeFocused();
-        await page.keyboard.press("PageUp");
+        if (touch) {
+          const offset = () => effectsRegion.evaluate((element) => element.scrollTop);
+          for (let swipe = 0; swipe < 3; swipe++) {
+            const before = await offset();
+            if (before === 0) break;
+            await scrollTouchRegion(effectsRegion, "up");
+            await expect.poll(offset).toBeLessThan(before);
+          }
+        } else {
+          await expect(effectsRegion).toBeFocused();
+          await page.keyboard.press("PageUp");
+        }
         await expect.poll(() => effectsRegion.evaluate((el) => el.scrollTop)).toBe(0);
       }
-      await page.keyboard.press("Tab");
-      await expect(close).toBeFocused();
-      await page.keyboard.press("Shift+Tab");
-      await expect(effectsRegion).toBeFocused();
-      await page.keyboard.press("Shift+Tab");
-      await expect(headerClose).toBeFocused();
-      await page.keyboard.press("Shift+Tab");
-      await expect(close).toBeFocused();
+      if (!touch) {
+        await page.keyboard.press("Tab");
+        await expect(close).toBeFocused();
+        await page.keyboard.press("Shift+Tab");
+        await expect(effectsRegion).toBeFocused();
+        await page.keyboard.press("Shift+Tab");
+        await expect(headerClose).toBeFocused();
+        await page.keyboard.press("Shift+Tab");
+        await expect(close).toBeFocused();
+      }
       await expect(
         dialog.getByText("Bu önizleme hesabını değiştirmez.", { exact: true }),
       ).toBeVisible();
@@ -139,10 +164,13 @@ for (const colorScheme of ["light", "dark"] as const)
       expect(await page.evaluate("document.documentElement.scrollWidth>innerWidth")).toBe(false);
       expect(applies).toBe(0);
       expect(previews).toBe(2);
-      await page.keyboard.press("Escape");
+      if (touch) await activate(headerClose);
+      else await page.keyboard.press("Escape");
       await expect(dialog).toHaveCount(0);
-      await expect(trigger).toBeFocused();
-      await trigger.click();
+      if (!touch) {
+        await expect(trigger).toBeFocused();
+      }
+      await activate(trigger);
       await expect(dialog.getByRole("status")).toContainText(
         "Önizlemede silmeyi engelleyen bir kayıt bildirilmedi",
       );
@@ -151,8 +179,10 @@ for (const colorScheme of ["light", "dark"] as const)
       ).toEqual([]);
       expect(previews).toBe(3);
       expect(applies).toBe(0);
-      await dialog.getByRole("button", { name: "Kapat", exact: true }).click();
-      await expect(trigger).toBeFocused();
+      await activate(dialog.getByRole("button", { name: "Kapat", exact: true }));
+      if (!touch) {
+        await expect(trigger).toBeFocused();
+      }
     });
   }
 test("account deletion blocked preview visual composition", async ({ page }, testInfo) => {
@@ -190,10 +220,10 @@ test("account deletion blocked preview visual composition", async ({ page }, tes
   await page.goto("/login");
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
-  await page.getByRole("tab", { name: "Güvenlik", exact: true }).click();
-  await page.getByRole("button", { name: "Silme önizlemesini aç", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Güvenlik", exact: true }));
+  await activate(page.getByRole("button", { name: "Silme önizlemesini aç", exact: true }));
   const dialog = page.getByRole("dialog", { name: "Hesap silme önizlemesi", exact: true });
   await expect(dialog.getByRole("alert")).toContainText("Önce stüdyo sahipliğini devretmelisin");
   await captureAuth(

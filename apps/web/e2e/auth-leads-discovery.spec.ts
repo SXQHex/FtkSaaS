@@ -1,3 +1,4 @@
+import { activate, closeWithDevice } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { scanAccessibility } from "./accessibility.js";
 import { verifyResponsiveLayout } from "./layout.js";
@@ -230,7 +231,7 @@ test("native filters and summaries use server scope and explicitly distinguish u
   page,
 }) => {
   const native = await mockLeads(page);
-  await page.getByRole("tab", { name: "Liste", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Liste", exact: true }));
   await page.getByRole("combobox", { name: "Sorumlu", exact: true }).selectOption("unassigned");
   await expect(page.getByText("Bu kapsamda aday bulunamadı.", { exact: true })).toBeVisible();
   const grid = page.getByRole("tabpanel", { name: "Liste", exact: true }).getByRole("grid");
@@ -244,7 +245,7 @@ test("native filters and summaries use server scope and explicitly distinguish u
   ).toMatchObject({ assigned_to: null, include_details: true, include_summary: true });
   await page.getByRole("combobox", { name: "Sorumlu", exact: true }).selectOption(I.self);
   await expect(page.getByRole("button", { name: "Aday A", exact: true })).toBeVisible();
-  await page.getByRole("radio", { name: "Görüşülüyor", exact: true }).click();
+  await activate(page.getByRole("radio", { name: "Görüşülüyor", exact: true }));
   await expect(page.getByRole("button", { name: "Aday A", exact: true })).toHaveCount(0);
   expect(
     native.reads.filter((row) => row.operation === "leads_list_v1").at(-1)?.request,
@@ -255,14 +256,14 @@ test("center followup opens its exact activity and saves a real outcome rather t
   page,
 }) => {
   const native = await mockLeads(page);
-  await page.getByRole("tab", { name: "Takipler", exact: true }).click();
-  await page.getByRole("button", { name: "İlk görüşmeyi yap", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Takipler", exact: true }));
+  await activate(page.getByRole("button", { name: "İlk görüşmeyi yap", exact: true }));
   const dialog = page.getByRole("dialog");
   await expect(dialog.getByLabel("Not", { exact: true })).toHaveValue("İlk görüşmeyi yap");
   await dialog.getByLabel("Faaliyet türü", { exact: true }).selectOption("outcome");
   await dialog.getByLabel("Sonuç", { exact: true }).fill("Görüşüldü");
-  await dialog.getByRole("checkbox").press("Space");
-  await dialog.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await activate(dialog.getByRole("checkbox"), "Space");
+  await activate(dialog.getByRole("button", { name: "Kaydet", exact: true }));
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   expect(native.writes.at(-1)?.request).toMatchObject({
     activity_id: leadIds.activity,
@@ -279,14 +280,14 @@ test("native trial creation checks category and ACK unread recovery performs onl
   await page.emulateMedia({ colorScheme: "dark" });
   const state = await trials(page);
   const dialog = await openLead(page);
-  await dialog.getByRole("button", { name: "Deneme teklif et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Deneme teklif et", exact: true }));
   await dialog
     .getByLabel("Deneme ürünü ve sürümü", { exact: true })
     .selectOption(state.product.product_version_id);
   await dialog.getByLabel("Ders günü", { exact: true }).fill("2026-11-17");
   await dialog.getByLabel("Deneme dersi", { exact: true }).selectOption(state.session.id);
-  await dialog.getByRole("checkbox").press("Space");
-  await dialog.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await activate(dialog.getByRole("checkbox"), "Space");
+  await activate(dialog.getByRole("button", { name: "Kaydet", exact: true }));
   await expect(dialog.getByLabel("Kategori", { exact: true })).toHaveAttribute(
     "aria-invalid",
     "true",
@@ -295,15 +296,15 @@ test("native trial creation checks category and ACK unread recovery performs onl
   expect((await scanAccessibility(page, "trial-invalid-category")).violations).toEqual([]);
   await verifyResponsiveLayout(page);
   await dialog.getByLabel("Kategori", { exact: true }).selectOption("female");
-  await dialog.getByRole("checkbox").press("Space");
-  await dialog.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await activate(dialog.getByRole("checkbox"), "Space");
+  await activate(dialog.getByRole("button", { name: "Kaydet", exact: true }));
   await expect(
     dialog.getByText("İşlem kaydedildi; güncel kayıt okunamadı. Yalnız okuma yeniden denenecek.", {
       exact: true,
     }),
   ).toBeVisible();
   await expect(dialog.getByRole("button", { name: "Kapat", exact: true })).toBeDisabled();
-  await dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(1);
   expect(state.native.writes).toHaveLength(0);
@@ -314,18 +315,18 @@ test("paid trial confirmation uses immutable offer terms and a real registration
 }) => {
   const state = await trials(page, "confirm"),
     dialog = await openLead(page);
-  await dialog.getByRole("button", { name: "Deneme kaydını onayla", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Deneme kaydını onayla", exact: true }));
   await dialog
     .getByLabel("Deneme teklifi", { exact: true })
     .selectOption(state.offers[0]!.offer_id);
   await expect(dialog.getByText(/Kayıt onayı için bu ürün sürümüne ait geçerli/)).toBeVisible();
   expect((await scanAccessibility(page, "trial-paid-confirmation")).violations).toEqual([]);
   await verifyResponsiveLayout(page);
-  await dialog.getByRole("checkbox").press("Space");
-  await dialog.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await activate(dialog.getByRole("checkbox"), "Space");
+  await activate(dialog.getByRole("button", { name: "Kaydet", exact: true }));
   await expect(dialog.getByText(/Sonuç bilinmiyor/)).toBeVisible();
   const historyReadsBeforeRecovery = state.historyReads.length;
-  await dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   await expect(dialog.getByText("Gerçek ders kaydı oluşturuldu.", { exact: true })).toBeVisible();
   expect(state.historyReads.slice(historyReadsBeforeRecovery)).toHaveLength(1);
@@ -339,7 +340,7 @@ test("denied trial history stays unread without a fabricated empty history or wr
 }) => {
   const state = await trials(page, "denied"),
     dialog = await openLead(page);
-  await dialog.getByRole("button", { name: "Deneme kaydını onayla", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Deneme kaydını onayla", exact: true }));
   await expect(dialog.getByRole("alert")).toBeVisible();
   await expect(
     dialog.getByText("Bu aday için görünür deneme teklifi yok.", { exact: true }),
@@ -357,7 +358,7 @@ test("an authorized assignee change rereads the real source rather than preservi
     dialog = await openLead(page);
   await expect(dialog.getByLabel("Sorumlu", { exact: true })).toBeEnabled();
   await dialog.getByLabel("Sorumlu", { exact: true }).selectOption("");
-  await dialog.getByRole("button", { name: "Kaydet", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Kaydet", exact: true }));
   await expect(dialog.getByText(saved, { exact: true })).toBeVisible();
   expect(native.writes.at(-1)?.request).toMatchObject({ assigned_to: null, expected_version: 2 });
   expect(native.leads[0]!.assigned_to).toBeNull();
@@ -398,7 +399,7 @@ for (const kind of ["renewal_due", "inactive_student"] as const)
         },
       });
     });
-    await page.getByRole("tab", { name: "Takipler", exact: true }).click();
+    await activate(page.getByRole("tab", { name: "Takipler", exact: true }));
     await page.getByRole("combobox", { name: "Takip kaynağı", exact: true }).selectOption(kind);
     const action = page.getByRole("button", {
       name: kind === "renewal_due" ? "Yenileme zamanı gelenler" : "Hareketsiz öğrenciler",
@@ -410,7 +411,7 @@ for (const kind of ["renewal_due", "inactive_student"] as const)
     expect(requests[0]).not.toHaveProperty("assigned_to");
     await expect(page.getByRole("combobox", { name: "Sorumlu", exact: true })).toBeDisabled();
     expect((await scanAccessibility(page, `native-${kind}-list`)).violations).toEqual([]);
-    await action.click();
+    await activate(action);
     await expect(page).toHaveURL(new RegExp(`/o/${I.org}/c/${I.center}/people/${leadIds.person}$`));
     await expect(page.getByRole("heading", { name: "Aday A", exact: true })).toBeVisible();
     expect(native.writes).toHaveLength(0);
@@ -487,25 +488,25 @@ test("automation followups open the exact generated activities for members and c
     }
     return route.fallback();
   });
-  await page.getByRole("tab", { name: "Takipler", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Takipler", exact: true }));
   await page
     .getByRole("combobox", { name: "Takip kaynağı", exact: true })
     .selectOption("automation_followup");
   const member = page.getByRole("row").filter({ hasText: "Örnek sorumlu" }).getByRole("button");
-  await member.click();
+  await activate(member);
   const dialog = page.getByRole("dialog", { name: "Otomasyon takipleri", exact: true });
   await expect(dialog.getByText("Otomasyon takibinin güncel kaydı okunamadı.")).toBeVisible();
   permitted = true;
-  await dialog.getByRole("button", { name: "Yeniden dene", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Yeniden dene", exact: true }));
   await expect(dialog.getByText("Sunucunun oluşturduğu takip notu", { exact: true })).toBeVisible();
   expect((await scanAccessibility(page, "automation-followup-source")).violations).toEqual([]);
   const close = dialog.getByRole("button", { name: "Kapat", exact: true });
   await close.focus();
   await expect(close).toBeFocused();
-  await page.keyboard.press("Escape");
+  await closeWithDevice(close);
   await expect(dialog).toHaveCount(0);
   await expect(member).toBeFocused();
-  await page.getByRole("row").filter({ hasText: "Aday A" }).getByRole("button").click();
+  await activate(page.getByRole("row").filter({ hasText: "Aday A" }).getByRole("button"));
   await expect(page.getByRole("dialog").getByLabel("Not", { exact: true })).toHaveValue(
     "İlk görüşmeyi yap",
   );
@@ -543,7 +544,7 @@ test("student followup policy failure remains unread and recovers through an exp
           },
     ),
   );
-  await page.getByRole("tab", { name: "Takipler", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Takipler", exact: true }));
   await page
     .getByRole("combobox", { name: "Takip kaynağı", exact: true })
     .selectOption("renewal_due");
@@ -552,10 +553,11 @@ test("student followup policy failure remains unread and recovers through an exp
     page.getByText("Gösterilecek takip veya faaliyet yok.", { exact: true }),
   ).toHaveCount(0);
   denied = false;
-  await page
-    .getByRole("tabpanel", { name: "Takipler", exact: true })
-    .getByRole("button", { name: "Güncel durumu oku", exact: true })
-    .click();
+  await activate(
+    page
+      .getByRole("tabpanel", { name: "Takipler", exact: true })
+      .getByRole("button", { name: "Güncel durumu oku", exact: true }),
+  );
   await expect(page.getByRole("alert")).toHaveCount(0);
   await expect(
     page.getByText("Gösterilecek takip veya faaliyet yok.", { exact: true }),

@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import {
   mockCompletion,
@@ -133,15 +134,15 @@ test("document directory has native global summaries, cursor/search, actual read
       ({ r }) => r.view === "documents" && !r.page.cursor && !r.query,
     ),
   ).toHaveLength(1);
-  await page.getByRole("button", { name: "Sonraki sayfa", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Sonraki sayfa", exact: true }));
   await expect(page.getByText("İkinci sentetik belge", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Önceki sayfa", exact: true }).click();
-  await page.getByRole("tab", { name: /Kabul/ }).click();
+  await activate(page.getByRole("button", { name: "Önceki sayfa", exact: true }));
+  await activate(page.getByRole("tab", { name: /Kabul/ }));
   await expect(page.getByRole("combobox", { name: "Belge", exact: true })).toBeVisible();
   await page
     .getByRole("combobox", { name: "Belge", exact: true })
     .selectOption(document.document_id);
-  await page.getByRole("radio", { name: "Tümü", exact: true }).click();
+  await activate(page.getByRole("radio", { name: "Tümü", exact: true }));
   await expect(
     page.getByRole("row", { name: "Sk Sentetik katılımcı Satış", exact: true }),
   ).toBeVisible();
@@ -180,7 +181,7 @@ test("organization discovered read-only document does not request forbidden vers
       );
   });
   await page.goto(completionUrl("documents"));
-  await page.getByRole("row").filter({ hasText: "Sentetik belge" }).click();
+  await activate(page.getByRole("row").filter({ hasText: "Sentetik belge" }));
   const sheet = page.getByRole("dialog");
   await expect(sheet).toContainText("Sentetik belge");
   await expect(sheet.getByRole("button", { name: "Yeni sürüm yükle", exact: true })).toHaveCount(0);
@@ -238,16 +239,16 @@ test("owned ready file reuses the native file and publishes only after explicit 
       );
   });
   await page.goto(completionUrl("documents"));
-  await page.getByRole("row").filter({ hasText: "Sentetik hazır dosya" }).click();
-  await page.getByRole("button", { name: "Yayına hazırla", exact: true }).click();
+  await activate(page.getByRole("row").filter({ hasText: "Sentetik hazır dosya" }));
+  await activate(page.getByRole("button", { name: "Yayına hazırla", exact: true }));
   const editor = page.getByRole("dialog");
   await expect(editor.getByRole("textbox", { name: /Belge adı/ })).toHaveAttribute("readonly", "");
   await editor.getByRole("textbox", { name: /Sürüm/ }).fill("Yeni sentetik sürüm");
-  await editor.getByRole("checkbox", { name: /Satış/ }).press("Space");
-  await editor.getByRole("button", { name: "Etkiyi göster", exact: true }).click();
+  await activate(editor.getByRole("checkbox", { name: /Satış/ }), "Space");
+  await activate(editor.getByRole("button", { name: "Etkiyi göster", exact: true }));
   await expect(editor.getByText(/0.*korun|korun.*0/)).toBeVisible();
-  await editor.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
-  await editor.getByRole("button", { name: "Yayınla", exact: true }).click();
+  await activate(editor.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }), "Space");
+  await activate(editor.getByRole("button", { name: "Yayınla", exact: true }));
   await expect.poll(() => writes.length).toBe(1);
   expect(writes[0]!.r.file_id).toBe(ready.file_id);
   await expect(
@@ -370,15 +371,15 @@ test("M02 refreshes cached document cursors and filters after publication", asyn
   });
 
   await page.goto(completionUrl("documents"));
-  await page.getByRole("button", { name: "Sonraki sayfa", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Sonraki sayfa", exact: true }));
   await expect(page.getByText("İkinci eski belge", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Önceki sayfa", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Önceki sayfa", exact: true }));
 
-  await page.getByRole("tab", { name: /Kabul/ }).click();
+  await activate(page.getByRole("tab", { name: /Kabul/ }));
   await page
     .getByRole("combobox", { name: "Belge", exact: true })
     .selectOption(document.document_id);
-  await page.getByRole("radio", { name: "Tümü", exact: true }).click();
+  await activate(page.getByRole("radio", { name: "Tümü", exact: true }));
   await expect(page.getByText("Tarihsel katılımcı", { exact: false })).toBeVisible();
   const initialAcceptanceReads = allAcceptanceReads;
   const initialCursorReads = oldCursorReads;
@@ -387,17 +388,17 @@ test("M02 refreshes cached document cursors and filters after publication", asyn
 
   // Restore the exact document-page query key primed before the publication.
   // The acceptance page remains cached under its original document/filter key.
-  await page.getByRole("radio", { name: "Bekleyen", exact: true }).click();
+  await activate(page.getByRole("radio", { name: "Bekleyen", exact: true }));
   await page.getByRole("combobox", { name: "Belge", exact: true }).selectOption("");
-  await page.getByRole("tab", { name: /Belgeler/ }).click();
-  await page.getByRole("row").filter({ hasText: ready.name }).click();
-  await page.getByRole("button", { name: "Yayına hazırla", exact: true }).click();
+  await activate(page.getByRole("tab", { name: /Belgeler/ }));
+  await activate(page.getByRole("row").filter({ hasText: ready.name }));
+  await activate(page.getByRole("button", { name: "Yayına hazırla", exact: true }));
   const editor = page.getByRole("dialog");
   await editor.getByRole("textbox", { name: /Sürüm/ }).fill("Yeni sentetik sürüm");
-  await editor.getByRole("checkbox", { name: /Satış/ }).press("Space");
-  await editor.getByRole("button", { name: "Etkiyi göster", exact: true }).click();
-  await editor.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
-  await editor.getByRole("button", { name: "Yayınla", exact: true }).click();
+  await activate(editor.getByRole("checkbox", { name: /Satış/ }), "Space");
+  await activate(editor.getByRole("button", { name: "Etkiyi göster", exact: true }));
+  await activate(editor.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }), "Space");
+  await activate(editor.getByRole("button", { name: "Yayınla", exact: true }));
 
   await expect(
     page.getByText("Yeni sentetik sürüm sürümü yayımlandı ve sunucudan yeniden doğrulandı.", {
@@ -447,18 +448,18 @@ test("M02 refreshes cached document cursors and filters after publication", asyn
   };
   expect(firstPageReadsAfterPublication()).toBe(1);
 
-  await editor.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(editor.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(editor).toHaveCount(0);
-  await page.getByRole("button", { name: "Sonraki sayfa", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Sonraki sayfa", exact: true }));
   await expect(page.getByText("İkinci güncel belge", { exact: true })).toBeVisible();
   expect(oldCursorReads).toBe(initialCursorReads + 1);
   expect(firstPageReadsAfterPublication()).toBe(1);
 
-  await page.getByRole("tab", { name: /Kabul/ }).click();
+  await activate(page.getByRole("tab", { name: /Kabul/ }));
   await page
     .getByRole("combobox", { name: "Belge", exact: true })
     .selectOption(document.document_id);
-  await page.getByRole("radio", { name: "Tümü", exact: true }).click();
+  await activate(page.getByRole("radio", { name: "Tümü", exact: true }));
   await expect(page.getByText("Tarihsel katılımcı", { exact: false })).toBeVisible();
   await expect.poll(() => allAcceptanceReads).toBe(initialAcceptanceReads + 1);
 });

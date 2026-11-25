@@ -1,3 +1,4 @@
+import { activate, hasTouchInput, scrollTouchRegion } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import { mockSessionDetail } from "./session-detail-fixture.js";
@@ -7,7 +8,6 @@ const id = (n: number) => `019a7b00-0000-7000-8000-${String(n).padStart(12, "0")
 test("own earnings preserves cursor scope and currency alongside native summaries and payment history", async ({
   page,
   browserName,
-  isMobile,
 }) => {
   const state = await mockSessionDetail(page, { existing: true, instructor: true });
   await mockAccount(page);
@@ -94,7 +94,7 @@ test("own earnings preserves cursor scope and currency alongside native summarie
   expect(requests[0]).not.toHaveProperty("interval");
   await expect(page.getByRole("combobox", { name: "Dönem", exact: true })).toHaveValue("all");
   await expect(page.getByText(/2019/).first()).toBeVisible();
-  await page.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Sonraki", exact: true }));
   await expect(page.getByText("Düzeltme", { exact: true })).toBeVisible();
   await expect(lines.getByText("Seans hakedişi", { exact: true })).toBeVisible();
   await expect(lines.getByText("Katılan kişi sayısı 0", { exact: true })).toBeVisible();
@@ -108,11 +108,11 @@ test("own earnings preserves cursor scope and currency alongside native summarie
     starts_at: "2026-09-30T21:00:00Z",
     ends_at: "2026-10-31T21:00:00Z",
   });
-  await page.getByRole("tab", { name: "Ödemeler", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Ödemeler", exact: true }));
   await expect(page.getByText("Bu dönemde ödeme yok.", { exact: true })).toBeVisible();
   await expect(page.getByText("Güncel ödeme geçmişi okunamadı.", { exact: true })).toHaveCount(0);
   expect(state.writes).toHaveLength(0);
-  await page.getByRole("tab", { name: "Seans satırları", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Seans satırları", exact: true }));
   await page.getByRole("combobox", { name: "Dönem", exact: true }).selectOption("2026-11");
   await expect
     .poll(() => requests.at(-1)?.interval)
@@ -121,12 +121,16 @@ test("own earnings preserves cursor scope and currency alongside native summarie
   await expect(page.getByText("Kalan yok", { exact: true })).toBeVisible();
   const tableRegion = page.getByRole("region", { name: "Seans satırları", exact: true });
   await expect(tableRegion).toHaveAttribute("tabindex", "0");
-  await tableRegion.focus();
-  if (browserName === "webkit" && isMobile) {
-    // iPhone emulation has no keyboard scrolling path, so scroll programmatically.
-    await tableRegion.evaluate((element) => element.scrollBy(40, 0));
+  if (hasTouchInput(page)) {
+    await scrollTouchRegion(tableRegion, "right");
   } else {
-    await tableRegion.press("ArrowRight");
+    await tableRegion.focus();
+    if (browserName === "webkit") {
+      await tableRegion.hover();
+      await page.mouse.wheel(160, 0);
+    } else {
+      await tableRegion.press("ArrowRight");
+    }
   }
   await expect.poll(() => tableRegion.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
   expect(await page.evaluate("document.documentElement.scrollWidth > innerWidth")).toBe(false);
@@ -165,7 +169,7 @@ test("own earnings denied read stays unknown until explicit retry", async ({ pag
   await expect(page.getByText("Bu dönemde hakediş satırı yok.", { exact: true })).toHaveCount(0);
   expect(reads).toBe(1);
   denied = false;
-  await page.getByRole("button", { name: "Yeniden oku", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Yeniden oku", exact: true }));
   await expect(page.getByText("Bu dönemde hakediş satırı yok.", { exact: true })).toBeVisible();
   expect(reads).toBe(2);
 });
@@ -269,11 +273,11 @@ test("own account payments use actual totals, independent cursor and unbounded n
   await page.goto(`${origin}/instructor/earnings?org=${I.org}&center=${I.center}`);
   await expect(page.getByText("₺7,00 · $0,00", { exact: true })).toBeVisible();
   await expect(page.getByText(/90.071.992.547.409,93/).first()).toBeVisible();
-  await page.getByRole("tab", { name: "Ödemeler", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Ödemeler", exact: true }));
   await expect(page.getByRole("grid", { name: "Ödemeler", exact: true })).toContainText(
     "Banka havalesi",
   );
-  await page.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Sonraki", exact: true }));
   await expect(page.getByRole("grid", { name: "Ödemeler", exact: true })).toContainText("Düzeltme");
   await expect(page.getByRole("grid", { name: "Ödemeler", exact: true })).toContainText(
     "Yöntem kaydedilmemiş",
@@ -315,7 +319,7 @@ test("own current agreements render native read-only terms and retain an authori
   await page.goto(`${origin}/instructor/earnings?org=${I.org}&center=${I.center}`);
   await page.getByRole("combobox", { name: "Geçerli anlaşman", exact: true }).selectOption(id(801));
   await expect(page.getByText(/Sürüm 5 ·/)).toBeVisible();
-  await page.getByText("Anlaşma koşulları", { exact: true }).click();
+  await activate(page.getByText("Anlaşma koşulları", { exact: true }));
   await expect(page.getByLabel("Para birimi (ISO 4217)", { exact: true })).toBeDisabled();
   await expect(page.getByLabel("Para birimi (ISO 4217)", { exact: true })).toHaveValue("TRY");
   expect(state.writes).toHaveLength(0);

@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { expect, type Page } from "@playwright/test";
 import type { LeadView, PersonView, CrmPipelineConfiguration } from "@ftksaas/api-contracts";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
@@ -545,7 +546,7 @@ export async function mockLeads(
   await page.goto(`${origin}/login`);
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await page.clock.setFixedTime(new Date("2026-11-16T12:00:00Z"));
@@ -566,14 +567,13 @@ export async function mockLeads(
   };
 }
 export async function openLead(page: Page) {
-  await page.getByRole("button", { name: "Aday A", exact: true }).first().click();
+  await activate(page.getByRole("button", { name: "Aday A", exact: true }).first());
   const dialog = page.getByRole("dialog");
   await dialog.getByLabel("İlgilendiği ders", { exact: true }).waitFor();
   return dialog;
 }
 export async function closeLead(page: Page) {
-  await page
-    .locator('[data-slot="sheet-footer"]')
-    .getByRole("button", { name: "Kapat", exact: true })
-    .click();
+  await activate(
+    page.locator('[data-slot="sheet-footer"]').getByRole("button", { name: "Kapat", exact: true }),
+  );
 }

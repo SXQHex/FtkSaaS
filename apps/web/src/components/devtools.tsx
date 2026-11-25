@@ -6,6 +6,7 @@ import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 export default function Devtools() {
   return (
     <TanStackDevtools
+      config={{ triggerMode: "fixed" }}
       plugins={[
         { name: "TanStack Query", render: <ReactQueryDevtoolsPanel /> },
         { name: "TanStack Router", render: <TanStackRouterDevtoolsPanel /> },

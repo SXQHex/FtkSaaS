@@ -1,3 +1,4 @@
+import { activate, hasTouchInput } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { captureAuth, mockNative, origin } from "./auth-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
@@ -121,11 +122,11 @@ for (const colorScheme of ["light", "dark"] as const) {
       await expect(page.getByText("Davet bağlantısı bulunamadı.", { exact: false })).toBeVisible();
       await page.goto("/invite#token=fixture-invitation");
       await expect(page).toHaveURL(`${origin}/invite`);
-      await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+      await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
       await expect(page).toHaveURL(`${origin}/login`);
       await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
       await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-      await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+      await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
       await expect(page).toHaveURL(`${origin}/invite`);
       expect(writes).toHaveLength(0);
       await expect(page.getByLabel("E-posta", { exact: true })).toHaveValue(
@@ -142,18 +143,24 @@ for (const colorScheme of ["light", "dark"] as const) {
         page.getByRole("button", { name: "Daveti kabul et", exact: true }),
         page.getByRole("button", { name: "Başka hesapla giriş yap", exact: true }),
       ];
-      await controls[0]!.focus();
+      const touch = hasTouchInput(page);
+      if (!touch) await controls[0]!.focus();
       for (const [index, control] of controls.entries()) {
-        if (index > 0) await page.keyboard.press("Tab");
-        await expect(control).toBeFocused();
+        if (touch) {
+          await control.scrollIntoViewIfNeeded();
+        } else {
+          if (index > 0) await page.keyboard.press("Tab");
+          await expect(control).toBeFocused();
+        }
         await expect(control).toBeInViewport({ ratio: 1 });
       }
-      for (const control of controls.slice(0, -1).reverse()) {
-        await page.keyboard.press("Shift+Tab");
-        await expect(control).toBeFocused();
+      if (!touch) {
+        for (const control of controls.slice(0, -1).reverse()) {
+          await page.keyboard.press("Shift+Tab");
+          await expect(control).toBeFocused();
+        }
       }
-      await controls[3]!.focus();
-      await page.keyboard.press("Enter");
+      await activate(controls[3]!, "Enter");
       await expect(page.getByRole("alert")).toContainText("Kabul sonucu henüz doğrulanamadı");
       expect(writes).toHaveLength(1);
       await page.goto("/invite#token=fixture-other-invitation");
@@ -161,11 +168,11 @@ for (const colorScheme of ["light", "dark"] as const) {
       await expect(
         page.getByRole("alert").filter({ hasText: "Bu ekrandaki işlemler önceki davete aittir" }),
       ).toBeVisible();
-      await page.getByRole("button", { name: "Durumu kontrol et" }).click();
+      await activate(page.getByRole("button", { name: "Durumu kontrol et" }));
       await expect(page.getByRole("alert").filter({ hasText: "İşlem sürüyor" })).toBeVisible();
       expect(writes).toHaveLength(1);
-      await page.getByRole("button", { name: "Durumu kontrol et" }).click();
-      await page.getByRole("button", { name: "Aynı kabulü yeniden dene" }).click();
+      await activate(page.getByRole("button", { name: "Durumu kontrol et" }));
+      await activate(page.getByRole("button", { name: "Aynı kabulü yeniden dene" }));
       await expect(
         page.getByRole("alert").filter({ hasText: "Kabul tamamlandı; güncel erişim okunamadı" }),
       ).toBeVisible();
@@ -174,7 +181,7 @@ for (const colorScheme of ["light", "dark"] as const) {
       expect(writes[1]!.operation_key).toBe(writes[0]!.operation_key);
       expect(writes[1]!.request_id).not.toBe(writes[0]!.request_id);
       expect((await scanAccessibility(page, "invite-read-retry")).violations).toEqual([]);
-      await page.getByRole("button", { name: "Erişimi yenile" }).click();
+      await activate(page.getByRole("button", { name: "Erişimi yenile" }));
       await expect(page.getByRole("status")).toContainText("Davet kabul edildi");
       await expect(page.getByText("Fixture Center", { exact: true })).toBeVisible();
       expect(centerReads).toBe(1);
@@ -182,7 +189,7 @@ for (const colorScheme of ["light", "dark"] as const) {
       expect((await scanAccessibility(page, "invite-accepted")).violations).toEqual([]);
       expect(await page.evaluate("document.documentElement.scrollWidth > innerWidth")).toBe(false);
       await page.reload();
-      await page.getByRole("button", { name: "Erişimi yenile" }).click();
+      await activate(page.getByRole("button", { name: "Erişimi yenile" }));
       await expect(page.getByRole("status")).toContainText("Davet kabul edildi");
       expect(writes).toHaveLength(2);
       expect(centerReads).toBe(2);
@@ -193,10 +200,10 @@ for (const colorScheme of ["light", "dark"] as const) {
 test("invitation visual composition", async ({ page }, testInfo) => {
   await mockNative(page);
   await page.goto("/invite#token=fixture-visual-invitation");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page.getByLabel("Ad soyad", { exact: true })).toHaveValue("Fixture Account");
   await captureAuth(page, "e07", testInfo);
 });

@@ -1,3 +1,4 @@
+import { activate, hasTouchInput, submitWithDevice } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { scanAccessibility } from "./accessibility.js";
 import { mockSettingsCompletion } from "./settings-native-fixture.js";
@@ -7,15 +8,16 @@ import { openWorkspaceSearch, origin } from "./auth-fixture.js";
 import common from "../src/locales/tr/common.json" with { type: "json" };
 async function confirm(page: import("@playwright/test").Page) {
   const dialog = page.getByRole("dialog");
-  await dialog
-    .getByRole("checkbox", {
+  await activate(
+    dialog.getByRole("checkbox", {
       name: "Kapsamı ve güncel etkileri okudum, bu değişikliği onaylıyorum.",
       exact: true,
-    })
-    .press("Space");
-  await dialog
-    .getByRole("button", { name: "Onaylanan değişiklikleri uygula", exact: true })
-    .click();
+    }),
+    "Space",
+  );
+  await activate(
+    dialog.getByRole("button", { name: "Onaylanan değişiklikleri uygula", exact: true }),
+  );
   return dialog;
 }
 test("a pending subscription owner can reach the first payment form through the Plan link", async ({
@@ -25,21 +27,23 @@ test("a pending subscription owner can reach the first payment form through the 
     bootstrapBilling: "owner",
     startUrl: `${origin}/account?org=${I.org}&center=${I.center}`,
   });
-  await page.getByRole("link", { name: common.settings.tabs.plan, exact: true }).press("Enter");
+  await activate(page.getByRole("link", { name: common.settings.tabs.plan, exact: true }), "Enter");
   await expect(page).toHaveURL(`${origin}/o/${I.org}/c/${I.center}/settings?section=plan`);
   const plan = page.getByRole("tabpanel", { name: common.settings.tabs.plan, exact: true });
   await expect(plan.getByText(/Ödeme bekliyor/)).toBeVisible();
   await expect(plan.getByRole("button", { name: common.settings.changePlan })).toBeDisabled();
-  await plan
-    .getByRole("button", { name: common.settings.reportPayment, exact: true })
-    .press("Enter");
+  await activate(
+    plan.getByRole("button", { name: common.settings.reportPayment, exact: true }),
+    "Enter",
+  );
   await expect(
     page.getByRole("dialog", { name: common.settings.paymentEditor.title }),
   ).toBeVisible();
-  await page
-    .getByRole("dialog", { name: common.settings.paymentEditor.title })
-    .getByRole("button", { name: common.settings.discard, exact: true })
-    .click();
+  await activate(
+    page
+      .getByRole("dialog", { name: common.settings.paymentEditor.title })
+      .getByRole("button", { name: common.settings.discard, exact: true }),
+  );
   await expect(
     page.getByRole("dialog", { name: common.settings.paymentEditor.title }),
   ).toBeHidden();
@@ -69,8 +73,12 @@ test("command palette opens a settings section in the current managed center", a
   const search = dialog.getByPlaceholder("Sayfa adı ara…");
   await expect(search).toBeFocused();
   await search.fill("Politikalar");
-  await page.keyboard.press("ArrowDown");
-  await page.keyboard.press("Enter");
+  if (hasTouchInput(page)) {
+    await activate(page.getByRole("menuitem", { name: "Politikalar", exact: true }));
+  } else {
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("Enter");
+  }
   await expect(page).toHaveURL(
     new RegExp(`/o/${I.org}/c/${I.center}/settings\\?section=politika$`),
   );
@@ -90,10 +98,13 @@ test("public settings explicitly bind the selected form and published consent so
   page,
 }) => {
   const f = await mockSettingsCompletion(page);
-  await page.getByRole("tab", { name: "Yayın", exact: true }).click();
-  await page.getByRole("button", { name: "Yayın ayarlarını düzenle", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Yayın", exact: true }));
+  await activate(page.getByRole("button", { name: "Yayın ayarlarını düzenle", exact: true }));
   const editor = page.getByRole("dialog");
-  await editor.getByRole("checkbox", { name: "Public profili göster", exact: true }).press("Space");
+  await activate(
+    editor.getByRole("checkbox", { name: "Public profili göster", exact: true }),
+    "Space",
+  );
   await editor
     .getByRole("combobox", { name: "Etkin web formu", exact: true })
     .selectOption(uid(105));
@@ -103,13 +114,13 @@ test("public settings explicitly bind the selected form and published consent so
   await editor
     .getByRole("textbox", { name: "Yayımlanmış belge kodu", exact: true })
     .fill("document.synthetic");
-  await editor.getByRole("button", { name: "Belge sürümlerini oku", exact: true }).click();
+  await activate(editor.getByRole("button", { name: "Belge sürümlerini oku", exact: true }));
   await editor
     .getByRole("combobox", { name: "Yayımlanmış metin", exact: true })
     .selectOption(uid(106));
   await editor.getByRole("textbox", { name: "Onay amacı", exact: true }).fill("application");
-  await editor.getByRole("button", { name: "Onay kaynağını ekle", exact: true }).click();
-  await editor.getByRole("button", { name: "Yayın önizlemesine geç", exact: true }).click();
+  await activate(editor.getByRole("button", { name: "Onay kaynağını ekle", exact: true }));
+  await activate(editor.getByRole("button", { name: "Yayın önizlemesine geç", exact: true }));
   const review = await confirm(page);
   await expect.poll(() => f.writes.length).toBe(1);
   await expect(
@@ -133,7 +144,7 @@ test("public settings explicitly bind the selected form and published consent so
       },
     },
   });
-  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(review.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(
     page.getByRole("switch", { name: "Ziyaretçi profili görünür", exact: true }),
   ).toBeChecked();
@@ -160,12 +171,12 @@ test("publication settings share the scoped visitor route and preview live close
     await context.grantPermissions(["clipboard-read", "clipboard-write"], { origin });
   }
   const f = await mockSettingsCompletion(page);
-  await page.getByRole("tab", { name: "Yayın", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Yayın", exact: true }));
   const centerUrl = `${origin}/public/${I.org}/calendar?center_id=${I.center}`;
   const address = page.getByRole("textbox", { name: "Sayfa adresi", exact: true });
   await expect(address).toHaveValue(centerUrl);
   await expect(address).toHaveAttribute("readonly", "");
-  await page.getByRole("button", { name: "Bağlantıyı kopyala", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Bağlantıyı kopyala", exact: true }));
   await expect(
     page.getByRole("status").filter({ hasText: "Yayın bağlantısı kopyalandı." }),
   ).toBeVisible();
@@ -192,7 +203,7 @@ test("publication settings share the scoped visitor route and preview live close
     });
   });
   const documentTime = await page.evaluate(() => performance.timeOrigin);
-  await page.getByRole("button", { name: "Sayfayı önizle", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Sayfayı önizle", exact: true }));
   await expect(page).toHaveURL(centerUrl);
   await expect(
     page.getByRole("heading", { name: "Bu sayfa şu an yayında değil", exact: true }),
@@ -234,22 +245,22 @@ test("organization publication address uses versioned settings and closes old ad
       },
     });
   });
-  await page.getByRole("tab", { name: "Yayın", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Yayın", exact: true }));
   const scope = page.getByRole("combobox", { name: "Ayar kapsamı", exact: true });
   const address = page.getByRole("textbox", { name: "Sayfa adresi", exact: true });
   await expect(address).toHaveValue(`${origin}/public/ilk-adres/calendar?center_id=${I.center}`);
   await scope.selectOption("organization");
-  await page.getByRole("button", { name: "Yayın ayarlarını düzenle", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Yayın ayarlarını düzenle", exact: true }));
   const editor = page.getByRole("dialog");
   const slug = editor.getByLabel("Yayın adresi kısa adı", { exact: true });
   const reviewButton = editor.getByRole("button", { name: "Yayın önizlemesine geç", exact: true });
   await slug.fill("Geçersiz Adres");
-  await reviewButton.click();
+  await activate(reviewButton);
   await expect(slug).toBeFocused();
   await expect(slug).toHaveAttribute("aria-invalid", "true");
   expect(f.writes).toHaveLength(0);
   await slug.fill("yeni-adres");
-  await reviewButton.click();
+  await activate(reviewButton);
   const review = await confirm(page);
   await expect(review.getByRole("status")).toHaveText(common.events.commandStates.saved);
   expect(f.writes[0]?.r).toMatchObject({
@@ -264,13 +275,14 @@ test("organization publication address uses versioned settings and closes old ad
     expect(request).not.toHaveProperty("interval");
     expect(request).not.toHaveProperty("include_disciplines");
   }
-  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(review.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(address).toHaveValue(`${origin}/public/yeni-adres/calendar`);
-  await page.getByRole("button", { name: "Yayın ayarlarını düzenle", exact: true }).click();
-  await editor
-    .getByRole("checkbox", { name: "Ziyaretçi sayfasını yayına aç", exact: true })
-    .press("Space");
-  await reviewButton.click();
+  await activate(page.getByRole("button", { name: "Yayın ayarlarını düzenle", exact: true }));
+  await activate(
+    editor.getByRole("checkbox", { name: "Ziyaretçi sayfasını yayına aç", exact: true }),
+    "Space",
+  );
+  await activate(reviewButton);
   await confirm(page);
   await expect(review.getByRole("status")).toHaveText(common.events.commandStates.saved);
   expect(f.writes[1]?.r).toMatchObject({
@@ -278,11 +290,11 @@ test("organization publication address uses versioned settings and closes old ad
     expected_version: 2,
     patch: { public_page: { slug: "yeni-adres", enabled: false } },
   });
-  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(review.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(
     page.getByRole("switch", { name: "Ziyaretçi sayfası yayında", exact: true }),
   ).not.toBeChecked();
-  await page.getByRole("button", { name: "Sayfayı önizle", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Sayfayı önizle", exact: true }));
   await expect(page).toHaveURL(`${origin}/public/yeni-adres/calendar`);
   await expect(
     page.getByRole("heading", { name: "Bu sayfa şu an yayında değil", exact: true }),
@@ -295,15 +307,15 @@ test("policy editing publishes a native protected change after review and keeps 
   await page
     .getByRole("combobox", { name: "Ayar kapsamı", exact: true })
     .selectOption("organization");
-  await page.getByRole("tab", { name: "Politikalar", exact: true }).click();
-  await page.getByRole("button", { name: "Düzenle", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Politikalar", exact: true }));
+  await activate(page.getByRole("button", { name: "Düzenle", exact: true }));
   const editor = page.getByRole("dialog");
   await editor.getByRole("spinbutton", { name: "Kapanış (dakika önce)", exact: true }).fill("120");
   await editor.locator('input[type="datetime-local"]').fill("2098-12-01T15:00");
   await editor
     .getByRole("textbox", { name: "Değişiklik gerekçesi", exact: true })
     .fill("Sentetik politika değişikliği");
-  await editor.getByRole("button", { name: "Yayın önizlemesine geç", exact: true }).click();
+  await activate(editor.getByRole("button", { name: "Yayın önizlemesine geç", exact: true }));
   const review = await confirm(page);
   await expect.poll(() => f.writes.some((row) => row.op === "policy_publish_v1")).toBe(true);
   await expect(
@@ -326,7 +338,10 @@ test("program duration changes only the reviewed center setting and survives a f
   const duration = form.getByRole("spinbutton", { name: "Varsayılan program süresi (dakika)" });
   await expect(duration).toHaveValue("60");
   await duration.fill("75");
-  await duration.press("Enter");
+  await submitWithDevice(
+    page.locator(`button[type="submit"][form="${await form.getAttribute("id")}"]`),
+    duration,
+  );
   expect(f.writes).toHaveLength(0);
   const review = await confirm(page);
   await expect(review.getByRole("status")).toContainText("güncel kayıt okundu");
@@ -336,7 +351,7 @@ test("program duration changes only the reviewed center setting and survives a f
     r: { scope: "center", org_id: I.org, center_id: I.center, expected_version: 1 },
   });
   expect(f.writes[0]?.r.patch).toEqual({ program_duration_minutes: 75 });
-  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(review.getByRole("button", { name: "Vazgeç", exact: true }));
   await page.reload();
   await expect(duration).toHaveValue("75");
   await page
@@ -352,7 +367,7 @@ test("V07.1 reviews organization billing fields and reloads the saved values wit
   const scope = page.getByRole("combobox", { name: "Ayar kapsamı", exact: true });
   await scope.selectOption("organization");
   const plan = page.getByRole("tab", { name: "Plan", exact: true });
-  await plan.click();
+  await activate(plan);
   await expect(plan).toHaveAttribute("aria-selected", "true");
   await expect(plan).toBeInViewport();
   const form = page.getByRole("form", { name: "Fatura bilgileri", exact: true });
@@ -363,7 +378,10 @@ test("V07.1 reviews organization billing fields and reloads the saved values wit
   await name.fill("Örnek Atölye");
   await address.fill("Örnek Sokak\nAnkara");
   await email.clear();
-  await name.press("Enter");
+  await submitWithDevice(
+    page.locator(`button[type="submit"][form="${await form.getAttribute("id")}"]`),
+    name,
+  );
   await expect(page.getByRole("dialog")).toContainText("Örnek Atölye");
   expect(f.writes).toHaveLength(0);
   const review = await confirm(page);
@@ -379,7 +397,7 @@ test("V07.1 reviews organization billing fields and reloads the saved values wit
     billing_address: "Örnek Sokak\nAnkara",
     billing_email: null,
   });
-  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(review.getByRole("button", { name: "Vazgeç", exact: true }));
   await page.reload();
   await scope.selectOption("organization");
   await expect(name).toHaveValue("Örnek Atölye");
@@ -392,7 +410,7 @@ test("E42 saves an automation preparation and restores the organization source w
   page,
 }) => {
   const f = await mockSettingsCompletion(page);
-  await page.getByRole("tab", { name: "Şablonlar", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Şablonlar", exact: true }));
   const form = page.getByRole("form", { name: "Otomasyon hazırlık şablonları", exact: true });
   await form.getByLabel("Şablon adı", { exact: true }).fill("Paket takibi");
   await form
@@ -406,7 +424,7 @@ test("E42 saves an automation preparation and restores the organization source w
     .getByLabel(common.automation.columns.action, { exact: true })
     .selectOption("create_followup");
   await form.getByLabel("Takip görevi metni", { exact: true }).fill("Paket yenilemesini görüş");
-  await form.getByRole("button", { name: "Şablonu incele", exact: true }).click();
+  await activate(form.getByRole("button", { name: "Şablonu incele", exact: true }));
   const review = page.getByRole("dialog");
   expect(f.writes).toHaveLength(0);
   await confirm(page);
@@ -427,9 +445,9 @@ test("E42 saves an automation preparation and restores the organization source w
       },
     ],
   });
-  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(review.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(form.getByRole("option", { name: "Paket takibi", exact: true })).toHaveCount(1);
-  await form.getByRole("button", { name: "Organizasyon kaynağını kullan", exact: true }).click();
+  await activate(form.getByRole("button", { name: "Organizasyon kaynağını kullan", exact: true }));
   await expect(
     review.getByText(common.settings.preparation.inheritReview, { exact: true }),
   ).toBeVisible();
@@ -446,7 +464,7 @@ test("E42 saves an automation preparation and restores the organization source w
       inherit_fields: ["automation_templates"],
     },
   });
-  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(review.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(form.getByRole("option", { name: "Organizasyon takibi", exact: true })).toHaveCount(
     1,
   );
@@ -458,20 +476,20 @@ test("E42 edits event capacity, payment and cancellation defaults without creati
   page,
 }) => {
   const f = await mockSettingsCompletion(page);
-  await page.getByRole("tab", { name: "Şablonlar", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Şablonlar", exact: true }));
   const form = page.getByRole("form", { name: "Etkinlik hazırlık şablonları", exact: true });
   await form.getByLabel("Şablon adı", { exact: true }).fill("Atölye koşulları");
   await form.getByLabel(common.events.editor.nominal, { exact: true }).fill("8");
   await form.getByLabel(common.events.editor.maximum, { exact: true }).fill("12");
   await form.getByLabel(common.events.editor.fee, { exact: true }).fill("15000");
   await form.getByLabel(common.events.editor.currency, { exact: true }).fill("TRY");
-  await form.getByLabel(common.events.editor.fullPayment, { exact: true }).press("Space");
+  await activate(form.getByLabel(common.events.editor.fullPayment, { exact: true }), "Space");
   await form.getByLabel(common.events.editor.cutoff, { exact: true }).fill("120");
   await form.getByLabel("Sınırdan önce", { exact: true }).selectOption("release");
   await form.getByLabel("Sınırdan sonra", { exact: true }).selectOption("consume");
   await form.getByLabel("Gelmediğinde", { exact: true }).selectOption("consume");
   await form.getByLabel("İade yöntemi", { exact: true }).selectOption("none");
-  await form.getByRole("button", { name: "Şablonu incele", exact: true }).click();
+  await activate(form.getByRole("button", { name: "Şablonu incele", exact: true }));
   expect(f.writes).toHaveLength(0);
   const review = page.getByRole("dialog");
   await expect(review.getByText(/Atölye koşulları.*15000 TRY/)).toBeVisible();
@@ -506,7 +524,7 @@ test("E42 edits event capacity, payment and cancellation defaults without creati
       },
     ],
   });
-  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(review.getByRole("button", { name: "Vazgeç", exact: true }));
   await form
     .getByLabel("Hazırlık şablonu", { exact: true })
     .selectOption({ label: "Atölye koşulları" });
@@ -517,17 +535,17 @@ test("E42 saves a weekly program template with exact clock and category capacity
   page,
 }) => {
   const f = await mockSettingsCompletion(page);
-  await page.getByRole("tab", { name: "Şablonlar", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Şablonlar", exact: true }));
   const form = page.getByRole("form", { name: "Program hazırlık şablonları", exact: true });
   await form.getByLabel("Şablon adı", { exact: true }).fill("Hafta sonu");
-  await form.getByRole("button", { name: "Cmt", exact: true }).press("Space");
-  await form.getByRole("button", { name: "Paz", exact: true }).press("Space");
+  await activate(form.getByRole("button", { name: "Cmt", exact: true }), "Space");
+  await activate(form.getByRole("button", { name: "Paz", exact: true }), "Space");
   await form.getByLabel("Başlangıç", { exact: true }).fill("10:20:30");
   await form.getByLabel("Süre (dakika)", { exact: true }).fill("75");
   await form.getByLabel(common.schedule.capacity, { exact: true }).fill("10");
   await form.getByLabel("Erkek kontenjanı", { exact: true }).fill("4");
   await form.getByLabel("Kadın kontenjanı", { exact: true }).fill("6");
-  await form.getByRole("button", { name: "Şablonu incele", exact: true }).click();
+  await activate(form.getByRole("button", { name: "Şablonu incele", exact: true }));
   expect(f.writes).toHaveLength(0);
   const review = page.getByRole("dialog");
   await expect(review.getByText(/Cmt, Paz · 10:20:30 · 75 dk/)).toBeVisible();
@@ -552,7 +570,7 @@ test("E42 saves a weekly program template with exact clock and category capacity
       },
     ],
   });
-  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(review.getByRole("button", { name: "Vazgeç", exact: true }));
   await form.getByLabel("Hazırlık şablonu", { exact: true }).selectOption({ label: "Hafta sonu" });
   await expect(form.getByLabel("Kadın kontenjanı", { exact: true })).toHaveValue("6");
 });
@@ -561,11 +579,11 @@ test("E42 manages a center payment template and an organization CRM template wit
   page,
 }) => {
   const f = await mockSettingsCompletion(page);
-  await page.getByRole("tab", { name: "Şablonlar", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Şablonlar", exact: true }));
   const collection = page.getByRole("form", { name: "Tahsilat hazırlık şablonları", exact: true });
   await collection.getByLabel("Hazırlık şablonu", { exact: true }).selectOption("cash");
   await collection.getByLabel("Ödeme yöntemi", { exact: true }).selectOption("bank_transfer");
-  await collection.getByRole("button", { name: "Şablonu incele", exact: true }).click();
+  await activate(collection.getByRole("button", { name: "Şablonu incele", exact: true }));
   const review = page.getByRole("dialog");
   await expect(
     review.getByText("Yerel nakit · TRY · Nakit → Yerel nakit · TRY · Havale", { exact: true }),
@@ -587,12 +605,12 @@ test("E42 manages a center payment template and an organization CRM template wit
       },
     ],
   });
-  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(review.getByRole("button", { name: "Vazgeç", exact: true }));
   await collection.getByLabel("Hazırlık şablonu").selectOption("cash");
   await expect(collection.getByLabel("Ödeme yöntemi")).toHaveValue("bank_transfer");
-  await collection.getByRole("button", { name: "Kaldırmayı incele", exact: true }).click();
+  await activate(collection.getByRole("button", { name: "Kaldırmayı incele", exact: true }));
   expect(f.writes).toHaveLength(1);
-  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(review.getByRole("button", { name: "Vazgeç", exact: true }));
   await page
     .getByRole("combobox", { name: "Ayar kapsamı", exact: true })
     .selectOption("organization");
@@ -600,7 +618,7 @@ test("E42 manages a center payment template and an organization CRM template wit
   await crm.getByLabel("Şablon adı", { exact: true }).fill("Telefon başvurusu");
   await crm.getByLabel(common.leads.source, { exact: true }).fill("phone");
   await crm.getByLabel(common.leads.interest, { exact: true }).fill("Tango");
-  await crm.getByRole("button", { name: "Şablonu incele", exact: true }).click();
+  await activate(crm.getByRole("button", { name: "Şablonu incele", exact: true }));
   expect(f.writes).toHaveLength(1);
   await confirm(page);
   await expect(review.getByRole("status")).toContainText("güncel kayıt okundu");
@@ -618,12 +636,12 @@ test("E42 manages a center payment template and an organization CRM template wit
     },
   });
   expect(f.writes[1]?.r).not.toHaveProperty("center_id");
-  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(review.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(crm.getByRole("option", { name: "Telefon başvurusu", exact: true })).toHaveCount(1);
   await crm
     .getByLabel("Hazırlık şablonu", { exact: true })
     .selectOption({ label: "Telefon başvurusu" });
-  await crm.getByRole("button", { name: "Kaldırmayı incele", exact: true }).click();
+  await activate(crm.getByRole("button", { name: "Kaldırmayı incele", exact: true }));
   expect(f.writes).toHaveLength(2);
   await confirm(page);
   await expect(review.getByRole("status")).toContainText("güncel kayıt okundu");
@@ -632,7 +650,7 @@ test("E42 manages a center payment template and an organization CRM template wit
     expected_version: 2,
     patch: { crm_templates: [] },
   });
-  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(review.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(crm.getByRole("option", { name: "Telefon başvurusu", exact: true })).toHaveCount(0);
 });
 
@@ -644,10 +662,10 @@ test("downgrade preserves the selected scope and period, then a stale Pro editor
   await page
     .getByRole("combobox", { name: "Ayar kapsamı", exact: true })
     .selectOption("organization");
-  await page.getByRole("tab", { name: "Plan", exact: true }).click();
-  await page.getByRole("button", { name: "Planı değiştir", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Plan", exact: true }));
+  await activate(page.getByRole("button", { name: "Planı değiştir", exact: true }));
   const editor = page.getByRole("dialog", { name: "Planı daralt", exact: true });
-  await editor.getByRole("radio", { name: /^Starter/ }).press("Space");
+  await activate(editor.getByRole("radio", { name: /^Starter/ }), "Space");
   await editor
     .getByRole("combobox", { name: "Korunacak merkez", exact: true })
     .selectOption(I.center);
@@ -657,7 +675,7 @@ test("downgrade preserves the selected scope and period, then a stale Pro editor
   await expect(
     editor.getByRole("checkbox", { name: "Sentetik öğrenci", exact: true }),
   ).not.toBeChecked();
-  await editor.getByRole("button", { name: "Teklifi incele", exact: true }).click();
+  await activate(editor.getByRole("button", { name: "Teklifi incele", exact: true }));
   const review = await confirm(page);
   await expect(review.getByText("Geçerlilik tarihi", { exact: true })).toBeVisible();
   await expect(review.getByText("1.01.2099 03:00", { exact: true })).toBeVisible();
@@ -689,18 +707,18 @@ test("downgrade preserves the selected scope and period, then a stale Pro editor
     },
   });
   expect(f.state.pending).toBe(true);
-  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(review.getByRole("button", { name: "Vazgeç", exact: true }));
   const base = `${origin}/o/${I.org}/c/${I.center}`;
   await expect(page.getByText("Pro", { exact: true }).first()).toBeVisible();
   await page.goto(`${base}/studio`);
-  await page.getByRole("tab", { name: "Anlaşmalar", exact: true }).click();
-  await page.getByRole("button", { name: /Sentetik personel/ }).click();
+  await activate(page.getByRole("tab", { name: "Anlaşmalar", exact: true }));
+  await activate(page.getByRole("button", { name: /Sentetik personel/ }));
   const staleEditor = page.getByRole("dialog");
   await staleEditor.getByLabel("Tutar (en küçük para birimi)", { exact: true }).fill("25000");
   await staleEditor.locator("#agreement-from").fill("2099-01-01T12:00");
   await staleEditor.locator("#agreement-until").fill("2100-01-01T12:00");
   await staleEditor.locator("#agreement-reason").fill("Sentetik eski Pro sekmesi");
-  await staleEditor.getByRole("checkbox").press("Space");
+  await activate(staleEditor.getByRole("checkbox"), "Space");
   // A native period transition is authoritative even in an already-open editor.
   // Backend period/limit behavior is accepted separately in native CI.
   f.state.transitioned = true;
@@ -715,17 +733,17 @@ test("downgrade preserves the selected scope and period, then a stale Pro editor
       },
     });
   });
-  await staleEditor.getByRole("button", { name: "Yeni sürümü yayınla", exact: true }).click();
+  await activate(staleEditor.getByRole("button", { name: "Yeni sürümü yayınla", exact: true }));
   await expect(staleEditor.getByRole("status")).toContainText(common.studio.agreementRejected);
   expect(rejected).toBe(1);
   expect(f.studio.agreements).toHaveLength(1);
   expect(f.studio.effects).not.toContain("instructor_agreement_publish_v1");
-  await staleEditor.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(staleEditor.getByRole("button", { name: "Vazgeç", exact: true }));
   await page.goto(`${base}/settings`);
   await page
     .getByRole("combobox", { name: "Ayar kapsamı", exact: true })
     .selectOption("organization");
-  await page.getByRole("tab", { name: "Plan", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Plan", exact: true }));
   await expect(page.getByText("Starter", { exact: true }).first()).toBeVisible();
   await expect(page.getByRole("button", { name: "Planı değiştir", exact: true })).toBeDisabled();
 });
@@ -740,10 +758,10 @@ for (const target of [
     await page
       .getByRole("combobox", { name: "Ayar kapsamı", exact: true })
       .selectOption("organization");
-    await page.getByRole("tab", { name: "Plan", exact: true }).click();
-    await page.getByRole("button", { name: "Planı değiştir", exact: true }).click();
+    await activate(page.getByRole("tab", { name: "Plan", exact: true }));
+    await activate(page.getByRole("button", { name: "Planı değiştir", exact: true }));
     const dialog = page.getByRole("dialog", { name: "Planı daralt", exact: true });
-    await dialog.getByRole("radio", { name: new RegExp(`^${target.name}`) }).press("Space");
+    await activate(dialog.getByRole("radio", { name: new RegExp(`^${target.name}`) }), "Space");
     await dialog
       .getByRole("combobox", { name: "Korunacak merkez", exact: true })
       .selectOption(uid(141));
@@ -755,11 +773,14 @@ for (const target of [
       await dialog
         .getByRole("combobox", { name: "Eğitmen", exact: true })
         .selectOption(I.instructor);
-      await dialog.getByRole("checkbox", { name: "Sentetik öğrenci", exact: true }).press("Space");
+      await activate(
+        dialog.getByRole("checkbox", { name: "Sentetik öğrenci", exact: true }),
+        "Space",
+      );
     } else {
       await expect(dialog.getByRole("combobox", { name: "Salon", exact: true })).toHaveCount(0);
     }
-    await dialog.getByRole("button", { name: "Teklifi incele", exact: true }).click();
+    await activate(dialog.getByRole("button", { name: "Teklifi incele", exact: true }));
     await expect(
       dialog.getByRole("button", { name: "Onaylanan değişiklikleri uygula", exact: true }),
     ).toBeDisabled();
@@ -793,10 +814,10 @@ test("team permission unknown state blocks scope and retries exactly one frozen 
   page,
 }) => {
   const f = await mockSettingsCompletion(page, { permissionUnknown: true });
-  await page.getByRole("tab", { name: "Ekip", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Ekip", exact: true }));
   const panelStart = f.requests.length;
-  await page.getByRole("button", { name: "İzinleri seç", exact: true }).click();
-  await page.getByRole("tab", { name: "İzinler", exact: true }).click();
+  await activate(page.getByRole("button", { name: "İzinleri seç", exact: true }));
+  await activate(page.getByRole("tab", { name: "İzinler", exact: true }));
   await expect(
     page.getByRole("checkbox", { name: "Sentetik personel: Satış", exact: true }),
   ).toBeVisible();
@@ -813,12 +834,13 @@ test("team permission unknown state blocks scope and retries exactly one frozen 
     },
     page: { limit: 1 },
   });
-  await page
-    .getByRole("checkbox", { name: "Sentetik personel: Satış", exact: true })
-    .press("Space");
+  await activate(
+    page.getByRole("checkbox", { name: "Sentetik personel: Satış", exact: true }),
+    "Space",
+  );
   const dialog = await confirm(page);
   await expect(page.getByRole("combobox", { name: "Ayar kapsamı", exact: true })).toBeDisabled();
-  await dialog.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }));
   await expect.poll(() => f.writes.filter((row) => row.op === "permission_set_v1").length).toBe(2);
   const writes = f.writes.filter((row) => row.op === "permission_set_v1");
   expect(writes[0]!.r.operation_key).toBe(writes[1]!.r.operation_key);
@@ -831,17 +853,17 @@ test("team permission unknown state blocks scope and retries exactly one frozen 
   await expect(
     dialog.getByRole("button", { name: "Onaylanan değişiklikleri uygula", exact: true }),
   ).toBeDisabled();
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
   const manage = page.getByRole("checkbox", {
     name: "Sentetik personel: Kişi yönetimi",
     exact: true,
   });
-  await manage.press("Space");
+  await activate(manage, "Space");
   let manageReview = await confirm(page);
   await expect(manageReview.getByRole("status")).toContainText(common.events.commandStates.saved);
-  await manageReview.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(manageReview.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(manage).toBeChecked();
-  await manage.press("Space");
+  await activate(manage, "Space");
   manageReview = await confirm(page);
   await expect(manageReview.getByRole("status")).toContainText(common.events.commandStates.saved);
   const changes = requestsFor(f.writes, "permission_set_v1").filter(
@@ -851,20 +873,21 @@ test("team permission unknown state blocks scope and retries exactly one frozen 
   expect(changes.map((row) => row.r.expected_version)).toEqual([4, 5]);
   expect(changes[0]!.r.operation_key).not.toBe(changes[1]!.r.operation_key);
   expect(f.state.permissions["person.manage"]).toBe(false);
-  await manageReview.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(manageReview.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(manage).not.toBeChecked();
 
-  await page.getByRole("tab", { name: "Kişiler", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Kişiler", exact: true }));
   await page
     .getByRole("combobox", { name: "Görev türü", exact: true })
     .selectOption("center_manager");
   const managerStart = f.requests.length;
-  await page
-    .getByRole("row")
-    .filter({ hasText: "Sentetik yönetici" })
-    .getByRole("button", { name: "İzinleri seç", exact: true })
-    .click();
-  await page.getByRole("tab", { name: "İzinler", exact: true }).click();
+  await activate(
+    page
+      .getByRole("row")
+      .filter({ hasText: "Sentetik yönetici" })
+      .getByRole("button", { name: "İzinleri seç", exact: true }),
+  );
+  await activate(page.getByRole("tab", { name: "İzinler", exact: true }));
   const managerPermissions = page.getByRole("tabpanel", { name: "İzinler", exact: true });
   await expect(managerPermissions.getByRole("checkbox")).toHaveCount(1);
   await expect(managerPermissions.getByRole("checkbox")).toHaveAccessibleName(
@@ -885,11 +908,11 @@ test("operational team role is a separate reviewed command and native channel/te
 }) => {
   await page.setViewportSize({ width: 320, height: 900 });
   const f = await mockSettingsCompletion(page);
-  await page.getByRole("tab", { name: "Ekip", exact: true }).click();
-  await page.getByRole("button", { name: "Görevi düzenle", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Ekip", exact: true }));
+  await activate(page.getByRole("button", { name: "Görevi düzenle", exact: true }));
   const editor = page.getByRole("dialog");
-  await editor.getByRole("checkbox", { name: /Asistan/ }).press("Space");
-  await editor.getByRole("button", { name: "Değişiklikleri önizle", exact: true }).click();
+  await activate(editor.getByRole("checkbox", { name: /Asistan/ }), "Space");
+  await activate(editor.getByRole("button", { name: "Değişiklikleri önizle", exact: true }));
   const review = await confirm(page);
   await expect.poll(() => f.writes.some((row) => row.op === "role_assign_v1")).toBe(true);
   await expect(
@@ -900,11 +923,11 @@ test("operational team role is a separate reviewed command and native channel/te
     role: "assistant",
     scope: { center_id: I.center },
   });
-  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
-  await page.getByRole("tab", { name: "Şablonlar", exact: true }).click();
+  await activate(review.getByRole("button", { name: "Vazgeç", exact: true }));
+  await activate(page.getByRole("tab", { name: "Şablonlar", exact: true }));
   const documentScan = await scanAccessibility(page, "settings-template-list");
   expect(documentScan.violations).toEqual([]);
-  await page.getByRole("button", { name: "Yönetim sınırı", exact: true }).first().click();
+  await activate(page.getByRole("button", { name: "Yönetim sınırı", exact: true }).first());
   const sheet = page.getByRole("dialog");
   await expect(sheet).toContainText("platform içerik kataloğunda");
   await expect(sheet.getByRole("textbox").first()).toHaveAttribute("readonly", "");
@@ -919,7 +942,7 @@ test("operational team role is a separate reviewed command and native channel/te
     documentScan,
   });
   expect(sheetScan.violations).toEqual([]);
-  await sheet.getByRole("button", { name: common.settings.discard, exact: true }).click();
+  await activate(sheet.getByRole("button", { name: common.settings.discard, exact: true }));
   await expect(sheet).toHaveCount(0);
   await expect.poll(backgroundIsHidden).toBe(false);
   await expect(page.getByRole("main")).toBeVisible();
@@ -930,18 +953,18 @@ test("failed role detail readback stays unread and recovers with one acknowledge
   page,
 }) => {
   const f = await mockSettingsCompletion(page, { roleDetailReadbackFailure: true });
-  await page.getByRole("tab", { name: "Ekip", exact: true }).click();
-  await page.getByRole("button", { name: "Görevi düzenle", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Ekip", exact: true }));
+  await activate(page.getByRole("button", { name: "Görevi düzenle", exact: true }));
   const editor = page.getByRole("dialog");
-  await editor.getByRole("checkbox", { name: /Asistan/ }).press("Space");
-  await editor.getByRole("button", { name: "Değişiklikleri önizle", exact: true }).click();
+  await activate(editor.getByRole("checkbox", { name: /Asistan/ }), "Space");
+  await activate(editor.getByRole("button", { name: "Değişiklikleri önizle", exact: true }));
   const review = await confirm(page);
   await expect(
     review.getByText(common.events.commandStates["saved-unread"], { exact: true }),
   ).toBeVisible();
   expect(requestsFor(f.writes, "role_assign_v1")).toHaveLength(1);
 
-  await review.getByRole("button", { name: common.finance.readResult, exact: true }).click();
+  await activate(review.getByRole("button", { name: common.finance.readResult, exact: true }));
   await expect(review.getByText(common.events.commandStates.saved, { exact: true })).toBeVisible();
   expect(requestsFor(f.writes, "role_assign_v1")).toHaveLength(1);
   expect(
@@ -949,14 +972,14 @@ test("failed role detail readback stays unread and recovers with one acknowledge
       ({ r }) => r.operation === "role_assign_v1",
     ),
   ).toHaveLength(0);
-  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(review.getByRole("button", { name: "Vazgeç", exact: true }));
 });
 
 test("manager directory binds role and state to scope and revokes through the dedicated org command", async ({
   page,
 }) => {
   const f = await mockSettingsCompletion(page);
-  await page.getByRole("tab", { name: "Ekip", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Ekip", exact: true }));
   await page
     .getByRole("combobox", { name: "Görev türü", exact: true })
     .selectOption("center_manager");
@@ -975,15 +998,16 @@ test("manager directory binds role and state to scope and revokes through the de
     f.requests.filter((row) => row.op === "roles_list_v1" && row.r.role === "org_manager").at(-1)
       ?.r,
   ).not.toHaveProperty("center_id");
-  await om.getByRole("button", { name: "Görevi düzenle", exact: true }).click();
+  await activate(om.getByRole("button", { name: "Görevi düzenle", exact: true }));
   const editor = page.getByRole("dialog");
-  await editor
-    .getByRole("checkbox", { name: "Organizasyon yöneticisi", exact: true })
-    .press("Space");
+  await activate(
+    editor.getByRole("checkbox", { name: "Organizasyon yöneticisi", exact: true }),
+    "Space",
+  );
   await editor
     .getByRole("textbox", { name: "Görev kaldırma gerekçesi", exact: true })
     .fill("Sentetik yönetici görevini kaldır");
-  await editor.getByRole("button", { name: "Değişiklikleri önizle", exact: true }).click();
+  await activate(editor.getByRole("button", { name: "Değişiklikleri önizle", exact: true }));
   const review = await confirm(page);
   await expect
     .poll(() => f.writes.filter((row) => row.op === "org_manager_revoke_v1").length)
@@ -999,7 +1023,7 @@ test("manager directory binds role and state to scope and revokes through the de
   await expect(
     review.getByRole("button", { name: "Onaylanan değişiklikleri uygula", exact: true }),
   ).toBeDisabled();
-  await review.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(review.getByRole("button", { name: "Vazgeç", exact: true }));
   await page.getByRole("combobox", { name: "Görev durumu", exact: true }).selectOption("inactive");
   await expect(page.getByRole("row").filter({ hasText: "Sentetik yönetici" })).toContainText(
     "Pasif",

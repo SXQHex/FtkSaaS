@@ -1,3 +1,4 @@
+import { activate, attemptOutsideDismissal } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { mockSessionDetail } from "./session-detail-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
@@ -144,7 +145,7 @@ async function setup(
     return route.fallback();
   });
   await page.goto(`${origin}/instructor/earnings?org=${I.org}&center=${I.center}`);
-  await page.getByRole("button", { name: text.open, exact: true }).click();
+  await activate(page.getByRole("button", { name: text.open, exact: true }));
   const panel = page.getByRole("dialog", { name: text.title, exact: true });
   if (!options.missing)
     await expect(
@@ -153,8 +154,8 @@ async function setup(
   return { native, view, panel, writes, receiptKeys, effects, documentRead };
 }
 async function accept(panel: import("@playwright/test").Locator) {
-  await panel.getByRole("checkbox", { name: text.review, exact: true }).press("Space");
-  await panel.getByRole("button", { name: text.accept, exact: true }).click();
+  await activate(panel.getByRole("checkbox", { name: text.review, exact: true }), "Space");
+  await activate(panel.getByRole("button", { name: text.accept, exact: true }));
 }
 test("own canonical account reads the immutable alias document as text and accepts only after explicit consent", async ({
   page,
@@ -165,7 +166,7 @@ test("own canonical account reads the immutable alias document as text and accep
   await expect(article).toContainText('<img src=x onerror="window.__agreementInjected=true">');
   await expect(article.locator("img")).toHaveCount(0);
   expect(await page.evaluate(() => Reflect.get(globalThis, "__agreementInjected"))).toBeUndefined();
-  await f.panel.getByRole("button", { name: text.accept, exact: true }).click();
+  await activate(f.panel.getByRole("button", { name: text.accept, exact: true }));
   await expect(f.panel.getByRole("alert")).toHaveText(text.reviewRequired);
   await expect(f.panel.getByRole("checkbox", { name: text.review, exact: true })).toBeFocused();
   expect(f.writes).toHaveLength(0);
@@ -176,8 +177,8 @@ test("own canonical account reads the immutable alias document as text and accep
   expect(f.view.agreement.person_id).toBe(id(999));
   expect(f.view.acceptance!.person_id).toBe(I.instructor);
   expect(f.native.writes).toHaveLength(0);
-  await f.panel.getByRole("button", { name: common.memberDocuments.close, exact: true }).click();
-  await page.getByRole("button", { name: text.open, exact: true }).click();
+  await activate(f.panel.getByRole("button", { name: common.memberDocuments.close, exact: true }));
+  await activate(page.getByRole("button", { name: text.open, exact: true }));
   await expect(page.getByRole("dialog").getByText(text.accepted, { exact: true })).toBeVisible();
   await expect(
     page.getByRole("dialog").getByRole("button", { name: text.accept, exact: true }),
@@ -191,8 +192,8 @@ test("missing approved organization source leaves financial terms readable and e
   await expect(f.panel.getByRole("alert")).toHaveText(text.noSource);
   await expect(f.panel.getByRole("checkbox")).toHaveCount(0);
   await expect(f.panel.getByRole("button", { name: text.accept, exact: true })).toHaveCount(0);
-  await f.panel.getByRole("button", { name: common.memberDocuments.close, exact: true }).click();
-  await page.getByText(common.instructorEarnings.agreementTerms, { exact: true }).click();
+  await activate(f.panel.getByRole("button", { name: common.memberDocuments.close, exact: true }));
+  await activate(page.getByText(common.instructorEarnings.agreementTerms, { exact: true }));
   await expect(page.getByLabel("Para birimi (ISO 4217)", { exact: true })).toHaveValue("TRY");
   await expect(page.getByLabel("Para birimi (ISO 4217)", { exact: true })).toBeDisabled();
   expect(f.writes).toHaveLength(0);
@@ -209,14 +210,14 @@ for (const recovery of ["retry", "receipt"] as const)
     await expect(
       f.panel.getByRole("button", { name: common.memberDocuments.close, exact: true }),
     ).toBeDisabled();
-    await page.keyboard.press("Escape");
+    await attemptOutsideDismissal(f.panel);
     await expect(f.panel).toBeVisible();
-    await f.panel
-      .getByRole("button", {
+    await activate(
+      f.panel.getByRole("button", {
         name: recovery === "retry" ? common.studio.retrySameRequest : common.finance.readResult,
         exact: true,
-      })
-      .click();
+      }),
+    );
     await expect(f.panel.getByText(text.accepted, { exact: true })).toBeVisible();
     expect(f.effects.size).toBe(1);
     if (recovery === "retry") {
@@ -235,7 +236,7 @@ test("acknowledged agreement consent rereads native evidence without another wri
   await expect(
     f.panel.getByText(common.events.commandStates["saved-unread"], { exact: true }),
   ).toBeVisible();
-  await f.panel.getByRole("button", { name: common.finance.readResult, exact: true }).click();
+  await activate(f.panel.getByRole("button", { name: common.finance.readResult, exact: true }));
   await expect(f.panel.getByText(text.accepted, { exact: true })).toBeVisible();
   expect(f.writes).toHaveLength(1);
   expect(f.receiptKeys).toHaveLength(0);
@@ -251,7 +252,7 @@ test("changed server document requires reloading and fresh consent before any wr
   await expect(f.panel.getByRole("alert")).toHaveText(text.changed);
   await expect(f.panel.getByRole("checkbox", { name: text.review, exact: true })).not.toBeChecked();
   expect(f.writes).toHaveLength(0);
-  await f.panel.getByRole("button", { name: common.memberDocuments.retry, exact: true }).click();
+  await activate(f.panel.getByRole("button", { name: common.memberDocuments.retry, exact: true }));
   await expect(f.panel.getByRole("article")).toContainText("Yeni kontrollü anlaşma metni.");
   await accept(f.panel);
   await expect(f.panel.getByText(text.accepted, { exact: true })).toBeVisible();
@@ -285,11 +286,15 @@ test("an open accepted agreement waits for current evidence after native reauthe
   });
   try {
     await otherTab.goto(`${origin}/account`);
-    await otherTab.getByRole("tab", { name: "Oturumlar", exact: true }).click();
-    await otherTab.getByRole("button", { name: "Diğerlerini kapat", exact: true }).click();
+    await activate(otherTab.getByRole("tab", { name: "Oturumlar", exact: true }));
+    await activate(otherTab.getByRole("button", { name: "Diğerlerini kapat", exact: true }));
     const reauth = otherTab.getByRole("dialog");
     await reauth.getByLabel("Parola", { exact: true }).fill("fixture-password");
-    await reauth.getByRole("button", { name: "Devam et", exact: true }).click();
+    await activate(reauth.getByRole("button", { name: "Devam et", exact: true }));
+    await expect(
+      reauth.getByRole("button", { name: common.sessions.confirmOthers, exact: true }),
+    ).toBeEnabled();
+    await page.bringToFront();
     await expect.poll(() => f.documentRead.waiting).toBe(true);
     await expect(f.panel).toBeVisible();
     await expect(f.panel.getByText(common.memberDocuments.loading, { exact: true })).toBeVisible();
@@ -307,8 +312,8 @@ test("an open accepted agreement waits for current evidence after native reauthe
     0,
   );
   f.documentRead.gate = undefined;
-  await f.panel.getByRole("button", { name: common.memberDocuments.retry, exact: true }).click();
+  await activate(f.panel.getByRole("button", { name: common.memberDocuments.retry, exact: true }));
   await expect(accepted).toBeVisible();
   expect(f.writes).toHaveLength(1);
-  await f.panel.getByRole("button", { name: common.memberDocuments.close, exact: true }).click();
+  await activate(f.panel.getByRole("button", { name: common.memberDocuments.close, exact: true }));
 });

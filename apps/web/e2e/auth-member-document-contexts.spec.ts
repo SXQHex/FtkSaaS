@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import type { AcceptanceContext, DocumentView } from "@ftksaas/api-contracts";
@@ -140,16 +141,20 @@ async function accept(page: Page) {
     name: "İşleme özel koşullar belgesini oku",
     exact: true,
   });
-  await read.click();
+  await activate(read);
   await expect(
     page.getByText("Sentetik işlem metni <script>window.contextScript=true</script>", {
       exact: true,
     }),
   ).toBeVisible();
-  await page
-    .getByRole("checkbox", { name: "Belgeyi okudum, bu işlem için kabul ediyorum.", exact: true })
-    .press("Space");
-  await page.getByRole("button", { name: "Belgeyi kabul et", exact: true }).click();
+  await activate(
+    page.getByRole("checkbox", {
+      name: "Belgeyi okudum, bu işlem için kabul ediyorum.",
+      exact: true,
+    }),
+    "Space",
+  );
+  await activate(page.getByRole("button", { name: "Belgeyi kabul et", exact: true }));
 }
 for (const operational of [false, true])
   test(`account document discovery preserves ${operational ? "attendance and event" : "purchase"} contexts and never copies another transaction acceptance`, async ({
@@ -163,9 +168,9 @@ for (const operational of [false, true])
     ).toBeVisible();
     expect(state.writes[0]!.context).toEqual(state.first);
     expect(await page.evaluate(() => Object.hasOwn(globalThis, "contextScript"))).toBe(false);
-    await page.getByRole("button", { name: "Belgeyi kapat", exact: true }).click();
+    await activate(page.getByRole("button", { name: "Belgeyi kapat", exact: true }));
     await expect(state.card.getByText("Kabul edildi", { exact: true })).toBeVisible();
-    await state.card.getByRole("button", { name: "Sonraki", exact: true }).click();
+    await activate(state.card.getByRole("button", { name: "Sonraki", exact: true }));
     await expect(
       state.card.getByRole("button", { name: "İşleme özel koşullar belgesini oku", exact: true }),
     ).toBeVisible();
@@ -193,7 +198,7 @@ for (const mode of ["unknown", "context-unread"] as const)
     await expect(
       page.getByRole("link", { name: "Hesap güvenliğini yönet", exact: true }),
     ).toHaveAttribute("aria-disabled", "true");
-    await page.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+    await activate(page.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
     await expect(
       page.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),
     ).toBeVisible();

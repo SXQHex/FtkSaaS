@@ -1,3 +1,4 @@
+import { activate, attemptOutsideDismissal } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import { mockStudio, openStudio, studioIds as I } from "./studio-fixture.js";
@@ -324,7 +325,7 @@ async function setup(
   await openStudio(page);
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/documents`);
   if (mode !== "catalog")
-    await page.getByRole("button", { name: "Belge yükle", exact: true }).click();
+    await activate(page.getByRole("button", { name: "Belge yükle", exact: true }));
   return state;
 }
 async function fill(page: Page) {
@@ -336,14 +337,14 @@ async function fill(page: Page) {
     mimeType: "text/plain",
     buffer: Buffer.from("Sentetik belge"),
   });
-  await dialog.getByRole("checkbox", { name: "Satış", exact: true }).press("Space");
-  await dialog.getByRole("button", { name: "Etkiyi göster", exact: true }).click();
+  await activate(dialog.getByRole("checkbox", { name: "Satış", exact: true }), "Space");
+  await activate(dialog.getByRole("button", { name: "Etkiyi göster", exact: true }));
   return dialog;
 }
 test("documents validates before upload and focuses the first invalid field", async ({ page }) => {
   const state = await setup(page);
   const dialog = page.getByRole("dialog");
-  await dialog.getByRole("button", { name: "Etkiyi göster", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Etkiyi göster", exact: true }));
   await expect(dialog.getByLabel("Belge adı", { exact: true })).toBeFocused();
   expect(state.writes).toHaveLength(0);
 });
@@ -353,7 +354,7 @@ test("M02 refreshes the directory after verified upload completion", async ({ pa
   await expect(dialog.getByText("Mevcut kaydı korunacak işlem: 1", { exact: true })).toBeVisible();
   expect(state.writes.filter((row) => row.op === "file_upload_complete_v1")).toHaveLength(1);
   expect(state.writes.filter((row) => row.op === "document_version_publish_v1")).toHaveLength(0);
-  await dialog.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(dialog).toHaveCount(0);
   await expect(page.getByRole("row").filter({ hasText: "Sentetik belge" })).toBeVisible();
 });
@@ -369,15 +370,17 @@ for (const mode of ["normal", "unknown", "unread"] as const)
     ).toBeVisible();
     const publish = dialog.getByRole("button", { name: "Yayınla", exact: true });
     await expect(publish).toBeDisabled();
-    await dialog.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
-    await publish.click();
+    await activate(dialog.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }), "Space");
+    await activate(publish);
     if (mode !== "normal") {
       await expect(
         dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }),
       ).toBeVisible();
-      await page.keyboard.press("Escape");
+      await attemptOutsideDismissal(dialog);
       await expect(dialog).toBeVisible();
-      await dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+      await activate(
+        dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }),
+      );
     }
     await expect(
       page.getByText("v1 sürümü yayımlandı ve sunucudan yeniden doğrulandı.", { exact: true }),
@@ -403,12 +406,12 @@ for (const mode of ["prepare-unknown", "transfer-unknown"] as const)
       ),
     ).toBeVisible();
     await expect(dialog.getByRole("textbox", { name: "Belge adı", exact: true })).toBeDisabled();
-    await page.keyboard.press("Escape");
+    await attemptOutsideDismissal(dialog);
     await expect(dialog).toBeVisible();
     if (mode === "prepare-unknown")
-      await dialog.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }).click();
+      await activate(dialog.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }));
     else
-      await dialog.getByRole("button", { name: "Yüklenen dosyayı doğrula", exact: true }).click();
+      await activate(dialog.getByRole("button", { name: "Yüklenen dosyayı doğrula", exact: true }));
     await expect(
       dialog.getByText("Mevcut kaydı korunacak işlem: 1", { exact: true }),
     ).toBeVisible();
@@ -427,21 +430,21 @@ test("digital publication confirms exact server content without any Storage uplo
   await dialog.getByLabel("Sürüm etiketi", { exact: true }).fill("v1");
   await dialog.getByLabel("Belge biçimi", { exact: true }).selectOption("digital");
   await expect(dialog.locator('input[type="file"]')).toHaveCount(0);
-  await dialog.getByRole("checkbox", { name: "Satış", exact: true }).press("Space");
+  await activate(dialog.getByRole("checkbox", { name: "Satış", exact: true }), "Space");
   const field = dialog.getByLabel("Dijital metin", { exact: true });
   const preview = dialog.getByRole("button", { name: "Etkiyi göster", exact: true });
-  await preview.click();
+  await activate(preview);
   await expect(field).toBeFocused();
   const source = "İlk satır.  \nİkinci satır.";
   await field.fill(source);
-  await preview.click();
+  await activate(preview);
   await expect(dialog.getByText("Mevcut kaydı korunacak işlem: 1", { exact: true })).toBeVisible();
-  await dialog.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
-  await dialog.getByRole("button", { name: "Yayınla", exact: true }).click();
+  await activate(dialog.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }), "Space");
+  await activate(dialog.getByRole("button", { name: "Yayınla", exact: true }));
   await expect(
     page.getByText("v1 sürümü yayımlandı ve sunucudan yeniden doğrulandı.", { exact: true }),
   ).toHaveCount(0);
-  await dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
   await expect(
     page.getByText("v1 sürümü yayımlandı ve sunucudan yeniden doğrulandı.", { exact: true }),
   ).toBeVisible();
@@ -455,48 +458,48 @@ test("content catalogue manages an exact source translation and acknowledges inv
   page,
 }) => {
   const state = await setup(page, "catalog");
-  await page.getByRole("tab", { name: "İçerik kataloğu" }).click();
+  await activate(page.getByRole("tab", { name: "İçerik kataloğu" }));
   await page.getByLabel("Belge", { exact: true }).selectOption({ label: "Sentetik belge" });
   const grid = page.getByRole("grid", { name: "İçerik kataloğu" });
   await expect(grid.getByRole("rowheader").last()).toHaveText(`document.${documentId}`);
-  await page.getByRole("button", { name: "Çeviri ekle" }).click();
+  await activate(page.getByRole("button", { name: "Çeviri ekle" }));
   const form = page.getByRole("form", { name: "Belge çevirisi" });
   const field = form.getByLabel("Dijital metin");
-  await form.getByRole("button", { name: "Taslağı kaydet" }).click();
+  await activate(form.getByRole("button", { name: "Taslağı kaydet" }));
   await expect(field).toBeFocused();
   await field.fill("Synthetic translation.");
   const confirm = async (name: string) => {
     const dialog = page.getByRole("dialog", { name, exact: true });
     const apply = dialog.getByRole("button", { name: common.settings.applyReview });
     await expect(apply).toBeDisabled();
-    await dialog.getByRole("checkbox").press("Space");
-    await apply.click();
+    await activate(dialog.getByRole("checkbox"), "Space");
+    await activate(apply);
     await expect(
       dialog.getByText(common.events.commandStates.saved, { exact: true }),
     ).toBeVisible();
-    await dialog.getByRole("button", { name: "Vazgeç" }).click();
+    await activate(dialog.getByRole("button", { name: "Vazgeç" }));
   };
-  await form.getByRole("button", { name: "Taslağı kaydet" }).click();
+  await activate(form.getByRole("button", { name: "Taslağı kaydet" }));
   await confirm("Taslağı kaydet");
   const row = grid
     .getByRole("row")
     .filter({ has: page.getByRole("gridcell", { name: "en", exact: true }) });
   await expect(row.getByRole("gridcell", { name: "Taslak", exact: true })).toBeVisible();
-  await row.getByRole("button", { name: "Taslağı düzenle" }).click();
+  await activate(row.getByRole("button", { name: "Taslağı düzenle" }));
   await expect(field).toHaveValue("Synthetic translation.");
-  await form.getByRole("button", { name: "Çeviriyi yayımla" }).click();
+  await activate(form.getByRole("button", { name: "Çeviriyi yayımla" }));
   await confirm("Çeviriyi yayımla");
   await expect(row.getByRole("gridcell", { name: "Yayın sürümü" })).toBeVisible();
-  await row.getByRole("button", { name: "Yayından kaldır" }).click();
+  await activate(row.getByRole("button", { name: "Yayından kaldır" }));
   await confirm("Yayından kaldır");
   await expect(row.getByRole("gridcell", { name: "Kaldırıldı" })).toBeVisible();
-  await row.getByRole("button", { name: "Geçersiz kıl" }).click();
+  await activate(row.getByRole("button", { name: "Geçersiz kıl" }));
   await confirm("Geçersiz kıl");
   await expect(page.getByText("Sunucu, sürümü geçersiz kıldığını doğruladı.")).toBeVisible();
   await expect(row.getByRole("gridcell", { name: "Geçersiz kılındı" })).toBeVisible();
   await expect(row.getByRole("button", { name: "Geçersiz kıl" })).toHaveCount(0);
   await page.reload();
-  await page.getByRole("tab", { name: "İçerik kataloğu" }).click();
+  await activate(page.getByRole("tab", { name: "İçerik kataloğu" }));
   await page.getByLabel("Belge", { exact: true }).selectOption({ label: "Sentetik belge" });
   await expect(row.getByRole("gridcell", { name: "Geçersiz kılındı" })).toBeVisible();
   expect(state.writes.map(({ r }) => r.action)).toEqual([

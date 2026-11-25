@@ -1,3 +1,4 @@
+import { hasTouchInput } from "./device-input.js";
 import AxeBuilder from "@axe-core/playwright";
 import axe, { type AxeResults, type Result } from "axe-core";
 import { expect, test, type Locator, type Page } from "@playwright/test";
@@ -56,7 +57,8 @@ export async function expectGridButtonTarget(button: Locator) {
   const selector = await gridCellSelector(cell);
   await expect(cell.getByRole("button")).toHaveCount(1);
   await expect(cell.getByRole("link")).toHaveCount(0);
-  await button.click({ trial: true });
+  if (hasTouchInput(button.page())) await button.tap({ trial: true });
+  else await button.click({ trial: true });
   await expectMinimumButtonSize(button);
   recordGridTarget(button.page(), selector, "button-size");
 }

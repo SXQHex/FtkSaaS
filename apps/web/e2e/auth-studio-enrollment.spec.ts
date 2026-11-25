@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import {
   mockStudio,
@@ -12,16 +13,16 @@ test("Studio enrollment: unknown person creation resumes without duplicating the
 }) => {
   const state = await mockStudio(page);
   await openStudio(page);
-  await page.getByRole("button", { name: "Eğitmen ekle", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Eğitmen ekle", exact: true }));
   const dialog = page.getByRole("dialog");
   await dialog.locator("#new-instructor-name").fill("Yeni Fixture Eğitmen");
   await dialog.locator("#new-instructor-email").fill("new-instructor@example.invalid");
   state.nextWrite = "unknown";
-  await dialog.getByRole("button", { name: "Kişiyi oluştur ve devam et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Kişiyi oluştur ve devam et", exact: true }));
   const retry = dialog.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true });
   await expect(retry).toBeVisible();
   await expect(dialog.getByRole("button", { name: "Vazgeç", exact: true })).toBeDisabled();
-  await retry.click();
+  await activate(retry);
   await expect(
     page.getByRole("dialog").getByText("Yeni Fixture Eğitmen", { exact: true }),
   ).toBeVisible();
@@ -53,30 +54,29 @@ test("Studio enrollment: queued invitation grants no access until link and expli
   await openStudio(page);
   const lifetime = await page.evaluate("performance.timeOrigin");
   await studioScheduleChoice(page, studioIds.instructor, false);
-  await page.getByRole("button", { name: "Eğitmen ekle", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Eğitmen ekle", exact: true }));
   let dialog = page.getByRole("dialog");
-  await dialog.getByRole("radio", { name: "Mevcut kişi", exact: true }).click();
-  await dialog.getByRole("button", { name: "Kişi ara", exact: true }).click();
+  await activate(dialog.getByRole("radio", { name: "Mevcut kişi", exact: true }));
+  await activate(dialog.getByRole("button", { name: "Kişi ara", exact: true }));
   await dialog.locator("#existing-instructor-person").selectOption(studioIds.instructor);
-  await dialog.getByRole("button", { name: "Kuruluma devam et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Kuruluma devam et", exact: true }));
   dialog = page.getByRole("dialog");
-  await dialog.getByRole("button", { name: "Hesap daveti gönder", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Hesap daveti gönder", exact: true }));
   await expect(dialog.getByText("Davet gönderim işi bekliyor.", { exact: true })).toBeVisible();
   expect(state.roles[0]!.accountAccessGranted).toBe(false);
   expect(state.effects).toEqual(["account_access_send_v1"]);
   await expect(dialog.locator("#instructor-role-grant")).toHaveCount(0);
   state.accountLinked = true;
-  await dialog.getByRole("button", { name: "Hesap bağını kontrol et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Hesap bağını kontrol et", exact: true }));
   const approval = dialog.getByRole("checkbox");
   await expect(approval).not.toBeChecked();
-  await approval.focus();
-  await page.keyboard.press("Space");
-  await dialog.getByRole("button", { name: "Bağlı hesaba rolü uygula", exact: true }).click();
+  await activate(approval, "Space");
+  await activate(dialog.getByRole("button", { name: "Bağlı hesaba rolü uygula", exact: true }));
   await expect(page.getByRole("dialog").locator("#instructor-name")).toBeEditable();
   expect(state.effects).toEqual(["account_access_send_v1", "role_assign_v1"]);
   expect(state.roles).toHaveLength(1);
   expect(state.roles[0]).toMatchObject({ accountAccessGranted: true, version: 3 });
-  await page.getByRole("dialog").getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(page.getByRole("dialog").getByRole("button", { name: "Vazgeç", exact: true }));
   await studioScheduleChoice(page, studioIds.instructor, true);
   expect(state.people[0]!.relationships).toContainEqual(foreign);
   expect(await page.evaluate("performance.timeOrigin")).toBe(lifetime);

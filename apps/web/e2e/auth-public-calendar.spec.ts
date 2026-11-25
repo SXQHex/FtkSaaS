@@ -1,3 +1,4 @@
+import { activate, hasTouchInput } from "./device-input.js";
 import { test, expect } from "./test.js";
 import {
   preparePublicCalendar as prepare,
@@ -12,7 +13,7 @@ test("anonymous public calendar reads published fields and paginates with unchan
   await expect(page.getByText("Saat dilimi: Europe/Istanbul", { exact: true })).toBeVisible();
   await expect(page.getByText("₺500,00", { exact: true })).toBeVisible();
   await expect(page.getByRole("combobox", { name: "Ders türü", exact: true })).toBeEnabled();
-  await page.getByRole("button", { name: "Daha fazla göster", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Daha fazla göster", exact: true }));
   await expect(page.getByRole("heading", { name: "İkinci program", exact: true })).toBeVisible();
   expect(state.calls).toHaveLength(2);
   expect(state.calls[1]!.interval).toEqual(state.calls[0]!.interval);
@@ -31,7 +32,7 @@ test("public transport failure offers retry and never claims a closed publicatio
   await expect(page.getByText("Program yüklenemedi.", { exact: true })).toBeVisible();
   await expect(page.getByText("Bu sayfa şu an yayında değil", { exact: true })).toHaveCount(0);
   state.recover();
-  await page.getByRole("button", { name: "Tekrar dene", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Tekrar dene", exact: true }));
   await expect(page.getByRole("heading", { name: "Tango programı", exact: true })).toBeVisible();
 });
 test("next page failure preserves loaded rows and retries only the missing page", async ({
@@ -40,20 +41,18 @@ test("next page failure preserves loaded rows and retries only the missing page"
   const state = await prepare(page);
   await expect(page.getByRole("heading", { name: "Tango programı", exact: true })).toBeVisible();
   state.failNext();
-  await page.getByRole("button", { name: "Daha fazla göster", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Daha fazla göster", exact: true }));
   await expect(
     page.getByText("Sonraki program sayfası yüklenemedi.", { exact: true }),
   ).toBeVisible();
   await expect(page.getByRole("heading", { name: "Tango programı", exact: true })).toBeVisible();
   state.recoverNext();
-  await page.getByRole("button", { name: "Daha fazla göster", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Daha fazla göster", exact: true }));
   await expect(page.getByRole("heading", { name: "İkinci program", exact: true })).toBeVisible();
   expect(state.calls).toHaveLength(3);
 });
 test("empty anonymous result does not reveal private profile or invent application availability", async ({
   page,
-  browserName,
-  isMobile,
 }) => {
   await page.setViewportSize({ width: 320, height: 750 });
   await prepare(page, "empty");
@@ -62,15 +61,16 @@ test("empty anonymous result does not reveal private profile or invent applicati
   ).toBeVisible();
   await expect(page.getByText("Örnek Stüdyo", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Başvur", exact: true })).toHaveCount(0);
-  if (browserName === "webkit" && isMobile) {
-    // Touch profiles have no Tab path to links, so focus the skip link directly.
-    await page.getByRole("link", { name: "İçeriğe geç", exact: true }).focus();
+  if (hasTouchInput(page)) {
+    const main = page.locator("#public-main");
+    await expect(main).toBeVisible();
+    await expect(main).toBeInViewport();
   } else {
     await page.keyboard.press("Tab");
+    await expect(page.getByRole("link", { name: "İçeriğe geç", exact: true })).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/#public-main$/);
   }
-  await expect(page.getByRole("link", { name: "İçeriğe geç", exact: true })).toBeFocused();
-  await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/#public-main$/);
 });
 test("malformed publication data fails closed without rendering duplicate rows", async ({
   page,

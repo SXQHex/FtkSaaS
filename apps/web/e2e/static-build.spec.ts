@@ -1,3 +1,5 @@
+import { hasTouchInput } from "./device-input.js";
+import { closeWorkspaceNavigation, openWorkspaceNavigation } from "./auth-fixture.js";
 import { test as base, expect } from "./test.js";
 import { loadEnv, preview, type PreviewServer } from "vite";
 import { mockSessionDetail } from "./session-detail-fixture.js";
@@ -162,8 +164,13 @@ test("production artifact reads the center calendar in its own timezone after a 
   await page.reload();
   await expect(page).toHaveURL(path);
   await expect(next).toContainText("16:00");
-  await page.keyboard.press("Tab");
-  await expect(page.locator(":focus-visible")).toBeVisible();
+  if (hasTouchInput(page)) {
+    await openWorkspaceNavigation(page);
+    await closeWorkspaceNavigation(page);
+  } else {
+    await page.keyboard.press("Tab");
+    await expect(page.locator(":focus-visible")).toBeVisible();
+  }
   expect(errors).toEqual([]);
   await testInfo.attach("production-calendar", {
     body: JSON.stringify({

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
-import { browserProfiles, browserShards, refactoringBrowserShards } from "./browser-profiles.mjs";
+import { browserProfiles } from "./browser-profiles.mjs";
 import { checkTestResults } from "./check-test-results.mjs";
 
 function reportTests(suites) {
@@ -33,8 +33,8 @@ function inventory(report, profile) {
   return tests;
 }
 
-export function verifyShardPlan(all, shards, files, profile, plannedShards = browserShards) {
-  assert.equal(shards.length, plannedShards.length, "Incomplete shard plan");
+export function verifyShardPlan(all, shards, files, profile) {
+  assert.equal(shards.length, browserProfiles[profile].shards, "Incomplete shard plan");
   const tests = inventory(all, profile);
   if (files.length) {
     assert.deepEqual(
@@ -68,11 +68,12 @@ export function verifyShardResult(report, expected, profile) {
 function runShard(env) {
   const profile = env.FTK_BROWSER_PROJECT;
   assert.ok(Object.hasOwn(browserProfiles, profile), "CI browser profile is required");
-  // Refactoring CI runs the complete Desktop Chromium inventory in 12 shards.
-  // Preserve the original three-shard plan for manual runs of other profiles.
-  const plannedShards = profile === "chromium" ? refactoringBrowserShards : browserShards;
+  const shardCount = browserProfiles[profile].shards;
   const shard = Number(env.FTK_BROWSER_SHARD);
-  assert.ok(plannedShards.includes(shard), "CI shard index is required");
+  assert.ok(
+    Number.isInteger(shard) && shard >= 1 && shard <= shardCount,
+    "CI shard index is required",
+  );
   const files = JSON.parse(env.FTK_E2E_SPECS);
   assert.ok(
     Array.isArray(files) &&
@@ -88,15 +89,14 @@ function runShard(env) {
       env: { ...env, PLAYWRIGHT_JSON_OUTPUT_FILE: "" },
     });
   const discover = (...flags) => JSON.parse(playwright(["--list", "--reporter=json", ...flags]));
-  const shardFlag = (index) => `--shard=${index}/${plannedShards.length}`;
+  const shardFlag = (index) => `--shard=${index}/${shardCount}`;
   const expected = verifyShardPlan(
     discover(),
-    plannedShards.map((index) => discover(shardFlag(index))),
+    Array.from({ length: shardCount }, (_, index) => discover(shardFlag(index + 1))),
     files,
     profile,
-    plannedShards,
   )[shard - 1];
-  console.log(`${profile} ${shard}/${plannedShards.length}: ${expected.length} selected tests`);
+  console.log(`${profile} ${shard}/${shardCount}: ${expected.length} selected tests`);
   playwright([shardFlag(shard)], "inherit");
   verifyShardResult(
     JSON.parse(readFileSync("test-reports/playwright.json", "utf8")),

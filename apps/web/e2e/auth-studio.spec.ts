@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { reviewStudioAccessibility } from "./studio-accessibility-review.js";
 import { mockStudio, openStudio } from "./studio-fixture.js";
@@ -40,7 +41,7 @@ test("Studio drawing: complete tabs and live form composition, responsive AA", a
     for (const colorScheme of ["light", "dark"] as const) {
       await page.emulateMedia({ colorScheme });
       for (const tab of tabs) {
-        await page.getByRole("tab", { name: tab, exact: true }).click();
+        await activate(page.getByRole("tab", { name: tab, exact: true }));
         await expect(page.getByRole("tab", { name: tab, exact: true })).toHaveAttribute(
           "aria-selected",
           "true",
@@ -56,7 +57,7 @@ test("Studio drawing: complete tabs and live form composition, responsive AA", a
         }
       }
       if (width === 1440 && colorScheme === "light") {
-        await page.getByRole("tab", { name: "Eğitmenler", exact: true }).click();
+        await activate(page.getByRole("tab", { name: "Eğitmenler", exact: true }));
         await expect(page.getByRole("tab", { name: "Eğitmenler", exact: true })).toHaveAttribute(
           "aria-selected",
           "true",
@@ -77,24 +78,24 @@ test("Studio drawing: complete tabs and live form composition, responsive AA", a
     await page.emulateMedia({ colorScheme });
     for (const form of ["new-instructor", "instructor", "class", "room", "closure", "agreement"]) {
       if (form === "new-instructor")
-        await page.getByRole("button", { name: "Eğitmen ekle", exact: true }).click();
+        await activate(page.getByRole("button", { name: "Eğitmen ekle", exact: true }));
       else if (form === "instructor") {
-        await page.getByRole("tab", { name: "Eğitmenler", exact: true }).click();
-        await page.getByRole("button", { name: /Örnek Eğitmen/ }).click();
+        await activate(page.getByRole("tab", { name: "Eğitmenler", exact: true }));
+        await activate(page.getByRole("button", { name: /Örnek Eğitmen/ }));
       } else if (form === "class" || form === "room") {
-        await page.getByRole("tab", { name: "Dersler ve salonlar", exact: true }).click();
-        await page
-          .getByRole("button", {
+        await activate(page.getByRole("tab", { name: "Dersler ve salonlar", exact: true }));
+        await activate(
+          page.getByRole("button", {
             name: form === "room" ? "Salon ekle" : "Ders türü ekle",
             exact: true,
-          })
-          .click();
+          }),
+        );
       } else if (form === "closure") {
-        await page.getByRole("tab", { name: "Kapanışlar", exact: true }).click();
-        await page.getByRole("button", { name: "Kapanış ekle", exact: true }).click();
+        await activate(page.getByRole("tab", { name: "Kapanışlar", exact: true }));
+        await activate(page.getByRole("button", { name: "Kapanış ekle", exact: true }));
       } else {
-        await page.getByRole("tab", { name: "Anlaşmalar", exact: true }).click();
-        await page.getByRole("button", { name: /Örnek Eğitmen/ }).click();
+        await activate(page.getByRole("tab", { name: "Anlaşmalar", exact: true }));
+        await activate(page.getByRole("button", { name: /Örnek Eğitmen/ }));
       }
       const dialog = page.getByRole("dialog");
       await expect(dialog).toBeVisible();
@@ -127,7 +128,7 @@ test("Studio drawing: complete tabs and live form composition, responsive AA", a
           dialog.getByRole("button", { name: "Yeni sürümü yayınla", exact: true }),
         ).toBeInViewport();
       }
-      await dialog.getByRole("button", { name: "Kapat", exact: true }).click();
+      await activate(dialog.getByRole("button", { name: "Kapat", exact: true }));
       await expect(dialog).toHaveCount(0);
     }
   }
@@ -156,10 +157,10 @@ test("an agreement plan denial preserves Starter studio resources and disables a
     }),
   );
   await openStudio(page);
-  await page.getByRole("tab", { name: "Dersler ve salonlar", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Dersler ve salonlar", exact: true }));
   await expect(page.getByRole("button", { name: "Salon ekle", exact: true })).toBeEnabled();
   await expect(page.getByRole("button", { name: "Ana salon", exact: true })).toBeVisible();
-  await page.getByRole("tab", { name: "Anlaşmalar", exact: true }).click();
+  await activate(page.getByRole("tab", { name: "Anlaşmalar", exact: true }));
   await expect(page.getByRole("alert")).toContainText(
     "Bu planda eğitmen ücret anlaşmaları kullanılamaz.",
   );

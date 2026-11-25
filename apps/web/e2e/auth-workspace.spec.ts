@@ -1,3 +1,4 @@
+import { activate, closeWithDevice, hasTouchInput } from "./device-input.js";
 import { test, expect } from "./test.js";
 import {
   closeWorkspaceNavigation,
@@ -34,19 +35,19 @@ test("command palette reaches appearance, switches the saved theme and signs out
   const input = page.getByPlaceholder("Sayfa adı ara…");
   await openWorkspaceSearch(page);
   await input.fill("Temayı değiştir");
-  await page.getByRole("menuitem", { name: "Temayı değiştir", exact: true }).click();
+  await activate(page.getByRole("menuitem", { name: "Temayı değiştir", exact: true }));
   await expect(page).toHaveURL(`${origin}/account?org=${org}&center=${center}#account-appearance`);
   const appearance = page.locator("#account-appearance");
   await expect(appearance.getByRole("radiogroup", { name: "Tema", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Temayı değiştir", exact: true })).toBeEnabled();
   await openWorkspaceSearch(page);
   await input.fill("Temayı değiştir");
-  await page.getByRole("menuitem", { name: "Temayı değiştir", exact: true }).click();
+  await activate(page.getByRole("menuitem", { name: "Temayı değiştir", exact: true }));
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   expect(native.settingsPatches).toEqual([{ theme: "dark" }]);
   await openWorkspaceSearch(page);
   await input.fill("Çıkış yap");
-  await page.getByRole("menuitem", { name: "Çıkış yap", exact: true }).click();
+  await activate(page.getByRole("menuitem", { name: "Çıkış yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/login`);
   await expect(page.locator("html")).not.toHaveAttribute("data-theme");
 });
@@ -125,7 +126,7 @@ for (const colorScheme of ["light", "dark"] as const)
     await page.goto(`${origin}/login`);
     await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
     await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-    await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+    await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
     await expect(page).toHaveURL(`${origin}/account`);
     await expect(page.getByRole("button", { name: /Fixture Studio Fixture Center/ })).toContainText(
       "Fixture Studio",
@@ -137,7 +138,7 @@ for (const colorScheme of ["light", "dark"] as const)
     const rail = page.locator('[data-slot="sidebar-rail"]');
     await expect(rail).toBeVisible();
     expect((await rail.boundingBox())?.width).toBeGreaterThanOrEqual(24);
-    await rail.click();
+    await activate(rail);
     await expect(page.locator('[data-slot="sidebar"][data-state="collapsed"]')).toBeVisible();
     // The rail moves with the sidebar width when the collapsed state is applied.
     await expect
@@ -151,7 +152,7 @@ for (const colorScheme of ["light", "dark"] as const)
         }))`),
       )
       .toBe(0);
-    await rail.click();
+    await activate(rail);
     await expect(page.locator('[data-slot="sidebar"][data-state="expanded"]')).toBeVisible();
     for (const viewport of shellViewports) {
       await page.setViewportSize(viewport);
@@ -163,27 +164,49 @@ for (const colorScheme of ["light", "dark"] as const)
     }
     await page.setViewportSize({ width: 390, height: 844 });
     const toggle = page.getByRole("button", { name: "Menüyü aç veya kapat", exact: true });
-    await toggle.focus();
-    await page.keyboard.press("Enter");
+    await activate(toggle, "Enter");
     const dialog = page.getByRole("dialog", { name: "Ana menü", exact: true });
     await expect(dialog).toBeVisible();
     const close = dialog.getByRole("button", { name: "Menüyü kapat", exact: true });
     await expect(close).toBeFocused();
-    await expect(close).toHaveCSS("box-shadow", /^(?!none$).+/);
+    if (!hasTouchInput(page)) {
+      await expect(close).toHaveCSS("box-shadow", /^(?!none$).+/);
+    }
     expect((await scanAccessibility(page, "workspace-mobile-drawer")).violations).toEqual([]);
-    await page.keyboard.press("Escape");
+    await closeWithDevice(close);
     await expect(dialog).toHaveCount(0);
     await expect(toggle).toBeFocused();
-    await toggle.click();
+    await activate(toggle);
     const studioPicker = dialog.getByRole("button", { name: /Fixture Studio Fixture Center/ });
     const studioMenu = page.getByRole("menu", { name: /Fixture Studio Fixture Center/ });
-    await studioPicker.click();
+    await activate(studioPicker);
     await expect(studioMenu).toBeVisible();
-    await page.keyboard.press("Escape");
+    if (hasTouchInput(page)) {
+      // React Aria dispatches outside dismissal from the document while the underlay is inert.
+      const outside = await studioMenu.evaluate((menu) => {
+        const { ownerDocument } = menu;
+        const { clientWidth, clientHeight } = ownerDocument.documentElement;
+        const corners = [
+          { x: 8, y: 8 },
+          { x: clientWidth - 8, y: 8 },
+          { x: 8, y: clientHeight - 8 },
+          { x: clientWidth - 8, y: clientHeight - 8 },
+        ];
+        return corners.find(({ x, y }) => {
+          const hit = ownerDocument.elementFromPoint(x, y);
+          return hit && !menu.contains(hit) && !hit.closest("button, a, input");
+        });
+      });
+      expect(outside).toBeDefined();
+      await page.touchscreen.tap(outside!.x, outside!.y);
+    } else {
+      await closeWithDevice(studioPicker);
+    }
     await expect(studioMenu).toHaveCount(0);
+    await expect(dialog).toBeVisible();
     await expect(page.locator('[data-slot="dropdown-menu-content"]')).toHaveCount(0);
     await expect(studioPicker).toBeFocused();
-    await page.keyboard.press("Escape");
+    await closeWithDevice(close);
     await expect(dialog).toHaveCount(0);
     await expect(toggle).toBeFocused();
     await page.setViewportSize({ width: 640, height: 1000 });
@@ -258,7 +281,7 @@ test("Starter self management opens the native owner navigation and removes it a
   await page.goto(`${origin}/login`);
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   await openWorkspaceNavigation(page);
   const studio = page.locator("nav a[href$='/studio']");
@@ -275,7 +298,7 @@ test("Starter self management opens the native owner navigation and removes it a
   const palette = page.getByRole("dialog", { name: "Sayfalarda ara", exact: true });
   await palette.getByPlaceholder("Sayfa adı ara…").fill("Otomasyon");
   await expect(palette.getByRole("menuitem", { name: "Otomasyon", exact: true })).toHaveCount(0);
-  await page.keyboard.press("Escape");
+  await closeWithDevice(palette.getByRole("button", { name: "Kapat", exact: true }));
   scope = null;
   await page.reload();
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
@@ -287,7 +310,7 @@ test("Starter self management opens the native owner navigation and removes it a
   await expect(palette.getByText("Eşleşen sayfa yok.", { exact: true })).toBeVisible();
   await expect(palette.getByRole("menuitem", { name: "Politikalar", exact: true })).toHaveCount(0);
   await palette.getByPlaceholder("Sayfa adı ara…").clear();
-  await page.keyboard.press("Escape");
+  await closeWithDevice(palette.getByRole("button", { name: "Kapat", exact: true }));
   await expect(palette).toBeHidden();
 });
 
@@ -371,27 +394,29 @@ test("workspace entry offers authorized studios and keeps the selected center on
   await page.goto(`${origin}/login`);
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   const studioHeading = page.getByRole("heading", { name: "Hangi stüdyoyla devam edeceksin?" });
   await expect(studioHeading).toBeFocused();
   await expect(page.getByRole("radio", { name: /Askıdaki stüdyo/ })).toBeDisabled();
   await expect(page.getByRole("button", { name: "Devam et", exact: true })).toBeDisabled();
-  await page.getByRole("radio", { name: "Açık stüdyo", exact: true }).check();
-  await page.getByRole("button", { name: "Devam et", exact: true }).click();
+  const studio = page.getByRole("radio", { name: "Açık stüdyo", exact: true });
+  await activate(studio, "Space");
+  await expect(studio).toBeChecked();
+  await activate(page.getByRole("button", { name: "Devam et", exact: true }));
   await expect(page.getByRole("heading", { name: "Çalışacağın merkezi seç" })).toBeFocused();
   await expect(page.getByRole("radio", { name: "Yetkisiz merkez" })).toHaveCount(0);
-  await page.getByRole("button", { name: "Stüdyo seçimine dön" }).click();
+  await activate(page.getByRole("button", { name: "Stüdyo seçimine dön" }));
   await expect(studioHeading).toBeFocused();
-  await page.getByRole("radio", { name: "Açık stüdyo", exact: true }).check();
-  await page.getByRole("button", { name: "Devam et", exact: true }).click();
+  if (!(await studio.isChecked())) await activate(studio, "Space");
+  await expect(studio).toBeChecked();
+  await activate(page.getByRole("button", { name: "Devam et", exact: true }));
   const selected = page.getByRole("radio", { name: "Seçilen merkez", exact: true });
-  await selected.focus();
-  await page.keyboard.press("Space");
+  await activate(selected, "Space");
   expect((await scanAccessibility(page, "workspace-entry-center")).violations).toEqual([]);
   assertLayoutFit(await readLayoutFit(page));
-  await page.getByRole("button", { name: "Merkezi aç" }).press("Enter");
+  await activate(page.getByRole("button", { name: "Merkezi aç" }), "Enter");
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeFocused();
-  await page.getByRole("button", { name: "Menüyü aç veya kapat" }).click();
+  await activate(page.getByRole("button", { name: "Menüyü aç veya kapat" }));
   await expect(page.getByRole("button", { name: /Açık stüdyo Seçilen merkez/ })).toBeVisible();
   const links = await page
     .locator("a")
@@ -405,7 +430,7 @@ test("workspace entry offers authorized studios and keeps the selected center on
     .getByRole("navigation", { name: "Ana menü" })
     .getByRole("link", { name: "Gelen kutusu", exact: true });
   await page.evaluate("document.documentElement.dataset.inboxNavigationProbe='management'");
-  await sidebarInbox.press("Enter");
+  await activate(sidebarInbox, "Enter");
   await expect(page).toHaveURL(`${origin}${inboxHref}`);
   await expect(page.getByRole("searchbox", { name: "İletilerde ara" })).toBeEnabled();
   await expect(page.locator("html")).toHaveAttribute("data-inbox-navigation-probe", "management");
@@ -418,7 +443,7 @@ test("workspace entry offers authorized studios and keeps the selected center on
   );
   await page.reload();
   await expect(page.getByRole("searchbox", { name: "İletilerde ara" })).toBeEnabled();
-  await page.getByRole("button", { name: "Menüyü aç veya kapat" }).click();
+  await activate(page.getByRole("button", { name: "Menüyü aç veya kapat" }));
   await expect(page.getByRole("button", { name: /Açık stüdyo Seçilen merkez/ })).toBeVisible();
   await expect(sidebarInbox).toHaveAttribute("aria-current", "page");
   await expect(page.getByRole("link", { name: "Ders programı", exact: true })).toHaveAttribute(
@@ -427,17 +452,17 @@ test("workspace entry offers authorized studios and keeps the selected center on
   );
 
   const accountHref = `/account?org=${org}&center=${otherCenter}`;
-  await page.locator('[data-slot="sidebar-footer"]').getByRole("button").click();
-  await page.getByRole("menuitem", { name: "Hesabım", exact: true }).click();
+  await activate(page.locator('[data-slot="sidebar-footer"]').getByRole("button"));
+  await activate(page.getByRole("menuitem", { name: "Hesabım", exact: true }));
   await expect(page).toHaveURL(`${origin}${accountHref}`);
   await expect(page.getByRole("tab", { name: "Profil", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Çalışacağın merkezi seç" })).toHaveCount(0);
   await page.reload();
   await expect(page.getByRole("tab", { name: "Profil", exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Menüyü aç veya kapat" }).click();
+  await activate(page.getByRole("button", { name: "Menüyü aç veya kapat" }));
   await expect(page.getByRole("button", { name: /Açık stüdyo Seçilen merkez/ })).toBeVisible();
 
-  await page.getByRole("link", { name: "Raporlar", exact: true }).press("Enter");
+  await activate(page.getByRole("link", { name: "Raporlar", exact: true }), "Enter");
   await expect(page).toHaveURL(`${origin}/reports`);
   await page.goBack();
   await expect(page).toHaveURL(`${origin}${accountHref}`);
@@ -445,7 +470,7 @@ test("workspace entry offers authorized studios and keeps the selected center on
   await expect(page).toHaveURL(`${origin}/reports`);
   await page.reload();
   await expect(page).toHaveURL(`${origin}/reports`);
-  await page.getByRole("button", { name: "Menüyü aç veya kapat" }).click();
+  await activate(page.getByRole("button", { name: "Menüyü aç veya kapat" }));
   await expect(page.getByRole("button", { name: /Açık stüdyo Seçilen merkez/ })).toBeVisible();
   await page.goto("/account");
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();

@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { mockNative } from "./auth-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
@@ -11,7 +12,7 @@ async function signIn(page: import("@playwright/test").Page) {
   await page.goto("/login");
   await page.getByLabel("E-posta", { exact: true }).fill("studio-setup@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Synthetic123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(/\/account$/);
 }
 test("verified account submits one studio setup request and hands the fulfilled organization to first-center setup", async ({
@@ -99,21 +100,21 @@ test("verified account submits one studio setup request and hands the fulfilled 
   await expect(page.getByRole("heading", { name: "Bir stüdyoya erişimin yok" })).toBeVisible();
   const studio = page.getByRole("textbox", { name: text.name, exact: true });
   const review = page.getByRole("button", { name: text.review, exact: true });
-  await review.click();
+  await activate(review);
   await expect(studio).toBeFocused();
   await expect(studio).toHaveAccessibleDescription(text.nameError);
   await studio.fill("  " + name + "  ");
-  await review.click();
+  await activate(review);
   const dialog = page.getByRole("dialog", { name: text.review });
   const submit = dialog.getByRole("button", { name: text.submit, exact: true });
   await expect(submit).toBeDisabled();
   expect(writes).toHaveLength(0);
-  await dialog.getByRole("checkbox").press("Space");
-  await submit.click();
+  await activate(dialog.getByRole("checkbox"), "Space");
+  await activate(submit);
   await expect(dialog.getByRole("status")).toHaveText(common.events.commandStates.unknown);
-  await dialog.getByRole("button", { name: common.studio.retrySameRequest, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: common.studio.retrySameRequest, exact: true }));
   await expect(dialog.getByRole("status")).toHaveText(common.events.commandStates.saved);
-  await dialog.getByRole("button", { name: common.settings.discard, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: common.settings.discard, exact: true }));
   await page.reload();
   await expect(page.getByText(text.pending, { exact: true })).toBeVisible();
   await expect(
@@ -122,7 +123,7 @@ test("verified account submits one studio setup request and hands the fulfilled 
   await expect(review).toHaveCount(0);
 
   finished = true;
-  await page.getByRole("button", { name: text.refresh, exact: true }).click();
+  await activate(page.getByRole("button", { name: text.refresh, exact: true }));
   await expect(
     page.getByRole("button", { name: common.centerSetup.action, exact: true }),
   ).toBeVisible();
@@ -162,7 +163,7 @@ test("an unread studio setup source stays closed and a foreign row does not expo
   await signIn(page);
   await expect(page.getByText(text.readError, { exact: true })).toBeVisible();
   fail = false;
-  await page.getByRole("button", { name: text.refresh, exact: true }).click();
+  await activate(page.getByRole("button", { name: text.refresh, exact: true }));
   await expect(page.getByText(text.readError, { exact: true })).toBeVisible();
   await expect(page.getByText("Başka hesaba ait stüdyo", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("textbox", { name: text.name, exact: true })).toHaveCount(0);

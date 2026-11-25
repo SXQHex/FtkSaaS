@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import {
   closeWorkspaceNavigation,
@@ -6,6 +7,7 @@ import {
   origin,
 } from "./auth-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
+import { assertLayoutFit, readLayoutFit } from "./layout.js";
 import common from "../src/locales/tr/common.json" with { type: "json" };
 
 const B = {
@@ -188,7 +190,7 @@ async function scopes(page: import("@playwright/test").Page) {
   await page.goto(`${origin}/login`);
   await page.getByLabel("E-posta", { exact: true }).fill("scopes@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Synthetic123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   return { state, release };
@@ -200,16 +202,35 @@ test("multiple roles reset navigation when the selected organization changes to 
   await scopes(page);
   await openWorkspaceNavigation(page);
   const switcher = page.locator("[data-workspace-logo]").locator("..");
-  await switcher.click();
-  await page.getByRole("menuitem", { name: "Birinci stüdyo", exact: true }).click();
+  await activate(switcher);
+  await activate(page.getByRole("menuitem", { name: "Birinci stüdyo", exact: true }));
   const nav = page.getByRole("navigation", { name: "Ana menü", exact: true });
   await expect(
     nav.getByRole("link", { name: common.workspace.links.finance, exact: true }),
   ).toHaveAttribute("href", `/o/${I.org}/c/${I.center}/finance`);
   await closeWorkspaceNavigation(page);
-  await page
-    .getByRole("radio", { name: common.workspace.viewLabels.instructor, exact: true })
-    .press("Space");
+  const viewport = page.viewportSize();
+  if (!viewport) throw new Error("The workspace requires an emulated viewport");
+  await page.setViewportSize({ ...viewport, width: 320 });
+  try {
+    const toolbar = page.locator(".workspace-topbar");
+    await expect(
+      toolbar.getByRole("radio", { name: common.workspace.viewLabels.management }),
+    ).toBeInViewport({ ratio: 1 });
+    await expect(
+      toolbar.getByRole("radio", { name: common.workspace.viewLabels.instructor }),
+    ).toBeInViewport({ ratio: 1 });
+    await expect(
+      toolbar.getByRole("button", { name: common.workspace.searchButtonLabel }),
+    ).toBeInViewport({ ratio: 1 });
+    assertLayoutFit(await readLayoutFit(page));
+  } finally {
+    await page.setViewportSize(viewport);
+  }
+  await activate(
+    page.getByRole("radio", { name: common.workspace.viewLabels.instructor, exact: true }),
+    "Space",
+  );
   await openWorkspaceNavigation(page);
   await expect(
     nav.getByRole("link", { name: common.workspace.links.today, exact: true }),
@@ -217,8 +238,8 @@ test("multiple roles reset navigation when the selected organization changes to 
   await expect(
     nav.getByRole("link", { name: common.workspace.links.finance, exact: true }),
   ).toHaveCount(0);
-  await switcher.click();
-  await page.getByRole("menuitem", { name: "İkinci stüdyo", exact: true }).click();
+  await activate(switcher);
+  await activate(page.getByRole("menuitem", { name: "İkinci stüdyo", exact: true }));
   await expect(switcher).toContainText("Londra merkezi");
   await expect(
     page.getByRole("radio", { name: common.workspace.viewLabels.instructor, exact: true }),
@@ -232,7 +253,7 @@ test("multiple roles reset navigation when the selected organization changes to 
   const accountLink = nav.getByRole("link", { name: common.workspace.links.account, exact: true });
   const accountHref = `/account?org=${B.org}&center=${B.center}`;
   await expect(accountLink).toHaveAttribute("href", accountHref);
-  await accountLink.press("Enter");
+  await activate(accountLink, "Enter");
   await expect(page).toHaveURL(`${origin}${accountHref}`);
   await openWorkspaceNavigation(page);
   await expect(switcher).toContainText("Londra merkezi");
@@ -262,9 +283,9 @@ test("a late previous-org calendar cannot replace the selected member, and revok
   await expect.poll(() => f.state.oldReplyCompleted).toBe(true);
   await expect(page.getByText("Londra ders kaydı", { exact: true })).toBeVisible();
   await expect(page.getByText("İstanbul ders kaydı", { exact: true })).toHaveCount(0);
-  await page
-    .getByRole("link", { name: common.memberReservations.links.entitlements, exact: true })
-    .click();
+  await activate(
+    page.getByRole("link", { name: common.memberReservations.links.entitlements, exact: true }),
+  );
   await expect
     .poll(() =>
       f.state.reads.some(

@@ -18,9 +18,13 @@
 - `defaultPreloadStaleTime: 0` Router'ın ayrı bir preload tazelik penceresini kapatır. Query tazelik ve yeniden okuma sahibidir; `router.invalidate()` kendi başına Query cache'ini geçersiz kılmaz. Etki oluşturan işlemlerde ilgili sorgu önce açıkça invalid edilir.
 - MFA, davet ve silme sonucu gibi kimlik yaşam döngüsü rotaları bu veri loader'ından ayrıdır. OAuth callback ve oturum döndüren signup, native session/MFA doğrulamasından sonra korumalı `/account` rotasıyla aynı platform hesap Query'sini paylaşır; recovery ordinary projeksiyonda kalır. `scopedBackend` üzerindeki pinned-bearer / hesap eşleme kontrolü, özellikle komut ve receipt yolları için güvenlik doğrulaması olarak korunur.
 
-## Geçici tarayıcı CI profili
+## Tarayıcı CI profilleri
 
-Refactoring tamamlanana dek otomatik frontend CI'si yalnız **Desktop Chromium** projesinin on iki Playwright shard'ını ve **tam Playwright test envanterini** çalıştırır. Diğer tarayıcı profilleri ve senaryoları korunur, fakat CI tarafından seçilmez. Lint, tip, build, birim/coverage, erişilebilirlik kontrolleri ve aynı profilin tam test envanteri geçerlidir. Dört tarayıcı kabulü bu dönemde iddia edilemez; refactoring kapanışında [CI politikasındaki](../../../docs/ci-policy.md) kaynak-özel güvenilir kurulum süreciyle dört tarayıcı profili × üç shard düzeni geri alınır.
+Otomatik CI, birim testleri ve tarayıcı shard'ları için [CI çalışma politikasındaki Ubuntu runner ve profil matrisini](../../../docs/ci-policy.md#ci-split--frontendbackend-kaynak-sınırı) kullanır. CI kanıtı tam aday kaynağına ve profil envanterine bağlıdır.
+
+Yerel D04 doğrulaması için `FTK_BROWSER_PROJECT` değerleri `chromium`, `mobile-chromium` (Pixel 7), `webkit` (13,6 inç MacBook Air, DPR 2, 1280×832 CSS ekranı) ve `mobile-webkit` (iPhone 15) olarak seçilir. `test:e2e --workers=1` bütün senaryoları tek işçiyle çalıştırır. Harici kabul koşusu aynı profilleri kullanır. Ayrı kullanıcı sayfaları seçili cihazı devralır ve kimlikleri bağımsız context'lerde tutar. [Test girdisi](../e2e/device-input.ts)
+
+Chromium’da mobil kaydırma ve pano sürüklemesi dokunma girdisiyle sınanır. iPhone profilinde taşma ve konum yerel kaydırma API’siyle, pano aşaması görünür seçim kontrolüyle sınanır. WebKit’te gerçek parmak hareketi için fiziksel cihaz veya iOS Simulator kanıtı gerekir. WCAG reflow testleri kontrollü 320 CSS piksel senaryolarını ayrıca korur.
 
 <a id="router--query-birleşik-veri-yaşam-döngüsü"></a>
 

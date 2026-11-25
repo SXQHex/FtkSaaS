@@ -1,3 +1,4 @@
+import { activate, attemptOutsideDismissal } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
@@ -97,21 +98,21 @@ async function setup(
   await page.goto(origin + "/login");
   await page.getByLabel("E-posta", { exact: true }).fill("synthetic@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("synthetic-password");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(origin + "/account");
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/finance`);
-  await page.getByRole("button", { name: "Üye bazlı finans", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Üye bazlı finans", exact: true }));
   await page.getByLabel("Üye", { exact: true }).selectOption(I.instructor);
   await page.getByLabel("Para birimi", { exact: true }).fill("TRY");
-  await page.getByRole("button", { name: "Finansı getir", exact: true }).click();
-  await page.getByRole("tab", { name: /Açık borçlar/ }).click();
-  await page
-    .getByRole("button", {
+  await activate(page.getByRole("button", { name: "Finansı getir", exact: true }));
+  await activate(page.getByRole("tab", { name: /Açık borçlar/ }));
+  await activate(
+    page.getByRole("button", {
       name: action === "offset" ? "Borca mahsup" : "Borç düzelt",
       exact: true,
-    })
-    .click();
+    }),
+  );
   const panel = page.getByRole("dialog");
   await expect(panel).toHaveAccessibleName(action === "offset" ? "Borca mahsup" : "Borcu düzelt");
   await panel.getByLabel("Tutar (para biriminin alt birimi)", { exact: true }).fill("10000");
@@ -130,28 +131,28 @@ for (const action of ["offset", "adjust"] as const)
       await expect(panel.getByLabel("Gerekçe", { exact: true })).toHaveCount(0);
     }
     expect((await scanAccessibility(page, `debt-${action}-editor`)).violations).toEqual([]);
-    await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+    await activate(panel.getByRole("button", { name: "Etkiyi incele", exact: true }));
     const apply = panel.getByRole("button", {
       name: action === "offset" ? "Mahsup et" : "Düzeltmeyi kaydet",
       exact: true,
     });
     await expect(apply).toBeDisabled();
     expect(writes).toHaveLength(0);
-    await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+    await activate(panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }), "Space");
     await expect(panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true })).toBeChecked();
     expect((await scanAccessibility(page, `debt-${action}-review`)).violations).toEqual([]);
-    await apply.click();
+    await activate(apply);
     await expect(
       panel.getByText("Borç işlemi alındı; güncel borç ve alacak okundu.", { exact: true }),
     ).toBeVisible();
     expect(writes).toHaveLength(1);
-    await panel.getByRole("button", { name: "Kapat", exact: true }).click();
+    await activate(panel.getByRole("button", { name: "Kapat", exact: true }));
     await expect(
       page
         .getByRole("grid", { name: "Açık borçlar", exact: true })
         .getByText("₺500,00", { exact: true }),
     ).toBeVisible();
-    await page.getByRole("tab", { name: /Hareketler/ }).click();
+    await activate(page.getByRole("tab", { name: /Hareketler/ }));
     await expect(
       page
         .getByRole("grid", { name: "Hareketler", exact: true })
@@ -161,7 +162,7 @@ for (const action of ["offset", "adjust"] as const)
   });
 test("debt action denial never becomes an enabled approval from finance read", async ({ page }) => {
   const { panel, writes } = await setup(page, "adjust", { denied: true });
-  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Etkiyi incele", exact: true }));
   await expect(
     panel.getByText("Bu borç işlemi için yetki doğrulanamadı.", { exact: true }),
   ).toBeVisible();
@@ -172,16 +173,16 @@ test("unknown offset preserves frozen version and key after receipt read fails",
   page,
 }) => {
   const { panel, writes } = await setup(page, "offset", { unknown: true });
-  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
-  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
-  await panel.getByRole("button", { name: "Mahsup et", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Etkiyi incele", exact: true }));
+  await activate(panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }), "Space");
+  await activate(panel.getByRole("button", { name: "Mahsup et", exact: true }));
   const retry = panel.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true });
   await expect(retry).toBeVisible();
-  await panel.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
   await expect(retry).toBeEnabled();
-  await page.keyboard.press("Escape");
+  await attemptOutsideDismissal(panel);
   await expect(panel).toBeVisible();
-  await retry.click();
+  await activate(retry);
   await expect(
     panel.getByText("Borç işlemi alındı; güncel borç ve alacak okundu.", { exact: true }),
   ).toBeVisible();
@@ -192,20 +193,20 @@ test("unknown offset preserves frozen version and key after receipt read fails",
 });
 test("stale offset requires a fresh debt version and a new explicit approval", async ({ page }) => {
   const { panel, writes, authorities } = await setup(page, "offset", { stale: true });
-  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
-  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
-  await panel.getByRole("button", { name: "Mahsup et", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Etkiyi incele", exact: true }));
+  await activate(panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }), "Space");
+  await activate(panel.getByRole("button", { name: "Mahsup et", exact: true }));
   await expect(
     panel.getByText("Borç işlemi uygulanamadı. Güncel kaydı yeniden incele.", { exact: true }),
   ).toBeVisible();
   await expect(panel.getByRole("button", { name: "Mahsup et", exact: true })).toBeDisabled();
-  await panel.getByRole("button", { name: "Geri", exact: true }).click();
-  await panel.getByRole("button", { name: "Etkiyi incele", exact: true }).click();
+  await activate(panel.getByRole("button", { name: "Geri", exact: true }));
+  await activate(panel.getByRole("button", { name: "Etkiyi incele", exact: true }));
   await expect(
     panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }),
   ).not.toBeChecked();
-  await panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
-  await panel.getByRole("button", { name: "Mahsup et", exact: true }).click();
+  await activate(panel.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }), "Space");
+  await activate(panel.getByRole("button", { name: "Mahsup et", exact: true }));
   await expect(
     panel.getByText("Borç işlemi alındı; güncel borç ve alacak okundu.", { exact: true }),
   ).toBeVisible();

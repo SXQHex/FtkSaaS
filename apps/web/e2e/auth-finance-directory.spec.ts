@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { mockFinanceDirectory } from "./finance-directory-fixture.js";
 import { scanAccessibility } from "./accessibility.js";
@@ -8,7 +9,7 @@ test("center finance uses native cursor and explicitly submitted server filters 
   const grid = page.getByRole("grid", { name: "Hareketler", exact: true });
   await expect(grid.getByText("8 derslik paket", { exact: true })).toBeVisible();
   await expect(page.getByText("TRY ₺1.000,00 · EUR €200,00", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Sonraki sayfa", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Sonraki sayfa", exact: true }));
   await expect(grid.getByText("İkinci sayfa üyesi", { exact: true })).toBeVisible();
   expect(state.requests.at(-1)?.page.cursor).toBe("native-next");
   const before = state.requests.length;
@@ -16,7 +17,7 @@ test("center finance uses native cursor and explicitly submitted server filters 
   await page.getByRole("combobox", { name: "Yöntem", exact: true }).selectOption("cash");
   await page.getByRole("textbox", { name: "Üye ara", exact: true }).fill("Örnek");
   expect(state.requests).toHaveLength(before);
-  await page.getByRole("button", { name: "Ara", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Ara", exact: true }));
   await expect.poll(() => state.requests.at(-1)?.query).toBe("Örnek");
   expect(state.requests.at(-1)).toMatchObject({
     kind: "collection",
@@ -34,11 +35,11 @@ test("mobile center debt and credit pages preserve per-currency identity and rea
   await page.emulateMedia({ colorScheme: "dark" });
   const state = await mockFinanceDirectory(page);
   await expect(page.getByRole("button", { name: "Dönemi göster", exact: true })).toBeVisible();
-  await page.getByRole("tab", { name: /Açık borçlar/ }).click();
+  await activate(page.getByRole("tab", { name: /Açık borçlar/ }));
   const debt = page.getByRole("grid", { name: "Açık borçlar", exact: true });
   await expect(debt.getByRole("columnheader", { name: "Kaynak satış", exact: true })).toBeVisible();
   await expect(debt.getByText("8 derslik paket", { exact: true })).toBeVisible();
-  await page.getByRole("tab", { name: /Alacaklar/ }).click();
+  await activate(page.getByRole("tab", { name: /Alacaklar/ }));
   const credits = page.getByRole("grid", { name: "Alacaklar", exact: true });
   await expect(credits.getByRole("row")).toHaveCount(3);
   await expect.poll(() => state.personalReads.length).toBe(2);
@@ -62,7 +63,7 @@ test("directory denial is distinct from an empty authorized list and preserves t
     ),
   ).toBeVisible();
   await expect(page.getByText("TRY ₺1.000,00 · EUR €200,00", { exact: true })).toHaveCount(0);
-  await page.getByRole("button", { name: "Üye bazlı finans", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Üye bazlı finans", exact: true }));
   await expect(page.getByRole("button", { name: "Finansı getir", exact: true })).toBeVisible();
   expect(state.personalReads).toHaveLength(0);
   expect(state.studio.writes).toHaveLength(0);
@@ -78,7 +79,7 @@ test("date-only period changes require submit, use center timezone and reject re
   await page.getByLabel("Başlangıç günü", { exact: true }).fill("2026-11-16");
   await page.getByLabel("Bitiş günü (dahil)", { exact: true }).fill("2026-11-15");
   expect(state.requests).toHaveLength(before);
-  await page.getByRole("button", { name: "Dönemi göster", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Dönemi göster", exact: true }));
   await expect(
     page.getByText("Geçerli başlangıç ve bitiş günlerini seç. Dönem en fazla 366 gün olabilir.", {
       exact: true,
@@ -86,7 +87,7 @@ test("date-only period changes require submit, use center timezone and reject re
   ).toBeVisible();
   expect(state.requests).toHaveLength(before);
   await page.getByLabel("Başlangıç günü", { exact: true }).fill("2026-11-01");
-  await page.getByRole("button", { name: "Dönemi göster", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Dönemi göster", exact: true }));
   await expect.poll(() => state.requests.at(-1)?.interval.ends_at).toBe("2026-11-15T21:00:00Z");
   expect(state.requests.at(-1)?.interval.starts_at).toBe("2026-10-31T21:00:00Z");
   expect(state.studio.writes).toHaveLength(0);
@@ -95,7 +96,7 @@ test("denied credit balance reads remain unknown rather than zero and malformed 
   page,
 }) => {
   const state = await mockFinanceDirectory(page, { creditDenied: true });
-  await page.getByRole("tab", { name: /Alacaklar/ }).click();
+  await activate(page.getByRole("tab", { name: /Alacaklar/ }));
   const credits = page.getByRole("grid", { name: "Alacaklar", exact: true });
   await expect.poll(() => state.personalReads.length).toBe(2);
   await expect(credits.getByText("Bilinmiyor", { exact: true })).toHaveCount(2);

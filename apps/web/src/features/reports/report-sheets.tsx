@@ -335,7 +335,7 @@ export function ReportImportSheet({
                   role="region"
                   aria-label={t(($) => $.reports.rows)}
                   tabIndex={0}
-                  className="overflow-x-auto rounded-md focus-visible:outline-2 focus-visible:outline-ring"
+                  className="shrink-0 overflow-x-auto rounded-md focus-visible:outline-2 focus-visible:outline-ring"
                 >
                   <Table aria-label={t(($) => $.reports.rows)} className="min-w-[26rem]">
                     <TableHeader>

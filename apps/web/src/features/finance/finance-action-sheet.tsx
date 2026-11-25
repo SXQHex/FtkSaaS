@@ -149,7 +149,12 @@ export function FinanceActionSheet({
           <XIcon />
         </Button>
       </SheetHeader>
-      <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto p-5 [scrollbar-gutter:stable] [overscroll-behavior:contain]">
+      <div
+        role="region"
+        aria-label={t(($) => $.finance.titles[action])}
+        tabIndex={0}
+        className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto p-5 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring [scrollbar-gutter:stable] [overscroll-behavior:contain]"
+      >
         {notice}
         {stage === "edit" ? (
           <form

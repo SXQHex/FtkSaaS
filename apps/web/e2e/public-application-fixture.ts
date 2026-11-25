@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { expect, type Page } from "@playwright/test";
 import { mockPublicCalendar, publicForm } from "./public-calendar-fixture.js";
 export async function prepareApplication(
@@ -76,8 +77,8 @@ export async function fillApplication(page: Page, completeFixtureProof = true) {
   await page.getByLabel("Ne ilgini çekiyor?", { exact: true }).selectOption({ label: "Tango" });
   const consent = page.getByRole("checkbox", { name: "Katılım koşulları", exact: true });
   await consent.focus();
-  await consent.press("Space");
+  await activate(consent, "Space");
   await expect(consent).toBeChecked();
   if (completeFixtureProof)
-    await page.getByRole("button", { name: "Test doğrulamasını tamamla", exact: true }).click();
+    await activate(page.getByRole("button", { name: "Test doğrulamasını tamamla", exact: true }));
 }

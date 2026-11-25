@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import type {
@@ -217,19 +218,19 @@ test("a reservation cancellation refreshes the warm rights panel on return", asy
   await expect(available.getByText("3", { exact: true })).toBeVisible();
   await expect(track).toHaveCSS("background-image", /37\.5%.*62\.5%/);
   const nav = page.getByRole("navigation");
-  await nav.getByRole("link", { name: "Rezervasyonlarım", exact: true }).click();
+  await activate(nav.getByRole("link", { name: "Rezervasyonlarım", exact: true }));
   await expect(page.getByText("Sentetik gelecek ders", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: /^İptal et —/ }).click();
+  await activate(page.getByRole("button", { name: /^İptal et —/ }));
   const dialog = page.getByRole("alertdialog");
   await dialog.getByLabel("Gerekçe", { exact: true }).fill("Sentetik iptal");
-  await dialog.getByRole("button", { name: "İptal et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "İptal et", exact: true }));
   await expect(
     dialog.getByText("Rezervasyon iptal edildi; güncel rezervasyon, seans ve haklar okundu.", {
       exact: true,
     }),
   ).toBeVisible();
-  await dialog.getByRole("button", { name: "Kapat", exact: true }).click();
-  await nav.getByRole("link", { name: "Haklarım", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Kapat", exact: true }));
+  await activate(nav.getByRole("link", { name: "Haklarım", exact: true }));
   await expect(available.getByText("4", { exact: true })).toBeVisible();
   await expect(track).toHaveCSS("background-image", /37\.5%.*50%/);
   await expect(page.getByText(/1,00.*borç/)).toBeVisible();
@@ -263,7 +264,7 @@ test("event cancellation restores the same purchased right and shows one release
     await expect(page.getByText(/Hak ayırma/).first()).toBeVisible();
     await expect(released).toHaveCount(0);
 
-    await operator.getByRole("button", { name: "Etkinliği iptal et", exact: true }).click();
+    await activate(operator.getByRole("button", { name: "Etkinliği iptal et", exact: true }));
     const confirmation = operator.getByRole("alertdialog");
     await confirmation
       .getByLabel("Gerekçe (zorunlu, geçmişe yazılır)", { exact: true })
@@ -272,13 +273,13 @@ test("event cancellation restores the same purchased right and shows one release
       name: "İşlemi ve etkilerini inceledim, onaylıyorum.",
       exact: true,
     });
-    await checked.press("Space");
-    await confirmation.getByRole("button", { name: "İptal etkilerini oku", exact: true }).click();
+    await activate(checked, "Space");
+    await activate(confirmation.getByRole("button", { name: "İptal etkilerini oku", exact: true }));
     await expect(confirmation.getByText("Serbest bırakma · 1", { exact: true })).toBeVisible();
     expect(state.writes).toHaveLength(0);
     expect(registration.state).toBe("active");
-    await checked.press("Space");
-    await confirmation.getByRole("button", { name: "Etkinliği iptal et", exact: true }).click();
+    await activate(checked, "Space");
+    await activate(confirmation.getByRole("button", { name: "Etkinliği iptal et", exact: true }));
     await expect(
       confirmation.getByText("İşlem kaydedildi; güncel kayıt okundu.", { exact: true }),
     ).toBeVisible();
@@ -346,7 +347,7 @@ test("Starter period keeps the same confirmed reservations, attendance, purchase
   }
 
   await expectHistoricalRights();
-  await reservations.click();
+  await activate(reservations);
   await expectHistoricalReservations();
   const records = structuredClone(state.reservations.reservations);
   const previousReads = state.reads.length;
@@ -365,7 +366,7 @@ test("Starter period keeps the same confirmed reservations, attendance, purchase
     page.getByText("Güncel bekleme listesi ve teklifler okunamadı.", { exact: true }),
   ).toBeVisible();
   await expect(page.getByText("Bekleme listesinde değilsin.", { exact: true })).toHaveCount(0);
-  await rights.click();
+  await activate(rights);
   await expectHistoricalRights();
 
   const after = state.reads.slice(previousReads);
@@ -408,7 +409,7 @@ test("own rights show native counts, exact separate debt currencies and a cursor
   await expect(page.getByText("3 / 8 ders kullanıldı", { exact: true })).toBeVisible();
   await expect(page.getByText("Satın alınan sabit Tango paketi", { exact: true })).toBeVisible();
   await expect(page.getByText("Ödeme hareketi yok.", { exact: true })).toHaveCount(0);
-  await page.getByRole("button", { name: "Sonraki", exact: true }).first().click();
+  await activate(page.getByRole("button", { name: "Sonraki", exact: true }).first());
   await expect.poll(() => state.reads.filter((row) => row.request.ledger_sale_id).length).toBe(2);
   expect(state.reads.filter((row) => row.request.ledger_sale_id).at(-1)!.request).toMatchObject({
     ledger_sale_id: id(980),
@@ -434,7 +435,7 @@ test("multiple owned packages require explicit selection and reset the ledger cu
   expect(state.reads.filter((row) => row.request.ledger_sale_id)).toHaveLength(0);
   await page.getByRole("combobox", { name: "Paket seç", exact: true }).selectOption(id(980));
   await expect.poll(() => state.reads.filter((row) => row.request.ledger_sale_id).length).toBe(1);
-  await page.getByRole("button", { name: "Sonraki", exact: true }).first().click();
+  await activate(page.getByRole("button", { name: "Sonraki", exact: true }).first());
   await expect.poll(() => state.reads.filter((row) => row.request.ledger_sale_id).length).toBe(2);
   await page.getByRole("combobox", { name: "Paket seç", exact: true }).selectOption(id(981));
   await expect.poll(() => state.reads.filter((row) => row.request.ledger_sale_id).length).toBe(3);
@@ -498,7 +499,7 @@ test("unread rights and balance remain unknown until an explicit retry", async (
   await expect(page.getByText("Bu merkezde açık paket kaydı yok.", { exact: true })).toHaveCount(0);
   await expect(page.getByText("Bu merkezde açık borcun yok.", { exact: true })).toHaveCount(0);
   state.setDenied(false);
-  await page.getByRole("button", { name: "Yeniden oku", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Yeniden oku", exact: true }));
   await expect(page.getByText(/90.071.992.547.409,93.*borç/)).toBeVisible();
 });
 
@@ -513,7 +514,7 @@ test("historical payment currencies and native credit remain separate with indep
   await expect(payments).toContainText("50,00");
   await expect(page.getByText(/Kullanılabilir alacağın:.*1,00/)).toBeVisible();
   const pages = page.getByRole("group", { name: "Ödemelerim", exact: true });
-  await pages.getByRole("button", { name: "Sonraki", exact: true }).click();
+  await activate(pages.getByRole("button", { name: "Sonraki", exact: true }));
   await expect(payments).toContainText("Nakit iade");
   expect(state.reads.filter((r) => r.operation === "finance_get_v1").at(-1)?.request).toMatchObject(
     { currency: "USD", page: { cursor: "next-payment" } },

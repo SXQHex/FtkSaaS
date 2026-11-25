@@ -175,7 +175,9 @@ export async function mockSettingsCompletion(
       exceptions: ["security", "center_cancellation", "near_24h_change", "expiring_seat_offer"],
     },
   };
-  const f = await mockCompletion(page, async ({ op, r, send, fail, abort }) => {
+  const directMemberEntry =
+    options.bootstrapBilling === "member" ? (options.startUrl ?? undefined) : undefined;
+  const handle: Parameters<typeof mockCompletion>[1] = async ({ op, r, send, fail, abort }) => {
     if (options.bootstrapBilling) {
       if (op === "organizations_list_v1") {
         return send(
@@ -684,11 +686,12 @@ export async function mockSettingsCompletion(
                 : I.account,
         },
       });
-  });
+  };
+  const f = await mockCompletion(page, handle, directMemberEntry);
   f.studio.people[0]!.display_name = "Sentetik personel";
   f.studio.people.push({ ...f.studio.people[0]!, id: I.self, display_name: "Sentetik hesap" });
   f.studio.people.push({ ...f.studio.people[0]!, id: uid(130), display_name: "Sentetik yönetici" });
   const startUrl = options.startUrl === undefined ? completionUrl("settings") : options.startUrl;
-  if (startUrl !== null) await page.goto(startUrl);
+  if (startUrl !== null && !directMemberEntry) await page.goto(startUrl);
   return { ...f, writes, state };
 }

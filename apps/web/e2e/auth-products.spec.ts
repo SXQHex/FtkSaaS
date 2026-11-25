@@ -1,3 +1,4 @@
+import { activate, attemptOutsideDismissal } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import type { ProductView, ProductLifecycleState } from "@ftksaas/api-contracts";
@@ -203,7 +204,7 @@ async function productsFixture(
   await page.goto(`${origin}/login`);
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/products`);
@@ -211,10 +212,10 @@ async function productsFixture(
   return { writes, managementReads, lifecycle, stateWrites };
 }
 async function fillProduct(page: Page, timed = false) {
-  await page.getByRole("button", { name: "Paket ekle", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Paket ekle", exact: true }));
   const dialog = page.getByRole("dialog");
   await dialog.getByLabel("Paket adı", { exact: true }).fill("Sentetik kabul paketi");
-  if (timed) await dialog.getByRole("radio", { name: "Süreli, sınırsız", exact: true }).click();
+  if (timed) await activate(dialog.getByRole("radio", { name: "Süreli, sınırsız", exact: true }));
   else await dialog.getByLabel("Ders sayısı", { exact: true }).fill("8");
   await dialog.getByLabel("Fiyat (para biriminin alt birimi)", { exact: true }).fill("120000");
   await dialog.getByLabel("Para birimi", { exact: true }).fill("TRY");
@@ -224,7 +225,10 @@ async function fillProduct(page: Page, timed = false) {
     .selectOption(timed ? "time_ratio" : "credit_ratio");
   await dialog.getByLabel("Geçerli olduğu alan", { exact: true }).selectOption("center_discipline");
   await dialog.getByLabel("Disiplin", { exact: true }).selectOption(I.discipline);
-  await dialog.getByRole("checkbox", { name: "Grup ve özel dersler", exact: true }).press("Space");
+  await activate(
+    dialog.getByRole("checkbox", { name: "Grup ve özel dersler", exact: true }),
+    "Space",
+  );
   await expect(
     dialog.getByRole("checkbox", { name: "Grup ve özel dersler", exact: true }),
   ).toBeChecked();
@@ -240,18 +244,20 @@ test("product management reads native center totals and sends search and lifecyc
   const activeHolders = page.getByRole("article").filter({ hasText: "Aktif hak sahibi" });
   await expect(recentSales.getByText("3", { exact: true })).toBeVisible();
   await expect(activeHolders.getByText("3", { exact: true })).toBeVisible();
-  await page
-    .getByRole("radiogroup", { name: "Durum", exact: true })
-    .getByRole("radio", { name: "Kapalı", exact: true })
-    .click();
+  await activate(
+    page
+      .getByRole("radiogroup", { name: "Durum", exact: true })
+      .getByRole("radio", { name: "Kapalı", exact: true }),
+  );
   await expect.poll(() => managementReads.at(-1)?.status).toBe("closed");
   await page.getByRole("textbox", { name: "Paket ara", exact: true }).fill("Fixture");
   await expect.poll(() => managementReads.at(-1)?.query).toBe("Fixture");
   expect(managementReads.at(-1)?.page).toEqual({ limit: 20 });
-  await page
-    .getByRole("radiogroup", { name: "Durum", exact: true })
-    .getByRole("radio", { name: "Arşiv", exact: true })
-    .click();
+  await activate(
+    page
+      .getByRole("radiogroup", { name: "Durum", exact: true })
+      .getByRole("radio", { name: "Arşiv", exact: true }),
+  );
   await expect.poll(() => managementReads.at(-1)?.status).toBe("archived");
   await expect(recentSales.getByText("3", { exact: true })).toBeVisible();
   await expect(activeHolders.getByText("3", { exact: true })).toBeVisible();
@@ -284,13 +290,13 @@ test("mobile product composition reviews explicit terms, publishes, and rereads 
   await dialog.getByLabel("Dönemde en fazla ders", { exact: true }).fill("2");
   await expect(dialog.getByLabel("Geçerlilik (gün)", { exact: true })).toBeDisabled();
   expect((await scanAccessibility(page, "product-editor")).violations).toEqual([]);
-  await dialog.getByRole("button", { name: "Değişiklikleri incele", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Değişiklikleri incele", exact: true }));
   await expect(dialog.getByRole("button", { name: "Yayınla", exact: true })).toBeDisabled();
-  await dialog.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+  await activate(dialog.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }), "Space");
   await expect(dialog.getByRole("checkbox", { name: "Etkiyi okudum", exact: true })).toBeChecked();
   expect(state.writes).toHaveLength(0);
   expect((await scanAccessibility(page, "product-review")).violations).toEqual([]);
-  await dialog.getByRole("button", { name: "Yayınla", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Yayınla", exact: true }));
   await expect(
     dialog.getByText("Paket yayınlandı ve güncel sürümü okundu.", { exact: true }),
   ).toBeVisible();
@@ -310,7 +316,7 @@ test("mobile product composition reviews explicit terms, publishes, and rereads 
       },
     ],
   });
-  await dialog.getByRole("button", { name: "Kapat", exact: true }).first().click();
+  await activate(dialog.getByRole("button", { name: "Kapat", exact: true }).first());
   await expect(page.getByText("Sentetik kabul paketi", { exact: true })).toBeVisible();
   const productRow = grid.getByRole("row").filter({ hasText: "Sentetik kabul paketi" });
   await expect(productRow.getByRole("rowheader")).toContainText("Sentetik kabul paketi");
@@ -322,64 +328,64 @@ test("unknown publish survives a failed receipt read and retries the same frozen
 }) => {
   const state = await productsFixture(page, true);
   const dialog = await fillProduct(page);
-  await dialog.getByRole("button", { name: "Değişiklikleri incele", exact: true }).click();
-  await dialog.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
+  await activate(dialog.getByRole("button", { name: "Değişiklikleri incele", exact: true }));
+  await activate(dialog.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }), "Space");
   await expect(dialog.getByRole("checkbox", { name: "Etkiyi okudum", exact: true })).toBeChecked();
-  await dialog.getByRole("button", { name: "Yayınla", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Yayınla", exact: true }));
   await expect(
     dialog.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }),
   ).toBeEnabled();
-  await dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));
   await expect(
     dialog.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }),
   ).toBeEnabled();
-  await page.keyboard.press("Escape");
+  await attemptOutsideDismissal(dialog);
   await expect(dialog).toBeVisible();
-  await dialog.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }).click();
+  await activate(dialog.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }));
   await expect(
     dialog.getByText("Paket yayınlandı ve güncel sürümü okundu.", { exact: true }),
   ).toBeVisible();
   expect(state.writes).toHaveLength(2);
   expect(state.writes[0]!.operation_key).toBe(state.writes[1]!.operation_key);
   expect(state.writes[0]!.terms).toEqual(state.writes[1]!.terms);
-  await dialog.getByRole("button", { name: "Kapat", exact: true }).first().click();
+  await activate(dialog.getByRole("button", { name: "Kapat", exact: true }).first());
 });
 
 test("product lifecycle keeps history and recovers one close effect, then opens and archives with fresh versions", async ({
   page,
 }) => {
   const state = await productsFixture(page, false, true);
-  await page.getByText(seedProduct.terms.name, { exact: true }).click();
+  await activate(page.getByText(seedProduct.terms.name, { exact: true }));
   let editor = page.getByRole("dialog");
   const versions = editor.getByRole("region", { name: "Sürümler", exact: true });
   await expect(versions.getByText(seedProduct.terms.name, { exact: true })).toBeVisible();
-  await versions.getByRole("button", { name: "Sonraki sayfa", exact: true }).click();
+  await activate(versions.getByRole("button", { name: "Sonraki sayfa", exact: true }));
   await expect(versions.getByText("Önceki sürüm", { exact: true })).toBeVisible();
   expect(state.managementReads.at(-1)).toMatchObject({
     product_id: seedProduct.id,
     view: "versions",
     page: { limit: 20, cursor: "older-versions" },
   });
-  await versions.getByRole("button", { name: "Önceki sayfa", exact: true }).click();
+  await activate(versions.getByRole("button", { name: "Önceki sayfa", exact: true }));
   await expect(versions.getByText(seedProduct.terms.name, { exact: true })).toBeVisible();
   await expect(editor.getByText("Geçmiş satış", { exact: true })).toBeVisible();
-  await editor.getByRole("switch", { name: "Satışta", exact: true }).press("Space");
+  await activate(editor.getByRole("switch", { name: "Satışta", exact: true }), "Space");
   let confirm = page.getByRole("alertdialog");
   await expect(confirm.getByRole("button", { name: "Vazgeç", exact: true })).toBeFocused();
   await expect(confirm.getByRole("button", { name: "Satışa kapat", exact: true })).toBeDisabled();
   await confirm.getByLabel("İşlem gerekçesi", { exact: true }).fill("Kontrollü kapatma");
   expect(state.stateWrites).toHaveLength(0);
   state.lifecycle.lostReply = true;
-  await confirm.getByRole("button", { name: "Satışa kapat", exact: true }).click();
+  await activate(confirm.getByRole("button", { name: "Satışa kapat", exact: true }));
   await expect(
     confirm.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }),
   ).toBeVisible();
-  await page.keyboard.press("Escape");
+  await attemptOutsideDismissal(confirm);
   await expect(confirm).toBeVisible();
   await expect(confirm.getByRole("button", { name: "Vazgeç", exact: true })).toBeDisabled();
   state.lifecycle.failResult = 1;
-  await confirm.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }).click();
-  await confirm.getByRole("button", { name: "Güncel kaydı oku", exact: true }).click();
+  await activate(confirm.getByRole("button", { name: "Aynı işlemi tekrar dene", exact: true }));
+  await activate(confirm.getByRole("button", { name: "Güncel kaydı oku", exact: true }));
   await expect(
     confirm.getByText("Satış durumu kaydedildi ve güncel ürün okundu.", { exact: true }),
   ).toBeVisible();
@@ -390,24 +396,27 @@ test("product lifecycle keeps history and recovers one close effect, then opens 
   await page.setViewportSize({ width: 320, height: 900 });
   await page.emulateMedia({ colorScheme: "dark" });
   expect((await scanAccessibility(page, "product-close-result-mobile")).violations).toEqual([]);
-  await confirm.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(confirm.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(page.getByRole("dialog")).toHaveCount(0);
   for (const action of ["open", "archive"] as const) {
-    await page.getByText(seedProduct.terms.name, { exact: true }).click();
+    await activate(page.getByText(seedProduct.terms.name, { exact: true }));
     editor = page.getByRole("dialog");
     await expect(editor.getByText("Geçmiş satış", { exact: true })).toBeVisible();
     if (action === "open")
-      await editor.getByRole("switch", { name: "Satışta", exact: true }).press("Space");
-    else await editor.getByRole("button", { name: "Arşivle", exact: true }).click();
+      await activate(editor.getByRole("switch", { name: "Satışta", exact: true }), "Space");
+    else await activate(editor.getByRole("button", { name: "Arşivle", exact: true }));
     confirm = page.getByRole("alertdialog");
     await confirm.getByLabel("İşlem gerekçesi", { exact: true }).fill(`Kontrollü ${action}`);
-    await confirm
-      .getByRole("button", { name: action === "open" ? "Satışa aç" : "Arşivle", exact: true })
-      .click();
+    await activate(
+      confirm.getByRole("button", {
+        name: action === "open" ? "Satışa aç" : "Arşivle",
+        exact: true,
+      }),
+    );
     await expect(
       confirm.getByText("Satış durumu kaydedildi ve güncel ürün okundu.", { exact: true }),
     ).toBeVisible();
-    await confirm.getByRole("button", { name: "Vazgeç", exact: true }).click();
+    await activate(confirm.getByRole("button", { name: "Vazgeç", exact: true }));
   }
   expect(state.lifecycle.effects).toBe(3);
   expect(state.stateWrites.map((write) => write.expected_version)).toEqual([1, 1, 2, 3]);
@@ -424,15 +433,15 @@ test("a closed product publishes a renamed immutable version and rereads history
   const state = await productsFixture(page, false, true, "inactive");
   const historyReads = () => state.managementReads.filter((request) => request.view === "versions");
   const previousReads = historyReads().length;
-  await page.getByText(seedProduct.terms.name, { exact: true }).click();
+  await activate(page.getByText(seedProduct.terms.name, { exact: true }));
   const editor = page.getByRole("dialog");
   const versions = editor.getByRole("region", { name: "Sürümler", exact: true });
   await expect(versions.getByText(seedProduct.terms.name, { exact: true })).toBeVisible();
   expect(historyReads()).toHaveLength(previousReads + 1);
   await editor.getByLabel("Paket adı", { exact: true }).fill("Yeni sürüm adı");
-  await editor.getByRole("button", { name: "Değişiklikleri incele", exact: true }).click();
-  await editor.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }).press("Space");
-  await editor.getByRole("button", { name: "Yayınla", exact: true }).click();
+  await activate(editor.getByRole("button", { name: "Değişiklikleri incele", exact: true }));
+  await activate(editor.getByRole("checkbox", { name: "Etkiyi okudum", exact: true }), "Space");
+  await activate(editor.getByRole("button", { name: "Yayınla", exact: true }));
   await expect(
     editor.getByText("Paket yayınlandı ve güncel sürümü okundu.", { exact: true }),
   ).toBeVisible();
@@ -445,9 +454,9 @@ test("a closed product publishes a renamed immutable version and rereads history
   expect(historyReads()).toHaveLength(previousReads + 2);
   expect(state.lifecycle.state).toBe("inactive");
   expect(state.stateWrites).toHaveLength(0);
-  await editor.getByRole("button", { name: "Kapat", exact: true }).first().click();
-  await page.getByText("Yeni sürüm adı", { exact: true }).click();
+  await activate(editor.getByRole("button", { name: "Kapat", exact: true }).first());
+  await activate(page.getByText("Yeni sürüm adı", { exact: true }));
   await expect(versions.getByText("Yeni sürüm adı", { exact: true })).toBeVisible();
   expect(historyReads()).toHaveLength(previousReads + 2);
-  await editor.getByRole("button", { name: "Kapat", exact: true }).first().click();
+  await activate(editor.getByRole("button", { name: "Kapat", exact: true }).first());
 });

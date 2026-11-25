@@ -1,3 +1,4 @@
+import { activate, hasTouchInput } from "./device-input.js";
 import { expect, test } from "@playwright/test";
 
 test("shares Query, Router and live Form state in one development panel", async ({
@@ -21,19 +22,18 @@ test("shares Query, Router and live Form state in one development panel", async 
   ).toBeVisible();
   const trigger = page.getByRole("button", { name: "Open TanStack Devtools", exact: true });
   await expect(trigger).toHaveCount(1);
-  await trigger.click();
+  await activate(trigger);
   await expect(page.getByRole("banner", { name: "TanStack Devtools", exact: true })).toHaveCount(1);
   for (const name of ["TanStack Query", "TanStack Router", "TanStack Form"]) {
     await expect(page.getByRole("button", { name, exact: true })).toBeVisible();
   }
-  await page.getByRole("button", { name: "TanStack Query", exact: true }).click();
+  await activate(page.getByRole("button", { name: "TanStack Query", exact: true }));
   await expect(page.getByRole("button", { name: "Clear query cache", exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "TanStack Router", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Close TanStack Query", exact: true }));
+  await activate(page.getByRole("button", { name: "TanStack Router", exact: true }));
   await expect(page.getByRole("button", { name: "Routes", exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "TanStack Form", exact: true }).click();
-  // Give the nested Form inspector the full panel width after checking Query and Router.
-  await page.getByRole("button", { name: "Close TanStack Query", exact: true }).click();
-  await page.getByRole("button", { name: "Close TanStack Router", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Close TanStack Router", exact: true }));
+  await activate(page.getByRole("button", { name: "TanStack Form", exact: true }));
 
   const panel = page.getByTestId("tanstack-devtools-panel");
   // The Form event listeners mount with the lazy inspector, after its workbench tab opens.
@@ -42,9 +42,9 @@ test("shares Query, Router and live Form state in one development panel", async 
   ).toBeVisible();
   const input = page.getByRole("textbox", { name: "Örnek metin", exact: true });
   await input.fill("ab");
-  await page.getByRole("button", { name: "Örneği gönder", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Örneği gönder", exact: true }));
   await expect(page.getByText("schema-example", { exact: true })).toBeVisible();
-  await page.getByText("schema-example", { exact: true }).click();
+  await activate(page.getByText("schema-example", { exact: true }));
   await expect(panel.getByText("Form values", { exact: true })).toBeVisible();
   await expect(panel.getByText("Individual Fields", { exact: true })).toBeVisible();
   await expect(panel).toContainText('"text": "ab"');
@@ -52,16 +52,18 @@ test("shares Query, Router and live Form state in one development panel", async 
   await expect(panel).toContainText('"isValid": false');
   // Expand the actual Zod issue in the Form panel, rather than reading the input's error message.
   const fieldErrors = panel.getByText(/"errors":\s*1 items/);
-  await fieldErrors.click();
-  await fieldErrors.locator("..").getByText("...", { exact: true }).click();
+  await activate(fieldErrors);
+  await activate(fieldErrors.locator("..").getByText("...", { exact: true }));
   await expect(panel).toContainText("En az 3 karakter girin.");
 
   await input.fill("örnek");
-  await input.press("Tab");
+  if (hasTouchInput(page))
+    await activate(page.getByRole("heading", { name: "Form altyapısı örneği", exact: true }));
+  else await input.press("Tab");
   await expect(panel).toContainText('"text": "örnek"');
   await expect(panel).toContainText('"isValid": true');
   await expect(panel).not.toContainText("En az 3 karakter girin.");
-  await page.getByRole("button", { name: "Örneği gönder", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Örneği gönder", exact: true }));
   await expect(page.getByRole("status")).toHaveText("Örnek gönderildi.");
   expect(errors).toEqual([]);
 });

@@ -15,7 +15,7 @@ import { fileURLToPath } from "node:url";
 
 const script = fileURLToPath(new URL("./ci-build.mjs", import.meta.url));
 
-test("only mobile WebKit on macOS ARM64 restores the source-bound Ubuntu build across OSes", (t) => {
+test("all Ubuntu x64 browser profiles restore the source-bound build and reject platform drift", (t) => {
   const dir = mkdtempSync(join(tmpdir(), "ftk-ci-build-"));
   t.after(() => rmSync(dir, { recursive: true, force: true }));
   mkdirSync(join(dir, "apps/web/dist"), { recursive: true });
@@ -73,8 +73,8 @@ test("only mobile WebKit on macOS ARM64 restores the source-bound Ubuntu build a
   assert.equal(readFileSync(index, "utf8"), html);
 
   writeFileSync(index, "stale build");
-  const mac = run("restore", "darwin", "arm64", mobile);
-  assert.equal(mac.status, 0, mac.stderr);
+  const mobileOnLinux = run("restore", "linux", "x64", mobile);
+  assert.equal(mobileOnLinux.status, 0, mobileOnLinux.stderr);
   assert.equal(readFileSync(index, "utf8"), html);
 
   const desktopOnMac = run("restore", "darwin", "arm64", {
@@ -84,11 +84,11 @@ test("only mobile WebKit on macOS ARM64 restores the source-bound Ubuntu build a
   assert.equal(desktopOnMac.status, 1);
   assert.match(desktopOnMac.stderr, /BUILD_BINDING_MISMATCH/);
 
-  const wrongRunner = run("restore", "linux", "x64", mobile);
+  const wrongRunner = run("restore", "darwin", "arm64", mobile);
   assert.equal(wrongRunner.status, 1);
-  assert.match(wrongRunner.stderr, /BUILD_RUNNER_MISMATCH/);
+  assert.match(wrongRunner.stderr, /BUILD_BINDING_MISMATCH/);
 
-  const wrongInputs = run("restore", "darwin", "arm64", {
+  const wrongInputs = run("restore", "linux", "x64", {
     ...mobile,
     VITE_TEST_INPUT: "different",
   });
@@ -96,7 +96,7 @@ test("only mobile WebKit on macOS ARM64 restores the source-bound Ubuntu build a
   assert.match(wrongInputs.stderr, /BUILD_BINDING_MISMATCH/);
 
   appendFileSync(join(dir, ".artifacts/frontend-build/app.tar"), "tampered");
-  const tampered = run("restore", "darwin", "arm64", mobile);
+  const tampered = run("restore", "linux", "x64", mobile);
   assert.equal(tampered.status, 1);
   assert.match(tampered.stderr, /BUILD_DIGEST_MISMATCH/);
   assert.equal(readFileSync(index, "utf8"), html);

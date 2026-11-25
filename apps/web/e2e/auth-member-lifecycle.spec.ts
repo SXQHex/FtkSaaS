@@ -1,10 +1,11 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import type { Page } from "@playwright/test";
 import { mockMemberLifecycle, lifecycleIds as R } from "./member-lifecycle-fixture.js";
 import common from "../src/locales/tr/common.json" with { type: "json" };
 const text = common.memberProfile;
 async function open(page: Page, action: "renew" | "change" | "terminate") {
-  await page.getByRole("button", { name: text.actions[action], exact: true }).click();
+  await activate(page.getByRole("button", { name: text.actions[action], exact: true }));
   const dialog = page.getByRole("dialog");
   await expect(dialog).toHaveAccessibleName(text.titles[action]);
   if (action !== "terminate")
@@ -13,20 +14,20 @@ async function open(page: Page, action: "renew" | "change" | "terminate") {
 }
 async function chooseProduct(page: Page) {
   const dialog = page.getByRole("dialog");
-  await dialog.getByRole("radio", { name: "Yeni 8 ders", exact: true }).press("Space");
+  await activate(dialog.getByRole("radio", { name: "Yeni 8 ders", exact: true }), "Space");
   await dialog.getByLabel(text.fields.startDate, { exact: true }).fill("2027-01-15");
   await dialog.getByLabel(text.fields.endDate, { exact: true }).fill("2027-02-15");
 }
 async function review(page: Page) {
   const dialog = page.getByRole("dialog");
-  await dialog.getByRole("button", { name: text.review, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: text.review, exact: true }));
   await expect(dialog.getByRole("checkbox", { name: text.accepted, exact: true })).toBeVisible();
   return dialog;
 }
 async function apply(page: Page) {
   const dialog = page.getByRole("dialog");
-  await dialog.getByRole("checkbox", { name: text.accepted, exact: true }).press("Space");
-  await dialog.getByRole("button", { name: text.confirm, exact: true }).click();
+  await activate(dialog.getByRole("checkbox", { name: text.accepted, exact: true }), "Space");
+  await activate(dialog.getByRole("button", { name: text.confirm, exact: true }));
   return dialog;
 }
 test("mobile renewal explicitly selects its source and dates, creates a linked sale and leaves old rights intact", async ({
@@ -79,7 +80,7 @@ test("change confirms the transfer to the new sale after separately reviewed kee
     dialog.getByText(text.lifecycle.states["saved-unread"], { exact: true }),
   ).toBeVisible();
   expect(state.writes).toHaveLength(1);
-  await dialog.getByRole("button", { name: common.finance.readResult, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: common.finance.readResult, exact: true }));
   await expect(dialog.getByText(text.lifecycle.states.saved, { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(1);
   expect(
@@ -123,7 +124,7 @@ test("unknown lifecycle apply recovers its exact receipt without another writer"
   await review(page);
   await apply(page);
   await expect(dialog.getByText(text.lifecycle.states.unknown, { exact: true })).toBeVisible();
-  await dialog.getByRole("button", { name: common.finance.readResult, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: common.finance.readResult, exact: true }));
   await expect(dialog.getByText(text.lifecycle.states.saved, { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(1);
 });
@@ -139,7 +140,7 @@ test("ACK with unread rights only rereads the confirmed lifecycle result", async
   await expect(
     dialog.getByRole("button", { name: common.finance.retrySame, exact: true }),
   ).toHaveCount(0);
-  await dialog.getByRole("button", { name: common.finance.readResult, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: common.finance.readResult, exact: true }));
   await expect(dialog.getByText(text.lifecycle.states.saved, { exact: true })).toBeVisible();
   expect(state.writes).toHaveLength(1);
 });
@@ -149,11 +150,11 @@ for (const mode of ["denied", "blocked"] as const)
     const dialog = await open(page, "renew");
     await chooseProduct(page);
     if (mode === "denied") {
-      await dialog.getByRole("button", { name: text.review, exact: true }).click();
+      await activate(dialog.getByRole("button", { name: text.review, exact: true }));
       await expect(dialog.getByText(text.lifecycle.sourceError, { exact: true })).toBeVisible();
     } else {
       await review(page);
-      await dialog.getByRole("checkbox", { name: text.accepted, exact: true }).press("Space");
+      await activate(dialog.getByRole("checkbox", { name: text.accepted, exact: true }), "Space");
       await expect(dialog.getByRole("button", { name: text.confirm, exact: true })).toBeDisabled();
     }
     expect(state.writes).toHaveLength(0);
@@ -166,15 +167,20 @@ test("a future event registration is cancelled with separate reason and approval
   await chooseProduct(page);
   await expect(dialog.getByText(text.lifecycle.eventsBlock, { exact: true })).toBeVisible();
   await expect(dialog.getByRole("button", { name: text.review, exact: true })).toBeDisabled();
-  await dialog.getByRole("button", { name: new RegExp(text.lifecycle.eventCancellation) }).click();
+  await activate(
+    dialog.getByRole("button", { name: new RegExp(text.lifecycle.eventCancellation) }),
+  );
   await dialog.locator('textarea[id^="event-cancel-"]').fill("Sentetik ayrı etkinlik iptali");
-  await dialog
-    .getByRole("checkbox", { name: text.lifecycle.eventConfirm, exact: true })
-    .press("Space");
-  await dialog.getByRole("button", { name: text.lifecycle.eventCancellation, exact: true }).click();
+  await activate(
+    dialog.getByRole("checkbox", { name: text.lifecycle.eventConfirm, exact: true }),
+    "Space",
+  );
+  await activate(
+    dialog.getByRole("button", { name: text.lifecycle.eventCancellation, exact: true }),
+  );
   await expect(dialog.getByText(text.lifecycle.states.saved, { exact: true })).toBeVisible();
   expect(state.writes.map((row) => row.operation)).toEqual(["event_registration_cancel_v1"]);
-  await dialog.getByRole("button", { name: text.lifecycle.readInventory, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: text.lifecycle.readInventory, exact: true }));
   await expect(dialog.getByText(text.lifecycle.eventsBlock, { exact: true })).toHaveCount(0);
   await dialog.getByLabel(text.reason, { exact: true }).fill("Sentetik paket değişimi");
   await review(page);
@@ -189,15 +195,15 @@ test("student activation and reasoned deactivation use the native center relatio
   page,
 }) => {
   const state = await mockMemberLifecycle(page);
-  await page.getByRole("button", { name: text.actions.activate, exact: true }).click();
+  await activate(page.getByRole("button", { name: text.actions.activate, exact: true }));
   let dialog = page.getByRole("alertdialog");
-  await dialog.getByRole("button", { name: text.actions.activate, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: text.actions.activate, exact: true }));
   await expect(dialog.getByText(text.studentStates.saved, { exact: true })).toBeVisible();
-  await dialog.getByRole("button", { name: text.close, exact: true }).click();
-  await page.getByRole("button", { name: text.actions.deactivate, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: text.close, exact: true }));
+  await activate(page.getByRole("button", { name: text.actions.deactivate, exact: true }));
   dialog = page.getByRole("alertdialog");
   await dialog.getByLabel(text.reason, { exact: true }).fill("Sentetik merkez pasifleştirme");
-  await dialog.getByRole("button", { name: text.actions.deactivate, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: text.actions.deactivate, exact: true }));
   await expect(dialog.getByText(text.studentStates.saved, { exact: true })).toBeVisible();
   expect(state.writes.map((row) => row.operation)).toEqual([
     "student_activate_v1",
@@ -208,10 +214,10 @@ test("native open operations prevent student deactivation without changing the v
   page,
 }) => {
   const state = await mockMemberLifecycle(page, { studentActive: true, studentBlocked: true });
-  await page.getByRole("button", { name: text.actions.deactivate, exact: true }).click();
+  await activate(page.getByRole("button", { name: text.actions.deactivate, exact: true }));
   const dialog = page.getByRole("alertdialog");
   await dialog.getByLabel(text.reason, { exact: true }).fill("Sentetik ret senaryosu");
-  await dialog.getByRole("button", { name: text.actions.deactivate, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: text.actions.deactivate, exact: true }));
   await expect(dialog.getByText(text.studentStates.rejected, { exact: true })).toBeVisible();
   expect(
     state.person.relationships.some((row) => row.kind === "student" && row.state === "active"),

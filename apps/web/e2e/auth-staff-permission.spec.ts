@@ -1,3 +1,4 @@
+import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { mockStudio, studioIds as I } from "./studio-fixture.js";
 import { clickWorkspaceLink, origin } from "./auth-fixture.js";
@@ -50,39 +51,39 @@ test("staff person.manage permits creation only while the native grant is active
   await page.goto(`${origin}/login`);
   await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   await clickWorkspaceLink(page, "Üyeler");
   const open = async (name: string) => {
-    await page.getByRole("button", { name: "Üye davet et", exact: true }).click();
+    await activate(page.getByRole("button", { name: "Üye davet et", exact: true }));
     const dialog = page.getByRole("dialog");
     await dialog.locator("#people-name").fill(name);
     await dialog.locator("#people-email").fill("staff-created@example.invalid");
     return dialog;
   };
   let form = await open("İzin öncesi kişi");
-  await form.getByRole("button", { name: "Kişiyi oluştur", exact: true }).click();
+  await activate(form.getByRole("button", { name: "Kişiyi oluştur", exact: true }));
   await expect(form.getByText(common.people.writeRejected, { exact: true })).toBeVisible();
   expect(native.effects).toEqual([]);
-  await form.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(form.getByRole("button", { name: "Vazgeç", exact: true }));
 
   // The paired manager UI test applies/revokes this native permission; this actor only consumes its live outcome.
   state.granted = true;
   form = await open("İzinli personel kaydı");
-  await form.getByRole("button", { name: "Kişiyi oluştur", exact: true }).click();
+  await activate(form.getByRole("button", { name: "Kişiyi oluştur", exact: true }));
   await expect(form.locator("#people-name")).toHaveAttribute("readonly", "");
   expect(
     native.people.filter((person) => person.display_name === "İzinli personel kaydı"),
   ).toHaveLength(1);
-  await form.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(form.getByRole("button", { name: "Vazgeç", exact: true }));
   form = await open("Geri alınan izinle taslak");
   state.granted = false;
-  await form.getByRole("button", { name: "Kişiyi oluştur", exact: true }).click();
+  await activate(form.getByRole("button", { name: "Kişiyi oluştur", exact: true }));
   await expect(form.getByText(common.people.writeRejected, { exact: true })).toBeVisible();
   expect(
     native.people.filter((person) => person.display_name === "Geri alınan izinle taslak"),
   ).toHaveLength(0);
   expect(native.effects).toEqual(["person_create_v1"]);
   expect(state.attempts).toBe(3);
-  await form.getByRole("button", { name: "Vazgeç", exact: true }).click();
+  await activate(form.getByRole("button", { name: "Vazgeç", exact: true }));
 });

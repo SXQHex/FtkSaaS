@@ -24,9 +24,10 @@ export async function mockEventDetail(
     refreshFailure?: boolean;
     documents?: boolean;
     practice?: boolean;
+    openDetail?: boolean;
   } = {},
 ) {
-  const base = await mockEvents(page),
+  const base = await mockEvents(page, "normal", { openList: options.openDetail !== false }),
     event = base.events[0]!;
   event.state = "published";
   event.registrations = [];
@@ -553,7 +554,9 @@ export async function mockEventDetail(
     }
     return route.fallback();
   });
-  await page.goto(`${origin}/o/${I.org}/c/${I.center}/events/${eventId}`);
-  await expect(page.getByRole("heading", { name: event.name, exact: true })).toBeVisible();
+  if (options.openDetail !== false) {
+    await page.goto(`${origin}/o/${I.org}/c/${I.center}/events/${eventId}`);
+    await expect(page.getByRole("heading", { name: event.name, exact: true })).toBeVisible();
+  }
   return state;
 }

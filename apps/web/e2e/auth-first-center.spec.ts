@@ -1,3 +1,4 @@
+import { activate, attemptOutsideDismissal, closeWithDevice } from "./device-input.js";
 import { test, expect } from "./test.js";
 import {
   checkLockedWorkspaceScope,
@@ -140,7 +141,7 @@ async function setup(
   await page.goto(`${origin}/login`);
   await page.getByLabel("E-posta", { exact: true }).fill("first-center@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Synthetic123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(`${origin}/account`);
   return {
     writes,
@@ -152,7 +153,7 @@ async function setup(
   };
 }
 async function fill(page: import("@playwright/test").Page) {
-  await page.getByRole("button", { name: text.action, exact: true }).click();
+  await activate(page.getByRole("button", { name: text.action, exact: true }));
   const panel = page.getByRole("dialog", { name: text.action, exact: true });
   await panel.getByLabel(text.name, { exact: true }).fill("İlk test merkezi");
   await panel.getByLabel(text.timezone, { exact: true }).selectOption("Europe/Istanbul");
@@ -161,25 +162,25 @@ async function fill(page: import("@playwright/test").Page) {
 }
 async function review(panel: import("@playwright/test").Locator) {
   const next = panel.getByRole("button", { name: text.continue, exact: true });
-  await next.click();
+  await activate(next);
   await expect(
     panel.getByRole("heading", { name: text.steps.resources, exact: true }),
   ).toBeFocused();
-  await next.click();
+  await activate(next);
   await expect(panel.getByRole("heading", { name: text.steps.review, exact: true })).toBeFocused();
 }
 test("first center validates the ready form, records its explicit zone and restores the actual workspace after reload", async ({
   page,
 }) => {
   const f = await setup(page);
-  await page.getByRole("button", { name: text.action, exact: true }).click();
+  await activate(page.getByRole("button", { name: text.action, exact: true }));
   const panel = page.getByRole("dialog", { name: text.action, exact: true });
   const name = panel.getByLabel(text.name, { exact: true }),
     zone = panel.getByLabel(text.timezone, { exact: true });
   await expect(name).toBeFocused();
   await expect(name).toHaveAttribute("aria-invalid", "false");
   await expect(zone).toHaveValue("");
-  await panel.getByRole("button", { name: text.continue, exact: true }).click();
+  await activate(panel.getByRole("button", { name: text.continue, exact: true }));
   await expect(name).toBeFocused();
   await expect(name).toHaveAttribute("aria-invalid", "true");
   expect(f.writes).toHaveLength(0);
@@ -189,11 +190,11 @@ test("first center validates the ready form, records its explicit zone and resto
   await review(panel);
   await expect(panel.getByText(f.center.name, { exact: true })).toBeVisible();
   expect(f.writes).toHaveLength(0);
-  await panel.getByRole("button", { name: text.action, exact: true }).click();
+  await activate(panel.getByRole("button", { name: text.action, exact: true }));
   await expect(panel.getByRole("status")).toContainText(text.states.saved);
   expect(f.effects).toBe(1);
   expect(f.writes).toHaveLength(1);
-  await panel.getByRole("button", { name: common.memberProfile.close, exact: true }).click();
+  await activate(panel.getByRole("button", { name: common.memberProfile.close, exact: true }));
   await expect(page.getByRole("link", { name: text.settings, exact: true })).toHaveAttribute(
     "href",
     `/o/${I.org}/c/${I.center}/settings`,
@@ -212,13 +213,12 @@ test("first-center setup can be postponed and starts again from the live account
 }) => {
   const f = await setup(page);
   const trigger = page.getByRole("button", { name: text.action, exact: true });
-  await trigger.focus();
-  await page.keyboard.press("Enter");
+  await activate(trigger, "Enter");
   const panel = page.getByRole("dialog", { name: text.action, exact: true });
   await expect(panel.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "1");
   await panel.getByLabel(text.name, { exact: true }).fill(f.center.name);
   await panel.getByLabel(text.timezone, { exact: true }).selectOption(f.center.timezone);
-  await panel.getByRole("button", { name: text.continue, exact: true }).click();
+  await activate(panel.getByRole("button", { name: text.continue, exact: true }));
   await page.setViewportSize({ width: 390, height: 844 });
   for (const theme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme: theme });
@@ -228,16 +228,16 @@ test("first-center setup can be postponed and starts again from the live account
     assertLayoutFit(await readLayoutFit(page));
     await page.screenshot({ path: `.tmp/v67-first-center-resources-${theme}.png` });
   }
-  await panel.getByRole("button", { name: text.later, exact: true }).click();
+  await activate(panel.getByRole("button", { name: text.later, exact: true }));
   await expect(panel).toHaveCount(0);
   await expect(trigger).toBeFocused();
   expect(f.writes).toHaveLength(0);
   await page.reload();
-  await trigger.click();
+  await activate(trigger);
   await expect(panel.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "1");
   await expect(panel.getByLabel(text.name, { exact: true })).toBeEmpty();
   expect(f.writes).toHaveLength(0);
-  await page.keyboard.press("Escape");
+  await closeWithDevice(panel.getByRole("button", { name: text.later, exact: true }));
 });
 test("managed center resumes only the live missing room and discipline", async ({ page }) => {
   const f = await setup(page, { existing: true, managesCenter: true });
@@ -257,7 +257,7 @@ test("unknown first-center outcome freezes scope and reuses one immutable comman
 }) => {
   const f = await setup(page, { unknown: true }),
     panel = await fill(page);
-  await panel.getByRole("button", { name: text.action, exact: true }).click();
+  await activate(panel.getByRole("button", { name: text.action, exact: true }));
   await expect(panel.getByRole("status")).toContainText(text.states.unknown);
   await checkLockedWorkspaceScope(page, async () => {
     await expect(page.locator("[data-workspace-logo]").locator("..")).toBeDisabled();
@@ -266,27 +266,27 @@ test("unknown first-center outcome freezes scope and reuses one immutable comman
   await expect(panel.getByRole("button", { name: text.later, exact: true })).toBeDisabled();
   await expect(panel.getByRole("textbox", { name: text.name, exact: true })).toHaveCount(0);
   await expect(panel.getByText(f.center.name, { exact: true })).toBeVisible();
-  await page.keyboard.press("Escape");
+  await attemptOutsideDismissal(panel);
   await expect(panel).toBeVisible();
-  await panel.getByRole("button", { name: common.finance.retrySame, exact: true }).click();
+  await activate(panel.getByRole("button", { name: common.finance.retrySame, exact: true }));
   await expect(panel.getByRole("status")).toContainText(text.states.saved);
   expect(f.effects).toBe(1);
   expect(f.writes).toHaveLength(2);
   expect(f.writes[1]!.operation_key).toBe(f.writes[0]!.operation_key);
   expect(f.writes[1]!.request_id).not.toBe(f.writes[0]!.request_id);
-  await panel.getByRole("button", { name: common.memberProfile.close, exact: true }).click();
+  await activate(panel.getByRole("button", { name: common.memberProfile.close, exact: true }));
 });
 for (const rejectCreate of ["VERSION_CONFLICT", "PLAN_LIMIT_REACHED"] as const)
   test(`first-center review handles ${rejectCreate} without a phantom center`, async ({ page }) => {
     const f = await setup(page, { rejectCreate });
     const panel = await fill(page);
-    await panel.getByRole("button", { name: text.action, exact: true }).click();
+    await activate(panel.getByRole("button", { name: text.action, exact: true }));
     const notice = rejectCreate === "VERSION_CONFLICT" ? text.states.stale : text.states.rejected;
     await expect(panel.getByRole("status")).toHaveText(notice);
     await expect(
       panel.getByRole("button", { name: common.finance.retrySame, exact: true }),
     ).toHaveCount(0);
-    await panel.getByRole("button", { name: text.later, exact: true }).click();
+    await activate(panel.getByRole("button", { name: text.later, exact: true }));
     await expect(panel).toHaveCount(0);
     await expect(page.getByRole("link", { name: text.settings, exact: true })).toHaveCount(0);
     expect(f.writes).toHaveLength(1);
@@ -297,17 +297,17 @@ test("acknowledged first-center creation permits only workspace rereads after a 
 }) => {
   const f = await setup(page, { unread: true }),
     panel = await fill(page);
-  await panel.getByRole("button", { name: text.action, exact: true }).click();
+  await activate(panel.getByRole("button", { name: text.action, exact: true }));
   await expect(panel.getByRole("status")).toContainText(text.states["saved-unread"]);
   await expect(
     panel.getByRole("button", { name: common.finance.retrySame, exact: true }),
   ).toHaveCount(0);
-  await panel.getByRole("button", { name: common.finance.readResult, exact: true }).click();
+  await activate(panel.getByRole("button", { name: common.finance.readResult, exact: true }));
   await expect(panel.getByRole("status")).toContainText(text.states.saved);
   expect(f.effects).toBe(1);
   expect(f.writes).toHaveLength(1);
   expect(f.reads).not.toContain("operation_status_get_v1");
-  await panel.getByRole("button", { name: common.memberProfile.close, exact: true }).click();
+  await activate(panel.getByRole("button", { name: common.memberProfile.close, exact: true }));
 });
 for (const condition of ["denied", "existing"] as const)
   test(`first-center setup is absent for ${condition} native scope`, async ({ page }) => {
@@ -325,10 +325,9 @@ test("unread first-center authority stays unknown and retries the native read be
   const f = await setup(page, { unreadAuthority: true });
   await expect(page.getByRole("alert")).toContainText(text.authorityUnavailable);
   await expect(page.getByRole("button", { name: text.action, exact: true })).toHaveCount(0);
-  await page
-    .getByRole("alert")
-    .getByRole("button", { name: common.auth.retry, exact: true })
-    .click();
+  await activate(
+    page.getByRole("alert").getByRole("button", { name: common.auth.retry, exact: true }),
+  );
   await expect(page.getByRole("button", { name: text.action, exact: true })).toBeEnabled();
   expect(f.writes).toHaveLength(0);
 });

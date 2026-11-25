@@ -1,3 +1,4 @@
+import { activate, newPageForCurrentDevice } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { mockNative } from "./auth-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
@@ -31,7 +32,7 @@ async function signIn(page: import("@playwright/test").Page) {
   await page.goto("/login");
   await page.getByLabel("E-posta", { exact: true }).fill("platform-fixture@example.invalid");
   await page.getByLabel("Parola", { exact: true }).fill("Synthetic123");
-  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
   await expect(page).toHaveURL(/\/account$/);
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
 }
@@ -199,38 +200,40 @@ test("platform console pages organizations, reads an independent detail and veri
   await page.setViewportSize({ width: 320, height: 900 });
   const f = await platformFixture(page, "platform");
   await signIn(page);
-  await page.getByRole("link", { name: text.title, exact: true }).click();
+  await activate(page.getByRole("link", { name: text.title, exact: true }));
   const region = page.getByRole("region", { name: text.organizations, exact: true });
   await region.focus();
   await expect(region).toBeFocused();
   await expect(page.getByRole("grid", { name: text.organizations })).toBeVisible();
   expect(await region.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
-  await page.getByRole("button", { name: text.more, exact: true }).click();
-  await page.getByRole("link", { name: initial.name, exact: true }).click();
+  await activate(page.getByRole("button", { name: text.more, exact: true }));
+  await activate(page.getByRole("link", { name: initial.name, exact: true }));
   await expect(page).toHaveURL(new RegExp(`/platform\\?organization_id=${target}$`));
   await page.reload();
   await expect(page.getByRole("heading", { name: initial.name, exact: true })).toBeVisible();
   await expect(page.getByText("Sentetik Sahip", { exact: true })).toBeVisible();
   const reason = page.getByRole("textbox", { name: text.reason, exact: true });
-  await page.getByRole("button", { name: text.suspend, exact: true }).click();
+  await activate(page.getByRole("button", { name: text.suspend, exact: true }));
   await expect(reason).toBeFocused();
   await expect(reason).toHaveAccessibleDescription(text.reasonError);
   const approve = async (label: string, value: string) => {
     await reason.fill(value);
-    await page.getByRole("button", { name: label, exact: true }).click();
+    await activate(page.getByRole("button", { name: label, exact: true }));
     const dialog = page.getByRole("dialog", { name: label, exact: true });
     const apply = dialog.getByRole("button", { name: common.settings.applyReview, exact: true });
     await expect(apply).toBeDisabled();
-    await dialog.getByRole("checkbox").press("Space");
-    await apply.click();
+    await activate(dialog.getByRole("checkbox"), "Space");
+    await activate(apply);
     return dialog;
   };
   const suspend = await approve(text.suspend, "Sentetik askı nedeni");
   await expect(suspend.getByRole("status")).toHaveText(common.events.commandStates.unknown);
   await expect(page.getByText(activity.empty, { exact: true })).toBeAttached();
-  await suspend.getByRole("button", { name: common.studio.retrySameRequest, exact: true }).click();
+  await activate(
+    suspend.getByRole("button", { name: common.studio.retrySameRequest, exact: true }),
+  );
   await expect(suspend.getByRole("status")).toHaveText(common.events.commandStates.saved);
-  await suspend.getByRole("button", { name: common.settings.discard, exact: true }).click();
+  await activate(suspend.getByRole("button", { name: common.settings.discard, exact: true }));
   await expect(page.getByText(text.suspended, { exact: true })).toBeVisible();
   await expect(page.getByText(text.subscriptions.active, { exact: true })).toBeVisible();
   await expect(activityLog(page).getByRole("listitem")).toHaveCount(1);
@@ -238,7 +241,7 @@ test("platform console pages organizations, reads an independent detail and veri
   await expect(activityLog(page)).not.toContainText("Sentetik askı nedeni");
   const resume = await approve(text.resume, "Sentetik açma nedeni");
   await expect(resume.getByRole("status")).toHaveText(common.events.commandStates.saved);
-  await resume.getByRole("button", { name: common.settings.discard, exact: true }).click();
+  await activate(resume.getByRole("button", { name: common.settings.discard, exact: true }));
   await expect(page.getByText(text.accessModes.normal, { exact: true })).toBeVisible();
   expect(f.changes()).toBe(2);
   const writes = f.calls.filter(
@@ -247,15 +250,15 @@ test("platform console pages organizations, reads an independent detail and veri
   expect(writes).toHaveLength(3);
   expect(writes[0]!.request.operation_key).toBe(writes[1]!.request.operation_key);
   expect(writes[2]!.request.expected_version).toBe(2);
-  await page.getByRole("link", { name: text.organizations, exact: true }).click();
+  await activate(page.getByRole("link", { name: text.organizations, exact: true }));
   await expect(activityLog(page).getByRole("listitem")).toHaveCount(2);
   await expect(activityLog(page).getByRole("listitem").first()).toContainText(
     activity.actions.resumed,
   );
-  await page.getByRole("link", { name: text.studioRequests.title, exact: true }).click();
+  await activate(page.getByRole("link", { name: text.studioRequests.title, exact: true }));
   await expect(activityLog(page).getByRole("listitem")).toHaveCount(2);
   f.revoke();
-  await page.getByRole("link", { name: text.organizations, exact: true }).click();
+  await activate(page.getByRole("link", { name: text.organizations, exact: true }));
   await expect(page.getByText(text.denied, { exact: true })).toBeVisible();
   await expect(page.getByText(initial.name, { exact: true })).toHaveCount(0);
   await expect(activityLog(page).getByRole("listitem")).toHaveCount(0);
@@ -320,18 +323,18 @@ test("platform reads the live studio request queue with native pagination and hi
     });
   });
   await signIn(page);
-  await page.getByRole("link", { name: text.title, exact: true }).click();
-  await page.getByRole("link", { name: queue.title, exact: true }).click();
+  await activate(page.getByRole("link", { name: text.title, exact: true }));
+  await activate(page.getByRole("link", { name: queue.title, exact: true }));
   await expect(page).toHaveURL(/\/platform\?section=studio-requests$/);
   const region = page.getByRole("region", { name: queue.title, exact: true });
   await region.focus();
   await expect(region).toBeFocused();
   await expect(region.getByText(rows[0]!.name, { exact: true })).toBeVisible();
   await expect(region.getByText(rows[1]!.name, { exact: true })).toHaveCount(0);
-  await page.getByRole("button", { name: queue.more, exact: true }).click();
+  await activate(page.getByRole("button", { name: queue.more, exact: true }));
   await expect(region.getByText(rows[1]!.name, { exact: true })).toBeVisible();
   permitted = false;
-  await page.getByRole("button", { name: queue.refresh, exact: true }).click();
+  await activate(page.getByRole("button", { name: queue.refresh, exact: true }));
   await expect(page.getByRole("alert")).toHaveText(text.denied);
   await expect(region).toHaveCount(0);
   await expect(page.getByText(rows[0]!.name, { exact: true })).toHaveCount(0);
@@ -488,15 +491,15 @@ async function applyBillingReview(page: import("@playwright/test").Page, action:
   const dialog = page.getByRole("dialog", { name: action, exact: true });
   const apply = dialog.getByRole("button", { name: common.settings.applyReview, exact: true });
   await expect(apply).toBeDisabled();
-  await dialog.getByRole("checkbox").press("Space");
-  await apply.click();
+  await activate(dialog.getByRole("checkbox"), "Space");
+  await activate(apply);
   return dialog;
 }
 
 async function openDecision(page: import("@playwright/test").Page, index: number, action: string) {
-  await page.getByRole("link", { name: "Sentetik bildirim " + (index + 1), exact: true }).click();
+  await activate(page.getByRole("link", { name: "Sentetik bildirim " + (index + 1), exact: true }));
   await page.getByLabel(text.reason, { exact: true }).fill("Sentetik işlem gerekçesi");
-  await page.getByRole("button", { name: action, exact: true }).click();
+  await activate(page.getByRole("button", { name: action, exact: true }));
 }
 
 test("operator filters a native payment queue, rejects a report and replays one accepted report without a second period change", async ({
@@ -522,17 +525,19 @@ test("operator filters a native payment queue, rejects a report and replays one 
   await openDecision(page, 1, billing.reject);
   const rejection = await applyBillingReview(page, billing.reject);
   await expect(rejection.getByRole("status")).toHaveText(common.events.commandStates.saved);
-  await rejection.getByRole("button", { name: common.settings.discard, exact: true }).click();
+  await activate(rejection.getByRole("button", { name: common.settings.discard, exact: true }));
   await expect(page.getByText(billing.states.rejected, { exact: true })).toBeVisible();
   expect(f.subscription.period_end).toBe(initialPeriod);
 
-  await page.getByRole("link", { name: billing.backToQueue, exact: true }).click();
+  await activate(page.getByRole("link", { name: billing.backToQueue, exact: true }));
   await openDecision(page, 0, billing.accept);
   const approval = await applyBillingReview(page, billing.accept);
   await expect(approval.getByRole("status")).toHaveText(common.events.commandStates.unknown);
-  await approval.getByRole("button", { name: common.studio.retrySameRequest, exact: true }).click();
+  await activate(
+    approval.getByRole("button", { name: common.studio.retrySameRequest, exact: true }),
+  );
   await expect(approval.getByRole("status")).toHaveText(common.events.commandStates.saved);
-  await approval.getByRole("button", { name: common.settings.discard, exact: true }).click();
+  await activate(approval.getByRole("button", { name: common.settings.discard, exact: true }));
   await expect(page.getByText(billing.states.accepted, { exact: true })).toBeVisible();
   await expect(page.getByText(text.subscriptions.active, { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: billing.accept, exact: true })).toHaveCount(0);
@@ -547,7 +552,7 @@ test("operator filters a native payment queue, rejects a report and replays one 
     activity.actions.paymentDeclined,
   );
 
-  const customer = await browser.newPage({ baseURL });
+  const customer = await newPageForCurrentDevice(browser, { baseURL });
   try {
     await mockSettingsCompletion(customer, { billingOwner: true, startUrl: null });
     await customer.route("**/functions/v1/backend-v1/subscription_get_v1", (route) =>
@@ -596,8 +601,8 @@ test("operator detects a changed payment before writing and refuses a decision a
   const dialog = await applyBillingReview(page, billing.accept);
   await expect(dialog.getByRole("status")).toHaveText(billing.sourceChanged);
   expect(f.writes).toEqual([]);
-  await dialog.getByRole("button", { name: common.profile.loadCurrent, exact: true }).click();
-  await page.getByRole("button", { name: billing.accept, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: common.profile.loadCurrent, exact: true }));
+  await activate(page.getByRole("button", { name: billing.accept, exact: true }));
   f.revoke();
   await applyBillingReview(page, billing.accept);
   await expect(page.getByText(text.denied, { exact: true })).toBeVisible();
@@ -618,16 +623,16 @@ test("operator sees the live grace limit and only extends it after reviewing an 
   const until = form.getByLabel(billing.newUntil, { exact: true });
   const action = form.getByRole("button", { name: billing.extend, exact: true });
   await until.fill("2026-11-22T12:00");
-  await action.click();
+  await activate(action);
   await expect(until).toBeFocused();
   await expect(until).toHaveAccessibleDescription(billing.untilError);
   expect(f.writes).toEqual([]);
   await until.fill(intendedGraceInput);
   await form.getByLabel(text.reason, { exact: true }).fill("Sentetik işlem gerekçesi");
-  await action.click();
+  await activate(action);
   const dialog = await applyBillingReview(page, billing.extend);
   await expect(dialog.getByRole("status")).toHaveText(common.events.commandStates.saved);
-  await dialog.getByRole("button", { name: common.settings.discard, exact: true }).click();
+  await activate(dialog.getByRole("button", { name: common.settings.discard, exact: true }));
   await expect(page.getByText(/25 Kas 2026.*13:30 UTC/)).toBeVisible();
   await expect(activityLog(page).getByRole("listitem")).toContainText(
     activity.actions.graceExtended,
@@ -736,13 +741,13 @@ test("platform creates a queued studio and a direct organization with a publishe
   await signIn(page);
   await page.goto("/platform?section=studio-requests");
   const more = page.getByRole("button", { name: text.studioRequests.more, exact: true });
-  await more.click();
+  await activate(more);
   await expect(page.getByRole("link", { name: "İkinci", exact: true })).toBeVisible();
-  await more.click();
+  await activate(more);
   const queuedLink = page.getByRole("link", { name: queued.name, exact: true });
   await expect(queuedLink).toBeVisible();
   const renderStart = operations.length;
-  await queuedLink.click();
+  await activate(queuedLink);
   await expect(page.getByLabel(text.create.name, { exact: true })).toHaveValue(queued.name);
   await expect(page.getByLabel(text.create.name, { exact: true })).toHaveJSProperty(
     "readOnly",
@@ -759,11 +764,11 @@ test("platform creates a queued studio and a direct organization with a publishe
   });
   const create = async () => {
     await page.getByLabel(text.create.plan, { exact: true }).selectOption(plan.id);
-    await page.getByRole("button", { name: text.create.review, exact: true }).click();
+    await activate(page.getByRole("button", { name: text.create.review, exact: true }));
     const dialog = await applyBillingReview(page, text.create.title);
     await expect(dialog.getByRole("status")).toHaveText(common.events.commandStates.saved);
-    await dialog.getByRole("button", { name: common.settings.discard, exact: true }).click();
-    await page.getByRole("link", { name: text.create.openCreated, exact: true }).click();
+    await activate(dialog.getByRole("button", { name: common.settings.discard, exact: true }));
+    await activate(page.getByRole("link", { name: text.create.openCreated, exact: true }));
   };
   const commandStart = operations.length;
   await create();
@@ -785,7 +790,7 @@ test("platform creates a queued studio and a direct organization with a publishe
   const name = "Sentetik doğrudan kuruluş";
   await page.getByLabel(text.create.name, { exact: true }).fill(name);
   await page.getByLabel(text.verifiedEmail, { exact: true }).fill("kurulus@example.invalid");
-  await page.getByRole("button", { name: text.findAccount, exact: true }).click();
+  await activate(page.getByRole("button", { name: text.findAccount, exact: true }));
   await expect(page.getByText(text.accountFound, { exact: true })).toBeVisible();
   await create();
   await expect(page.getByRole("heading", { name })).toBeVisible();
@@ -857,13 +862,13 @@ test("platform operator protects the last eligible member, verifies an addition 
   await expect(page.getByText(text.operators.last, { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: /^Yetkiyi kaldır/ })).toHaveCount(0);
   await page.getByLabel(text.verifiedEmail, { exact: true }).fill(operatorEmail);
-  await page.getByRole("button", { name: text.findAccount, exact: true }).click();
+  await activate(page.getByRole("button", { name: text.findAccount, exact: true }));
   await expect(page.getByText(text.accountFound, { exact: true })).toBeVisible();
   const reason = page.getByLabel(text.reason, { exact: true });
   await reason.fill("Açık yetki verme gerekçesi");
   const viewport = page.viewportSize()!;
   await page.setViewportSize({ width: 320, height: viewport.height });
-  await page.getByRole("button", { name: text.operators.add, exact: true }).click();
+  await activate(page.getByRole("button", { name: text.operators.add, exact: true }));
   const review = page.getByRole("dialog", { name: text.operators.add, exact: true });
   const accountRow = review.getByRole("listitem").filter({ hasText: text.verifiedEmail });
   await expect(accountRow.locator("strong")).toHaveText(operatorEmail);
@@ -872,7 +877,7 @@ test("platform operator protects the last eligible member, verifies an addition 
   expect(writes).toHaveLength(0);
   const grant = await applyBillingReview(page, text.operators.add);
   await expect(grant.getByRole("status")).toHaveText(common.events.commandStates.saved);
-  await grant.getByRole("button", { name: common.settings.discard, exact: true }).click();
+  await activate(grant.getByRole("button", { name: common.settings.discard, exact: true }));
   await page.setViewportSize(viewport);
   await expect(page.getByText("Sentetik Yeni Operatör", { exact: true })).toBeVisible();
   await expect(activityLog(page).getByRole("listitem")).toContainText(
@@ -884,9 +889,9 @@ test("platform operator protects the last eligible member, verifies an addition 
     contentType: "image/png",
   });
   await reason.fill("Kendi yetkimi kaldırıyorum");
-  await page
-    .getByRole("button", { name: "Yetkiyi kaldır (Sentetik Platform)", exact: true })
-    .click();
+  await activate(
+    page.getByRole("button", { name: "Yetkiyi kaldır (Sentetik Platform)", exact: true }),
+  );
   await applyBillingReview(page, text.operators.remove);
   await expect(page.getByText(text.denied, { exact: true })).toBeVisible();
   await expect(page.getByText("Sentetik Yeni Operatör", { exact: true })).toHaveCount(0);
@@ -1058,7 +1063,7 @@ test("platform stages and publishes one exact private invoice through lost respo
   await page.goto(`/platform?organization_id=${target}`);
   const form = page.getByRole("form", { name: invoice.title });
   const upload = form.getByRole("button", { name: invoice.upload });
-  await upload.click();
+  await activate(upload);
   await expect(form.getByLabel(invoice.number)).toBeFocused();
   await form.getByLabel(invoice.number).fill("WEB1-1");
   await form.getByLabel(invoice.date).fill("2026-11-19");
@@ -1068,24 +1073,24 @@ test("platform stages and publishes one exact private invoice through lost respo
     mimeType: "application/pdf",
     buffer: Buffer.from("not a PDF"),
   });
-  await upload.click();
+  await activate(upload);
   await expect(field).toBeFocused();
   await expect(field).toHaveAccessibleDescription(/Geçerli bir PDF veya ZIP dosyası seç/);
   expect(attempts.preparation).toHaveLength(0);
   await field.setInputFiles({ name: "invoice.pdf", mimeType: "application/pdf", buffer: body });
-  await upload.click();
-  await form.getByRole("button", { name: common.studio.retrySameRequest }).click();
+  await activate(upload);
+  await activate(form.getByRole("button", { name: common.studio.retrySameRequest }));
   await expect(page.getByText(invoice.staged, { exact: true })).toBeVisible();
   expect(attempts.preparation).toHaveLength(2);
   expect(new Set(attempts.preparation).size).toBe(1);
   expect(uploads).toBe(1);
   expect(attempts.publication).toHaveLength(0);
-  await page.getByRole("button", { name: invoice.publish, exact: true }).click();
+  await activate(page.getByRole("button", { name: invoice.publish, exact: true }));
   const review = await applyBillingReview(page, invoice.publish);
   await expect(review.getByRole("status")).toHaveText(common.events.commandStates.unknown);
-  await review.getByRole("button", { name: common.studio.retrySameRequest }).click();
+  await activate(review.getByRole("button", { name: common.studio.retrySameRequest }));
   await expect(review.getByRole("status")).toHaveText(common.events.commandStates.saved);
-  await review.getByRole("button", { name: common.settings.discard }).click();
+  await activate(review.getByRole("button", { name: common.settings.discard }));
   await expect(page.getByText(invoice.published, { exact: true })).toBeVisible();
   await expect(activityLog(page).getByRole("listitem")).toHaveCount(1);
   await expect(activityLog(page)).toContainText(text.activity.actions.invoicePublished);
@@ -1151,18 +1156,18 @@ test("platform invoices paginate and publish a pending invoice discovered after 
   const grid = page.getByRole("grid", { name: invoice.history });
   await expect(grid).toContainText(invoice.pendingStatus);
   await page.reload();
-  await page.getByRole("button", { name: invoice.more }).click();
+  await activate(page.getByRole("button", { name: invoice.more }));
   await expect(grid.getByRole("rowheader", { name: historical.invoice_number })).toBeVisible();
-  await grid.getByRole("button", { name: invoice.publish, exact: true }).click();
+  await activate(grid.getByRole("button", { name: invoice.publish, exact: true }));
   const review = await applyBillingReview(page, invoice.publish);
   await expect(review.getByRole("status")).toHaveText(common.events.commandStates.saved);
-  await review.getByRole("button", { name: common.settings.discard }).click();
+  await activate(review.getByRole("button", { name: common.settings.discard }));
   await expect(grid.getByRole("row").filter({ hasText: pending.invoice_number })).toContainText(
     invoice.publishedStatus,
   );
   expect(postPublishHistory).toEqual([undefined]);
   await expect(grid.getByRole("rowheader", { name: historical.invoice_number })).toHaveCount(0);
-  await page.getByRole("button", { name: invoice.more }).click();
+  await activate(page.getByRole("button", { name: invoice.more }));
   await expect(grid.getByRole("rowheader", { name: historical.invoice_number })).toBeVisible();
   expect(postPublishHistory).toEqual([undefined, "next-invoice"]);
   denied = true;

@@ -1,3 +1,4 @@
+import { activate, hasTouchInput } from "./device-input.js";
 import { test, expect } from "./test.js";
 import { mockStudio, openStudio } from "./studio-fixture.js";
 import { clickWorkspaceLink, mockNative, origin } from "./auth-fixture.js";
@@ -83,12 +84,14 @@ test("auth links use SPA history while modified clicks retain native new-tab nav
   await page.goto(`${origin}/login`);
   const lifetime = await page.evaluate("window.__spaLifetime = performance.timeOrigin");
   const forgot = page.getByRole("link", { name: "Parolamı unuttum", exact: true });
-  const popupPromise = context.waitForEvent("page");
-  await forgot.click({ modifiers: ["ControlOrMeta"] });
-  const popup = await popupPromise;
-  await popup.waitForURL(`${origin}/forgot-password`);
-  await popup.close();
-  await forgot.click();
+  if (!hasTouchInput(page)) {
+    const popupPromise = context.waitForEvent("page");
+    await forgot.click({ modifiers: ["ControlOrMeta"] });
+    const popup = await popupPromise;
+    await popup.waitForURL(`${origin}/forgot-password`);
+    await popup.close();
+  }
+  await activate(forgot);
   await expect(
     page.getByRole("heading", { name: "Parolanı mı unuttun?", exact: true }),
   ).toBeVisible();
