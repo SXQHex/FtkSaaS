@@ -12,6 +12,7 @@ import {beginBoundR2PilotErasure,enrollSyntheticErasure,r2ErasurePilot} from './
 import {verifySettledBillingErasure} from './p07-billing-archive-fixture.mjs';
 import {verifyBillingHistoryErasure} from './p07-billing-history-fixture.mjs';
 import {verifySignedDocumentErasure} from './p07-signed-document-erasure-fixture.mjs';
+import {verifyOrganizationPaidSaleRetention} from './p07-organization-sale-fixture.mjs';
 import {seedPublishedInvoice,verifyArchivedInvoiceRemoval,verifyPublishedInvoiceArchive} from './p07-invoice-archive-fixture.mjs';
 
 export async function verifyOrganizationErasure(t){
@@ -225,6 +226,8 @@ export async function verifyOrganizationErasure(t){
     signingContext,controlId:restoreControlId,dbUrl:DB_URL});
    t.diagnostic(JSON.stringify(mixed));
   });
+  await t.test('a terminated, fully collected learner sale retains the financial graph until archive eligibility',
+   verifyOrganizationPaidSaleRetention);
  }finally{
   for(const session of sessions)await session.end();
   for(const role of roles){

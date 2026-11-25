@@ -2,6 +2,55 @@ import assert from 'node:assert/strict';
 import * as archive from '../scripts/organization-db-archive.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
 import {sha256} from '../scripts/restore-guard.mjs';
+import {must} from './api-client.mjs';
+import {preparationFixture} from './starter-preparation-fixture.mjs';
+
+export async function verifyOrganizationPaidSaleRetention(){
+ const f=await preparationFixture({schedule:true});
+ const {db,org,center,discipline,owner,api,day}=f;
+ const rows=async(sql,args=[])=>(await db.query(sql,args)).rows;
+ try{
+  await db.query("update core.saas_plan_versions set name='business' where id=$1",[f.plan]);
+  const person=(await api('person_create_v1',{display_name:'Synthetic O04 paid student',contacts:[]})).primary_id;
+  await api('student_activate_v1',{person_id:person});
+  const product=(await api('product_publish_v1',{terms:{
+   name:'Synthetic O04 paid package',kind:'credits',booking_mode:'flexible',credits:2,price_minor:'1000',currency:'TRY',
+   freeze:{enabled:false,extends_validity:false},refund:{method:'none'},
+   scopes:[{scope_kind:'center_discipline',center_id:center,discipline_id:discipline,usage_targets:['lesson']}]
+  }})).primary_id;
+  const salePreview=await api('sale_preview_v1',{person_id:person,product_version_id:product,start_date:day(0),end_date:day(30)});
+  const token=preview=>({id:preview.id,token:preview.token});
+  const sale=(await api('sale_apply_v1',{preview:token(salePreview)})).primary_id;
+  const [{id:debt}]=await rows('select id from core.debts where org_id=$1 and sale_id=$2',[org,sale]);
+  await api('collection_record_v1',{person_id:person,debt_ids:[debt],amount_minor:'1000',
+   currency:'TRY',occurred_at:new Date().toISOString(),payment:{method:'cash'}});
+  const termination=await api('sale_terminate_preview_v1',{sale_id:sale,reason:'Synthetic paid sale ended without obligation'});
+  await api('sale_terminate_apply_v1',{preview:token(termination)});
+  const finance=()=>rows(`select s.state as sale_state,s.net_minor,d.state as debt_state,d.amount_minor as debt_amount,
+   private.debt_remaining(s.org_id,d.id) as remaining,c.kind,c.amount_minor as cash_amount,
+   a.amount_minor as allocation_amount,e.state as entitlement_state,private.credit_available(s.org_id,s.id) as available
+   from core.sales s join core.debts d on d.org_id=s.org_id and d.sale_id=s.id
+   join core.debt_allocations a on a.org_id=d.org_id and a.debt_id=d.id
+   join core.cash_movements c on c.org_id=a.org_id and c.id=a.cash_movement_id
+   join core.entitlement_accounts e on e.org_id=s.org_id and e.sale_id=s.id where s.org_id=$1 and s.id=$2`,[org,sale]);
+  const before=await finance();
+  assert.deepEqual(before,[{sale_state:'terminated',net_minor:'1000',debt_state:'settled',debt_amount:'1000',
+   remaining:'0',kind:'collection',cash_amount:'1000',allocation_amount:'1000',entitlement_state:'closed',available:'0'}]);
+
+  const preview=await must(owner,'organization_delete_preview_v1',{org_id:org,all_data:true,reason:'Synthetic paid archive boundary'});
+  const {job_id:jobId}=await must(owner,'organization_delete_apply_v1',{
+   org_id:org,all_data:true,preview:token(preview),reauth:owner.jwt
+  },key());
+  const [{request_id:requestId}]=await rows('select request_id from private.p07_privacy_jobs where id=$1 and org_id=$2',[jobId,org]);
+  const target={db,requestId,orgId:org};
+  assert.deepEqual(await archive.readOrganizationSaleArchiveScope(target),{state:'blocked',reason:'dependent_sale_work'});
+  await assert.rejects(archive.archiveOrganizationSales({...target,
+   store:{put:()=>assert.fail('Unapproved financial evidence must not be archived')}
+  }),/ORGANIZATION_SALE_ARCHIVE_SOURCE_BLOCKED/);
+  assert.deepEqual(await finance(),before);
+  assert.deepEqual(await rows('select completed_at from private.organization_sale_erasures where request_id=$1',[requestId]),[]);
+ }finally{await db.end();}
+}
 
 export async function verifyOrganizationSaleErasure({db,worker,attestor,request,requestId,org,sale,product,studentPerson,
  terminationReason,terminationPreviewId,store,reader,sourceProjectRef}){

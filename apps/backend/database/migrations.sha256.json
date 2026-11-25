@@ -249,5 +249,6 @@
   "20261125052500_organization_erasure_pending_claim.sql": "2414cb7a9d508201a39ce6ba4f4c844861e4bf68d1651d732956625ec841bfcf",
   "20261125053500_organization_erasure_abandoned_previews.sql": "960e5e6b015ba754ded18821584987e43a83a4531fcd205bec0b730f427fc9ad",
   "20261125054500_organization_linked_import_source_erasure.sql": "bf5d552a50b949dd05bbedaed14e537c09f1d924e02cf9493233dfae4f9275a0",
-  "20261125055500_organization_linked_import_storage_attestation.sql": "a9e273d0f4170adecc121551755d4f9c756629f0bd12fbd21c4255444ab3d1ac"
+  "20261125055500_organization_linked_import_storage_attestation.sql": "a9e273d0f4170adecc121551755d4f9c756629f0bd12fbd21c4255444ab3d1ac",
+  "20261125060500_organization_import_rejected_row_hold_evidence.sql": "c9fa85409327b753d6d88da013c4384e040ed28c2fc31e56b67f287864c9a8fc"
 }

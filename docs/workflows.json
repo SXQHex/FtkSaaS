@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "10072306912797b4be82096adabbd7a3a0f936323883ada0b7e14840d9678a04",
-        "reason": "Ortak sözleşme ve 251 migration envanteri kaynakla eşlendi."
+        "fingerprint": "07e8bd30871c2c03e52d2d4262665cfbba930327f495d4f6f150bb21247b6d1d",
+        "reason": "Ortak sözleşme ve 252 migration envanteri kaynakla eşlendi."
       }
     },
     {
@@ -2063,7 +2063,8 @@
         "apps/backend/supabase/migrations/20261125052500_organization_erasure_pending_claim.sql",
         "apps/backend/supabase/migrations/20261125053500_organization_erasure_abandoned_previews.sql",
         "apps/backend/supabase/migrations/20261125054500_organization_linked_import_source_erasure.sql",
-        "apps/backend/supabase/migrations/20261125055500_organization_linked_import_storage_attestation.sql"
+        "apps/backend/supabase/migrations/20261125055500_organization_linked_import_storage_attestation.sql",
+        "apps/backend/supabase/migrations/20261125060500_organization_import_rejected_row_hold_evidence.sql"
       ],
       "operations": [
         "account_delete_preview_v1",
@@ -2088,8 +2089,8 @@
         "platform_operator_access_set_v1"
       ],
       "review": {
-        "fingerprint": "6c8a91aed6d0bb46efd393e8d31a17324b62bf151cb1824610655d6c3862ee5f",
-        "reason": "Bağlı CSV için imha kararı, native Storage kanıtı ve izole restore retleri incelendi."
+        "fingerprint": "cd91cb780cf4d6eb0c429d3a784afea06bf88cabcbafc6c195c2cfa8db680ccc",
+        "reason": "Karma import bağımsız makbuz sayımlarıyla ve kapanmış ücretli satışın finans sınırıyla incelendi."
       }
     },
     {
@@ -2298,7 +2299,8 @@
         "apps/backend/supabase/migrations/20261125052500_organization_erasure_pending_claim.sql",
         "apps/backend/supabase/migrations/20261125053500_organization_erasure_abandoned_previews.sql",
         "apps/backend/supabase/migrations/20261125054500_organization_linked_import_source_erasure.sql",
-        "apps/backend/supabase/migrations/20261125055500_organization_linked_import_storage_attestation.sql"
+        "apps/backend/supabase/migrations/20261125055500_organization_linked_import_storage_attestation.sql",
+        "apps/backend/supabase/migrations/20261125060500_organization_import_rejected_row_hold_evidence.sql"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -2313,8 +2315,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "2ac274357f1ab5b8d71f89c445e18d9fdfedbb28905bf6b67576dfc656d8e1c4",
-        "reason": "Ayrı attestor yetkisi ve sonradan gelen sağlayıcı yanıtıyla lease ve origin bağları incelendi."
+        "fingerprint": "15e86f12068646d3ba51f0a65273c8b8438877d6587071dc3e0f7c1b3463567e",
+        "reason": "P07 karma satır, saklama, Storage makbuzu ve restore kabulü mevcut testler korunarak eşlendi."
       }
     }
   ]
