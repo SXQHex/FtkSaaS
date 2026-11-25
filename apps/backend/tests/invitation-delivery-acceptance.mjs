@@ -42,6 +42,35 @@ test('XREQ-003: native Auth invitation job scope, durable leases and provider ha
    }
    const privateRpc=await timedFetch('invitation.denied_rpc',env.API_URL+'/rest/v1/rpc/outbox_deliver_v1',{method:'POST',headers:{authorization:'Bearer '+owner.jwt,apikey:env.ANON_KEY,'Content-Profile':'api_v1','content-type':'application/json'},body:JSON.stringify({p_request:{request_id:id()},p_actor_auth_id:null,p_session_id:null,p_ids:[],p_aux:{invitation_phase:'claim'}})});await privateRpc.arrayBuffer();assert([401,403,404].includes(privateRpc.status));
   });
+  await t.test('Cron skips a recent idle tick but dispatches due work and stale health checks',async()=>{
+   await db.query('begin');
+   try{
+    const observed='2080-11-25T12:00:00.000Z';
+    const required=async seconds=>(await db.query(
+     'select private.invitation_dispatch_needed($1::timestamptz+make_interval(secs=>$2)) needed',[observed,seconds]
+    )).rows[0].needed;
+    await db.query('insert into private.invitation_ticks(request_id,created_at) values($1,$2)',[id(),observed]);
+    await db.query("update core.outbox_jobs set state='retry_wait',next_attempt_at=$2::timestamptz+interval '31 seconds' where id=$1",[job,observed]);
+    assert.equal(await required(30),false);
+    assert.equal(await required(31),true);
+    await db.query('update private.invitation_sender_config set enabled=false where org_id=$1',[org]);
+    assert.equal(await required(31),false);
+    assert.equal(await required(45),true);
+
+    const emailJob=id();
+    await db.query(`insert into core.outbox_jobs(id,org_id,kind,dedupe_key,state,attempts,lease_until)
+     values($1,$2,'transactional_email',$1::uuid::text,'running',1,$3::timestamptz+interval '30 seconds')`,[emailJob,org,observed]);
+    await db.query('insert into private.transactional_email_jobs(job_id,org_id,center_id,subject_version) values($1,$2,$3,1)',[emailJob,org,center]);
+    assert.equal(await required(29),false);
+    assert.equal(await required(30),true);
+    const acl=(await db.query(`select
+      has_function_privilege('ftk_ops_invitation','private.invitation_dispatch()','execute') dispatch,
+      has_function_privilege('service_role','private.invitation_dispatch_needed(timestamptz)','execute') service_probe,
+      has_function_privilege('authenticated','private.invitation_dispatch_needed(timestamptz)','execute') authenticated_probe`
+    )).rows[0];
+    assert.deepEqual(acl,{dispatch:true,service_probe:false,authenticated_probe:false});
+   }finally{await db.query('rollback');}
+  });
   await t.test('supersession cancels queued old job; same signed tick is consumed once',async()=>{
    const old=job;job=(await send()).job_id;assert.equal((await status(old)).state,'cancelled');
    const preferences=await must(member,'settings_get_v1',{scope:'user'});await must(member,'settings_update_v1',{scope:'user',expected_version:preferences.version,patch:{language:'en'}},id());
