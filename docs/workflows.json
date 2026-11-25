@@ -321,8 +321,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "c3bb3e3b1aa75074da09c4b0092bc1ed03ea1ca9b1dbec49bbd4d27794c70bf5",
-        "reason": "Hesap ve davet kabulü incelendi. API envanterinde davet testinin kaynak parmak izi güncellendi; sahiplik, seri çalışma ve kontrol kuralları aynı."
+        "fingerprint": "b721ba9a3e8f0ed107dee978b59626c60a3c7e92096f7007c4d49b100b221ff9",
+        "reason": "Kişi kapsam migration envanteri ve öğrenci durumu testinin hash bağları incelendi. Test sahipliği ve ortak çağrı protokolü korunur."
       }
     },
     {
@@ -557,8 +557,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "353c9892ac7477a799c739855ea2f2c4039bb072c7fbc9876d242801566e0d8c",
-        "reason": "Kapasite görünümü aynı sayımları yeniden kullanır. Eğitmen gereksinimi aynı aktif seans ve legacy ders ataması kurallarından okunur."
+        "fingerprint": "0539e62c52513ff082b645402eff06638ef5c5f83165048c87fc95dc75bd9172",
+        "reason": "Tek merkez yöneticisinin kişi listesinde kapsamı doğrulayan native test, stüdyo yetki sınırı için güncellendi."
       }
     },
     {
@@ -682,8 +682,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "162b1758b3a07f2ef9a35800937aace68e2a514485431f391964291717468ae5",
-        "reason": "Takvimde aktif kapasite ve eğitmen gereksinimi aynı erişim koşulları ve yanıt alanlarıyla daha az sorgu kullanır."
+        "fingerprint": "c2b5a93890a8fddae1cbdfe0a5d28a4b0a1f0e37f22849ca89a1d6e4d3b4a239",
+        "reason": "Ortak öğrenci durumu testine kişi listesi yetki örneği eklendi. Takvim çağrısı ve seans görünürlük kontrolleri korunur."
       }
     },
     {
@@ -786,7 +786,8 @@
         "apps/backend/supabase/migrations/20261124013000_scoped_read_projections.sql",
         "apps/backend/supabase/migrations/20261124152000_scoped_consumer_followup.sql",
         "apps/backend/supabase/migrations/20261125112000_share_person_calendar_read_locks.sql",
-        "apps/backend/supabase/migrations/20261125124000_selective_person_field_policy.sql"
+        "apps/backend/supabase/migrations/20261125124000_selective_person_field_policy.sql",
+        "apps/backend/supabase/migrations/20261125143626_people_page_operational_scope.sql"
       ],
       "operations": [
         "account_access_send_v1",
@@ -805,8 +806,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "50048f3df17d972928ddea67b1c7febaea638eeba0ead49c93793cca245270e5",
-        "reason": "Davetin scope, sender config, lease ve tekrar kuralları korunur. Mevcut native kabul aynı job üzerinden vade ve sağlık kontrolünü doğrular."
+        "fingerprint": "4b78ca92ca09b4383ee3da837e8868c67f08ec76fd0120c2bd29c42baa7f8c44",
+        "reason": "Aktif canonical ilişki, alias geçmişi, kapsamlı iletişim ve cursor davranışı incelendi. Kişi sayfası canlı yetkiyi istek başında çözümleyip yeniden kullanır."
       }
     },
     {
@@ -935,8 +936,8 @@
         "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "fcc62a261798bff027bdca51022d983ec05c06c8f4bdbc16f3c08eeb9efc51d6",
-        "reason": "Katalog okumasının paylaşımlı kilit kontrolü korunuyor. Genişletilen regresyon kişi ve takvim okumalarını da kapsıyor."
+        "fingerprint": "32ff9a2cd31abab26e28957722291de670c7437e7a1133e452c2e6384df476df",
+        "reason": "Paylaşılan öğrenci durumu testindeki merkez yetki senaryosu incelendi. Satış ve hak komutları mevcut canonical kişi kapsamını kullanır."
       }
     },
     {

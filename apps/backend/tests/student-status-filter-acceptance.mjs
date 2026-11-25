@@ -83,6 +83,26 @@ test('Student status filters selected-center current membership before paginatio
   try{await relation(alias,center,'active');assert.deepEqual(await all({student_status:'active'}),[people[1],people[4],people[5]].sort());assert.deepEqual(await all({student_status:'inactive'}),[people[0],people[2],people[3]].sort());}
   finally{await db.query('delete from core.center_relationships where org_id=$1 and person_id=$2',[org,alias]);await db.query('delete from core.people where id=$1',[alias]);}
  });
+ await t.test('scoped manager includes active alias membership without showing other center students',async()=>{
+  const actor=await authUser('status-scoped-manager');
+  const actorAccount=await must(actor,'account_get_v1');
+  const actorPerson=(await api('person_create_v1',{display_name:'Scoped status manager',contacts:[]})).primary_id;
+  await db.query("insert into core.account_links(id,org_id,person_id,account_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[key(),org,actorPerson,actorAccount.id]);
+  await api('center_manager_assign_v1',{person_id:actorPerson});
+  const alias=key();
+  await db.query("insert into core.people(id,org_id,display_name,state,merged_into_id) values($1,$2,'Scoped alias snapshot','merged',$3)",[alias,org,people[1]]);
+  try{
+   await relation(alias,center,'active');
+   const page=await read({student_status:'active',page:{limit:20}},actor);
+   assert.deepEqual(page.items.map(item=>item.id).sort(),[people[1],people[4],people[5]].sort());
+   assert.deepEqual(page.items.find(item=>item.id===people[1]).contacts,[]);
+   const foreign=await read({center_id:other,student_status:'active',page:{limit:20}},actor);
+   assert.deepEqual(foreign.items,[]);
+  }finally{
+   await db.query('delete from core.center_relationships where org_id=$1 and person_id=$2',[org,alias]);
+   await db.query('delete from core.people where id=$1',[alias]);
+  }
+ });
  await t.test('filtered reads never create business effects',async()=>{
   const counts=async()=>(await db.query('select (select count(*) from core.audit_events where org_id=$1) a,(select count(*) from core.operation_receipts where org_id=$1) r,(select count(*) from core.outbox_jobs where org_id=$1) o',[org])).rows;const before=await counts();await all({student_status:'active'});await all({student_status:'inactive'});assert.deepEqual(await counts(),before);
  });

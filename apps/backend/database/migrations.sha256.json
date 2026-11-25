@@ -261,5 +261,6 @@
   "20261125124800_calendar_read_projections.sql": "cc56e5bda35127701cb472417f0f03f03e851f208d380aca759e403b7d9b7524",
   "20261125131200_index_invitation_tick_retention.sql": "0c5802917e9d1dd9de32986f3c4e7494b6a51621186f26b392c807711c9571fa",
   "20261125133000_reduce_account_projection_reads.sql": "598e2ec1d9917fe4baa3d2ea298f20b4ba77e6ec7013bab7762c5ab4204642de",
-  "20261125133100_skip_recent_idle_invitation_dispatch.sql": "a9be46d11ac85b271c1b6f90093cb88e972f46cfd5b6fd6146b368969028fd8a"
+  "20261125133100_skip_recent_idle_invitation_dispatch.sql": "a9be46d11ac85b271c1b6f90093cb88e972f46cfd5b6fd6146b368969028fd8a",
+  "20261125143626_people_page_operational_scope.sql": "9035d94f9e0cf33511a60168b10b3759b59639c97f05f2c9f2935a5318b55984"
 }
