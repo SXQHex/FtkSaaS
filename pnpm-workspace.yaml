@@ -10,6 +10,19 @@ catalog:
   oxlint-tsgolint: 7.0.2006
   typescript: 7.0.2
 
+# One release only. Remove after 2026-11-25 15:55:55 UTC, when the CLI and
+# these platform packages all meet the normal 24-hour release age.
+minimumReleaseAgeExclude:
+  - 'supabase@3.4.0'
+  - '@supabase/cli-darwin-arm64@3.4.0'
+  - '@supabase/cli-darwin-x64@3.4.0'
+  - '@supabase/cli-linux-arm64@3.4.0'
+  - '@supabase/cli-linux-arm64-musl@3.4.0'
+  - '@supabase/cli-linux-x64@3.4.0'
+  - '@supabase/cli-linux-x64-musl@3.4.0'
+  - '@supabase/cli-windows-arm64@3.4.0'
+  - '@supabase/cli-windows-x64@3.4.0'
+
 allowBuilds:
   # Optional next-intl extraction tools; not used by runtime translations.
   "@parcel/watcher": false

@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "eca934814c3ac1fbae7740373c50d565605c772e21f87480f9168912773eb690",
-        "reason": "Migration envanteri ve ortak native sözleşme kapsamı doğrulandı. D04 için onaylanan sekiz kaynak parmak izi Ubuntu runner ve dört profilin tam 2/2/4/4 shard beklentilerini günceller. Native API, yetki, işlem sonucu ve ilgili kapsam denetimleri korunur."
+        "fingerprint": "7340f0cba1ffee321e62a44e81cd67750157ccb6ff3e987c30904f506d1bbbf4",
+        "reason": "Node LTS ve pnpm pinleri ile yerel Auth sağlayıcı anahtarları güncellendi. Frozen kurulum, API kapsamı ve pnpm sürüm beklentisine ait inceleme kaydı doğrulandı. D04 için onaylanan sekiz kaynak parmak izi Ubuntu runner ve 2/2/4/4 shard beklentilerini kapsar."
       }
     },
     {
@@ -414,8 +414,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "c6f03a3f77c1decd89366e56100400584f18c6efabba94db763c345705dcb5cd",
-        "reason": "Kimlik ve doğrulanmış ad fallback kabulü, hesap kaydı olmayan operatörü kendi üyelik zamanıyla doğrular."
+        "fingerprint": "758419c4222488629a10e82a1e2a82c2b285676b9fc04274f0537a84b17020b4",
+        "reason": "E-posta açık ve SMS kapalı değerleri yeni sağlayıcı anahtarlarına taşındı. Genel kayıt izni ve e-posta onay gereksinimi korunuyor."
       }
     },
     {
@@ -2266,8 +2266,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "f2f972d97a832193a8ee928732804b537b0cb03782f9c48577134b94e0e4c552",
-        "reason": "Terminal importun kaynak eşliği, saklama blokajları ve exact worker bağlantısı incelendi."
+        "fingerprint": "fc9c163b9de3b8e9d334dacd4c96934a78180e521219f9d4cb14f58528a7ec46",
+        "reason": "Standard Webhooks güncellemesi yerleşik imza doğrulama sınırını ve Resend yanıt sözleşmesini koruyor."
       }
     }
   ]

@@ -92,12 +92,20 @@ jobs:
           const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
           if(git('rev-parse','HEAD')!==reference.merge||git('rev-parse','HEAD^{tree}')!==reference.tree)throw Error('Source mismatch');
           JS
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          sparse-checkout: apps/backend/scripts/ci/install-corepack.sh
+          sparse-checkout-cone-mode: false
+          path: definition
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: 'source/.nvmrc'
       - run: |
           set -euo pipefail
-          corepack enable
+          corepack_bin="$(bash "$GITHUB_WORKSPACE/definition/apps/backend/scripts/ci/install-corepack.sh" "$RUNNER_TEMP/corepack")"
+          PATH="$corepack_bin:$PATH" corepack enable --install-directory "$(dirname "$(command -v node)")" pnpm
           pnpm --filter @ftksaas/backend... --filter ftksaas install --frozen-lockfile
         working-directory: source
       - name: Clean acceptance
@@ -164,7 +172,8 @@ jobs:
           node-version-file: 'source/.nvmrc'
       - run: |
           set -euo pipefail
-          corepack enable
+          corepack_bin="$(bash "$GITHUB_WORKSPACE/definition/apps/backend/scripts/ci/install-corepack.sh" "$RUNNER_TEMP/corepack")"
+          PATH="$corepack_bin:$PATH" corepack enable --install-directory "$(dirname "$(command -v node)")" pnpm
           pnpm --filter @ftksaas/backend... --filter ftksaas install --frozen-lockfile
         working-directory: source
       - name: Experimental API tests
