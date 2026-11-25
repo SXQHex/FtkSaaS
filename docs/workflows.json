@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "b8adde31b35380f28cd91c8516317d3089a13ae2d6df4e44ebae7450e23c3ce0",
-        "reason": "Migration envanteri bir kayıt arttı. Native Auth, oturum ve istemci taşıma sözleşmesi aynı davranışı sürdürüyor."
+        "fingerprint": "5da627dde25d0f78fbe3c3cab284ee3f758a742ae78f9ae4537c9434e2c22834",
+        "reason": "Aday envanterinde yalnız genişletilen okuma kilidi testinin kaynak özeti güncellendi. Test sahipliği ve çalıştırma kuralları korundu."
       }
     },
     {

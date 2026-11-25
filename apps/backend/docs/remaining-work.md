@@ -994,7 +994,7 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 <a id="o09"></a>
 ### O09 — Backup non-resurrection kabulü
 
-- [ ] **Durum:** Guard reddi testli, tam restore sonrası replay açık · **Tür:** H · **Plan:** Tümü · **Özellik:** F33
+- [ ] **Durum:** [Gerçek imha öncesi yedek bağımsız R2 siciliyle reddedildi](00-FtkSaaS-yeni-sohbet-devir.md#o09-gercek-r2-restore-reddi). Kapalı hedefte tam restore sonrası imha replay’i ve güvenli açılış açık · **Tür:** H · **Plan:** Tümü · **Özellik:** F33
 - **Bağımlılık:** O08
 - **Kabul:** Silme öncesi backup restore edilince silinmiş kişi/org erişime dönmez.
 - **Sınır/olumsuz durum:** Eski trust+ledger veya eksik sicil erişim açamaz.
