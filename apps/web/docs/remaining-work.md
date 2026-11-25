@@ -86,3 +86,10 @@
 
 - [x] **MONO-01 · Eski kabulün sonlandırılması.** Taşıma adayının ortak CI kabulü ve yayımlı sürümü aynı Git ağacına bağlandı. [Kaynak ve Cloudflare kanıtı](handover.md#monorepo-teslim-kabulu)
 - [x] **MONO-02 · Kişisel ICS derin linkleri.** Yayımlı SPA’da gerçek ICS bağlantılarından giriş ve öğrenci ile eğitmen ekranlarında canlı merkez ve rol eşleşmesi doğrulandı. [Kaynak ve ortam](handover.md#mono-02-kaynak-ve-ortam) · [İstemci protokolü](../../../docs/client-integration.md#statik-spa-transportu)
+
+<a id="ortak-talep-kabulleri"></a>
+
+## Ortak talep kabulleri
+
+- [ ] **XREQ-071 · Platform ödeme onayı.** Yetkili sentetik Platform operatörüyle gerçek bekleyen test ödemesinde son onay → ACK ve doğrulanmış ekran sonucunu, eş koşullarda önce/sonra ölç. [Kabul sözleşmesi](../../../docs/requests.md#xreq-071) · [Kontrollü tarayıcı ölçümü](handover.md#xreq-071-olcumu).
+- [x] **XREQ-042 · Yayımlı public başvuru.** Sentetik formda gerçek Turnstile, Worker gönderimi ve yetkili merkez gelen kutusu doğrulandı. [Canlı kabul](handover.md#xreq-042-canli-kabul).

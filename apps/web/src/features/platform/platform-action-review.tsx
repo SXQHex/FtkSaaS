@@ -26,10 +26,10 @@ export function PlatformActionReview<Intent, Result>({
   beforeWrite: (intent: Intent) => Promise<void>;
   write: (intent: Intent) => Promise<{ primary_id: string }>;
   read: (intent: Intent, id?: string) => Promise<Result>;
-  onResult: (result: Result) => Promise<void>;
+  onResult: (result: Result, assertCurrent: () => void) => Promise<void>;
   onClose: () => void;
   onReload?: () => void;
-  onDenied: () => void;
+  onDenied: (error: unknown) => void;
 }) {
   const { t } = useTranslation();
   const checking = useRef(false);
@@ -42,7 +42,7 @@ export function PlatformActionReview<Intent, Result>({
     onRefresh: onResult,
     onAccessLost: (error) => {
       if (!platformAccessDenied(error)) return false;
-      onDenied();
+      onDenied(error);
       return true;
     },
   });
@@ -54,7 +54,7 @@ export function PlatformActionReview<Intent, Result>({
       await beforeWrite(intent);
       await command.start(intent);
     } catch (error) {
-      if (platformAccessDenied(error)) onDenied();
+      if (platformAccessDenied(error)) onDenied(error);
       else setFailed(true);
     } finally {
       checking.current = false;

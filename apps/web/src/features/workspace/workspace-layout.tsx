@@ -5,7 +5,7 @@ import { useRouter, useRouterState } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { BellIcon, MoonIcon, UsersRoundIcon } from "lucide-react";
 import { hasWorkspaceManagementScope, readWorkspace, workspaceRoles } from "./workspace";
-import { workspaceQuery } from "./workspace-query";
+import { useWorkspaceQuery } from "./workspace-query";
 import { workspaceNavigation, workspacePersonalHref, type NavigationView } from "./navigation";
 import { NavigationSearch } from "./navigation-search";
 import { BackendError } from "../../lib/backend";
@@ -87,7 +87,7 @@ export function WorkspaceLayout({
   const selectedCenterId = scopeControl ? scopeControl.centerId : localCenterId;
   const [preferredView, setPreferredView] = useState<NavigationView>();
   const queries = useQueryClient();
-  const scope = useQuery(workspaceQuery(queries, accountId, organizationId));
+  const scope = useWorkspaceQuery(accountId, organizationId);
   useEffect(() => {
     const error = scope.error;
     if (

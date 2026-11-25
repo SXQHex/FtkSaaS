@@ -486,8 +486,9 @@ test("automation unknown write recovers via the exact receipt without another ef
   await expect(toggle).toBeEnabled();
   await toggle.focus();
   await expect(toggle).toBeFocused();
-  await activate(toggle, "Space");
+  await activate(toggle.locator('xpath=ancestor::label[@data-slot="switch"][1]'));
   const d = page.getByRole("alertdialog");
+  await expect(d).toBeVisible();
   await activate(d.getByRole("checkbox"), "Space");
   await activate(d.getByRole("button", { name: "Otomasyonu kapat", exact: true }));
   await activate(page.getByRole("button", { name: "İşlem sonucunu kontrol et", exact: true }));

@@ -11,6 +11,31 @@ export default defineConfig(({ command, mode }) => ({
   plugins: [
     ...(command === "serve" && mode === "development" ? [devtools()] : []),
     {
+      name: "e2e-http-response-bytes",
+      apply: (_config, env) => env.command === "serve" && env.mode === "e2e",
+      configureServer(server) {
+        server.middlewares.use((_request, response, next) => {
+          // Keep large Vite module strings out of the Node 26 HTTP fast path.
+          // https://github.com/nodejs/node/issues/66870
+          const end = response.end.bind(response);
+          response.end = (
+            ...args: [
+              chunk?: unknown,
+              encoding?: BufferEncoding | (() => void),
+              callback?: () => void,
+            ]
+          ) => {
+            const [chunk, encoding] = args;
+            if (typeof chunk === "string") {
+              args[0] = Buffer.from(chunk, typeof encoding === "string" ? encoding : undefined);
+            }
+            return Reflect.apply(end, undefined, args) as typeof response;
+          };
+          next();
+        });
+      },
+    },
+    {
       name: "e2e-oauth-redirect",
       apply: (_config, env) => env.command === "serve" && env.mode === "e2e",
       configureServer(server) {

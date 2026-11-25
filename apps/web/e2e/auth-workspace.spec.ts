@@ -1,5 +1,6 @@
 import { activate, closeWithDevice, hasTouchInput } from "./device-input.js";
 import { test, expect } from "./test.js";
+import type { Page } from "@playwright/test";
 import {
   closeWorkspaceNavigation,
   openWorkspaceNavigation,
@@ -18,6 +19,20 @@ import type {
 const org = "019a7b00-0000-7000-8000-000000000003",
   center = "019a7b00-0000-7000-8000-000000000004",
   person = "019a7b00-0000-7000-8000-000000000005";
+
+// These members are read in the browser. The E2E runner compiles with Node libraries.
+type HitTarget = {
+  closest(selectors: string): HitTarget | null;
+};
+
+type WorkspacePopover = {
+  getAnimations(): readonly { pending: boolean; playState: string }[];
+  contains(target: HitTarget): boolean;
+  ownerDocument: {
+    documentElement: { clientWidth: number; clientHeight: number };
+    elementFromPoint(x: number, y: number): HitTarget | null;
+  };
+};
 
 const shellViewports = [
   { width: 1440, height: 900 },
@@ -51,90 +66,94 @@ test("command palette reaches appearance, switches the saved theme and signs out
   await expect(page).toHaveURL(`${origin}/login`);
   await expect(page.locator("html")).not.toHaveAttribute("data-theme");
 });
-for (const colorScheme of ["light", "dark"] as const)
-  test(`ready workspace sidebar and mobile navigation ${colorScheme}`, async ({ page }) => {
-    await mockNative(page);
-    await page.setViewportSize(shellViewports[0]!);
-    await page.emulateMedia({ colorScheme });
-    await page.route("**/functions/v1/backend-v1/organizations_list_v1", (route) =>
-      route.fulfill({
-        json: {
-          ok: true,
-          data: {
-            items: [
-              {
-                id: org,
-                name: "Fixture Studio",
-                state: "active",
-                access_mode: "normal",
-                version: 1,
-                self_context: { person_id: person, subscriber_number: null, centers: [] },
-              },
-            ],
-            next_cursor: null,
-            as_of: "2026-11-14T06:00:00Z",
-          },
-          trace_id: org,
-        } satisfies SuccessOrganizationsList,
-      }),
-    );
-    await page.route("**/functions/v1/backend-v1/centers_list_v1", (route) =>
-      route.fulfill({
-        json: {
-          ok: true,
-          data: {
-            items: [
-              {
-                id: center,
-                name: "Fixture Center",
-                timezone: "Europe/Istanbul",
-                state: "active",
-                accessible: true,
-                version: 1,
-              },
-            ],
-            next_cursor: null,
-            as_of: "2026-11-14T06:00:00Z",
-          },
-          trace_id: org,
-        } satisfies SuccessCentersList,
-      }),
-    );
-    await page.route("**/functions/v1/backend-v1/roles_list_v1", (route) => {
-      expect(route.request().postDataJSON()).toMatchObject({ org_id: org, person_id: person });
-      return route.fulfill({
-        json: {
-          ok: true,
-          data: {
-            items: [
-              {
-                id: person,
-                person_id: person,
-                role: "owner",
-                scope_center_id: null,
-                state: "active",
-                version: 1,
-              },
-            ],
-            next_cursor: null,
-            as_of: "2026-11-14T06:00:00Z",
-          },
-          trace_id: org,
-        } satisfies SuccessRolesList,
-      });
+async function openReadyWorkspace(page: Page, colorScheme: "light" | "dark") {
+  await mockNative(page);
+  await page.setViewportSize(shellViewports[0]!);
+  await page.emulateMedia({ colorScheme });
+  await page.route("**/functions/v1/backend-v1/organizations_list_v1", (route) =>
+    route.fulfill({
+      json: {
+        ok: true,
+        data: {
+          items: [
+            {
+              id: org,
+              name: "Fixture Studio",
+              state: "active",
+              access_mode: "normal",
+              version: 1,
+              self_context: { person_id: person, subscriber_number: null, centers: [] },
+            },
+          ],
+          next_cursor: null,
+          as_of: "2026-11-14T06:00:00Z",
+        },
+        trace_id: org,
+      } satisfies SuccessOrganizationsList,
+    }),
+  );
+  await page.route("**/functions/v1/backend-v1/centers_list_v1", (route) =>
+    route.fulfill({
+      json: {
+        ok: true,
+        data: {
+          items: [
+            {
+              id: center,
+              name: "Fixture Center",
+              timezone: "Europe/Istanbul",
+              state: "active",
+              accessible: true,
+              version: 1,
+            },
+          ],
+          next_cursor: null,
+          as_of: "2026-11-14T06:00:00Z",
+        },
+        trace_id: org,
+      } satisfies SuccessCentersList,
+    }),
+  );
+  await page.route("**/functions/v1/backend-v1/roles_list_v1", (route) => {
+    expect(route.request().postDataJSON()).toMatchObject({ org_id: org, person_id: person });
+    return route.fulfill({
+      json: {
+        ok: true,
+        data: {
+          items: [
+            {
+              id: person,
+              person_id: person,
+              role: "owner",
+              scope_center_id: null,
+              state: "active",
+              version: 1,
+            },
+          ],
+          next_cursor: null,
+          as_of: "2026-11-14T06:00:00Z",
+        },
+        trace_id: org,
+      } satisfies SuccessRolesList,
     });
-    await page.goto(`${origin}/login`);
-    await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
-    await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-    await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
-    await expect(page).toHaveURL(`${origin}/account`);
-    await expect(page.getByRole("button", { name: /Fixture Studio Fixture Center/ })).toContainText(
-      "Fixture Studio",
-    );
-    await expect(page.getByRole("button", { name: /Fixture Account Stüdyo sahibi/ })).toContainText(
-      "Stüdyo sahibi",
-    );
-    await expect(page.locator("main")).toHaveCount(1);
+  });
+  await page.goto(`${origin}/login`);
+  await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
+  await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
+  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
+  await expect(page).toHaveURL(`${origin}/account`);
+  await expect(page.getByRole("button", { name: /Fixture Studio Fixture Center/ })).toContainText(
+    "Fixture Studio",
+  );
+  await expect(page.getByRole("button", { name: /Fixture Account Stüdyo sahibi/ })).toContainText(
+    "Stüdyo sahibi",
+  );
+  await expect(page.locator("main")).toHaveCount(1);
+}
+
+for (const colorScheme of ["light", "dark"] as const) {
+  test(`ready workspace sidebar and responsive layout ${colorScheme}`, async ({ page }) => {
+    await openReadyWorkspace(page, colorScheme);
     const rail = page.locator('[data-slot="sidebar-rail"]');
     await expect(rail).toBeVisible();
     expect((await rail.boundingBox())?.width).toBeGreaterThanOrEqual(24);
@@ -162,8 +181,12 @@ for (const colorScheme of ["light", "dark"] as const)
       assertLayoutFit(await readLayoutFit(page));
       await page.screenshot({ path: `.tmp/v67-shell-app-${viewport.width}-${colorScheme}.png` });
     }
+  });
+  test(`ready workspace sidebar and mobile navigation ${colorScheme}`, async ({ page }) => {
+    await openReadyWorkspace(page, colorScheme);
     await page.setViewportSize({ width: 390, height: 844 });
     const toggle = page.getByRole("button", { name: "Menüyü aç veya kapat", exact: true });
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
     await activate(toggle, "Enter");
     const dialog = page.getByRole("dialog", { name: "Ana menü", exact: true });
     await expect(dialog).toBeVisible();
@@ -182,20 +205,28 @@ for (const colorScheme of ["light", "dark"] as const)
     await activate(studioPicker);
     await expect(studioMenu).toBeVisible();
     if (hasTouchInput(page)) {
-      // React Aria dispatches outside dismissal from the document while the underlay is inert.
-      const outside = await studioMenu.evaluate((menu) => {
-        const { ownerDocument } = menu;
+      // Wait for the popover to settle before hit-testing the document outside it.
+      const popover = page.locator('[data-slot="dropdown-menu-content"]');
+      await expect
+        .poll(() =>
+          popover.evaluate((element: WorkspacePopover) =>
+            element
+              .getAnimations()
+              .some((animation) => animation.pending || animation.playState === "running"),
+          ),
+        )
+        .toBe(false);
+      const outside = await popover.evaluate((element: WorkspacePopover) => {
+        const { ownerDocument } = element;
         const { clientWidth, clientHeight } = ownerDocument.documentElement;
-        const corners = [
-          { x: 8, y: 8 },
-          { x: clientWidth - 8, y: 8 },
-          { x: 8, y: clientHeight - 8 },
-          { x: clientWidth - 8, y: clientHeight - 8 },
-        ];
-        return corners.find(({ x, y }) => {
-          const hit = ownerDocument.elementFromPoint(x, y);
-          return hit && !menu.contains(hit) && !hit.closest("button, a, input");
-        });
+        return [0.85, 0.15]
+          .flatMap((x) =>
+            [0.5, 0.75, 0.25].map((y) => ({ x: clientWidth * x, y: clientHeight * y })),
+          )
+          .find(({ x, y }) => {
+            const hit = ownerDocument.elementFromPoint(x, y);
+            return hit && !element.contains(hit) && !hit.closest("button, a, input, [inert]");
+          });
       });
       expect(outside).toBeDefined();
       await page.touchscreen.tap(outside!.x, outside!.y);
@@ -209,6 +240,9 @@ for (const colorScheme of ["light", "dark"] as const)
     await closeWithDevice(close);
     await expect(dialog).toHaveCount(0);
     await expect(toggle).toBeFocused();
+  });
+  test(`ready workspace account reflow ${colorScheme}`, async ({ page }) => {
+    await openReadyWorkspace(page, colorScheme);
     await page.setViewportSize({ width: 640, height: 1000 });
     await page.addStyleTag({
       content:
@@ -217,6 +251,7 @@ for (const colorScheme of ["light", "dark"] as const)
     expect(await page.evaluate("document.documentElement.scrollWidth>innerWidth")).toBe(false);
     expect((await scanAccessibility(page, "workspace-account-reflow")).violations).toEqual([]);
   });
+}
 
 test("Starter self management opens the native owner navigation and removes it after scope revocation", async ({
   page,
@@ -462,14 +497,19 @@ test("workspace entry offers authorized studios and keeps the selected center on
   await activate(page.getByRole("button", { name: "Menüyü aç veya kapat" }));
   await expect(page.getByRole("button", { name: /Açık stüdyo Seçilen merkez/ })).toBeVisible();
 
+  const scopedReports = page.getByRole("tab", { name: "Özet", exact: true });
   await activate(page.getByRole("link", { name: "Raporlar", exact: true }), "Enter");
   await expect(page).toHaveURL(`${origin}/reports`);
+  await expect(scopedReports).toBeVisible();
   await page.goBack();
   await expect(page).toHaveURL(`${origin}${accountHref}`);
+  await expect(page.getByRole("tab", { name: "Profil", exact: true })).toBeVisible();
   await page.goForward();
   await expect(page).toHaveURL(`${origin}/reports`);
-  await page.reload();
+  await expect(scopedReports).toBeVisible();
+  await page.reload({ waitUntil: "commit" });
   await expect(page).toHaveURL(`${origin}/reports`);
+  await expect(scopedReports).toBeVisible();
   await activate(page.getByRole("button", { name: "Menüyü aç veya kapat" }));
   await expect(page.getByRole("button", { name: /Açık stüdyo Seçilen merkez/ })).toBeVisible();
   await page.goto("/account");

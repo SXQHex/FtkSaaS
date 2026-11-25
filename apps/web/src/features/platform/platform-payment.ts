@@ -1,7 +1,11 @@
 import { z } from "zod";
 import { v7 as uuidv7 } from "uuid";
 import { BackendError } from "../../lib/backend";
-import { scopedBackend, type AccountReadContext } from "../../lib/scoped-backend";
+import {
+  scopedBackend,
+  scopedCommandBackend,
+  type AccountReadContext,
+} from "../../lib/scoped-backend";
 import { organizationAt, platformRequest, readDirectory } from "./platform-directory";
 
 const instant = z.iso.datetime({ offset: true });
@@ -76,6 +80,10 @@ export async function readPaymentDetail(
   readContext?: AccountReadContext,
 ) {
   const backend = await scopedBackend({ accountId }, undefined, readContext);
+  return readPaymentDetailFrom(backend, orgId, id);
+}
+
+async function readPaymentDetailFrom(backend: Backend, orgId: string, id: string) {
   const [row, organization] = await Promise.all([
     paymentAt(backend, orgId, id),
     organizationAt(backend, orgId),
@@ -172,8 +180,7 @@ export function parseGraceUntil(
 function stale(requestId: string) {
   return new BackendError({ code: "VERSION_CONFLICT", retryable: false, trace_id: requestId });
 }
-export async function writePlatformBilling(intent: BillingIntent) {
-  const backend = await scopedBackend(intent);
+async function submitBilling(intent: BillingIntent, backend: Backend) {
   const request = { ...platformRequest(), org_id: intent.orgId, operation_key: intent.key };
   if (intent.kind === "payment")
     return backend.call("saas_payment_verify_v1", {
@@ -189,9 +196,12 @@ export async function writePlatformBilling(intent: BillingIntent) {
   });
 }
 
+export async function writePlatformBilling(intent: BillingIntent) {
+  return submitBilling(intent, await scopedBackend(intent));
+}
+
 // Verify the version immediately before the first write. Recovery replays the same key without a new preflight.
-export async function confirmBillingSource(intent: BillingIntent) {
-  const backend = await scopedBackend(intent);
+async function assertBillingSource(intent: BillingIntent, backend: Backend) {
   if (intent.kind === "payment") {
     const row = await paymentAt(backend, intent.orgId, intent.id);
     if (row?.version !== intent.version || row.state !== "pending") throw stale(uuidv7());
@@ -208,10 +218,34 @@ export async function confirmBillingSource(intent: BillingIntent) {
   }
 }
 
-export async function readBillingResult(intent: BillingIntent, id?: string) {
+export async function confirmBillingSource(intent: BillingIntent) {
+  return assertBillingSource(intent, await scopedBackend(intent));
+}
+
+export async function preparePaymentDecision(source: BillingIntent & PaymentIntent) {
+  const intent = structuredClone(source);
+  const command = await scopedCommandBackend(intent);
+  await command.currentSession();
+  try {
+    await assertBillingSource(intent, command.backend);
+  } finally {
+    await command.currentSession();
+  }
+  return {
+    key: intent.key,
+    write: () => command.write((backend) => submitBilling(intent, backend)),
+    read: (id?: string) => command.readback((backend) => readBillingResult(intent, id, backend)),
+  };
+}
+
+export async function readBillingResult(intent: BillingIntent, id?: string, backend?: Backend) {
   if (id !== intent.id) throw Error("PLATFORM_BILLING_RESULT_INVALID");
   if (intent.kind === "payment") {
-    const result = await readPaymentDetail(intent.accountId, intent.orgId, id);
+    const result = await readPaymentDetailFrom(
+      backend ?? (await scopedBackend(intent)),
+      intent.orgId,
+      id,
+    );
     if (
       !result ||
       result.row.version <= intent.version ||

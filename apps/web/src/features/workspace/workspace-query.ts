@@ -1,6 +1,14 @@
-import { queryOptions, useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query";
+import { useCallback, useContext, useSyncExternalStore } from "react";
+import {
+  notifyManager,
+  queryOptions,
+  useQuery,
+  useQueryClient,
+  type QueryClient,
+} from "@tanstack/react-query";
 import { readWorkspace } from "./workspace";
 import { verifiedWorkspaceAccount } from "../auth/account-query";
+import { PrivateSessionRevision } from "../auth/private-session-revision";
 
 type Workspace = Awaited<ReturnType<typeof readWorkspace>>;
 
@@ -59,6 +67,30 @@ export function refreshWorkspace(queries: QueryClient, accountId: string, organi
 // The shell owns the live fetch. Feature screens only observe the same query
 // without initiating their own background read when disabled.
 export function useWorkspaceQuery(accountId: string, organizationId?: string, enabled = true) {
+  // Same-actor handoff evicts the underlying Query while views stay mounted.
+  // Rebind the observer to the replacement even if the route and props match.
+  useContext(PrivateSessionRevision);
   const queries = useQueryClient();
-  return useQuery({ ...workspaceQuery(queries, accountId, organizationId), enabled });
+  const options = queries.defaultQueryOptions({
+    ...workspaceQuery(queries, accountId, organizationId),
+    enabled,
+  });
+  const workspace = useQuery(options);
+  const cache = queries.getQueryCache();
+  const { queryHash } = options;
+  // A concurrent access check can evict the workspace again in the same
+  // revision. Observe replacement of the entry and let useQuery own the data.
+  useSyncExternalStore(
+    useCallback(
+      (notify: () => void) => {
+        const onRemoval = notifyManager.batchCalls(notify);
+        return cache.subscribe((event) => {
+          if (event.type === "removed" && event.query.queryHash === queryHash) onRemoval();
+        });
+      },
+      [cache, queryHash],
+    ),
+    () => cache.get(queryHash),
+  );
+  return workspace;
 }

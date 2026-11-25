@@ -1,5 +1,5 @@
-import { useId, useRef, useState } from "react";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useContext, useId, useRef, useState } from "react";
+import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { Badge } from "@ftksaas/ui/components/badge";
@@ -16,6 +16,8 @@ import {
   TableRow,
 } from "@ftksaas/ui/components/table";
 import { Textarea } from "@ftksaas/ui/components/textarea";
+import { privateQueryRevision } from "../../lib/cache-invalidation";
+import { PrivateSessionRevision } from "../auth/private-session-revision";
 import { formatMinorAmount } from "../../lib/money";
 import { PlatformReadError } from "./platform-read-error";
 import { PlatformBillingReview } from "./platform-billing-review";
@@ -193,11 +195,19 @@ export function PlatformPaymentDetail({
   onDenied: () => void;
 }) {
   const { t } = useTranslation();
+  const queries = useQueryClient();
+  const sessionRevision = useContext(PrivateSessionRevision);
   const reasonId = useId();
   const reasonField = useRef<HTMLTextAreaElement>(null);
   const [reason, setReason] = useState("");
   const [invalid, setInvalid] = useState(false);
-  const [review, setReview] = useState<{ intent: BillingIntent; title: string; detail: string }>();
+  const [review, setReview] = useState<{
+    intent: BillingIntent;
+    title: string;
+    detail: string;
+    scopeRevision: number;
+    sessionRevision: number;
+  }>();
   const key = ["platform-payment", accountId, orgId, paymentId];
   const query = useQuery({
     queryKey: key,
@@ -217,6 +227,8 @@ export function PlatformPaymentDetail({
       return;
     }
     setReview({
+      scopeRevision: privateQueryRevision(queries),
+      sessionRevision,
       intent: billingIntent(accountId, orgId, {
         kind: "payment",
         id: row.id,
@@ -338,12 +350,17 @@ export function PlatformPaymentDetail({
           <AlertDescription>{t(($) => $.platform.billing.missing)}</AlertDescription>
         </Alert>
       )}
-      {review && (
+      {review?.sessionRevision === sessionRevision && (
         <PlatformBillingReview
+          key={review.intent.key}
           {...review}
           sourceKey={key}
           onDenied={onDenied}
-          onClose={() => setReview(undefined)}
+          onClose={() =>
+            setReview((current) =>
+              current?.intent.key === review.intent.key ? undefined : current,
+            )
+          }
         />
       )}
     </>
