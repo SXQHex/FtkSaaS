@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "5da627dde25d0f78fbe3c3cab284ee3f758a742ae78f9ae4537c9434e2c22834",
-        "reason": "Aday envanterinde yalnız genişletilen okuma kilidi testinin kaynak özeti güncellendi. Test sahipliği ve çalıştırma kuralları korundu."
+        "fingerprint": "bcb00b59d581db715ae7e155e08f4b375d8fab2d0cfa9a4976c42876090a9e60",
+        "reason": "Migration envanteri bir arttı. İstemci sözleşmesi ve mevcut yerel CI kapsamı korunuyor."
       }
     },
     {
@@ -2054,6 +2054,7 @@
         "apps/backend/supabase/migrations/20261124233946_organization_projected_contact_erasure.sql",
         "apps/backend/scripts/organization-erasure-receipt.mjs",
         "apps/backend/supabase/migrations/20261125005753_organization_live_database_erasure.sql",
+        "apps/backend/supabase/migrations/20261125121407_organization_erasure_scheduler_cursor.sql",
         "apps/backend/supabase/migrations/20261125005455_organization_managed_file_erasure.sql",
         "apps/backend/scripts/r2-erasure-state.mjs",
         "apps/backend/scripts/r2-s3-object-store.mjs",
@@ -2104,8 +2105,8 @@
         "platform_operator_access_set_v1"
       ],
       "review": {
-        "fingerprint": "b47aff24a26782ff8a1d3354af086d2f50e30a5d988512e7e10037c0d058ac6d",
-        "reason": "Yerel ücretli satış ve CRM kabulü doğrulandı. Kalıcı AB R2 koşusu karşı bucket okumasını sentetik makbuzdan önce reddeder."
+        "fingerprint": "bfd46a83ed454468eafeeaa2a7498777c0a86978796ed13523651c31f511295d",
+        "reason": "Organizasyon imhası scheduler sağlık satırının yalnız son organizasyon alanındaki teknik referansı tanır. Başka alanlarda aynı kapsama ait referanslar imhayı durdurur."
       }
     },
     {

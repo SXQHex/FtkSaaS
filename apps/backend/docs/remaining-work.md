@@ -989,7 +989,7 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 - **Sınır/olumsuz durum:** Tek SQL veya dosya restore bütün kabul değildir; kaynak hedef ayrıdır.
 - **Doğrulama senaryosu:** DB mutabakatı, gerçek giriş, Storage checksum; Edge/config/secret envanteri ve worker binding doğrulaması.
 - **Kaynak alanı:** restore runbook ve mevcut araçlar
-- **Kalan:** [Tam restore prosedüründe](remote-backend-setup.md#managed-restore-prosedürünün-sınırı) öngörülen dış sağlayıcı yapılandırmasını, gereken sırların hedefte yeniden sağlanmasını ve bu ayarlara bağlı işlevleri [hazırlanan karşılaştırmayla](remote-backend-setup.md#izole-restore-on-kontrol) doğrula. [Hedefin son envanteri](00-FtkSaaS-yeni-sohbet-devir.md#o08-o10-hedef-on-kontrol).
+- **Kalan:** [Hedefin son envanterinde](00-FtkSaaS-yeni-sohbet-devir.md#o08-o10-hedef-on-kontrol) doğrulanan P01, P05, P06 ve P07 işlerine ek olarak privacy Cron’unun gerçek iş kabulünü tamamla. [Tam restore prosedüründe](remote-backend-setup.md#managed-restore-prosedürünün-sınırı) öngörülen dış sağlayıcı yapılandırmasını ve gereken sırların hedefte yeniden sağlanmasını [hazırlanan karşılaştırmayla](remote-backend-setup.md#izole-restore-on-kontrol) doğrula.
 
 <a id="o09"></a>
 ### O09 — Backup non-resurrection kabulü
