@@ -994,7 +994,7 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 <a id="o09"></a>
 ### O09 — Backup non-resurrection kabulü
 
-- [ ] **Durum:** Guard reddi testli, tam restore sonrası replay açık · **Tür:** H · **Plan:** Tümü · **Özellik:** F33
+- [ ] **Durum:** [Gerçek imha öncesi yedek bağımsız R2 siciliyle reddedildi](00-FtkSaaS-yeni-sohbet-devir.md#o09-gercek-r2-restore-reddi). Kapalı hedefte tam restore sonrası imha replay’i ve güvenli açılış açık · **Tür:** H · **Plan:** Tümü · **Özellik:** F33
 - **Bağımlılık:** O08
 - **Kabul:** Silme öncesi backup restore edilince silinmiş kişi/org erişime dönmez.
 - **Sınır/olumsuz durum:** Eski trust+ledger veya eksik sicil erişim açamaz.
@@ -1005,7 +1005,7 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 <a id="o10"></a>
 ### O10 — Yük ve kurtarma hedeflerini ölç
 
-- [ ] **Durum:** [Yerel okuma ve kritik yazma ölçümleri](00-FtkSaaS-yeni-sohbet-devir.md#o10-yerel-business-on-olcum) gecikme hedeflerini aştı. Tam hosted pilot ve RPO/RTO kabulü açık · **Tür:** D/H · **Plan:** Tümü · **Özellik:** F01,F08,F19,F28,F33
+- [ ] **Durum:** [İlk hosted dalga ve kilit tanısı](00-FtkSaaS-yeni-sohbet-devir.md#o08-o10-hedef-on-kontrol) gecikme hedeflerinin aşıldığını gösterdi. Yerel düzeltme doğrulandı. Düzeltilmiş kaynakla tam hosted pilot ve RPO/RTO kabulü açık · **Tür:** D/H · **Plan:** Tümü · **Özellik:** F01,F08,F19,F28,F33
 - **Bağımlılık:** O02,O08
 - **Kabul:** Ayrı altyapı projesinde belirlenecek veri hacmi ve iş karışımıyla gecikme/queue/finans doğruluğu ve kurtarma hedefleri ölçülür. G02/G01/G03 için plan başına ayrı işletim kabulü oluşturmaz.
 - **Sınır/olumsuz durum:** Öğrenci sayısı eşzamanlı kullanıcı sayısı değildir; onaylanmamış SLA/eşik uydurulmaz.
