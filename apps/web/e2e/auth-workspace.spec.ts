@@ -172,6 +172,7 @@ for (const colorScheme of ["light", "dark"] as const) {
     await openReadyWorkspace(page, colorScheme);
     await page.setViewportSize({ width: 390, height: 844 });
     const toggle = page.getByRole("button", { name: "Menüyü aç veya kapat", exact: true });
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
     await activate(toggle, "Enter");
     const dialog = page.getByRole("dialog", { name: "Ana menü", exact: true });
     await expect(dialog).toBeVisible();
@@ -190,20 +191,28 @@ for (const colorScheme of ["light", "dark"] as const) {
     await activate(studioPicker);
     await expect(studioMenu).toBeVisible();
     if (hasTouchInput(page)) {
-      // React Aria dispatches outside dismissal from the document while the underlay is inert.
-      const outside = await studioMenu.evaluate((menu) => {
-        const { ownerDocument } = menu;
+      // Wait for the popover to settle before hit-testing the document outside it.
+      const popover = page.locator('[data-slot="dropdown-menu-content"]');
+      await expect
+        .poll(() =>
+          popover.evaluate((element) =>
+            element
+              .getAnimations()
+              .some((animation) => animation.pending || animation.playState === "running"),
+          ),
+        )
+        .toBe(false);
+      const outside = await popover.evaluate((element) => {
+        const { ownerDocument } = element;
         const { clientWidth, clientHeight } = ownerDocument.documentElement;
-        const corners = [
-          { x: 8, y: 8 },
-          { x: clientWidth - 8, y: 8 },
-          { x: 8, y: clientHeight - 8 },
-          { x: clientWidth - 8, y: clientHeight - 8 },
-        ];
-        return corners.find(({ x, y }) => {
-          const hit = ownerDocument.elementFromPoint(x, y);
-          return hit && !menu.contains(hit) && !hit.closest("button, a, input");
-        });
+        return [0.85, 0.15]
+          .flatMap((x) =>
+            [0.5, 0.75, 0.25].map((y) => ({ x: clientWidth * x, y: clientHeight * y })),
+          )
+          .find(({ x, y }) => {
+            const hit = ownerDocument.elementFromPoint(x, y);
+            return hit && !element.contains(hit) && !hit.closest("button, a, input, [inert]");
+          });
       });
       expect(outside).toBeDefined();
       await page.touchscreen.tap(outside!.x, outside!.y);
@@ -474,14 +483,19 @@ test("workspace entry offers authorized studios and keeps the selected center on
   await activate(page.getByRole("button", { name: "Menüyü aç veya kapat" }));
   await expect(page.getByRole("button", { name: /Açık stüdyo Seçilen merkez/ })).toBeVisible();
 
+  const scopedReports = page.getByRole("tab", { name: "Özet", exact: true });
   await activate(page.getByRole("link", { name: "Raporlar", exact: true }), "Enter");
   await expect(page).toHaveURL(`${origin}/reports`);
+  await expect(scopedReports).toBeVisible();
   await page.goBack();
   await expect(page).toHaveURL(`${origin}${accountHref}`);
+  await expect(page.getByRole("tab", { name: "Profil", exact: true })).toBeVisible();
   await page.goForward();
   await expect(page).toHaveURL(`${origin}/reports`);
-  await page.reload();
+  await expect(scopedReports).toBeVisible();
+  await page.reload({ waitUntil: "commit" });
   await expect(page).toHaveURL(`${origin}/reports`);
+  await expect(scopedReports).toBeVisible();
   await activate(page.getByRole("button", { name: "Menüyü aç veya kapat" }));
   await expect(page.getByRole("button", { name: /Açık stüdyo Seçilen merkez/ })).toBeVisible();
   await page.goto("/account");

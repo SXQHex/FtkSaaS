@@ -1,6 +1,8 @@
+import { useContext } from "react";
 import { queryOptions, useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { readWorkspace } from "./workspace";
 import { verifiedWorkspaceAccount } from "../auth/account-query";
+import { PrivateSessionRevision } from "../auth/private-session-revision";
 
 type Workspace = Awaited<ReturnType<typeof readWorkspace>>;
 
@@ -59,6 +61,9 @@ export function refreshWorkspace(queries: QueryClient, accountId: string, organi
 // The shell owns the live fetch. Feature screens only observe the same query
 // without initiating their own background read when disabled.
 export function useWorkspaceQuery(accountId: string, organizationId?: string, enabled = true) {
+  // Same-actor handoff evicts the underlying Query while views stay mounted.
+  // Rebind the observer to the replacement even if the route and props match.
+  useContext(PrivateSessionRevision);
   const queries = useQueryClient();
   return useQuery({ ...workspaceQuery(queries, accountId, organizationId), enabled });
 }
