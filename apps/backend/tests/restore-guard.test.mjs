@@ -24,7 +24,7 @@ test('signed malformed request ID array is rejected',()=>{const x=fixture();cons
 for(const name of ['snapshot','captured_at'])test('snapshot metadata cannot hide structured payload in '+name,()=>{const x=fixture();const data=JSON.parse(x.snapshotBytes);data[name]={hidden_rows:[{id:erased}]};x.snapshotBytes=Buffer.from(JSON.stringify(data));x.trust.snapshot_sha256=sha256(x.snapshotBytes);assert.throws(()=>inspectRestore(x),/INVALID_SNAPSHOT/);});
 
 // Real disk + Ed25519 adapter tests: no database/provider substitutes.
-const {appendErasure,rotateErasureRegister,signErasureCheckpointRotation,publishErasureCheckpoint,readErasureCheckpoint}=await import('../scripts/erasure-register.mjs');
+const {appendErasure,appendAndPublishErasure,rotateErasureRegister,signErasureCheckpointRotation,publishErasureCheckpoint,readErasureCheckpoint}=await import('../scripts/erasure-register.mjs');
 const fs=await import('node:fs');const path=await import('node:path');const os=await import('node:os');
 function diskFixture(run){const dir=fs.mkdtempSync(path.join(os.tmpdir(),'erasure-register-'));try{return run(path.join(dir,'ledger.json'));}finally{fs.rmSync(dir,{recursive:true,force:true});}}
 function appendArgs(file){return{file,privateKeyPem:privateKey.export({type:'pkcs8',format:'pem'}),publicKeyPem:pem,sourceProjectRef:'abcdefghijklmnopqrst',expectedHead:null,expectedSequence:0,entry:{request_id:request,kind:'account',subject_ids:[erased],completed_at:'2026-10-29T10:00:00.000Z'},now:'2026-10-29T11:00:00.000Z'};}
@@ -32,6 +32,39 @@ test('durable register signs a verifiable head and replay is byte-identical',()=
 test('stale writer and conflicting receipt cannot overwrite register',()=>diskFixture(file=>{const args=appendArgs(file),first=appendErasure(args);assert.throws(()=>appendErasure(args),/REGISTER_HEAD_CONFLICT/);assert.throws(()=>appendErasure({...args,expectedHead:first.sha256,expectedSequence:1,entry:{...args.entry,subject_ids:[other]}}),/ERASURE_RECEIPT_CONFLICT/);assert.equal(sha256(fs.readFileSync(file)),first.sha256);}));
 test('another writer lock is not removed and crash pending file is not overwritten',()=>diskFixture(file=>{const args=appendArgs(file);fs.writeFileSync(file+'.lock','');assert.throws(()=>appendErasure(args),/EEXIST/);assert(fs.existsSync(file+'.lock'));fs.unlinkSync(file+'.lock');fs.writeFileSync(file+'.pending','ambiguous');assert.throws(()=>appendErasure(args),/REGISTER_RECOVERY_REQUIRED/);assert.equal(fs.readFileSync(file+'.pending','utf8'),'ambiguous');assert(!fs.existsSync(file));}));
 test('invalid receipt cannot create a head or leave a normal-call lock',()=>diskFixture(file=>{const args=appendArgs(file);assert.throws(()=>appendErasure({...args,entry:{...args.entry,subject_ids:[]}}),/INVALID_ERASURE_ENTRY/);assert(!fs.existsSync(file));assert(!fs.existsSync(file+'.lock'));}));
+
+test('receipt append publishes the same verified head and can replay without another write',()=>diskFixture(file=>{
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'verified-erasure-checkpoint-'));
+ try{
+  const args=appendArgs(file),checkpointFile=path.join(dir,'current.json');
+  const publication={...args,checkpointFile};
+  const first=appendAndPublishErasure(publication);
+  assert.equal(first.sequence,1);
+  assert.equal(first.sha256,sha256(fs.readFileSync(file)));
+  assert.equal(readErasureCheckpoint(publication).ledger_sha256,first.sha256);
+  const replay=appendAndPublishErasure(publication);
+  assert.deepEqual(replay,{...first,replayed:true});
+  const entry={...args.entry,request_id:other,subject_ids:[other]};
+  assert.equal(appendAndPublishErasure({...publication,entry}).sequence,2);
+  assert.equal(readErasureCheckpoint(publication).ledger_sequence,2);
+  assert.deepEqual(JSON.parse(fs.readFileSync(file)).erasures,[args.entry,entry]);
+ }finally{fs.rmSync(dir,{recursive:true,force:true});}
+}));
+
+test('an interrupted receipt publication blocks the previously published checkpoint',()=>diskFixture(file=>{
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'interrupted-erasure-checkpoint-'));
+ try{
+  const args=appendArgs(file),checkpointFile=path.join(dir,'current.json'),publication={...args,checkpointFile};
+  const first=appendAndPublishErasure(publication);
+  fs.writeFileSync(checkpointFile+'.next','conflicting publication stage');
+  const entry={...args.entry,request_id:other,subject_ids:[other]};
+  assert.throws(()=>appendAndPublishErasure({...publication,entry}),{code:'EEXIST'});
+  assert.equal(JSON.parse(fs.readFileSync(checkpointFile)).ledger_sha256,first.sha256);
+  assert.equal(JSON.parse(fs.readFileSync(file)).sequence,2);
+  assert.throws(()=>readErasureCheckpoint(publication),/CHECKPOINT_RECOVERY_REQUIRED/);
+  assert.throws(()=>appendAndPublishErasure({...publication,entry}),/CHECKPOINT_RECOVERY_REQUIRED/);
+ }finally{fs.rmSync(dir,{recursive:true,force:true});}
+}));
 
 function rotationArgs(args,head){
  const pair=generateKeyPairSync('ed25519');
@@ -303,3 +336,4 @@ test('Unix server transport requires explicit null approval, never a missing add
  const missing={...restoreTarget};delete missing.server_address;
  assert.throws(()=>validateRestoreTarget('postgresql://127.0.0.1/ftk_restore_probe',missing),/ISOLATED_RESTORE_TARGET_REQUIRED/);
 });
+import './r2-erasure-state-unit.mjs';

@@ -4,7 +4,7 @@ type Column={source_column:string;target:string};
 const targets=new Set(['display_name','email','phone','source_key','person_ref','opening_credits','opening_debt_minor','opening_credit_value_minor','currency','product_version_ref','start_date','end_date']);
 // Strict RFC4180, including escaped quotes and quoted line breaks. Headers are
 // exact, unique names; malformed structure fails the file, typed values fail a row.
-export function parseImportCsv(text:string,mapping:{columns:Column[];delimiter?:','|';';kind?:'students'|'crm_applications'},maxRows:number){
+export function parseImportCsv(text:string,mapping:{columns:Column[];delimiter?:','|';';kind?:'students'|'crm_applications'},maxRows:number,requireCompleteMapping=false){
  const crm=mapping.kind==='crm_applications';if(mapping.kind!==undefined&&!['students','crm_applications'].includes(mapping.kind))throw Error('VALIDATION_FAILED');
  const allowed=crm?new Set(['source_key','display_name','phone','email','interest','message','partner_name','mode','consents','source_url']):targets;
  const delimiter=mapping.delimiter===undefined?',':mapping.delimiter;
@@ -32,7 +32,7 @@ export function parseImportCsv(text:string,mapping:{columns:Column[];delimiter?:
   if(!allowed.has(c.target)||!headers.includes(c.source_column)||source.has(c.source_column)||(seen.has(c.target)&&!(crm?[]:['email','phone']).includes(c.target)))throw Error('VALIDATION_FAILED');
   source.add(c.source_column);seen.add(c.target);
  }
- if(!seen.has('source_key')||!seen.has('display_name')||crm&&!seen.has('phone'))throw Error('VALIDATION_FAILED');
+ if((requireCompleteMapping&&source.size!==headers.length)||!seen.has('source_key')||!seen.has('display_name')||crm&&!seen.has('phone'))throw Error('VALIDATION_FAILED');
  const keys=new Set<string>();
  return lines.map((cells,index)=>{
   const fieldErrors:string[]=[];const payload:Record<string,unknown>={},contacts:{kind:string;value:string}[]=[];let error:string|null=cells.length!==headers.length?'VALIDATION_FAILED':null;

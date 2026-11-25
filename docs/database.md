@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `c2c54546da3eda9eb118efac4d2b0465e400a83bb1d17b9438f634930188f65e`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `6ffe325145b440ba75a49ae95c43f44f6ef0547e8a84695918c60883c80f95e9`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 234. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 256. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -242,3 +242,25 @@ Sıralı migration: 234. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261124230835_organization_operational_erasure.sql](../apps/backend/supabase/migrations/20261124230835_organization_operational_erasure.sql) | `af4aecf877911100b3a27781edd131e88f69c935039b49ea6c4499e27234e9ca` |
 | [20261124233740_organization_import_copy_erasure.sql](../apps/backend/supabase/migrations/20261124233740_organization_import_copy_erasure.sql) | `e918bf468ea3a9099c751ab58401993acac3cde5cff8be2a53f40ddf28d3a463` |
 | [20261124233946_organization_projected_contact_erasure.sql](../apps/backend/supabase/migrations/20261124233946_organization_projected_contact_erasure.sql) | `e9b251fdb46fc8eddc3c4ac76aa69dc2adcbfe719aad5b1ab0be8627100609bc` |
+| [20261125005455_organization_managed_file_erasure.sql](../apps/backend/supabase/migrations/20261125005455_organization_managed_file_erasure.sql) | `bee148b66cd0c7da53747e0c8d3041226fdf4fb8a2e79468c8266d0628c93a4d` |
+| [20261125005753_organization_live_database_erasure.sql](../apps/backend/supabase/migrations/20261125005753_organization_live_database_erasure.sql) | `d65bfd1c955035aaf32319bb352333076e8ce9dfc88f312fe9ccce54f244ac67` |
+| [20261125023500_organization_invoice_erasure.sql](../apps/backend/supabase/migrations/20261125023500_organization_invoice_erasure.sql) | `1795d8f528e72fcefb15c58fe6faa2da3c9e0c5ca2e63567d992426ae8409242` |
+| [20261125030500_organization_billing_erasure.sql](../apps/backend/supabase/migrations/20261125030500_organization_billing_erasure.sql) | `7fc6908f2678dce68778a1265265762134a77de8fab6394a055e843544049998` |
+| [20261125034500_organization_billing_history_erasure.sql](../apps/backend/supabase/migrations/20261125034500_organization_billing_history_erasure.sql) | `95898d68b954958dddc3c7d9d8c32eaa3f3c3f3c5af5def409e383166414cc81` |
+| [20261125040500_organization_signed_document_erasure.sql](../apps/backend/supabase/migrations/20261125040500_organization_signed_document_erasure.sql) | `f7c20488d36740876a8e8527d804a609b9a763efb954b95699c88769a2b5c0f8` |
+| [20261125041500_organization_media_erasure.sql](../apps/backend/supabase/migrations/20261125041500_organization_media_erasure.sql) | `e7f6799da1d84b8db08e84ce7f283a7b318c031b254294354f0f5f536046a1a3` |
+| [20261125042500_organization_signed_document_storage_erasure.sql](../apps/backend/supabase/migrations/20261125042500_organization_signed_document_storage_erasure.sql) | `a7ecf532a454ca4f11a324db917bbb0f41379cf65cffe661c9cd6e81495c1b4b` |
+| [20261125043500_organization_sale_erasure.sql](../apps/backend/supabase/migrations/20261125043500_organization_sale_erasure.sql) | `76da9747e8f7c0d1aa5dc8790d9c43df5ae0ee7cb6a92f1e883adc7adb5792bb` |
+| [20261125044500_organization_directory_erasure.sql](../apps/backend/supabase/migrations/20261125044500_organization_directory_erasure.sql) | `1c3f8ed967c2e3ad0cce25b5f2df81f187f803d6e407a38a36ccf874a8763494` |
+| [20261125045500_organization_erasure_commit_fences.sql](../apps/backend/supabase/migrations/20261125045500_organization_erasure_commit_fences.sql) | `edd53fbf6a6ac88133a59008813ef6107dd6030bda74c01c4b201edd7bc09724` |
+| [20261125050500_organization_erasure_intake.sql](../apps/backend/supabase/migrations/20261125050500_organization_erasure_intake.sql) | `5dd89490b3b72f6c439b107df4c1c8279921da85dce96d5eb12be15c43861af0` |
+| [20261125051500_organization_erasure_register_pending.sql](../apps/backend/supabase/migrations/20261125051500_organization_erasure_register_pending.sql) | `960d0e0acee85a8c90d5f4b828d07567abe964fda3157ae5b120d30fe038b4f8` |
+| [20261125052500_organization_erasure_pending_claim.sql](../apps/backend/supabase/migrations/20261125052500_organization_erasure_pending_claim.sql) | `2414cb7a9d508201a39ce6ba4f4c844861e4bf68d1651d732956625ec841bfcf` |
+| [20261125053500_organization_erasure_abandoned_previews.sql](../apps/backend/supabase/migrations/20261125053500_organization_erasure_abandoned_previews.sql) | `960e5e6b015ba754ded18821584987e43a83a4531fcd205bec0b730f427fc9ad` |
+| [20261125054500_organization_linked_import_source_erasure.sql](../apps/backend/supabase/migrations/20261125054500_organization_linked_import_source_erasure.sql) | `bf5d552a50b949dd05bbedaed14e537c09f1d924e02cf9493233dfae4f9275a0` |
+| [20261125055500_organization_linked_import_storage_attestation.sql](../apps/backend/supabase/migrations/20261125055500_organization_linked_import_storage_attestation.sql) | `a9e273d0f4170adecc121551755d4f9c756629f0bd12fbd21c4255444ab3d1ac` |
+| [20261125060500_organization_import_rejected_row_hold_evidence.sql](../apps/backend/supabase/migrations/20261125060500_organization_import_rejected_row_hold_evidence.sql) | `c9fa85409327b753d6d88da013c4384e040ed28c2fc31e56b67f287864c9a8fc` |
+| [20261125061500_organization_import_directory_erasure.sql](../apps/backend/supabase/migrations/20261125061500_organization_import_directory_erasure.sql) | `e8c44954356fe60b177ce8612b34d0300bd3d013421a99d8d3188174b99b1607` |
+| [20261125062500_crm_import_copy_retention_holds.sql](../apps/backend/supabase/migrations/20261125062500_crm_import_copy_retention_holds.sql) | `767f47b3fc53f36397ab1fba8af2c7dca8d2705a0bcd81a972f4e420d76a9b17` |
+| [20261125064500_organization_settled_student_sale_erasure.sql](../apps/backend/supabase/migrations/20261125064500_organization_settled_student_sale_erasure.sql) | `3b028805f183738ba6a600c46f059004a7a484525e252b000a1d06efb67bd3b8` |
+| [20261125080144_crm_import_source_storage_erasure.sql](../apps/backend/supabase/migrations/20261125080144_crm_import_source_storage_erasure.sql) | `47ec6d96939e002505fbaea11082dfc541b40c0b6301810f105993aec9ec86b0` |
