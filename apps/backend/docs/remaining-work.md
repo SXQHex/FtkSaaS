@@ -923,7 +923,7 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 
 **Uygulama güvenlik geçmişi:** Hedef hesabın geçmiş oturum kimliğini temizleme aşaması [native aday ve main kabulünü](00-FtkSaaS-yeni-sohbet-devir.md#o04-guvenlik-gecmisi) geçti. Organizasyon imhası ve kalan karma yüzeylerin kabulü açık.
 
-**Organizasyon DB imhası:** Fatura, mutabakatlı SaaS tahsilatı, imzalı belge, sonlandırılmış bedelsiz satış, merkez ve üyelik bağları ile kritik işlem geçmişini içeren karma organizasyon [tam sentetik DB imha makbuzunu](00-FtkSaaS-yeni-sohbet-devir.md#o06-r2-pilot) üretti. Silme gerekçesinin canlı kopyaları işlem ve saklama blokajı bağıyla temizlenir. Canlı kopyayı temizleyen işlem başka organizasyonları ve ortak giriş hesaplarını korur. Ücretli veya hizmet ifasına bağlı satış/hak geçmişi ile etkin belge bağı için onaylı saklama kapsamına bağlı doğrulama gerekir. Doğrulanmış öğrenci importunun canlı iş, satır, önizleme ve kaynak eşlemesi mevcut dizin arşivi adımında imha edilir. Mali kayıt üreten importlar ve kaynağı doğrulanamayan işler kendi saklama ve imha kabulünü bekler. [Kalıcı silme kapsamı](../../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md#kalıcı-silme-kapsamı).
+**Organizasyon DB imhası:** Fatura, mutabakatlı SaaS tahsilatı, imzalı belge, sonlandırılmış bedelsiz satış, merkez ve üyelik bağları ile kritik işlem geçmişini içeren karma organizasyon [tam sentetik DB imha makbuzunu](00-FtkSaaS-yeni-sohbet-devir.md#o06-r2-pilot) üretti. Tek nakit tahsilatla kapanmış öğrenci satışının finans ve denetim kanıtı aynı pakette ayrı yerel senaryoda arşivlendi ve canlı kaynakları kaldırıldı. Silme gerekçesinin canlı kopyaları işlem ve saklama blokajı bağıyla temizlenir. Başka organizasyonlar ve ortak giriş hesapları korunur. Hizmet ifası, etkin belge bağı, karma finansman ve kaynağı belirsiz importlar [onaylı saklama kapsamına](remote-backend-setup.md#bagimsiz-arsiv-ve-sicil-taslagi) göre incelenir. [Kalıcı silme kapsamı](../../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md#kalıcı-silme-kapsamı).
 
 **Bağımsız iletişim kayıtları:** Kuruluşa bağlı ayrı P07 yetkisi, ortak hesap veya birleştirilmiş kişiyle bağlı olmayan e-posta ve telefon kayıtlarını sınırlı gruplar halinde temizler. Kayıt, kişi, merkez veya organizasyon blokajı geçerlidir. [Native aday ve development teslimi](00-FtkSaaS-yeni-sohbet-devir.md#o04-o07-kapanis-tatbikati) doğrulandı. Kalan karma veri ve gerekli arşiv kayıtlarının ayrımı açık.
 
@@ -940,7 +940,7 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 - **Sınır/olumsuz durum:** Metadata silmek bayt silmek değildir; izinli hold ve retry sınırları korunur.
 - **Doğrulama senaryosu:** Dosya/download kalıntısı, kesinti/retry ve expiry; checksum/envanter ile kanıt.
 - **Kaynak alanı:** Storage/export/temp executor; ilgili acceptance
-- **Kalan:** Özgün dosya veya satır eşliği doğrulanamayan eski import dosyaları, CRM kaynak CSV’si, diğer işleme/aktarım kopyaları ve aktif kullanıma bağlı belge dosyaları için gerekli saklama kararı ile bayt ve indirme yokluğu kabulü. Fatura, yüklemeli imzalı belge, güncel/geçmiş logo ve satış önizlemesi içeren [karma R2 tatbikatında dosya makbuzu](00-FtkSaaS-yeni-sohbet-devir.md#o06-r2-pilot) tamamlandı.
+- **Kalan:** Kaynak veya satır eşliği doğrulanamayan, saklanması gereken kanıt taşıyan ya da aktif kullanıma bağlı dosyalar [onaylı saklama kuralına](remote-backend-setup.md#bagimsiz-arsiv-ve-sicil-taslagi) göre incelemeye alınır. Doğrulanmış CRM kaynağı ve karma organizasyonun yönetilen dosyaları [yerel ve canlı R2 tatbikatında](00-FtkSaaS-yeni-sohbet-devir.md#o06-r2-pilot) sınandı. Aday CI ve development teslimi bekliyor.
 
 **DB export dilimi:** Hesap silme talebinde exact rol/hesap bağlantısı, tam report/job/file sahipliği, hold ve canlı lease kontrolüyle yalnız geçici DB export baytları kaldırılır. Olağan expiry de aynı hold/proof yolunu bounded100 dosyalık adımlarda kullanır; gerçek boyut/hash ve değişmez minimal kanıt atomiktir. Kaynak import dosyaları, tenant belge/kişi/finans ve rapor metadata'sı korunur. Bu alt aşama genel exports/Storage/backup veya privacy tamamlandı anlamına gelmez. Kaynak/native/CI/hosted ayrımı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#pro-export-saklama-ve-imha-paketi) tutulur.
 
@@ -959,18 +959,18 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 <a id="o06"></a>
 ### O06 — Bağımsız imha sicili
 
-- [ ] **Durum:** [Karma sentetik organizasyonun tam makbuzuyla canlı R2 sicil kabulü](00-FtkSaaS-yeni-sohbet-devir.md#o06-r2-pilot) geçti. Kalıcı işletim kabulü açık · **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
+- [ ] **Durum:** [Karma sentetik organizasyonun imzalı makbuzuyla kalıcı AB R2 teknik kabulü](00-FtkSaaS-yeni-sohbet-devir.md#o06-r2-pilot) geçti. Aday CI ve development teslimi bekliyor · **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
 - **Bağımlılık:** O04,O05
 - **Kabul:** İmzalı sicil gerçek imha sonucuna ve bağımsız güncel checkpoint/trust kaynağına bağlıdır.
 - **Sınır/olumsuz durum:** Sicil ve trust aynı eski backup ile geriye alınamaz; tamamlanmamış imha başarı yazmaz.
 - **Doğrulama senaryosu:** Eski/eksik/sahte kayıt ve replay; anahtar erişim/rotasyon/kalıcılık işletim kanıtı.
 - **Kaynak alanı:** erasure-register/guard kaynakları; restore test
-- **Kalan:** [İşletim komutunu ve sicil kimliğini](remote-backend-setup.md#bagimsiz-arsiv-ve-sicil-taslagi) onaylı kalıcı hedefe bağla. Bu hedefte bağımsız checkpoint, kapsamlı yazma yetkisi ve [anahtar rotasyonu](remote-backend-setup.md#managed-restore-prosedürünün-sınırı) kabulünü doğrula.
+- **Kalan:** Aynı aday kaynak için CI ve development kanıtını doğrula. Gerçek kayıtların işletim yetkisi [arşiv kurulumundaki](remote-backend-setup.md#bagimsiz-arsiv-ve-sicil-taslagi) aktarım ve saklama kararlarına bağlıdır.
 
 <a id="o07"></a>
 ### O07 — Guard ile gerçek restore yükleyicisi
 
-- [ ] **Durum:** [Karma sentetik organizasyonun aynı tam R2 makbuzuna bağlı izole PostgreSQL tatbikatı](00-FtkSaaS-yeni-sohbet-devir.md#o06-r2-pilot) geçti. O06’nın kalıcı işletim kabulü bekleniyor · **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
+- [ ] **Durum:** [Kalıcı AB R2 sicilindeki aynı imzalı makbuzla izole PostgreSQL tatbikatı](00-FtkSaaS-yeni-sohbet-devir.md#o06-r2-pilot) geçti. Aday CI ve development teslimi bekliyor · **Tür:** K/D/H · **Plan:** Tümü · **Özellik:** F33
 - **Bağımlılık:** O06
 - **Kabul:** Guard reddi yüklemeyi, loader hatası hizmete erişim açılmasını engeller.
 - **Sınır/olumsuz durum:** Kod rollback DB restore değildir; production reset/seed yok.
