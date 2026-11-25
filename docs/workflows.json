@@ -308,7 +308,8 @@
         "packages/api-contracts/src/validators.d.ts",
         "apps/backend/supabase/functions/deno-runtime.d.ts",
         "packages/api-contracts/src/validators.js",
-        "packages/api-contracts/package.json"
+        "packages/api-contracts/package.json",
+        "apps/backend/supabase/migrations/20261125133000_reduce_account_projection_reads.sql"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -320,8 +321,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "30b0b6874146f55ccbec027b11105969a77a544f7487a2a7a9ef2aa6893d880a",
-        "reason": "Migration envanteri davet tick saklama indeksini içerir. Ortak Auth ve komut kurtarma kuralları korunur."
+        "fingerprint": "c3bb3e3b1aa75074da09c4b0092bc1ed03ea1ca9b1dbec49bbd4d27794c70bf5",
+        "reason": "Hesap ve davet kabulü incelendi. API envanterinde davet testinin kaynak parmak izi güncellendi; sahiplik, seri çalışma ve kontrol kuralları aynı."
       }
     },
     {
@@ -339,7 +340,8 @@
         "apps/backend/tests/auth-password-security-unit.mjs",
         "apps/backend/tests/hosted-password-runner-unit.mjs",
         "apps/backend/tests/hosted-recovery-runner-unit.mjs",
-        "apps/backend/tests/spa-ingress-unit.mjs"
+        "apps/backend/tests/spa-ingress-unit.mjs",
+        "apps/backend/tests/p07-account-profile-merge-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/account-identity-projection.sql",
@@ -402,7 +404,8 @@
         "apps/backend/supabase/migrations/20261119170000_shared_center_authorization.sql",
         "apps/backend/database/account-display-label.sql",
         "apps/backend/supabase/migrations/20261120145403_account_display_label.sql",
-        "apps/backend/supabase/functions/backend-v1/auth-payload.ts"
+        "apps/backend/supabase/functions/backend-v1/auth-payload.ts",
+        "apps/backend/supabase/migrations/20261125133000_reduce_account_projection_reads.sql"
       ],
       "operations": [
         "account_get_v1",
@@ -414,8 +417,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "758419c4222488629a10e82a1e2a82c2b285676b9fc04274f0537a84b17020b4",
-        "reason": "E-posta açık ve SMS kapalı değerleri yeni sağlayıcı anahtarlarına taşındı. Genel kayıt izni ve e-posta onay gereksinimi korunuyor."
+        "fingerprint": "c108dcca5810eb8ce80be032c4fc0b3a6ff12ee9683f1552c96f667bc366dc32",
+        "reason": "Canlı görünen ad, native doğrulanmış ve bekleyen alanlar, silinmiş oturum retleri ve platform kapsamı korunur. Hesap projeksiyonu yinelenen kaynak okumalarını azaltır."
       }
     },
     {
@@ -802,8 +805,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "1cdcdd6b7e6e186c63a9d26d84a5dc02d203855ee30ac5a7b4050623cb246c3f",
-        "reason": "Kişi adı ve iletişim sahipliği yalnız ilgili canlı hesap bağlantısı ve seçili iletişim kimliklerinden okunur. Alias, alan sahipliği, ACL ve mevcut kişi liste/detay sözleşmesi korunur."
+        "fingerprint": "50048f3df17d972928ddea67b1c7febaea638eeba0ead49c93793cca245270e5",
+        "reason": "Davetin scope, sender config, lease ve tekrar kuralları korunur. Mevcut native kabul aynı job üzerinden vade ve sağlık kontrolünü doğrular."
       }
     },
     {
@@ -2326,7 +2329,8 @@
         "apps/backend/supabase/migrations/20261125061500_organization_import_directory_erasure.sql",
         "apps/backend/supabase/migrations/20261125062500_crm_import_copy_retention_holds.sql",
         "apps/backend/supabase/migrations/20261125080144_crm_import_source_storage_erasure.sql",
-        "apps/backend/supabase/migrations/20261125131200_index_invitation_tick_retention.sql"
+        "apps/backend/supabase/migrations/20261125131200_index_invitation_tick_retention.sql",
+        "apps/backend/supabase/migrations/20261125133100_skip_recent_idle_invitation_dispatch.sql"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -2341,8 +2345,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "0dfadc700f4999382020d85ad6a7dd0260e7b68daf5debd30675152df6bd406d",
-        "reason": "Davet worker imzalı tick, tekrar reddi, bir günlük saklama ve en fazla yüz eski satır temizliğini korur. Saklama sorgusu zaman indeksinden yararlanır."
+        "fingerprint": "470f981288a71f1669f7a61d5c6369c7eebc2766bde8de1f064dc437317217af",
+        "reason": "Otuz saniyelik Cron kontrolü vadesi gelen davet ve işlemsel e-posta işlerini geçirir. Taze imzalı makbuzla boş HTTP çağrısı atlanır ve stale işareti izlenir."
       }
     }
   ]
