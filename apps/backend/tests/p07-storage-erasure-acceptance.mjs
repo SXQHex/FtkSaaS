@@ -7,6 +7,7 @@ import {eraseExpiredImportObject} from '../scripts/p07-storage-erasure.mjs';
 import {tick as buildReports} from '../scripts/p06-worker.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
 import {verifyErasureReceiptRestore} from './native-erasure-restore-fixture.mjs';
+import {beginBoundR2PilotErasure} from './r2-erasure-pilot-fixture.mjs';
 
 export async function verifyNativeStorageErasure(){
  const {db,org,center,owner,account,platform,plan,person}=await preparationFixture();
@@ -139,6 +140,7 @@ export async function verifyNativeStorageErasure(){
   const preview=await must(owner,'organization_delete_preview_v1',{org_id:org,reason:'synthetic O05 restore acceptance',all_data:true});
   const {job_id}=await must(owner,'organization_delete_apply_v1',{org_id:org,all_data:true,preview:{id:preview.id,token:preview.token},reauth:owner.jwt},key());
   requestId=(await q('select request_id from private.p07_privacy_jobs where id=$1',[job_id]))[0].request_id;
+  await beginBoundR2PilotErasure({db,requestId,orgId:org});
   await db.query(`create role ${role} login password '${password}' in role ftk_p07_privacy_worker`);
   await db.query(`create role ${attestorRole} login password '${attestorPassword}' in role ftk_p07_storage_attestor`);
   await db.query('insert into private.p07_privacy_worker_scopes values($1,$2)',[role,org]);

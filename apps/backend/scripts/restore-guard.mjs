@@ -34,7 +34,9 @@ export function inspectRestore({snapshotBytes,ledgerBytes,trust,now=Date.now()})
  if(signature.length!==64||signature.toString('base64')!==ledger.signature||!verify(null,Buffer.from(canonical(payload)),key,signature))fail('INVALID_LEDGER_SIGNATURE');
  const erased=new Set(),requests=new Set();
  for(const e of ledger.erasures){
-  keys(e,['request_id','kind','subject_ids','completed_at']);
+  const evidence=e&&typeof e==='object'&&Object.hasOwn(e,'proof_sha256');
+  keys(e,evidence?['request_id','kind','subject_ids','completed_at','proof_sha256']:['request_id','kind','subject_ids','completed_at']);
+  if(evidence&&(e.kind!=='organization'||typeof e.proof_sha256!=='string'||!digest.test(e.proof_sha256)))fail('INVALID_ERASURE_ENTRY');
   if(typeof e.request_id!=='string'||!uuid.test(e.request_id)||requests.has(e.request_id)||!['account','organization'].includes(e.kind)||!Array.isArray(e.subject_ids)||!e.subject_ids.length||e.subject_ids.some(id=>typeof id!=='string'||!uuid.test(id))||new Set(e.subject_ids).size!==e.subject_ids.length||timestamp(e.completed_at)>issued)fail('INVALID_ERASURE_ENTRY');
   requests.add(e.request_id);for(const id of e.subject_ids)erased.add(id);
  }

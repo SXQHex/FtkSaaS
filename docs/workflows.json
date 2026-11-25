@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "7340f0cba1ffee321e62a44e81cd67750157ccb6ff3e987c30904f506d1bbbf4",
-        "reason": "Node LTS ve pnpm pinleri ile yerel Auth sağlayıcı anahtarları güncellendi. Frozen kurulum, API kapsamı ve pnpm sürüm beklentisine ait inceleme kaydı doğrulandı. D04 için onaylanan sekiz kaynak parmak izi Ubuntu runner ve 2/2/4/4 shard beklentilerini kapsar."
+        "fingerprint": "fbc4850656414398bfe6333451ac962b40065f746ff928e439a02fd7c05c91da",
+        "reason": "Ortak sözleşme ve 249 migration envanteri değişen backend kaynaklarıyla eşlendi."
       }
     },
     {
@@ -1694,8 +1694,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "a0e928b0f320700e398f17fe2d7e6ebf6f7a87f5780d99e103506be1b8972d25",
-        "reason": "P07 native kabulünde ortak hesap ve başka organizasyonun iletişim kaydı koruması incelendi."
+        "fingerprint": "fc05081ee6d898fddbc865ee343a30cb0b9f12328bc174104604a109964c6128",
+        "reason": "Ortak P07 kabulünde abonelik kapsamı ve mevcut davranış korunarak organizasyon imhasının başlangıç hazırlığı güncellendi."
       }
     },
     {
@@ -1946,7 +1946,19 @@
         "apps/backend/tests/account-identity-acceptance.mjs",
         "apps/backend/tests/p07-storage-erasure-acceptance.mjs",
         "apps/backend/tests/p07-storage-erasure-unit.mjs",
-        "apps/backend/tests/native-erasure-restore-fixture.mjs"
+        "apps/backend/tests/native-erasure-restore-fixture.mjs",
+        "apps/backend/tests/organization-erasure-acceptance.mjs",
+        "apps/backend/tests/managed-file-erasure-fixture.mjs",
+        "apps/backend/tests/native-organization-erasure-restore-fixture.mjs",
+        "apps/backend/tests/r2-erasure-state-unit.mjs",
+        "apps/backend/tests/r2-erasure-pilot-fixture.mjs",
+        "apps/backend/tests/p07-invoice-archive-fixture.mjs",
+        "apps/backend/tests/p07-billing-archive-fixture.mjs",
+        "apps/backend/tests/p07-billing-history-fixture.mjs",
+        "apps/backend/tests/p07-signed-document-erasure-fixture.mjs",
+        "apps/backend/tests/p07-organization-media-fixture.mjs",
+        "apps/backend/tests/p07-organization-sale-fixture.mjs",
+        "apps/backend/tests/p07-organization-directory-fixture.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -2028,7 +2040,28 @@
         "apps/backend/supabase/migrations/20261124230652_organization_export_and_source_erasure.sql",
         "apps/backend/supabase/migrations/20261124230835_organization_operational_erasure.sql",
         "apps/backend/supabase/migrations/20261124233740_organization_import_copy_erasure.sql",
-        "apps/backend/supabase/migrations/20261124233946_organization_projected_contact_erasure.sql"
+        "apps/backend/supabase/migrations/20261124233946_organization_projected_contact_erasure.sql",
+        "apps/backend/scripts/organization-erasure-receipt.mjs",
+        "apps/backend/supabase/migrations/20261125005753_organization_live_database_erasure.sql",
+        "apps/backend/supabase/migrations/20261125005455_organization_managed_file_erasure.sql",
+        "apps/backend/scripts/r2-erasure-state.mjs",
+        "apps/backend/scripts/r2-s3-object-store.mjs",
+        "apps/backend/scripts/organization-retention-archive.mjs",
+        "apps/backend/scripts/organization-invoice-erasure.mjs",
+        "apps/backend/supabase/migrations/20261125023500_organization_invoice_erasure.sql",
+        "apps/backend/scripts/organization-db-archive.mjs",
+        "apps/backend/supabase/migrations/20261125030500_organization_billing_erasure.sql",
+        "apps/backend/supabase/migrations/20261125034500_organization_billing_history_erasure.sql",
+        "apps/backend/supabase/migrations/20261125040500_organization_signed_document_erasure.sql",
+        "apps/backend/supabase/migrations/20261125041500_organization_media_erasure.sql",
+        "apps/backend/supabase/migrations/20261125042500_organization_signed_document_storage_erasure.sql",
+        "apps/backend/supabase/migrations/20261125043500_organization_sale_erasure.sql",
+        "apps/backend/supabase/migrations/20261125044500_organization_directory_erasure.sql",
+        "apps/backend/supabase/migrations/20261125045500_organization_erasure_commit_fences.sql",
+        "apps/backend/supabase/migrations/20261125050500_organization_erasure_intake.sql",
+        "apps/backend/supabase/migrations/20261125051500_organization_erasure_register_pending.sql",
+        "apps/backend/supabase/migrations/20261125052500_organization_erasure_pending_claim.sql",
+        "apps/backend/supabase/migrations/20261125053500_organization_erasure_abandoned_previews.sql"
       ],
       "operations": [
         "account_delete_preview_v1",
@@ -2053,8 +2086,8 @@
         "platform_operator_access_set_v1"
       ],
       "review": {
-        "fingerprint": "242c5a7d6518e808c1a4883433fb0db620d203989016fb4f111099aeb8b70a3c",
-        "reason": "Organizasyon kopyaları, gerçek imha makbuzları ve PostgreSQL commit ile ortak checkpoint kilidi incelendi."
+        "fingerprint": "d9f6b0ca2d72feb3973d2dc17af13eac9042331e6009dbc1e7a4dc89098ab2c8",
+        "reason": "Bağımsız R2 sicilinin birim testleri mevcut restore guard test köküne bağlandı."
       }
     },
     {
@@ -2159,7 +2192,8 @@
         "apps/backend/tests/content-catalog-acceptance.mjs",
         "apps/backend/tests/p07-storage-erasure-acceptance.mjs",
         "apps/backend/tests/p07-storage-erasure-unit.mjs",
-        "apps/backend/tests/native-erasure-restore-fixture.mjs"
+        "apps/backend/tests/native-erasure-restore-fixture.mjs",
+        "apps/backend/tests/ops-pilot-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/automation-results.sql",
@@ -2251,7 +2285,16 @@
         "apps/backend/supabase/migrations/20261124230652_organization_export_and_source_erasure.sql",
         "apps/backend/supabase/migrations/20261124230835_organization_operational_erasure.sql",
         "apps/backend/supabase/migrations/20261124233740_organization_import_copy_erasure.sql",
-        "apps/backend/supabase/migrations/20261124233946_organization_projected_contact_erasure.sql"
+        "apps/backend/supabase/migrations/20261124233946_organization_projected_contact_erasure.sql",
+        "apps/backend/scripts/acceptance/o08-recovery-workers.sql",
+        "apps/backend/scripts/acceptance/o10-hosted-pilot.mjs",
+        "apps/backend/scripts/acceptance/o10-pilot-reconciliation.sql",
+        "apps/backend/scripts/acceptance/o10-pilot.mjs",
+        "apps/backend/supabase/migrations/20261125050500_organization_erasure_intake.sql",
+        "apps/backend/supabase/migrations/20261125051500_organization_erasure_register_pending.sql",
+        "apps/backend/scripts/organization-erasure-receipt.mjs",
+        "apps/backend/supabase/migrations/20261125052500_organization_erasure_pending_claim.sql",
+        "apps/backend/supabase/migrations/20261125053500_organization_erasure_abandoned_previews.sql"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -2266,8 +2309,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "fc9c163b9de3b8e9d334dacd4c96934a78180e521219f9d4cb14f58528a7ec46",
-        "reason": "Standard Webhooks güncellemesi yerleşik imza doğrulama sınırını ve Resend yanıt sözleşmesini koruyor."
+        "fingerprint": "edeb852a9abb0f0d75f86e6d74901c37d4776debcb5b62741c2c7dc712f382ef",
+        "reason": "P07 kuyruğu ve Storage imhası doğrulanmış bağımsız sicil niyetini bekler; ortak worker regresyonları korunur."
       }
     }
   ]

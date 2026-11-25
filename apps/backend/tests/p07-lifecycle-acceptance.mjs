@@ -1,6 +1,8 @@
 // Existing registry shard. Native Auth -> Edge -> RPC plus real dedicated LOGIN sessions.
 import {eraseNativeAccount} from '../scripts/native-account-erasure.mjs';
 import {verifyNativeStorageErasure} from './p07-storage-erasure-acceptance.mjs';
+import {verifyOrganizationErasure} from './organization-erasure-acceptance.mjs';
+import {beginBoundR2PilotErasure} from './r2-erasure-pilot-fixture.mjs';
 import test,{resources,step} from './p07-diagnostics.mjs';import assert from 'node:assert/strict';import {randomBytes} from 'node:crypto';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';
 test('P07 billing and privacy use live Auth, atomic receipts and scoped native workers',async t=>{
@@ -96,8 +98,9 @@ test('P07 billing and privacy use live Auth, atomic receipts and scoped native w
    const deleted=await must(owner,'organization_delete_apply_v1',body,k);assert.equal((await must(owner,'organization_delete_apply_v1',body,k)).job_id,deleted.job_id);
    const altered=await call(owner,'organization_delete_apply_v1',{...body,preview:{id:preview.id,token:preview.token+'changed'}},k);assert.equal(altered.result.error.code,'IDEMPOTENCY_PAYLOAD_MISMATCH');
 
-   const c=clients.at(-1);const [entry]=await claim(c,true,org);assert.equal(entry.request.job_id,deleted.job_id);assert.equal((await execute(c,entry,true)).ok,true);
    const request=(await q('select request_id from private.p07_privacy_jobs where id=$1',[deleted.job_id]))[0].request_id;
+   await beginBoundR2PilotErasure({db,requestId:request,orgId:org});
+   const c=clients.at(-1);const [entry]=await claim(c,true,org);assert.equal(entry.request.job_id,deleted.job_id);assert.equal((await execute(c,entry,true)).ok,true);
    const scope=async()=>(await q("select scopes#>'{database,organization_contacts}' proof from private.p07_privacy_manifests where request_id=$1",[request]))[0].proof;
    const proof=()=>q('select operation_id,removed_rows from private.organization_contact_erasures where request_id=$1 order by completed_at,operation_id',[request]);
    const present=async()=>new Set((await q('select id from core.person_contacts where id=any($1::uuid[])',[[first,second,otherContact]])).map(row=>row.id));
@@ -362,6 +365,7 @@ test('P07 billing and privacy use live Auth, atomic receipts and scoped native w
    await unbound.query('drop table p07_residue_attempt');await unbound.query('drop function pg_temp.p07_residue_attempt()');
   });
   await t.test('native contact and Storage receipts block pre-erasure restore and preserve the control object',{timeout:120000},verifyNativeStorageErasure);
+  await t.test('organization DB and Storage discharge the same isolated deletion request',{timeout:180000},verifyOrganizationErasure);
   await t.test('a shared native identity keeps the other tenant copy after scoped projection erasure',async()=>{
    const c=await native('ftk_p07_privacy_worker'),role=(await c.query('select session_user as role')).rows[0].role;
    const {owner_person_id:ownerPerson}=(await q('select owner_person_id from core.organizations where id=$1',[org]))[0];

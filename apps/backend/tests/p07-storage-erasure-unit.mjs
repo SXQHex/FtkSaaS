@@ -47,4 +47,23 @@ test('Storage erasure requires exact native DELETE acknowledgement and absence b
  assert.deepEqual(calls,['prepare','GET','DELETE','GET']);
  await assert.rejects(invoke(removed,missing,{apiUrl:'https://aaaaaaaaaaaaaaaaaaaa.supabase.co'}),/STORAGE_PROVIDER_BINDING_MISMATCH/);
  assert.deepEqual(calls,['prepare']);
+ const document={...preparation,bucket_id:'ftksaas-documents',mime:'text/plain'};
+ const documentDb={async query(){return {rows:[{result:document}]};}};
+ const documentPaths=[];
+ assert.deepEqual(await invoke(removed,missing,{
+  db:documentDb,
+  fetcher:async(url,{method})=>{
+   documentPaths.push(new URL(url).pathname);
+   if(method==='DELETE')return removed();
+   if(documentPaths.length===1)return new Response(bytes,{headers:{'content-type':'text/plain'}});
+   return missing();
+  }
+ }),{state:'completed'});
+ assert.deepEqual(documentPaths,[
+  '/storage/v1/object/authenticated/ftksaas-documents/'+document.object_key,
+  '/storage/v1/object/ftksaas-documents/'+document.object_key,
+  '/storage/v1/object/authenticated/ftksaas-documents/'+document.object_key
+ ]);
+ const protectedDb={async query(){return {rows:[{result:{...document,bucket_id:'ftksaas-invoices'}}]};}};
+ await assert.rejects(invoke(removed,missing,{db:protectedDb}),/INVALID_STORAGE_PREPARATION/);
 });

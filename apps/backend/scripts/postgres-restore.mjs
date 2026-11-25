@@ -1,5 +1,7 @@
 import pg from 'pg';
 import {isIP} from 'node:net';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import {sha256} from './restore-guard.mjs';
 import {guardedRestore} from './guarded-restore.mjs';
 
@@ -19,6 +21,21 @@ export function validateRestoreTarget(connectionString,target){
   ||target.tables.some(t=>!t||Object.keys(t).sort().join(',')!=='schema,table'||!identifier.test(t.schema)||!identifier.test(t.table)||['pg_catalog','information_schema','pg_toast'].includes(t.schema))
   ||new Set(target.tables.map(t=>t.schema+'.'+t.table)).size!==target.tables.length)throw Error('ISOLATED_RESTORE_TARGET_REQUIRED');
  return structuredClone(target);
+}
+
+export async function restorePostgresSnapshotFromR2({connectionString,target,state,registerBindingSha256,snapshotBytes,snapshotSha256}){
+ const approved=validateRestoreTarget(connectionString,target),snapshot=Buffer.from(snapshotBytes);
+ if(sha256(snapshot)!==snapshotSha256)throw Error('SNAPSHOT_DIGEST_MISMATCH');
+ if(typeof registerBindingSha256!=='string'||!/^[a-f0-9]{64}$/.test(registerBindingSha256)
+  ||state?.registerBindingSha256!==registerBindingSha256)throw Error('RESTORE_REGISTER_BINDING_MISMATCH');
+ return state.withRestoreEvidence(snapshotSha256,async({trust,ledgerBytes,readCheckpoint,coordinationDir})=>{
+  const directory=await fs.mkdtemp(path.join(coordinationDir,'.restore-'));
+  try{
+   const registerFile=path.join(directory,'ledger.json');
+   await fs.writeFile(registerFile,ledgerBytes,{mode:0o600});
+   return await restorePostgresSnapshot({connectionString,target:approved,snapshotBytes:snapshot,registerFile,trust,readCheckpoint});
+  }finally{await fs.rm(directory,{recursive:true,force:true});}
+ });
 }
 
 export async function restorePostgresSnapshot({connectionString,target,readCheckpoint,checkpointFile,...evidence}){

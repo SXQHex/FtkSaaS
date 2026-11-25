@@ -20,6 +20,25 @@ function syncDirectory(dir){
  try{fs.fsyncSync(fd);}finally{fs.closeSync(fd);}
 }
 
+function withLock(lockFile,run){
+ const fd=fs.openSync(lockFile,'wx',0o600),dir=path.dirname(lockFile);
+ try{
+  fs.fsyncSync(fd);
+  syncDirectory(dir);
+  return run();
+ }finally{
+  fs.closeSync(fd);
+  fs.unlinkSync(lockFile);
+  syncDirectory(dir);
+ }
+}
+
+function writeExclusive(file,bytes){
+ const fd=fs.openSync(file,'wx',0o600);
+ try{fs.writeFileSync(fd,bytes);fs.fsyncSync(fd);}
+ finally{fs.closeSync(fd);}
+}
+
 function readEvidence(file,maxBytes){
  const fd=fs.openSync(file,fs.constants.O_RDONLY|fs.constants.O_NOFOLLOW|fs.constants.O_NONBLOCK);
  try{
@@ -31,15 +50,23 @@ function readEvidence(file,maxBytes){
 
 export function readErasureCheckpoint({checkpointFile,sourceProjectRef}){
  if(!path.isAbsolute(checkpointFile))throw Error('INDEPENDENT_CHECKPOINT_REQUIRED');
- if(fs.existsSync(checkpointFile+'.pending'))throw Error('CHECKPOINT_RECOVERY_REQUIRED');
- const current=JSON.parse(readEvidence(checkpointFile,16384).toString('utf8'));
+ ensureCheckpointReadable(checkpointFile);
+ const current=validateErasureCheckpoint(JSON.parse(readEvidence(checkpointFile,16384).toString('utf8')),sourceProjectRef);
+ ensureCheckpointReadable(checkpointFile);
+ return current;
+}
+
+export function validateErasureCheckpoint(current,sourceProjectRef){
  if(!current||Object.keys(current).sort().join(',')!=='format,ledger_public_key_pem,ledger_sequence,ledger_sha256,source_project_ref'
   ||current.format!==1||typeof sourceProjectRef!=='string'||!(/^[a-z]{20}$/).test(sourceProjectRef)||current.source_project_ref!==sourceProjectRef
   ||typeof current.ledger_sha256!=='string'||!(/^[a-f0-9]{64}$/).test(current.ledger_sha256)
   ||!Number.isSafeInteger(current.ledger_sequence)||current.ledger_sequence<1
   ||typeof current.ledger_public_key_pem!=='string'||!current.ledger_public_key_pem.startsWith('-----BEGIN PUBLIC KEY-----'))throw Error('INVALID_ERASURE_CHECKPOINT');
- if(fs.existsSync(checkpointFile+'.pending'))throw Error('CHECKPOINT_RECOVERY_REQUIRED');
  return current;
+}
+
+function ensureCheckpointReadable(checkpointFile){
+ if(fs.existsSync(checkpointFile+'.pending')||fs.existsSync(checkpointFile+'.receipt-pending'))throw Error('CHECKPOINT_RECOVERY_REQUIRED');
 }
 
 function rotationMessage(previous,next){
@@ -58,7 +85,7 @@ export function resolveErasureCheckpointFile(registerFile,checkpointFile){
 export function resolveErasureCheckpointLock(checkpoint,lockFile=checkpoint+'.lock'){
  if(typeof lockFile!=='string'||!path.isAbsolute(lockFile))throw Error('INVALID_CHECKPOINT_LOCK');
  const lock=path.join(fs.realpathSync(path.dirname(lockFile)),path.basename(lockFile));
- if([checkpoint,checkpoint+'.pending',checkpoint+'.next'].includes(lock))throw Error('INVALID_CHECKPOINT_LOCK');
+ if([checkpoint,checkpoint+'.pending',checkpoint+'.next',checkpoint+'.receipt-pending'].includes(lock))throw Error('INVALID_CHECKPOINT_LOCK');
  return lock;
 }
 
@@ -67,21 +94,56 @@ export function signErasureCheckpointRotation({previous,head,publicKeyPem,previo
  return sign(null,rotationMessage(previous,next),createPrivateKey(previousPrivateKeyPem)).toString('base64');
 }
 
-export function publishErasureCheckpoint({
- registerFile,checkpointFile,checkpointLockFile,sourceProjectRef,expected,head,publicKeyPem,previousLedgerBytes,rotationSignature,now=Date.now()
-}){
- const checkpoint=resolveErasureCheckpointFile(registerFile,checkpointFile),checkpointDir=path.dirname(checkpoint);
+export function verifyErasureCheckpointRotation({previous,next,signature}){
+ if(typeof signature!=='string')return false;
+ return verify(null,rotationMessage(previous,next),createPublicKey(previous.ledger_public_key_pem),Buffer.from(signature,'base64'));
+}
+
+function withPublicationLocks({registerFile,checkpointFile,checkpointLockFile},run){
+ const checkpoint=resolveErasureCheckpointFile(registerFile,checkpointFile);
  const register=path.join(fs.realpathSync(path.dirname(registerFile)),path.basename(registerFile));
  const registerLock=register+'.lock',checkpointLock=resolveErasureCheckpointLock(checkpoint,checkpointLockFile);
- const pending=checkpoint+'.pending',staging=checkpoint+'.next';
- const registerFd=fs.openSync(registerLock,'wx',0o600);
- let checkpointFd;
- try{
-  checkpointFd=fs.openSync(checkpointLock,'wx',0o600);
+ return withLock(registerLock,()=>withLock(checkpointLock,()=>run(register,checkpoint)));
+}
+
+function currentCheckpoint(checkpointFile,sourceProjectRef){
+ try{return readErasureCheckpoint({checkpointFile,sourceProjectRef});}
+ catch(error){if(error.code!=='ENOENT')throw error;return null;}
+}
+
+export function publishErasureCheckpoint(options){
+ return withPublicationLocks(options,(register,checkpoint)=>{
+  const current=currentCheckpoint(checkpoint,options.sourceProjectRef);
+  return publishCheckpointLocked(register,checkpoint,current,options);
+ });
+}
+
+export function appendAndPublishErasure({file,entry,checkpointFile,checkpointLockFile,sourceProjectRef,privateKeyPem,publicKeyPem,now=new Date().toISOString()}){
+ return withPublicationLocks({registerFile:file,checkpointFile,checkpointLockFile},(register,checkpoint)=>{
+  const current=currentCheckpoint(checkpoint,sourceProjectRef);
+  const previousLedgerBytes=current?readEvidence(register,128*1024*1024):undefined;
+  const intent=checkpoint+'.receipt-pending',dir=path.dirname(checkpoint);
+  const head=updateRegisterLocked({
+   file:register,sourceProjectRef,privateKeyPem,publicKeyPem,now,
+   expectedHead:current?.ledger_sha256??null,expectedSequence:current?.ledger_sequence??0
+  },{entry,rotation:false},()=>{
+   writeExclusive(intent,Buffer.from(sha256(canonical(entry))+'\n'));
+   syncDirectory(dir);
+  });
+  publishCheckpointLocked(register,checkpoint,current,{sourceProjectRef,publicKeyPem,head,expected:current,previousLedgerBytes,now:Date.parse(now)});
+  if(!head.replayed){
+   fs.unlinkSync(intent);
+   syncDirectory(dir);
+  }
+  return head;
+ });
+}
+
+function publishCheckpointLocked(register,checkpoint,current,{
+ sourceProjectRef,expected,head,publicKeyPem,previousLedgerBytes,rotationSignature,now=Date.now()
+}){
+  const checkpointDir=path.dirname(checkpoint),pending=checkpoint+'.pending',staging=checkpoint+'.next';
   if(fs.existsSync(register+'.pending'))throw Error('REGISTER_RECOVERY_REQUIRED');
-  let current;
-  try{current=readErasureCheckpoint({checkpointFile:checkpoint,sourceProjectRef});}
-  catch(error){if(error.code!=='ENOENT')throw error;current=null;}
   const next={format:1,source_project_ref:sourceProjectRef,ledger_sha256:head.sha256,ledger_sequence:head.sequence,ledger_public_key_pem:publicKeyPem};
   const snapshotBytes=Buffer.from(JSON.stringify({project_ref:sourceProjectRef,tables:[{schema:'auth',table:'users',rows:[]}]}));
   const snapshotHash=sha256(snapshotBytes),ledgerBytes=readEvidence(register,128*1024*1024);
@@ -103,9 +165,7 @@ export function publishErasureCheckpoint({
     ||!verify(null,rotationMessage(current,next),previousKey,Buffer.from(rotationSignature,'base64'))))throw Error('CHECKPOINT_ROTATION_NOT_AUTHORIZED');
   }
 
-  const fd=fs.openSync(pending,'wx',0o600);
-  try{fs.writeFileSync(fd,JSON.stringify(next)+'\n');fs.fsyncSync(fd);}
-  finally{fs.closeSync(fd);}
+  writeExclusive(pending,JSON.stringify(next)+'\n');
   syncDirectory(checkpointDir);
   fs.linkSync(pending,staging);
   fs.renameSync(staging,checkpoint);
@@ -113,18 +173,21 @@ export function publishErasureCheckpoint({
   fs.unlinkSync(pending);
   syncDirectory(checkpointDir);
   return next;
- }finally{
-  if(checkpointFd!==undefined){fs.closeSync(checkpointFd);fs.unlinkSync(checkpointLock);}
-  fs.closeSync(registerFd);
-  fs.unlinkSync(registerLock);
- }
 }
 
-function updateRegister(
+function updateRegister(options,mutation){
+ const {file}=options;
+ if(typeof file!=='string'||!path.isAbsolute(file))throw Error('INVALID_REGISTER_ARGUMENT');
+ const dir=path.dirname(file);
+ if(!fs.statSync(dir).isDirectory()||fs.lstatSync(dir).isSymbolicLink())throw Error('INVALID_REGISTER_DIRECTORY');
+ return withLock(file+'.lock',()=>updateRegisterLocked(options,mutation));
+}
+
+function updateRegisterLocked(
  {file,privateKeyPem,publicKeyPem,sourceProjectRef,expectedHead,expectedSequence,now=new Date().toISOString()},
- {entry,previousPublicKeyPem=publicKeyPem,rotation}
+ {entry,previousPublicKeyPem=publicKeyPem,rotation},beforeWrite
 ){
- if(typeof file!=='string'||!path.isAbsolute(file)||!Number.isSafeInteger(expectedSequence)||expectedSequence<0)throw Error('INVALID_REGISTER_ARGUMENT');
+ if(!Number.isSafeInteger(expectedSequence)||expectedSequence<0)throw Error('INVALID_REGISTER_ARGUMENT');
  const secret=createPrivateKey(privateKeyPem),pub=createPublicKey(publicKeyPem);
  const nextKey=pub.export({type:'spki',format:'der'});
  if(secret.asymmetricKeyType!=='ed25519'||pub.asymmetricKeyType!=='ed25519'||!createPublicKey(secret).export({type:'spki',format:'der'}).equals(nextKey))throw Error('REGISTER_KEY_MISMATCH');
@@ -134,17 +197,14 @@ function updateRegister(
   if(priorKey.asymmetricKeyType!=='ed25519')throw Error('INVALID_LEDGER_KEY');
   if(priorKey.export({type:'spki',format:'der'}).equals(nextKey))throw Error('REGISTER_ROTATION_SAME_KEY');
  }
- const dir=path.dirname(file);if(!fs.statSync(dir).isDirectory()||fs.lstatSync(dir).isSymbolicLink())throw Error('INVALID_REGISTER_DIRECTORY');
- let lock;const lockFile=file+'.lock',temporary=file+'.pending';
+ const dir=path.dirname(file),temporary=file+'.pending';
  const blank=Buffer.from(JSON.stringify({project_ref:sourceProjectRef,tables:[{schema:'auth',table:'users',rows:[]}]}));
  const check=(bytes,keyPem)=>inspectRestore({snapshotBytes:blank,ledgerBytes:bytes,trust:{format:1,source_project_ref:sourceProjectRef,snapshot_sha256:sha256(blank),ledger_sha256:sha256(bytes),ledger_sequence:JSON.parse(bytes).sequence,ledger_public_key_pem:keyPem},now:Date.parse(now)});
- try{
-  lock=fs.openSync(lockFile,'wx',0o600);fs.fsyncSync(lock);syncDirectory(dir);
   if(fs.existsSync(temporary))throw Error('REGISTER_RECOVERY_REQUIRED');
   let previous;
   if(fs.existsSync(file)){
    if(fs.lstatSync(file).isSymbolicLink()||!fs.statSync(file).isFile())throw Error('INVALID_REGISTER_FILE');
-   const previousBytes=fs.readFileSync(file);if(sha256(previousBytes)!==expectedHead)throw Error('REGISTER_HEAD_CONFLICT');
+   const previousBytes=readEvidence(file,128*1024*1024);if(sha256(previousBytes)!==expectedHead)throw Error('REGISTER_HEAD_CONFLICT');
    check(previousBytes,previousPublicKeyPem);previous=JSON.parse(previousBytes);if(previous.sequence!==expectedSequence)throw Error('REGISTER_SEQUENCE_CONFLICT');
    if(Date.parse(now)<Date.parse(previous.issued_at))throw Error('REGISTER_CLOCK_REGRESSION');
    if(!rotation){
@@ -156,13 +216,8 @@ function updateRegister(
   if(!rotation)erasures.push(entry);
   const payload={format:1,source_project_ref:sourceProjectRef,sequence:expectedSequence+1,issued_at:now,erasures};
   const ledger={...payload,signature:sign(null,Buffer.from(canonical(payload)),secret).toString('base64')};const bytes=Buffer.from(JSON.stringify(ledger));check(bytes,publicKeyPem);
-  let fd;
-  try{fd=fs.openSync(temporary,'wx',0o600);fs.writeFileSync(fd,bytes);fs.fsyncSync(fd);}finally{if(fd!==undefined)fs.closeSync(fd);}
+  beforeWrite?.();
+  writeExclusive(temporary,bytes);
   fs.renameSync(temporary,file);syncDirectory(dir);
   return{sequence:ledger.sequence,sha256:sha256(bytes),replayed:false};
- }finally{
-  // Never remove a lock owned by another caller. A leftover .pending file is
-  // ambiguous after a crash; do not silently replace it with another head.
-  if(lock!==undefined){fs.closeSync(lock);fs.unlinkSync(lockFile);syncDirectory(dir);}
- }
 }
