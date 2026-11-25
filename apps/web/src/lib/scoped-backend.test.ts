@@ -8,7 +8,7 @@ const { native } = vi.hoisted(() => ({ native: { getSession: vi.fn() } }));
 vi.mock("./supabase", () => ({ getSupabaseClient: () => ({ auth: native }) }));
 
 import { BackendError } from "./backend";
-import { scopedBackend, type AccountReadContext } from "./scoped-backend";
+import { scopedBackend, scopedCommandBackend, type AccountReadContext } from "./scoped-backend";
 import {
   accountQuery,
   accountQueryKeys,
@@ -447,5 +447,64 @@ describe("Query-owned scoped account validation", () => {
       expect(queries.getQueryData(["people", scope.accountId, index])).toBeUndefined();
     }
     expect(accountCount()).toBe(1);
+  });
+});
+
+describe("a preflight-bound native command", () => {
+  const invoke = (backend: Awaited<ReturnType<typeof scopedBackend>>) =>
+    backend.call("people_list_v1", { ...request, org_id: scope.orgId, page: { limit: 20 } });
+
+  it("reuses the verified bearer for the first dispatch and verifies the account on retry", async () => {
+    const command = await scopedCommandBackend(scope);
+    await invoke(command.backend);
+    await command.write(invoke);
+    expect(accountCount()).toBe(1);
+    expect(featureCount()).toBe(2);
+
+    await command.write(invoke);
+    expect(accountCount()).toBe(2);
+    expect(featureCount()).toBe(3);
+  });
+
+  it("verifies the account again when a normal refresh changes the bearer", async () => {
+    const command = await scopedCommandBackend(scope);
+    current = session(sessionId, nativeId, "refreshed");
+    await command.write(invoke);
+    expect(accountCount()).toBe(2);
+    expect(calls.at(-1)).toEqual({
+      operation: "people_list_v1",
+      bearer: "Bearer " + current.access_token,
+    });
+  });
+
+  it("rejects a new session for the same user before dispatch", async () => {
+    const command = await scopedCommandBackend(scope);
+    current = session(secondSessionId);
+    await expect(command.write(invoke)).rejects.toThrow("ACCOUNT_CHANGED");
+    expect(accountCount()).toBe(1);
+    expect(featureCount()).toBe(0);
+  });
+
+  it("keeps a received acknowledgment while rejecting readback from a replacement session", async () => {
+    const command = await scopedCommandBackend(scope);
+    beforeFeature = async () => {
+      current = session(secondSessionId);
+    };
+    await expect(command.write(invoke)).resolves.toEqual(page);
+    await expect(command.readback(invoke)).rejects.toThrow("ACCOUNT_CHANGED");
+    expect(featureCount()).toBe(1);
+    await expect(command.write(invoke)).rejects.toThrow("ACCOUNT_CHANGED");
+    expect(featureCount()).toBe(1);
+  });
+
+  it("revalidates the account for readback and discards a late denial from a replaced session", async () => {
+    const command = await scopedCommandBackend(scope);
+    beforeFeature = async () => {
+      rejectedFeature = "FORBIDDEN";
+      current = session(secondSessionId);
+    };
+    await expect(command.readback(invoke)).rejects.toThrow("ACCOUNT_CHANGED");
+    expect(accountCount()).toBe(2);
+    expect(featureCount()).toBe(1);
   });
 });

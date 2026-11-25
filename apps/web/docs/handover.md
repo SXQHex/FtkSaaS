@@ -149,6 +149,25 @@ Aynı 1280×720 yerel Chromium fixture’ında, `97176d4f4ff7ed73353d4ec80991726
 
 25 Kasım 2026'da development bağlantı şablonu yayımlı SPA'ya çevrildi. Canlı tarayıcı kabulü, `0cd41e60dd7bf359b1054c6f2d552a2d8093b457` kaynaklı [Cloudflare yayını](https://github.com/SXQHex/FtkSaaS/actions/runs/45532734192) üzerinde yapıldı. Aynı frontend ağacının [aday tarayıcı kontrolü](https://github.com/SXQHex/FtkSaaS/actions/runs/45528129959) dört cihaz profilinde 12/12 shard ile geçti. Pro2 Merkez'de 26 Kasım 2026, 16.00–16.45 TSİ için planlanan sentetik Tango Başlangıç seansı kullanıldı. İki kişisel ICS akışı da aynı seansı ve yayımlı SPA URL'sini döndürdü. Oturum kapalıyken URL'nin giriş dönüşü korundu. Öğrenci kendi aktif rezervasyonuna, eğitmen canlı görevinin seansına gerçek native oturumla ulaştı. Her rol için merkez seçeneğiyle bir `session_get_v1` okundu. Öğrencide aynı seans ve kişi için bir `reservation_list_v1` okundu. İki akışta da takvim taraması olmadı. Geçici abonelikler iptalden sonra HTTP 404 döndürdü. Bu kabulde açılan tarayıcı oturumları yerel kapsamda kapatıldı. Güncellenen S15 tekrar aracında iki rol için gerçek GET/HEAD, giriş dönüşü, yenileme ve iptal doğrulandı.
 
+<a id="xreq-042-canli-kabul"></a>
+
+### XREQ-042 yayımlı başvuru kabulü
+
+25 Kasım 2026'da Pro2 Merkez için ayrı sentetik web formu açıldı. `6b7229d7fb74eeb1795d18b4f6040db33268b696` kaynağından yayımlanan SPA, açık formu gerçek Worker üzerinden HTTP 200 ile okudu. Yanıtın izinli origin'i `https://app.fethiyetango.com` ile eşleşti. Normal Chrome'da gerçek Turnstile `public_application` doğrulamasıyla gönderilen tek sentetik başvuruda “Başvurun iletildi.” göründü. Yetkili merkez gelen kutusu aynı formdan tek bekleyen kayıt, seçilmemiş isteğe bağlı test bildirimi ve boş kişi bağı döndürdü. Test başvurusu kendi sürümüyle kapatıldı. Sentetik form açık bırakıldı. [Cloudflare yayını](https://github.com/SXQHex/FtkSaaS/actions/runs/45588368435) · [Development yayını](https://github.com/SXQHex/FtkSaaS/actions/runs/45588368454).
+
+<a id="xreq-071-olcumu"></a>
+
+### XREQ-071 ödeme onayı ölçümü
+
+Kontrollü Chromium koşusunda 1280×800 masaüstü profili, tek işçi ve her Edge fixture yanıtına 80 ms sabit gecikme kullanıldı. Aynı sentetik ödeme kuyruğunda, her kaynak için 10 yeni tarayıcı bağlamında ilk onay ölçüldü. İkinci onayda aynı native oturum ve tarayıcı bağlamıyla ödeme sayfası yeniden açıldı. Onay tıklaması başlangıç, başarılı yazma yanıtının bitişi ACK ve doğrulanmış sonuç durumunun görünmesi ekran ölçümüdür. Önceki kaynak `283cdb615dbd5185f51834fd49cfbf73e90e50fa`.
+
+| Profil                    | Örnek / kaynak | Onay → ACK p50 / p95 (ms)     | Onay → görünür sonuç p50 / p95 (ms) | Edge istekleri |
+| ------------------------- | -------------- | ----------------------------- | ----------------------------------- | -------------- |
+| İlk onay                  | 10             | 339,4 / 355,1 → 256,6 / 284,7 | 527,3 / 601,4 → 440,7 / 469,4       | 7 → 6          |
+| Aynı oturumda ikinci onay | 10             | 338,1 / 340,5 → 255,4 / 264,2 | 519,2 / 524,0 → 437,8 / 447,8       | 7 → 6          |
+
+Ağ sırası hesap → bekleyen ödeme kaynağı → tek yazma/ACK → taze hesap → paralel kesin ödeme ve organizasyon okumasıdır. Kayıp ACK sonrası aynı-key kurtarmada kaynak kontrolü tekrarlanmaz. Bu ölçüm sabit gecikmeli fixture koşusuna aittir. [Canlı kabul](remaining-work.md#ortak-talep-kabulleri) için yetkili sentetik operatör ve kendisine ayrılmış bekleyen ödeme gerekir.
+
 ## Devam
 
 Kaynak değiştiyse `main` ve aktif dalın tam farkını incele. [İlk açık ve önkoşulu karşılanan iş](production-queue.md#aktif-sıra) ile devam et. Aynı SHA'nın unit/MSW, tarayıcı, kalite, merge/main ve gerekli hosted kanıtlarını birbirinden ayır. Başarısız test için assertion/timeout/politika gevşetme; bilinmeyen ACK için ikinci native writer açma. Yalnız gerçek yeni kaynak veya ortam kanıtıyla kayıt güncelle; mikro adım günlükleri ve tekrar eden kabul metni üretme.

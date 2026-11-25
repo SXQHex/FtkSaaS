@@ -15,22 +15,23 @@ export interface ClientScope {
 // native writes, receipts and mandatory readbacks retain a fresh account read.
 export type AccountReadContext = Pick<QueryFunctionContext, "client" | "signal">;
 
-// Pin one native bearer across an operation and validate the domain account.
-// A stale editor must never submit its draft as a newly selected native account.
-export async function scopedBackend(
+async function nativeSession() {
+  const { data, error } = await getSupabaseClient().auth.getSession();
+  if (error) throw error;
+  if (!data.session) throw new Error("AUTH_REQUIRED");
+  return data.session;
+}
+
+async function verifiedBackend(
   scope: Pick<ClientScope, "accountId">,
   signal?: AbortSignal,
   context?: AccountReadContext,
 ) {
   signal?.throwIfAborted();
   context?.signal.throwIfAborted();
-  const { data, error } = await getSupabaseClient().auth.getSession();
-  if (error) throw error;
-  if (!data.session) throw new Error("AUTH_REQUIRED");
-  const bearer = data.session.access_token;
-  const backend = getBackend(bearer);
+  const session = await nativeSession();
+  const backend = getBackend(session.access_token);
   const request = { client_api_version: 1 as const, request_id: uuidv7() };
-  // Callers opt in to cancellation only for reads.
   const account = context
     ? await verifiedAccountForId(context.client, scope.accountId)
     : signal
@@ -38,9 +39,58 @@ export async function scopedBackend(
       : await backend.call("account_get_v1", request);
   signal?.throwIfAborted();
   if (account.id !== scope.accountId) throw new Error("ACCOUNT_CHANGED");
+  return { backend, session };
+}
+
+// Bind preflight and the first write to one verified, current native bearer.
+// A refreshed bearer or an explicit retry receives a fresh account check.
+export async function scopedCommandBackend(scope: Pick<ClientScope, "accountId">) {
+  const { backend, session } = await verifiedBackend(scope);
+  async function currentSession() {
+    const latest = await nativeSession();
+    if (!sameNativeSession(session, latest)) throw new Error("ACCOUNT_CHANGED");
+    return latest;
+  }
+  async function renew() {
+    const renewed = await verifiedBackend(scope);
+    if (!sameNativeSession(session, renewed.session)) throw new Error("ACCOUNT_CHANGED");
+    await currentSession();
+    return renewed.backend;
+  }
+  let attempted = false;
+  async function write<Result>(submit: (client: typeof backend) => Promise<Result>) {
+    const latest = await currentSession();
+    try {
+      const writer =
+        attempted || latest.access_token !== session.access_token ? await renew() : backend;
+      attempted = true;
+      return await submit(writer);
+    } catch (error) {
+      await currentSession();
+      throw error;
+    }
+  }
+  async function readback<Result>(load: (client: typeof backend) => Promise<Result>) {
+    await currentSession();
+    try {
+      return await load(await renew());
+    } finally {
+      await currentSession();
+    }
+  }
+  return { backend, currentSession, write, readback };
+}
+
+// Pin one native bearer across an operation and validate the domain account.
+// A stale editor must never submit its draft as a newly selected native account.
+export async function scopedBackend(
+  scope: Pick<ClientScope, "accountId">,
+  signal?: AbortSignal,
+  context?: AccountReadContext,
+) {
+  const { backend, session } = await verifiedBackend(scope, signal, context);
   const readSignal = context?.signal ?? signal;
   if (readSignal) {
-    const session = data.session;
     const currentSession = async () => {
       readSignal.throwIfAborted();
       const latest = await getSupabaseClient().auth.getSession();

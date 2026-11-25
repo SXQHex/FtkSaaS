@@ -6,7 +6,7 @@ Cache doğruluğu ve oturum kapsamı [kabul edildi](remaining-work.md#final-cach
 
 ## Aktif sıra
 
-Aktif teslim dilimi yok. [Güncel kabul kaydı](remaining-work.md#monorepo-geçişi).
+1. [XREQ-071](remaining-work.md#ortak-talep-kabulleri) için yetkili sentetik operatör ve bekleyen test ödemesi hazır olunca canlı ölçüm.
 
 Her teslim ayrı branch ve Draft PR ile başlar. Kod, test ve kabul aynı kaynak SHA'sına bağlıdır. Merge ve production değişikliği açık yetkiye bağlıdır.
 
