@@ -321,8 +321,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "c3bb3e3b1aa75074da09c4b0092bc1ed03ea1ca9b1dbec49bbd4d27794c70bf5",
-        "reason": "Hesap ve davet kabulü incelendi. API envanterinde davet testinin kaynak parmak izi güncellendi; sahiplik, seri çalışma ve kontrol kuralları aynı."
+        "fingerprint": "f968582baa3adab894ce718138ac855bba0d3b3cd42470289764b02cee9c65e2",
+        "reason": "İki hesap dizini görünümü aynı kanonik merkez kümesini kullanır. Test envanteri ve migration parmak izi güncellendi."
       }
     },
     {
@@ -557,8 +557,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "353c9892ac7477a799c739855ea2f2c4039bb072c7fbc9876d242801566e0d8c",
-        "reason": "Kapasite görünümü aynı sayımları yeniden kullanır. Eğitmen gereksinimi aynı aktif seans ve legacy ders ataması kurallarından okunur."
+        "fingerprint": "ed1f5f3f48a00043d6cb533871a936e302e1b717ae70d01ddd89a9722e21df9a",
+        "reason": "Merkez yöneticisi ve merkez dışı kullanıcı için hesap bağlantısı sınırı ortak native testte doğrulanır."
       }
     },
     {
@@ -682,8 +682,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "162b1758b3a07f2ef9a35800937aace68e2a514485431f391964291717468ae5",
-        "reason": "Takvimde aktif kapasite ve eğitmen gereksinimi aynı erişim koşulları ve yanıt alanlarıyla daha az sorgu kullanır."
+        "fingerprint": "acf09eef7b55cd70cd64c48775386c537fcafeb623367115993e2f977a0014e6",
+        "reason": "Paylaşılan öğrenci filtre testine hesap bağlantısı ve merkez izolasyonu örneği eklendi. Takvim ve seans sınırları aynı."
       }
     },
     {
@@ -786,7 +786,9 @@
         "apps/backend/supabase/migrations/20261124013000_scoped_read_projections.sql",
         "apps/backend/supabase/migrations/20261124152000_scoped_consumer_followup.sql",
         "apps/backend/supabase/migrations/20261125112000_share_person_calendar_read_locks.sql",
-        "apps/backend/supabase/migrations/20261125124000_selective_person_field_policy.sql"
+        "apps/backend/supabase/migrations/20261125124000_selective_person_field_policy.sql",
+        "apps/backend/supabase/migrations/20261125143626_people_page_operational_scope.sql",
+        "apps/backend/supabase/migrations/20261125144852_management_account_directory_reads.sql"
       ],
       "operations": [
         "account_access_send_v1",
@@ -805,8 +807,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "50048f3df17d972928ddea67b1c7febaea638eeba0ead49c93793cca245270e5",
-        "reason": "Davetin scope, sender config, lease ve tekrar kuralları korunur. Mevcut native kabul aynı job üzerinden vade ve sağlık kontrolünü doğrular."
+        "fingerprint": "f08bf806f50799d3bee2674acbad9d2317bc9965bb7941917cdf136f1697c774",
+        "reason": "Kişi ve bağlantı dizinleri kanonik merkez ilişkisini yeniden kullanır. Seçici, sayfa, arama, özet, Starter kişi kontrolü ve ACL korunur."
       }
     },
     {
@@ -935,8 +937,8 @@
         "freeze_cancel_apply_v1"
       ],
       "review": {
-        "fingerprint": "fcc62a261798bff027bdca51022d983ec05c06c8f4bdbc16f3c08eeb9efc51d6",
-        "reason": "Katalog okumasının paylaşımlı kilit kontrolü korunuyor. Genişletilen regresyon kişi ve takvim okumalarını da kapsıyor."
+        "fingerprint": "d9c5fba0d7f3efaf9b84ba9219b644db37c9fb1abe0bdc368a273e2f23f1a555",
+        "reason": "Paylaşılan öğrenci durumu testindeki alias bağlantısı merkezi ve mevcut kişi kapsamını doğrular. Satış ve hak okuma sırası aynı."
       }
     },
     {
@@ -2345,8 +2347,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "470f981288a71f1669f7a61d5c6369c7eebc2766bde8de1f064dc437317217af",
-        "reason": "Otuz saniyelik Cron kontrolü vadesi gelen davet ve işlemsel e-posta işlerini geçirir. Taze imzalı makbuzla boş HTTP çağrısı atlanır ve stale işareti izlenir."
+        "fingerprint": "12f3f66005ce363a68827ad5ed9d444be6258b0bb23c5a61d4b83f3dd2e932a6",
+        "reason": "O10 pilotunda 50 native oturumun ağ öncesi doğrulanmasını ve başarısız isteklerin güvenli HTTP/iz kaydını inceledik. Dalga kapsamı ve yerel mutabakat kuralları korunur."
       }
     }
   ]
