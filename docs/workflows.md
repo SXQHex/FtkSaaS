@@ -56,6 +56,8 @@ Kesin merkez okumasında `centers_list_v1(center_id,page)` mevcut görünürlük
 
 Disiplin kapatmadan önce organizasyon veya merkez kapsamındaki yönetim selector’üyle güncel pasifleştirme etkisi okunur. Açık işler çözülür, kalan referanslar güncel proof ile açıkça kabul edilir; [kesin kapsam](settings.md#iş-takvimi-disiplin-etkisi-ve-iş-uyarıları) hak/geçmiş silmez.
 
+**İmha ve organizasyon dizini.** DB ve Storage imha makbuzları eşleşen organizasyon, kapalı anonimleştirilmiş kayıt saklansa da `organizations_list_v1` ve `self_context` sonucundan çıkar. İmha tamamlanmadan bekleyen durum ve yetkili iş takibi erişilebilir kalır.
+
 **Kendi kişi bağını keşfetme (XREQ-032):** Native girişten sonra `organizations_list_v1` içinden açık seçilen org öğesinin `self_context` alanı kullanılır. Doğrulanmış canlı bağ yoksa null; org listede yoksa erişim yoktur. Dönen canonical person_id, nullable Abone No ve canlı centers/student/instructor/assistant kapsamı UUID türetme veya rezervasyon arama ihtiyacını kaldırır. Üyelik/rol kaybında yeniden okunur; bu snapshot sonraki writer'ın canlı yetki kontrolünün yerine geçmez. Hesap kimliği kişi kimliği değildir.
 
 **Amaç/aktör:** Yetkili kullanıcı stüdyo ve işlem yetkisini kurar. Owner/OM ile CM kapsamı ayrıdır.

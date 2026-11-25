@@ -51,6 +51,8 @@ export async function verifyOrganizationErasure(t){
   const preview=await must(owner,'organization_delete_preview_v1',{org_id:org,all_data:true,reason:org});
   const {job_id:jobId}=await must(owner,'organization_delete_apply_v1',{org_id:org,all_data:true,preview:{id:preview.id,token:preview.token},reauth:owner.jwt},key());
   const [{request_id:requestId}]=await rows('select request_id from private.p07_privacy_jobs where id=$1',[jobId]);
+  const pendingDirectory=await must(owner,'organizations_list_v1',{page:{},include_self_management_scope:true});
+  assert(pendingDirectory.items.some(item=>item.id===org&&item.state==='deletion_pending'));
   await assert.rejects(readOrganizationErasureReceipt({db,requestId,orgId:org}),/ORGANIZATION_ERASURE_RECEIPT_INCOMPLETE/);
   const {role,client:worker}=await login('ftk_p07_privacy_worker');
   const {role:attestorRole,client:attestor}=await login('ftk_p07_storage_attestor');
@@ -147,6 +149,10 @@ export async function verifyOrganizationErasure(t){
   assert.equal((await must(owner,'account_get_v1')).id,account.id);
   assert.equal((await must(control,'account_get_v1')).id,controlAccount.id);
   assert.equal((await must(owner,'job_status_get_v1',{org_id:org,job_id:jobId})).privacy.request_state,'partial');
+  const afterErasure=await must(owner,'organizations_list_v1',{page:{},include_self_management_scope:true});
+  assert(!afterErasure.items.some(item=>item.id===org));
+  const controlDirectory=await must(control,'organizations_list_v1',{page:{}});
+  assert(controlDirectory.items.some(item=>item.id===otherOrg));
   const restore=await verifyCompleteOrganizationErasureRestore({db,dbUrl:DB_URL,requestId,ids,before,r2Pilot,signingContext});
   assert.equal(restore.erased_subjects,4);
   t.diagnostic(JSON.stringify(restore));
