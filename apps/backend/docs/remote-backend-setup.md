@@ -434,7 +434,9 @@ Hesap silme için mevcut global privacy worker'a ek `private.account_export_eras
 <a id="o05-storage-on-kontrolu"></a>
 ### O05 Storage ön kontrolü
 
-[Storage imha adaptörü](../scripts/p07-storage-erasure.mjs) envanterden yetkili olarak seçilmiş tek süresi dolmuş bekleyen yüklemeyi işler. Mevcut P07 lease’i, talep ve dosyaya bağlı worker, aynı kapsamda ayrı attestor bağlantısı ve tanımlı Storage origin’i gerekir. İmha makbuzu için kesin Storage API silme yanıtı ve yetkili yokluk okuması gerekir. Belirsiz yanıt operatör incelemesine kalır. Saklama kapsamındaki hazır kaynaklar korunur.
+[Storage imha adaptörü](../scripts/p07-storage-erasure.mjs) envanterden yetkili olarak seçilmiş tek nesneyi işler. Mevcut P07 lease’i, talep ve dosyaya bağlı worker, aynı kapsamda ayrı attestor bağlantısı ve tanımlı Storage origin’i gerekir. İmha makbuzu için kesin Storage API silme yanıtı ve yetkili yokluk okuması gerekir. Belirsiz yanıt operatör incelemesine kalır.
+
+Tüm satırları uygulanmış import işine bağlı CSV için yetkili DB oturumu, `private.organization_import_source_erasure_approvals` kaydına talep, organizasyon, iş ve dosya kimliklerini, dosya checksum’ını ve açık imha kararının kimliğini bağlar. Hazırlık ve native Storage silme işlemi P06 işini, uygulanan önizlemeyi, kaynak sonuçlarını ve işleme kopyalarının yokluğunu doğrular. İçe aktarılan sonuç, iş ve satır saklama blokajları da kontrol edilir. Ayrı attestor, kaynak baytlarının checksum doğrulamasından sonra kesin nesne ve lease için silme yetkisi verir. Başarılı sağlayıcı yanıtını o silmenin kaydıyla eşler. Yanıt geldikten sonra bağlantı kesilirse yeni lease yalnız başlangıçta doğrulanan Storage adresinden yokluk okumasını sürdürür. Uygulanmamış satır veya doğrulanamayan kaynak bağı varsa imha durur.
 
 Yetkili işletim bağlantısında yalnız sayım al. Sorgu, `ftksaas-imports` nesnelerini beklenen organizasyon/dosya yolu, dosya amacı ve P06 sahiplik kaydı ile eşler. Hazır kaynakları, eşleşmesi belirsiz nesneleri ve süresi dolmuş bekleyen yüklemeleri tespit eder. Hesap blokajı organizasyonlar arasında, kayıt ve organizasyon blokajı kendi kapsamlarında geçerlidir.
 

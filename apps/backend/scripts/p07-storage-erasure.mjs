@@ -49,7 +49,12 @@ export async function eraseExpiredImportObject({db,attestor,request,fileId,apiUr
  const args=[request,fileId];
  const prepared=(await db.query('select private.p07_storage_erasure_prepare($1,$2) result',args)).rows[0].result;
  if(['unbound','held','absent','unconfirmed','completed'].includes(prepared?.state))return{state:prepared.state};
- await deletePreparedStorageObject({origin,serviceKey,prepared,fileId,fetcher});
+ const linked=prepared?.linked_import_attestation===true&&prepared.bucket_id==='ftksaas-imports';
+ const witness=phase=>attestor.query('select private.p07_linked_import_storage_witness($1,$2,$3,$4,$5)',
+  [...args,phase,prepared.checksum,prepared.bytes]);
+ await deletePreparedStorageObject({origin,serviceKey,prepared,fileId,fetcher,readbackOnly:linked&&prepared.state==='readback',
+  beforeDelete:linked?()=>witness('authorize'):undefined,
+  acknowledge:linked?()=>witness('acknowledge'):undefined});
  const proof=(await attestor.query('select private.p07_storage_erasure_confirm($1,$2) result',args)).rows[0].result;
  if(proof?.state!=='completed')throw Error('STORAGE_PROOF_UNCONFIRMED');
  return{state:'completed'};
@@ -68,7 +73,7 @@ export async function erasePreparedDocumentObject({apiUrl,serviceKey,prepared,fe
   readbackOnly:prepared.state==='readback'});
 }
 
-async function deletePreparedStorageObject({origin,serviceKey,prepared,fileId,fetcher,invoice=false,acknowledge,readbackOnly=false}){
+async function deletePreparedStorageObject({origin,serviceKey,prepared,fileId,fetcher,invoice=false,beforeDelete,acknowledge,readbackOnly=false}){
  const objectKey=prepared?.object_key,segments=typeof objectKey==='string'?objectKey.split('/'):[];
  // Older deployed import preparations predate the explicit bucket and MIME.
  const legacy=!invoice&&prepared?.bucket_id===undefined&&prepared?.mime===undefined;
@@ -89,6 +94,7 @@ async function deletePreparedStorageObject({origin,serviceKey,prepared,fileId,fe
  });
  if(!readbackOnly){
   await verifyBytes(await download(),prepared,mime);
+  if(beforeDelete)await beforeDelete();
   let removed;
   try{
    removed=await fetcher(endpoint+bucket+'/'+objectKey,{

@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "fbc4850656414398bfe6333451ac962b40065f746ff928e439a02fd7c05c91da",
-        "reason": "Ortak sözleşme ve 249 migration envanteri değişen backend kaynaklarıyla eşlendi."
+        "fingerprint": "10072306912797b4be82096adabbd7a3a0f936323883ada0b7e14840d9678a04",
+        "reason": "Ortak sözleşme ve 251 migration envanteri kaynakla eşlendi."
       }
     },
     {
@@ -2061,7 +2061,9 @@
         "apps/backend/supabase/migrations/20261125050500_organization_erasure_intake.sql",
         "apps/backend/supabase/migrations/20261125051500_organization_erasure_register_pending.sql",
         "apps/backend/supabase/migrations/20261125052500_organization_erasure_pending_claim.sql",
-        "apps/backend/supabase/migrations/20261125053500_organization_erasure_abandoned_previews.sql"
+        "apps/backend/supabase/migrations/20261125053500_organization_erasure_abandoned_previews.sql",
+        "apps/backend/supabase/migrations/20261125054500_organization_linked_import_source_erasure.sql",
+        "apps/backend/supabase/migrations/20261125055500_organization_linked_import_storage_attestation.sql"
       ],
       "operations": [
         "account_delete_preview_v1",
@@ -2086,8 +2088,8 @@
         "platform_operator_access_set_v1"
       ],
       "review": {
-        "fingerprint": "d9f6b0ca2d72feb3973d2dc17af13eac9042331e6009dbc1e7a4dc89098ab2c8",
-        "reason": "Bağımsız R2 sicilinin birim testleri mevcut restore guard test köküne bağlandı."
+        "fingerprint": "6c8a91aed6d0bb46efd393e8d31a17324b62bf151cb1824610655d6c3862ee5f",
+        "reason": "Bağlı CSV için imha kararı, native Storage kanıtı ve izole restore retleri incelendi."
       }
     },
     {
@@ -2294,7 +2296,9 @@
         "apps/backend/supabase/migrations/20261125051500_organization_erasure_register_pending.sql",
         "apps/backend/scripts/organization-erasure-receipt.mjs",
         "apps/backend/supabase/migrations/20261125052500_organization_erasure_pending_claim.sql",
-        "apps/backend/supabase/migrations/20261125053500_organization_erasure_abandoned_previews.sql"
+        "apps/backend/supabase/migrations/20261125053500_organization_erasure_abandoned_previews.sql",
+        "apps/backend/supabase/migrations/20261125054500_organization_linked_import_source_erasure.sql",
+        "apps/backend/supabase/migrations/20261125055500_organization_linked_import_storage_attestation.sql"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -2309,8 +2313,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "edeb852a9abb0f0d75f86e6d74901c37d4776debcb5b62741c2c7dc712f382ef",
-        "reason": "P07 kuyruğu ve Storage imhası doğrulanmış bağımsız sicil niyetini bekler; ortak worker regresyonları korunur."
+        "fingerprint": "2ac274357f1ab5b8d71f89c445e18d9fdfedbb28905bf6b67576dfc656d8e1c4",
+        "reason": "Ayrı attestor yetkisi ve sonradan gelen sağlayıcı yanıtıyla lease ve origin bağları incelendi."
       }
     }
   ]

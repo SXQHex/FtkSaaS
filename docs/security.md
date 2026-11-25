@@ -1,6 +1,6 @@
 # Güvenlik kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `0cfb85cad0f151a2cf88efef07a3ae54891c4f40c251fc86189b6fedf2d71add`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `6fa78dd4f55ec7f065b5b7a0fbac17d56491e63589aecc94994fa9ca5366792f`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 İnsan istemci native Auth ile JWT doğrulanan Edge yolunu, düz merkez listesi ise [istemci protokolündeki](client-integration.md) Data API yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan denetlenir. İstemci erişimi core/private ve service-only RPC dışında kalır. Worker ve public credential transport ayrı yetki yollarıdır. [Teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
 
@@ -470,6 +470,8 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [20261125050500_organization_erasure_intake.sql](../apps/backend/supabase/migrations/20261125050500_organization_erasure_intake.sql) | `5dd89490b3b72f6c439b107df4c1c8279921da85dce96d5eb12be15c43861af0` |
 | [20261125051500_organization_erasure_register_pending.sql](../apps/backend/supabase/migrations/20261125051500_organization_erasure_register_pending.sql) | `960d0e0acee85a8c90d5f4b828d07567abe964fda3157ae5b120d30fe038b4f8` |
 | [20261125052500_organization_erasure_pending_claim.sql](../apps/backend/supabase/migrations/20261125052500_organization_erasure_pending_claim.sql) | `2414cb7a9d508201a39ce6ba4f4c844861e4bf68d1651d732956625ec841bfcf` |
+| [20261125054500_organization_linked_import_source_erasure.sql](../apps/backend/supabase/migrations/20261125054500_organization_linked_import_source_erasure.sql) | `bf5d552a50b949dd05bbedaed14e537c09f1d924e02cf9493233dfae4f9275a0` |
+| [20261125055500_organization_linked_import_storage_attestation.sql](../apps/backend/supabase/migrations/20261125055500_organization_linked_import_storage_attestation.sql) | `a9e273d0f4170adecc121551755d4f9c756629f0bd12fbd21c4255444ab3d1ac` |
 | [member-profile-lifecycle.sql](../apps/backend/tests/fixtures/member-profile-lifecycle.sql) | `1cac25c1610482b03cb7e594e4c28a61903bd047ae86ff724623c600dbf858d0` |
 | [product-class-management-acceptance.sql](../apps/backend/tests/fixtures/product-class-management-acceptance.sql) | `52141944d8ff08008a71d20be6b69d79e55480fad3e387f4ad377ace15a274d1` |
 | [sale-discount-acceptance.sql](../apps/backend/tests/fixtures/sale-discount-acceptance.sql) | `c17253fcdcd3460048bc35bf31c752315e1b7d5092b6c4231ab9b5349b4afc29` |

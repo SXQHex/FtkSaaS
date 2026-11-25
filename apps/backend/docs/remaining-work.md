@@ -940,7 +940,7 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 - **Sınır/olumsuz durum:** Metadata silmek bayt silmek değildir; izinli hold ve retry sınırları korunur.
 - **Doğrulama senaryosu:** Dosya/download kalıntısı, kesinti/retry ve expiry; checksum/envanter ile kanıt.
 - **Kaynak alanı:** Storage/export/temp executor; ilgili acceptance
-- **Kalan:** İşe bağlı özgün import dosyaları, kalan işleme/aktarım kopyaları ve aktif kullanıma bağlı belge dosyaları için hold, yeniden başlatma sonrası bayt ve indirme yokluğu. Fatura, yüklemeli imzalı belge, güncel/geçmiş logo ve satış önizlemesi içeren [karma R2 tatbikatında dosya makbuzu](00-FtkSaaS-yeni-sohbet-devir.md#o06-r2-pilot) tamamlandı.
+- **Kalan:** Uygulanmamış satır içeren import işlerine bağlı özgün dosyalar, kalan işleme/aktarım kopyaları ve aktif kullanıma bağlı belge dosyaları için gerekli saklama kararı ile bayt ve indirme yokluğu kabulü. Fatura, yüklemeli imzalı belge, güncel/geçmiş logo ve satış önizlemesi içeren [karma R2 tatbikatında dosya makbuzu](00-FtkSaaS-yeni-sohbet-devir.md#o06-r2-pilot) tamamlandı.
 
 **DB export dilimi:** Hesap silme talebinde exact rol/hesap bağlantısı, tam report/job/file sahipliği, hold ve canlı lease kontrolüyle yalnız geçici DB export baytları kaldırılır. Olağan expiry de aynı hold/proof yolunu bounded100 dosyalık adımlarda kullanır; gerçek boyut/hash ve değişmez minimal kanıt atomiktir. Kaynak import dosyaları, tenant belge/kişi/finans ve rapor metadata'sı korunur. Bu alt aşama genel exports/Storage/backup veya privacy tamamlandı anlamına gelmez. Kaynak/native/CI/hosted ayrımı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#pro-export-saklama-ve-imha-paketi) tutulur.
 
@@ -954,7 +954,7 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 
 **Organizasyon export ve bağlantısız hazır kaynakları:** Aynı P07 talebi kapsamında, doğrulanmış geçici DB rapor baytları ve bağlı kullanımı olmayan hazır import nesneleri ayrı değişmez makbuz üretir. İşe bağlanmış import kaynakları ve işleme kopyaları, belge ve fatura baytları için saklama ile imha sınırı ve açık kalan yürütüm kendi kapsamlarında doğrulanır.
 
-**Terminal import işleme kopyaları:** Aynı P07 talebi, kaynak ve sonuç eşliği kanıtlanmış terminal işlerin ham satır alanlarını ve geçici önizleme, doğrulama ve takip bağlamını temizler. Girdi parmak izi, uygulanan sonuç referansları, açık işler ve saklama blokajlı kayıtlar korunur. İşe bağlı özgün import kaynaklarında arşiv veya imha kararıyla birlikte gerçek bayt kanıtı açık.
+**Terminal import işleme kopyaları:** Aynı P07 talebi, kaynak ve sonuç eşliği kanıtlanmış terminal işlerin ham satır alanlarını ve geçici önizleme, doğrulama ve takip bağlamını temizler. Tüm satırları uygulanmış işe bağlı özgün CSV, dosyaya özgü imha kararıyla native Storage makbuzu üretir. [İzole kaynak ve restore kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#o06-r2-pilot).
 
 <a id="o06"></a>
 ### O06 — Bağımsız imha sicili
