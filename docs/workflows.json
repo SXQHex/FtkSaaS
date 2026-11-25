@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "5da627dde25d0f78fbe3c3cab284ee3f758a742ae78f9ae4537c9434e2c22834",
-        "reason": "Aday envanterinde yalnız genişletilen okuma kilidi testinin kaynak özeti güncellendi. Test sahipliği ve çalıştırma kuralları korundu."
+        "fingerprint": "30b0b6874146f55ccbec027b11105969a77a544f7487a2a7a9ef2aa6893d880a",
+        "reason": "Migration envanteri davet tick saklama indeksini içerir. Ortak Auth ve komut kurtarma kuralları korunur."
       }
     },
     {
@@ -525,7 +525,8 @@
         "apps/backend/supabase/migrations/20261124013000_scoped_read_projections.sql",
         "apps/backend/supabase/migrations/20261124013200_exact_management_readbacks.sql",
         "apps/backend/supabase/migrations/20261124134857_share_center_configuration_read_locks.sql",
-        "apps/backend/supabase/migrations/20261124152000_scoped_consumer_followup.sql"
+        "apps/backend/supabase/migrations/20261124152000_scoped_consumer_followup.sql",
+        "apps/backend/supabase/migrations/20261125124800_calendar_read_projections.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -553,8 +554,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "5de77c7f5c8eb6fba5c147af7cd1bacb08e428b9f878332773a624bac6d40a36",
-        "reason": "Kilit regresyonu mevcut stüdyo okumalarına ek olarak kişi ve takvim sorgularını doğruluyor. Merkez ve rol yetkileri önceki kurallardan okunuyor."
+        "fingerprint": "353c9892ac7477a799c739855ea2f2c4039bb072c7fbc9876d242801566e0d8c",
+        "reason": "Kapasite görünümü aynı sayımları yeniden kullanır. Eğitmen gereksinimi aynı aktif seans ve legacy ders ataması kurallarından okunur."
       }
     },
     {
@@ -654,7 +655,8 @@
         "apps/backend/supabase/migrations/20261124013000_scoped_read_projections.sql",
         "apps/backend/supabase/migrations/20261124152000_scoped_consumer_followup.sql",
         "apps/backend/supabase/migrations/20261124220645_session_read_center_projection.sql",
-        "apps/backend/supabase/migrations/20261125112000_share_person_calendar_read_locks.sql"
+        "apps/backend/supabase/migrations/20261125112000_share_person_calendar_read_locks.sql",
+        "apps/backend/supabase/migrations/20261125124800_calendar_read_projections.sql"
       ],
       "operations": [
         "availability_save_v1",
@@ -677,8 +679,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "c39e85cf93fdcdac269c6903d39f0d0a04acf7acea44ea06d756cfa1ba126056",
-        "reason": "Takvim okuması paylaşımlı organizasyon kilidi alıyor. Görünür kayıtlar, kapsam ve yazma yetkileri önceki kurallarla doğrulanıyor."
+        "fingerprint": "162b1758b3a07f2ef9a35800937aace68e2a514485431f391964291717468ae5",
+        "reason": "Takvimde aktif kapasite ve eğitmen gereksinimi aynı erişim koşulları ve yanıt alanlarıyla daha az sorgu kullanır."
       }
     },
     {
@@ -780,7 +782,8 @@
         "apps/backend/supabase/migrations/20261124012000_share_organization_read_locks.sql",
         "apps/backend/supabase/migrations/20261124013000_scoped_read_projections.sql",
         "apps/backend/supabase/migrations/20261124152000_scoped_consumer_followup.sql",
-        "apps/backend/supabase/migrations/20261125112000_share_person_calendar_read_locks.sql"
+        "apps/backend/supabase/migrations/20261125112000_share_person_calendar_read_locks.sql",
+        "apps/backend/supabase/migrations/20261125124000_selective_person_field_policy.sql"
       ],
       "operations": [
         "account_access_send_v1",
@@ -799,8 +802,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "b19eb172bc083e0782d36a0b8df5ba0be2d245d800d5e6dc16f44712b1ada22f",
-        "reason": "Kişi detayı diğer yetkili okumalarla aynı organizasyon kilidini paylaşabiliyor. Canlı kişi ve merkez kapsamı ile özel alan erişimi mevcut kurallara bağlı."
+        "fingerprint": "1cdcdd6b7e6e186c63a9d26d84a5dc02d203855ee30ac5a7b4050623cb246c3f",
+        "reason": "Kişi adı ve iletişim sahipliği yalnız ilgili canlı hesap bağlantısı ve seçili iletişim kimliklerinden okunur. Alias, alan sahipliği, ACL ve mevcut kişi liste/detay sözleşmesi korunur."
       }
     },
     {
@@ -2054,6 +2057,7 @@
         "apps/backend/supabase/migrations/20261124233946_organization_projected_contact_erasure.sql",
         "apps/backend/scripts/organization-erasure-receipt.mjs",
         "apps/backend/supabase/migrations/20261125005753_organization_live_database_erasure.sql",
+        "apps/backend/supabase/migrations/20261125121407_organization_erasure_scheduler_cursor.sql",
         "apps/backend/supabase/migrations/20261125005455_organization_managed_file_erasure.sql",
         "apps/backend/scripts/r2-erasure-state.mjs",
         "apps/backend/scripts/r2-s3-object-store.mjs",
@@ -2104,8 +2108,8 @@
         "platform_operator_access_set_v1"
       ],
       "review": {
-        "fingerprint": "b47aff24a26782ff8a1d3354af086d2f50e30a5d988512e7e10037c0d058ac6d",
-        "reason": "Yerel ücretli satış ve CRM kabulü doğrulandı. Kalıcı AB R2 koşusu karşı bucket okumasını sentetik makbuzdan önce reddeder."
+        "fingerprint": "400e75f862eaa3d8326f5bca14e2320641ecf53e5d98ba3400f67294f449cd70",
+        "reason": "Ortak Edge girişi Auth sağlayıcısı arızasını geçersiz oturumdan ayırır. Platform erişim kapsamı, canlı üyelik ve JWT/MFA kontrolleri korunur."
       }
     },
     {
@@ -2321,7 +2325,8 @@
         "apps/backend/supabase/migrations/20261125060500_organization_import_rejected_row_hold_evidence.sql",
         "apps/backend/supabase/migrations/20261125061500_organization_import_directory_erasure.sql",
         "apps/backend/supabase/migrations/20261125062500_crm_import_copy_retention_holds.sql",
-        "apps/backend/supabase/migrations/20261125080144_crm_import_source_storage_erasure.sql"
+        "apps/backend/supabase/migrations/20261125080144_crm_import_source_storage_erasure.sql",
+        "apps/backend/supabase/migrations/20261125131200_index_invitation_tick_retention.sql"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -2336,8 +2341,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "47fbeefc9afc17d9410c4a6f63a71ad054551f670bb565d356354158fd47b22e",
-        "reason": "Özgün CRM dosyasının bayt, satır, sonuç ve canlı blokaj eşliği mevcut Storage makbuzuna bağlandı. Eşlenmemiş sütun, rıza ve eksik dayanak dosyayı korur."
+        "fingerprint": "0dfadc700f4999382020d85ad6a7dd0260e7b68daf5debd30675152df6bd406d",
+        "reason": "Davet worker imzalı tick, tekrar reddi, bir günlük saklama ve en fazla yüz eski satır temizliğini korur. Saklama sorgusu zaman indeksinden yararlanır."
       }
     }
   ]
