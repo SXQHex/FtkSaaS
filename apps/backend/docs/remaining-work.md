@@ -989,7 +989,7 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 - **Sınır/olumsuz durum:** Tek SQL veya dosya restore bütün kabul değildir; kaynak hedef ayrıdır.
 - **Doğrulama senaryosu:** DB mutabakatı, gerçek giriş, Storage checksum; Edge/config/secret envanteri ve worker binding doğrulaması.
 - **Kaynak alanı:** restore runbook ve mevcut araçlar
-- **Kalan:** [Hedefin son envanterinde](00-FtkSaaS-yeni-sohbet-devir.md#o08-o10-hedef-on-kontrol) doğrulanan P01, P05, P06 ve P07 işlerine ek olarak privacy Cron’unun gerçek iş kabulünü tamamla. [Tam restore prosedüründe](remote-backend-setup.md#managed-restore-prosedürünün-sınırı) öngörülen dış sağlayıcı yapılandırmasını ve gereken sırların hedefte yeniden sağlanmasını [hazırlanan karşılaştırmayla](remote-backend-setup.md#izole-restore-on-kontrol) doğrula.
+- **Kalan:** Beş worker’ın [gerçek Cron kabulü](00-FtkSaaS-yeni-sohbet-devir.md#o08-o10-hedef-on-kontrol) tamamlandı. [Tam restore prosedüründe](remote-backend-setup.md#managed-restore-prosedürünün-sınırı) öngörülen dış sağlayıcı yapılandırmasını ve gereken sırların hedefte yeniden sağlanmasını [hazırlanan karşılaştırmayla](remote-backend-setup.md#izole-restore-on-kontrol) doğrula.
 
 <a id="o09"></a>
 ### O09 — Backup non-resurrection kabulü
@@ -1005,7 +1005,7 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 <a id="o10"></a>
 ### O10 — Yük ve kurtarma hedeflerini ölç
 
-- [ ] **Durum:** [İlk hosted dalga ve kilit tanısı](00-FtkSaaS-yeni-sohbet-devir.md#o08-o10-hedef-on-kontrol) gecikme hedeflerinin aşıldığını gösterdi. Yerel düzeltme doğrulandı. Düzeltilmiş kaynakla tam hosted pilot ve RPO/RTO kabulü açık · **Tür:** D/H · **Plan:** Tümü · **Özellik:** F01,F08,F19,F28,F33
+- [ ] **Durum:** [Hosted dalgalar ve istek bazında SQL zaman aşımı tanısı](00-FtkSaaS-yeni-sohbet-devir.md#o08-o10-hedef-on-kontrol) gecikme hedeflerinin kilit düzeltmesinden sonra da aşıldığını gösterdi. Kalıcı performans düzeltmesi, tam hosted pilot ve RPO/RTO kabulü açık · **Tür:** D/H · **Plan:** Tümü · **Özellik:** F01,F08,F19,F28,F33
 - **Bağımlılık:** O02,O08
 - **Kabul:** Ayrı altyapı projesinde belirlenecek veri hacmi ve iş karışımıyla gecikme/queue/finans doğruluğu ve kurtarma hedefleri ölçülür. G02/G01/G03 için plan başına ayrı işletim kabulü oluşturmaz.
 - **Sınır/olumsuz durum:** Öğrenci sayısı eşzamanlı kullanıcı sayısı değildir; onaylanmamış SLA/eşik uydurulmaz.

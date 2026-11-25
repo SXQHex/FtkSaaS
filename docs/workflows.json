@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "bcb00b59d581db715ae7e155e08f4b375d8fab2d0cfa9a4976c42876090a9e60",
-        "reason": "Migration envanteri bir arttı. İstemci sözleşmesi ve mevcut yerel CI kapsamı korunuyor."
+        "fingerprint": "4d8def013511e874014cb445ae97aeeccda40f79aff1363dd2a4861fd7f26f98",
+        "reason": "Yalnız migration envanteri ve kişi alanı kaynak izi güncellendi. Ortak native Auth, canlı yetki ve komut kurtarma protokolü aynı."
       }
     },
     {
@@ -780,7 +780,8 @@
         "apps/backend/supabase/migrations/20261124012000_share_organization_read_locks.sql",
         "apps/backend/supabase/migrations/20261124013000_scoped_read_projections.sql",
         "apps/backend/supabase/migrations/20261124152000_scoped_consumer_followup.sql",
-        "apps/backend/supabase/migrations/20261125112000_share_person_calendar_read_locks.sql"
+        "apps/backend/supabase/migrations/20261125112000_share_person_calendar_read_locks.sql",
+        "apps/backend/supabase/migrations/20261125124000_selective_person_field_policy.sql"
       ],
       "operations": [
         "account_access_send_v1",
@@ -799,8 +800,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "b19eb172bc083e0782d36a0b8df5ba0be2d245d800d5e6dc16f44712b1ada22f",
-        "reason": "Kişi detayı diğer yetkili okumalarla aynı organizasyon kilidini paylaşabiliyor. Canlı kişi ve merkez kapsamı ile özel alan erişimi mevcut kurallara bağlı."
+        "fingerprint": "1cdcdd6b7e6e186c63a9d26d84a5dc02d203855ee30ac5a7b4050623cb246c3f",
+        "reason": "Kişi adı ve iletişim sahipliği yalnız ilgili canlı hesap bağlantısı ve seçili iletişim kimliklerinden okunur. Alias, alan sahipliği, ACL ve mevcut kişi liste/detay sözleşmesi korunur."
       }
     },
     {
