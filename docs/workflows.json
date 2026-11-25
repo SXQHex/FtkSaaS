@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "c023eb73e2dc78c049936ecf2ec3a75112648571cb1fb661e768beabc9cd5518",
-        "reason": "Node LTS ve pnpm pinleri güncellendi. Frozen kurulum ve API kapsamı korunuyor. Onaylı inceleme kaydı yalnız pnpm sürüm beklentisine bağlı."
+        "fingerprint": "acf6e1291779471849b2d4fc125fbdb92161a4b89cbe01222fd4bf1a6638a666",
+        "reason": "Node LTS ve pnpm pinleri ile yerel Auth sağlayıcı anahtarları güncellendi. Frozen kurulum, API kapsamı ve pnpm sürüm beklentisine ait inceleme kaydı doğrulandı."
       }
     },
     {
@@ -414,8 +414,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "c6f03a3f77c1decd89366e56100400584f18c6efabba94db763c345705dcb5cd",
-        "reason": "Kimlik ve doğrulanmış ad fallback kabulü, hesap kaydı olmayan operatörü kendi üyelik zamanıyla doğrular."
+        "fingerprint": "758419c4222488629a10e82a1e2a82c2b285676b9fc04274f0537a84b17020b4",
+        "reason": "E-posta açık ve SMS kapalı değerleri yeni sağlayıcı anahtarlarına taşındı. Genel kayıt izni ve e-posta onay gereksinimi korunuyor."
       }
     },
     {
