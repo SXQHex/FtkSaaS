@@ -1,5 +1,10 @@
 # Güncel kaynak ve kabul
 
+<a id="supabase-cli-v4-uyumlulugu"></a>
+## Supabase CLI v4 uyumluluğu
+
+Taban main `f622f8e4954148e51051a35ae99e9c86e9ba8d4f` ve [aynı SHA’nın kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/45517163690) doğrulandı. Yerel [Supabase ayarları](../supabase/config.toml) açık e-posta ve kapalı SMS sağlayıcısı için `enabled` kullanır. Genel kayıt izni ve e-posta onayı korunur. `db:advisors` CLI’ın yerel hedef varsayılanını kullanır. CLI 3.3.0 yapılandırmayı sıfır uyarıyla doğruladı. CLI 3.0.0 ile izole native başlangıç, sağlayıcı ayarı okuması, kayıt kabulü (7/7) ve yerel advisor komutu geçti.
+
 <a id="o03-o10-isletim-kaniti"></a>
 ## O03–O10 — Saklama, imha ve kurtarma kabulü
 

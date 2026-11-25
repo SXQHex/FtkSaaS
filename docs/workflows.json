@@ -320,8 +320,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "a053ba45e01c36d7a810c1959a32dc97470edc0358fc5bcec3aeea307ff355ba",
-        "reason": "Migration envanteri ve ortak native sözleşme kapsamı doğrulandı."
+        "fingerprint": "ebf3741cf63d2fd5bd6e6e2baf78399d6f341ac4295ed9d44d3b569ebc439e5b",
+        "reason": "Yerel Supabase yapılandırmasında e-posta ve SMS sağlayıcıları yeni CLI anahtarlarıyla aynı değerleri koruyor."
       }
     },
     {
@@ -414,8 +414,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "c6f03a3f77c1decd89366e56100400584f18c6efabba94db763c345705dcb5cd",
-        "reason": "Kimlik ve doğrulanmış ad fallback kabulü, hesap kaydı olmayan operatörü kendi üyelik zamanıyla doğrular."
+        "fingerprint": "758419c4222488629a10e82a1e2a82c2b285676b9fc04274f0537a84b17020b4",
+        "reason": "E-posta açık ve SMS kapalı değerleri yeni sağlayıcı anahtarlarına taşındı. Genel kayıt izni ve e-posta onay gereksinimi korunuyor."
       }
     },
     {
