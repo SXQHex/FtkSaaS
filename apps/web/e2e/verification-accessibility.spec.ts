@@ -21,6 +21,7 @@ for (const colorScheme of ["light", "dark"] as const) {
       const resend = page.getByRole("button", { name: "Yeniden gönder" });
       await activate(resend, "Enter");
       const email = page.getByLabel("E-posta", { exact: true });
+      const touch = hasTouchInput(page);
       await expect(email).toBeFocused();
       const controls = [
         page.getByRole("link", { name: "F FtkSaaS" }),
@@ -28,7 +29,6 @@ for (const colorScheme of ["light", "dark"] as const) {
         resend,
         page.getByRole("link", { name: "Girişe dön" }),
       ];
-      const touch = hasTouchInput(page);
       if (!touch) await controls[0]!.focus();
       for (const [index, control] of controls.entries()) {
         if (touch) {
@@ -52,9 +52,15 @@ for (const colorScheme of ["light", "dark"] as const) {
       }
       await email.fill("invalid");
       await submitWithDevice(resend);
-      await expect(email).toBeFocused();
+      if (!touch) {
+        await expect(email).toBeFocused();
+      }
       await expect(email).toHaveAttribute("aria-invalid", "true");
       await expect(email).toHaveAccessibleDescription("Geçerli bir e-posta adresi gir.");
+      if (touch) {
+        await email.tap();
+        await expect(email).toBeFocused();
+      }
       expect(await page.evaluate("document.documentElement.scrollWidth > innerWidth")).toBe(false);
       expect(
         (await scanAccessibility(page, "verification-expanded-invalid-email")).violations,

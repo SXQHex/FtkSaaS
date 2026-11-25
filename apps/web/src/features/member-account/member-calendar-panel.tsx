@@ -337,6 +337,7 @@ export function MemberCalendarPanel({
         }}
         isDismissable={!locked}
         isKeyboardDismissDisabled={locked}
+        showCloseButton={!locked}
       >
         <SheetHeader>
           <SheetTitle>{intent ? names[intent.action] : names.create}</SheetTitle>

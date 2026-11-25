@@ -940,5 +940,22 @@ export async function mockNative(page: Page, mfa = false, origins = { app: origi
     if (url.origin !== origins.app) return route.abort("blockedbyclient");
     await route.continue();
   });
-  return calls;
+  return Object.assign(calls, {
+    async seedSession(destination: string) {
+      const target = new URL(destination);
+      expect(target.origin).toBe(origins.app);
+      const storageKey = `sb-${new URL(origins.auth).hostname.split(".")[0]}-auth-token`;
+      const expiresAt = Math.floor(Date.now() / 1000) + 3600;
+      const seed = JSON.stringify({
+        destination: target.href,
+        key: storageKey,
+        value: JSON.stringify({ ...session(), expires_at: expiresAt }),
+      });
+      await page.addInitScript(`(({ destination, key, value }) => {
+        if (location.href !== destination || sessionStorage.getItem(key)) return;
+        localStorage.setItem(key, value);
+        sessionStorage.setItem(key, "seeded");
+      })(${seed})`);
+    },
+  });
 }

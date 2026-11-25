@@ -1,4 +1,4 @@
-import { activate } from "./device-input.js";
+import { activate, hasTouchInput } from "./device-input.js";
 import { closeWorkspaceNavigation, openWorkspaceNavigation } from "./auth-fixture.js";
 import type { Page } from "@playwright/test";
 import { test, expect } from "./test.js";
@@ -884,8 +884,16 @@ test("a Business owner sees why adding a sixth active center is unavailable", as
   await expect(page.getByText("5 / 5 aktif merkez kullanılıyor.", { exact: true })).toBeVisible();
   await expect(add).toBeDisabled();
   await expect(add).toHaveAccessibleDescription(text.quotaReached);
-  await activate(add, "Enter");
-  await expect(add).toBeFocused();
+  if (hasTouchInput(page)) {
+    // The quota uses aria-disabled while preserving the control in the tab order.
+    await add.scrollIntoViewIfNeeded();
+    const box = await add.boundingBox();
+    expect(box).not.toBeNull();
+    await page.touchscreen.tap(box!.x + box!.width / 2, box!.y + box!.height / 2);
+  } else {
+    await activate(add, "Enter");
+    await expect(add).toBeFocused();
+  }
   await expect(form).toHaveCount(0);
   expect(f.calls.filter(({ op }) => op === "center_create_v1")).toHaveLength(1);
 });

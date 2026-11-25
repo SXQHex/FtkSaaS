@@ -90,6 +90,7 @@ export function LeadSheet({
       }}
       isDismissable={!disabled}
       isKeyboardDismissDisabled={disabled}
+      showCloseButton={!disabled}
     >
       <SheetHeader>
         <SheetTitle>

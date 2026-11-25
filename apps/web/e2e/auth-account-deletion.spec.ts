@@ -130,7 +130,13 @@ for (const colorScheme of ["light", "dark"] as const)
             }),
         );
         if (touch) {
-          await scrollTouchRegion(effectsRegion, "up");
+          const offset = () => effectsRegion.evaluate((element) => element.scrollTop);
+          for (let swipe = 0; swipe < 3; swipe++) {
+            const before = await offset();
+            if (before === 0) break;
+            await scrollTouchRegion(effectsRegion, "up");
+            await expect.poll(offset).toBeLessThan(before);
+          }
         } else {
           await expect(effectsRegion).toBeFocused();
           await page.keyboard.press("PageUp");

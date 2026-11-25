@@ -60,6 +60,7 @@ export type CompletionRequest = {
 export async function mockCompletion(
   page: Page,
   handler: (request: CompletionRequest) => Promise<void>,
+  sessionDestination?: string,
 ) {
   const studio = await mockStudio(page);
   const requests: RecordedRequest[] = [];
@@ -93,12 +94,17 @@ export async function mockCompletion(
     await handler({ ...request, route, send, fail, abort });
     if (!handled) await route.fallback();
   });
-  await page.goto(`${origin}/login`);
-  await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
-  await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
-  await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
-  await expect(page).toHaveURL(`${origin}/account`);
-  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
+  if (sessionDestination) {
+    await studio.native.seedSession(sessionDestination);
+    await page.goto(sessionDestination);
+  } else {
+    await page.goto(`${origin}/login`);
+    await page.getByLabel("E-posta", { exact: true }).fill("fixture@example.invalid");
+    await page.getByLabel("Parola", { exact: true }).fill("Fixture123");
+    await activate(page.getByRole("button", { name: "Giriş yap", exact: true }));
+    await expect(page).toHaveURL(`${origin}/account`);
+    await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
+  }
   return { studio, requests };
 }
 export const completionUrl = (name: "documents" | "reports" | "audit" | "settings") =>

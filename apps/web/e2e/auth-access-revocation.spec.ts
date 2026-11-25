@@ -1,6 +1,6 @@
 import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
-import { origin } from "./auth-fixture.js";
+import { closeWorkspaceNavigation, openWorkspaceNavigation, origin } from "./auth-fixture.js";
 import { mockLeads } from "./leads-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 
@@ -13,8 +13,10 @@ test("M06: warm Back keeps the CRM hidden until the native center read settles",
   await expect(privateRow).toBeVisible();
   const privateScreen = page.getByRole("tab", { name: "Liste", exact: true });
 
+  await openWorkspaceNavigation(page);
   await activate(page.locator('[data-slot="sidebar-footer"]').getByRole("button"));
   await activate(page.getByRole("menuitem", { name: "Hesabım", exact: true }));
+  await closeWorkspaceNavigation(page);
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
 
   let release!: () => void;
@@ -71,6 +73,19 @@ test("M06: revoked center access clears live CRM, history and deep-link permissi
     });
   });
 
+  await page.route("**/functions/v1/backend-v1/settings_catalog_get_v1", (route) => {
+    const request = route.request().postDataJSON();
+    if (!revoked || request.scope !== "organization") return route.fallback();
+    expect(request.org_id).toBe(I.org);
+    return route.fulfill({
+      status: 403,
+      json: {
+        ok: false,
+        error: { code: "FORBIDDEN", retryable: false, trace_id: I.role },
+      },
+    });
+  });
+
   // The current tab still holds a successful, recent privileged Query result.
   // After remote revocation the next native feature read must not preserve it.
   revoked = true;
@@ -85,8 +100,10 @@ test("M06: revoked center access clears live CRM, history and deep-link permissi
 
   // A React Router history transition must revalidate native authority before
   // any cached manager content can return.
+  await openWorkspaceNavigation(page);
   await activate(page.locator('[data-slot="sidebar-footer"]').getByRole("button"));
   await activate(page.getByRole("menuitem", { name: "Hesabım", exact: true }));
+  await closeWorkspaceNavigation(page);
   await expect(page).toHaveURL(/\/account/);
   await page.goBack();
   await expect(privateRow).toHaveCount(0);
@@ -95,6 +112,9 @@ test("M06: revoked center access clears live CRM, history and deep-link permissi
 
   // A hard deep-link load must also honor the same inaccessible center.
   await page.goto(`${origin}/o/${I.org}/c/${I.center}/leads`);
+  await expect(
+    page.getByText("Devam etmek için organizasyon ve merkez seç.", { exact: true }),
+  ).toBeVisible();
   await expect(privateRow).toHaveCount(0);
   await expect(page).not.toHaveURL(/\/login$/);
   expect(state.writes).toHaveLength(0);

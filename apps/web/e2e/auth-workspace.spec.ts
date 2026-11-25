@@ -181,8 +181,14 @@ for (const colorScheme of ["light", "dark"] as const)
     const studioMenu = page.getByRole("menu", { name: /Fixture Studio Fixture Center/ });
     await activate(studioPicker);
     await expect(studioMenu).toBeVisible();
-    await closeWithDevice(studioPicker);
+    if (hasTouchInput(page)) {
+      // React Aria's popover underlay receives the tap above the still-open drawer.
+      await page.getByTestId("underlay").tap({ position: { x: 8, y: 8 } });
+    } else {
+      await closeWithDevice(studioPicker);
+    }
     await expect(studioMenu).toHaveCount(0);
+    await expect(dialog).toBeVisible();
     await expect(page.locator('[data-slot="dropdown-menu-content"]')).toHaveCount(0);
     await expect(studioPicker).toBeFocused();
     await closeWithDevice(close);

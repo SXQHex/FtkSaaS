@@ -79,18 +79,28 @@ export async function scrollTouchRegion(region: Locator, direction: "down" | "up
   const height = Math.min(viewport.height, box.y + box.height) - top;
   if (width <= 0 || height <= 0) throw new Error("The touch scroll region is outside the viewport");
   const horizontal = direction === "right";
+  const startX = left + width * (horizontal ? 0.8 : 0.5);
+  const startY = top + height * (horizontal ? 0.5 : direction === "down" ? 0.8 : 0.2);
+  const deltaX = horizontal ? -width * 0.6 : 0;
+  const deltaY = horizontal ? 0 : height * (direction === "down" ? -0.5 : 0.7);
   const session = await page.context().newCDPSession(page);
   try {
-    await session.send("Input.synthesizeScrollGesture", {
-      x: Math.round(left + width / 2),
-      y: Math.round(top + height / 2),
-      xDistance: horizontal ? -Math.round(width * 0.55) : 0,
-      yDistance: horizontal ? 0 : (direction === "down" ? -1 : 1) * Math.round(height * 0.7),
-      gestureSourceType: "touch",
-      preventFling: true,
+    await session.send("Input.dispatchTouchEvent", {
+      type: "touchStart",
+      touchPoints: [{ x: startX, y: startY }],
     });
+    for (let step = 1; step <= 8; step++) {
+      await session.send("Input.dispatchTouchEvent", {
+        type: "touchMove",
+        touchPoints: [{ x: startX + (deltaX * step) / 8, y: startY + (deltaY * step) / 8 }],
+      });
+    }
   } finally {
-    await session.detach();
+    try {
+      await session.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    } finally {
+      await session.detach();
+    }
   }
 }
 

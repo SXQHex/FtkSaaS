@@ -53,7 +53,13 @@ test("payment refreshes historical period and person cursor pages after native r
     }),
   );
   await page.getByRole("combobox", { name: "Eğitmen", exact: true }).selectOption(I.instructor);
-  await activate(page.getByRole("tab", { name: "Satırlar", exact: true }));
+  await expect(page.getByRole("combobox", { name: "Eğitmen", exact: true })).toHaveValue(
+    I.instructor,
+  );
+  await expect(page.getByRole("row").filter({ hasText: "Örnek Eğitmen" })).toBeVisible();
+  const entries = page.getByRole("tab", { name: "Satırlar", exact: true });
+  await activate(entries);
+  await expect(entries).toHaveAttribute("aria-selected", "true");
   await expect(page.getByText("Tango başlangıç", { exact: true })).toBeVisible();
   await activate(page.getByRole("button", { name: "Sonraki sayfa", exact: true }));
   await expect(page.getByText("Etkinlik hakedişi", { exact: true })).toBeVisible();

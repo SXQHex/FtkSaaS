@@ -29,12 +29,11 @@ test("shares Query, Router and live Form state in one development panel", async 
   }
   await activate(page.getByRole("button", { name: "TanStack Query", exact: true }));
   await expect(page.getByRole("button", { name: "Clear query cache", exact: true })).toBeVisible();
+  await activate(page.getByRole("button", { name: "Close TanStack Query", exact: true }));
   await activate(page.getByRole("button", { name: "TanStack Router", exact: true }));
   await expect(page.getByRole("button", { name: "Routes", exact: true })).toBeVisible();
-  await activate(page.getByRole("button", { name: "TanStack Form", exact: true }));
-  // Give the nested Form inspector the full panel width after checking Query and Router.
-  await activate(page.getByRole("button", { name: "Close TanStack Query", exact: true }));
   await activate(page.getByRole("button", { name: "Close TanStack Router", exact: true }));
+  await activate(page.getByRole("button", { name: "TanStack Form", exact: true }));
 
   const panel = page.getByTestId("tanstack-devtools-panel");
   // The Form event listeners mount with the lazy inspector, after its workbench tab opens.

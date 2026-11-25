@@ -58,6 +58,11 @@ for (const colorScheme of ["light", "dark"] as const) {
       await expect(code).toHaveAttribute("aria-invalid", "true");
       expect(calls.verify).toBe(0);
       await code.fill("000000");
+      if (touch) {
+        // Dismiss the touch input before tapping a button whose position changes with validation.
+        await activate(mfa.getByRole("heading", { level: 1 }));
+      }
+      await expect(code).toHaveAttribute("aria-invalid", "false");
       await submitWithDevice(mfa.getByRole("button", { name: "Doğrula", exact: true }));
       await expect(page.getByRole("alert")).toContainText("Kod doğrulanamadı");
       expect(calls.account).toBe(0);
