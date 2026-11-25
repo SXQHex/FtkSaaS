@@ -51,11 +51,7 @@ export async function verifyNativeStorageErasure(){
   method:'POST',headers:{apikey:ANON_KEY,authorization:'Bearer '+owner.jwt,'content-type':'application/json'},
   body:JSON.stringify({client_api_version:1,request_id:key(),org_id:org,center_id:center,operation_key:key(),job_id:jobId})
  });
- const orgExport=async()=>{
-  const filters={center_ids:[center],interval:{starts_at:new Date(Date.now()-86400000).toISOString(),ends_at:new Date().toISOString()}};
-  const {job_id}=await must(owner,'report_export_start_v1',{org_id:org,center_id:center,report:'collections_debts',filters,format:'csv'},key());
-  await db.query(`create role ${reportRole} login password '${reportPassword}' in role ftk_p06_worker`);
-  await db.query('insert into private.p06_worker_scopes values($1,$2)',[reportRole,org]);
+ const runP06=async()=>{
   const url=new URL(DB_URL);url.username=reportRole;url.password=reportPassword;
   const builder=new pg.Client({connectionString:url.href,statement_timeout:10000});
   await builder.connect();
@@ -63,11 +59,33 @@ export async function verifyNativeStorageErasure(){
    const [result]=await buildReports(builder,org);
    assert.equal(result.ok,true,result.error?.code);
   }finally{await builder.end();}
+ };
+ const orgExport=async()=>{
+  const filters={center_ids:[center],interval:{starts_at:new Date(Date.now()-86400000).toISOString(),ends_at:new Date().toISOString()}};
+  const {job_id}=await must(owner,'report_export_start_v1',{org_id:org,center_id:center,report:'collections_debts',filters,format:'csv'},key());
+  await db.query(`create role ${reportRole} login password '${reportPassword}' in role ftk_p06_worker`);
+  await db.query('insert into private.p06_worker_scopes values($1,$2)',[reportRole,org]);
+  await runP06();
   const snapshot=(await q('select file_id,expires_at from core.report_jobs where id=$1',[job_id]))[0];
   assert(snapshot.expires_at>Date.now(),'Organization delete must exercise unexpired export bytes');
   const hash=await byteHash(await orgExportDownload(job_id));
   return {job_id,file_id:snapshot.file_id,hash};
  };
+ const pendingImport=async namespace=>{
+  const file=await upload(org,center,person);
+  const mapping={columns:['source_key','display_name'].map(target=>({source_column:target,target}))};
+  const {job_id}=await must(owner,'import_preview_v1',{org_id:org,center_id:center,file_id:file.id,mapping,source_namespace:namespace},key());
+  await runP06();
+  const result=await must(owner,'job_status_get_v1',{org_id:org,center_id:center,job_id});
+  assert.equal(result.result_reference.type,'previews');
+  return {file,jobId:job_id,previewId:result.result_reference.id};
+ };
+ const copies=async({jobId,previewId})=>({
+  preview:await q('select preview_id from private.p06_previews where preview_id=$1',[previewId]),
+  payload:await q('select preview_id from private.preview_payloads where preview_id=$1',[previewId]),
+  contexts:await q("select c.receipt_id from private.p06_contexts c join core.operation_receipts r on r.id=c.receipt_id where r.org_id=$1 and r.business_reference=$2 and c.operation in ('import_preview_v1','import_apply_v1') order by c.receipt_id",[org,jobId])
+ });
+ const rowPayload=async jobId=>(await q('select id,payload,state,source_key,created_references from core.import_rows where job_id=$1',[jobId]))[0];
  try{
   await db.query('insert into private.p07_lifecycle_config values(true,300) on conflict(singleton) do update set reauth_max_age_seconds=excluded.reauth_max_age_seconds');
   await db.query('insert into private.p06_configuration values($1,2097152,5000,16777216)',[org]);
@@ -81,6 +99,22 @@ export async function verifyNativeStorageErasure(){
   }
   await db.query("insert into core.import_jobs(id,org_id,center_id,requester_account_id,file_id,mapping,state,file_checksum,source_namespace) values($1,$2,$3,$4,$5,'{}','succeeded',$6,'synthetic retained source')",[key(),org,center,account.id,linked.id,checksum]);
   const report=await orgExport();
+  const processed=await pendingImport('synthetic processed source');
+  const pending=await pendingImport('synthetic pending source');
+  const apply=await must(owner,'preview_get_v1',{org_id:org,center_id:center,preview_id:processed.previewId});
+  await must(owner,'import_apply_v1',{org_id:org,center_id:center,preview:{id:apply.id,token:apply.token}},key());
+  await runP06();
+  const processingBefore=await rowPayload(processed.jobId);
+  const pendingBefore=await rowPayload(pending.jobId);
+  const copiesBefore=await copies(processed),pendingCopies=await copies(pending);
+  const source=()=>q('select payload_hash,created_references,operation_id from private.p06_sources where org_id=$1 and source_namespace=$2',[org,'synthetic processed source']);
+  const sourceBefore=await source();
+  assert.equal(processingBefore.state,'applied');
+  assert.equal(pendingBefore.state,'valid');
+  assert.equal(copiesBefore.preview.length,1);
+  assert.equal(copiesBefore.payload.length,1);
+  assert(copiesBefore.contexts.length>0);
+  assert.equal(sourceBefore.length,1);
   const foreignOwner=await authUser('p07-storage-control'),foreignAccount=await must(foreignOwner,'account_get_v1');
   const foreignOrg=(await must(platform,'organization_create_v1',{verified_account_id:foreignAccount.id,name:'Synthetic O05 control tenant',initial_plan_id:plan},key())).primary_id;
   const foreignCenter=(await must(foreignOwner,'center_create_v1',{org_id:foreignOrg,name:'O05 control center',timezone:'UTC'},key())).primary_id;
@@ -164,8 +198,11 @@ export async function verifyNativeStorageErasure(){
   assert.deepEqual(await proof(),expected);
   assert.equal(await byteHash(await read(control)),checksum);
   await db.query('insert into private.organization_export_erasure_scopes(db_role,request_id) values($1,$2)',[role,requestId]);
+  await db.query('insert into private.organization_import_copy_erasure_scopes(db_role,request_id) values($1,$2)',[role,requestId]);
   const exportHold=key();
+  const processingHold=key();
   await db.query("insert into core.retention_holds(id,org_id,subject_table,subject_id,reason,authority_reference,review_at) values($1,$2,'core.report_jobs',$3,'Synthetic retained CSV','isolated acceptance',clock_timestamp()-interval '1 day')",[exportHold,org,report.job_id]);
+  await db.query("insert into core.retention_holds(id,org_id,subject_table,subject_id,reason,authority_reference,review_at) values($1,$2,'core.import_rows',$3,'Synthetic import row hold','isolated acceptance',clock_timestamp()-interval '1 day')",[processingHold,org,processingBefore.id]);
   const stage=(await worker.query('select private.p07_privacy_execute($1,$2) result',[request,bank()])).rows[0].result;
   assert.equal(stage.ok,true,stage.error?.code);
   assert.deepEqual(await invoke(target.id),{state:'completed'});
@@ -176,8 +213,14 @@ export async function verifyNativeStorageErasure(){
   assert.equal(manifest.storage.state,'pending');
   assert.equal(manifest.storage.import_uploads.confirmed_objects,1);
   assert.equal(manifest.exports.organization_database_exports.state,'held');
+  assert.equal(manifest.exports.import_processing_copies.state,'held');
+  assert.deepEqual(await rowPayload(processed.jobId),processingBefore);
+  assert.deepEqual(await copies(processed),copiesBefore);
   assert.equal((await q("select encode(extensions.digest(body,'sha256'),'hex') hash from private.p06_export_files where file_id=$1",[report.file_id]))[0].hash,report.hash);
   await db.query('delete from core.retention_holds where id=$1',[exportHold]);
+  await db.query('delete from core.retention_holds where id=$1',[processingHold]);
+  const badPayload={...processingBefore.payload,display_name:'Synthetic mismatched copy'};
+  await db.query('update core.import_rows set payload=$2 where id=$1',[processingBefore.id,badPayload]);
   await db.query("update private.p07_privacy_jobs set next_attempt_at=clock_timestamp()-interval '1 second' where id=$1",[job_id]);
   request=await claim();
   await assert.rejects(invoke(linked.id),/FORBIDDEN/);
@@ -192,6 +235,26 @@ export async function verifyNativeStorageErasure(){
   assert.deepEqual((await proof()).filter(p=>p.file_id===ready.id),[{file_id:ready.id,object_id:ready.objectId,removed_bytes:String(bytes.length),checksum}]);
   const finished=(await worker.query('select private.p07_privacy_execute($1,$2) result',[request,bank()])).rows[0].result;
   assert.equal(finished.ok,true,finished.error?.code);
+  assert.equal((await q("select scopes#>>'{exports,import_processing_copies,state}' state from private.p07_privacy_manifests where request_id=$1",[requestId]))[0].state,'blocked_provenance');
+  assert.deepEqual((await rowPayload(processed.jobId)).payload,badPayload);
+  assert.deepEqual(await copies(processed),copiesBefore);
+  assert.deepEqual(await q('select operation_id from private.organization_import_copy_erasures where request_id=$1',[requestId]),[]);
+  await db.query('update core.import_rows set payload=$2 where id=$1',[processingBefore.id,processingBefore.payload]);
+  await db.query("update private.p07_privacy_jobs set next_attempt_at=clock_timestamp()-interval '1 second' where id=$1",[job_id]);
+  request=await claim();
+  const processing=(await worker.query('select private.p07_privacy_execute($1,$2) result',[request,bank()])).rows[0].result;
+  assert.equal(processing.ok,true,processing.error?.code);
+  assert.equal((await q("select scopes#>>'{exports,import_processing_copies,state}' state from private.p07_privacy_manifests where request_id=$1",[requestId]))[0].state,'completed');
+  assert.deepEqual(await rowPayload(processed.jobId),{...processingBefore,payload:{}});
+  assert.deepEqual(await copies(processed),{preview:[],payload:[],contexts:[]});
+  assert.deepEqual(await rowPayload(pending.jobId),pendingBefore);
+  assert.deepEqual(await copies(pending),pendingCopies);
+  assert.deepEqual(await source(),sourceBefore);
+  assert.equal(await byteHash(await read(processed.file)),checksum);
+  assert.equal((await q('select state from core.previews where id=$1',[processed.previewId]))[0].state,'applied');
+  const [copyProof]=await q('select removed_rows,removed_previews,removed_preview_payloads,removed_contexts from private.organization_import_copy_erasures where request_id=$1',[requestId]);
+  assert.deepEqual(copyProof,{removed_rows:1,removed_previews:1,removed_preview_payloads:1,removed_contexts:copiesBefore.contexts.length});
+  await assert.rejects(db.query('delete from private.organization_import_copy_erasures where request_id=$1',[requestId]),/INTEGRITY_VIOLATION/);
   assert.equal((await q("select scopes#>>'{exports,organization_database_exports,state}' state from private.p07_privacy_manifests where request_id=$1",[requestId]))[0].state,'completed');
   assert.deepEqual(await q('select reason,checksum from private.p06_export_purges where request_id=$1 and file_id=$2',[requestId,report.file_id]),[{reason:'organization_delete',checksum:report.hash}]);
   assert.deepEqual(await q('select file_id from private.p06_export_files where file_id=$1',[report.file_id]),[]);
@@ -209,6 +272,7 @@ export async function verifyNativeStorageErasure(){
   if(attestor)await attestor.end();
   if(requestId)await db.query('delete from private.p07_storage_erasure_scopes where db_role=$1',[role]);
   await db.query('delete from private.organization_export_erasure_scopes where db_role=$1',[role]);
+  await db.query('delete from private.organization_import_copy_erasure_scopes where db_role=$1',[role]);
   await db.query('delete from private.p06_worker_scopes where db_role=$1',[reportRole]);
   await db.query('delete from private.organization_contact_erasure_scopes where db_role=$1',[role]);
   await db.query('delete from private.p07_privacy_worker_scopes where db_role=$1',[role]);

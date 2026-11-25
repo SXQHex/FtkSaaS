@@ -929,6 +929,8 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 
 **Davet ve CRM kişisel alanları:** Organizasyona bağlı P07 kapsamı terminal davet tesliminin alıcı ve şifreli gönderim alanlarını, CRM iletişim ve takip satırının serbest notunu temizler. Saklama blokajı, karma sahiplik, açık iş ve sonuç kayıtları korunur. Finans, belge onayı ve denetim kanıtının gerekli alanlara indirgenmesi ve arşiv ayrımı açık.
 
+**Hesaptan yansıtılmış iletişim:** Organizasyona bağlı P07 worker, doğrulanmış kişi ve hesap bağıyla eşleşen tenant e-posta ve telefon kopyasını sahiplik eşlemesiyle birlikte kaldırır. Diğer organizasyonların kopyaları, ortak Auth hesabı ve saklama blokajı korunur. Eşlemesiz eski kopyalar, zorunlu kişi adı, fatura ad/adresi, imzalı kabul kopyaları ve serbest denetim gerekçelerinin arşiv ayrımı açık.
+
 <a id="o05"></a>
 ### O05 — Storage ve export fiziksel imha
 
@@ -951,6 +953,8 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 **Süresi dolmuş import yüklemeleri:** Bağlı P07 worker, tamamlanmamış import yüklemesinin bağımsız Storage bağını, güncel blokajı ve bayt özetini doğrular. Ayrı attestor, API ile silme ve yetkili nesne yokluğu doğrulandıktan sonra değişmez makbuzu yazar. [Native aday ve development teslimi](00-FtkSaaS-yeni-sohbet-devir.md#o04-o07-kapanis-tatbikati) doğrulandı. Hazır iş belgeleri, kaynak dosyalar ve diğer geçici aktarım yüzeylerinin kabulü açık.
 
 **Organizasyon export ve bağlantısız hazır kaynakları:** Aynı P07 talebi kapsamında, doğrulanmış geçici DB rapor baytları ve bağlı kullanımı olmayan hazır import nesneleri ayrı değişmez makbuz üretir. İşe bağlanmış import kaynakları ve işleme kopyaları, belge ve fatura baytları için saklama ile imha sınırı ve açık kalan yürütüm kendi kapsamlarında doğrulanır.
+
+**Terminal import işleme kopyaları:** Aynı P07 talebi, kaynak ve sonuç eşliği kanıtlanmış terminal işlerin ham satır alanlarını ve geçici önizleme, doğrulama ve takip bağlamını temizler. Girdi parmak izi, uygulanan sonuç referansları, açık işler ve saklama blokajlı kayıtlar korunur. İşe bağlı özgün kaynak dosyasının ve belge/fatura baytlarının saklama ve imha işlemleri açık.
 
 <a id="o06"></a>
 ### O06 — Bağımsız imha sicili

@@ -21,9 +21,9 @@ export function validateRestoreTarget(connectionString,target){
  return structuredClone(target);
 }
 
-export async function restorePostgresSnapshot({connectionString,target,readCheckpoint,...evidence}){
+export async function restorePostgresSnapshot({connectionString,target,readCheckpoint,checkpointFile,...evidence}){
  const approved=validateRestoreTarget(connectionString,target);
- if(typeof readCheckpoint!=='function')throw Error('CURRENT_CHECKPOINT_REQUIRED');
+ if(typeof readCheckpoint!=='function'&&checkpointFile===undefined)throw Error('CURRENT_CHECKPOINT_REQUIRED');
  let client,observer,started=false,closed=false,gated=false,dataConnectionFailed=false,controlConnectionFailed=false,identity,gateState,closeGate;
  const end=async()=>{if(!closed){closed=true;try{if(client)await client.end();}finally{if(observer)await observer.end();}}};
  const transaction={
@@ -115,11 +115,11 @@ export async function restorePostgresSnapshot({connectionString,target,readCheck
   }
  };
  try{
-  const result=await guardedRestore({...evidence,readCheckpoint,transaction});
+  const result=await guardedRestore({...evidence,readCheckpoint,checkpointFile,transaction});
   return{...result,result:'isolated_postgres_rows_restored',target_database:approved.database,scope:'data rows only; database connection gate remains closed; schema/Auth login/Storage/config/workers and full recovery acceptance remain separate'};
  }catch(error){
   // Provider messages/detail/query/cause may include complete failing rows.
-  const safe=/^(?:RESTORE_[A-Z_]+|ISOLATED_RESTORE_TARGET_REQUIRED|CURRENT_CHECKPOINT_[A-Z_]+|ERASED_SUBJECT_PRESENT|SNAPSHOT_[A-Z_]+|LEDGER_[A-Z_]+|INVALID_[A-Z_]+|FUTURE_LEDGER|REGISTER_[A-Z_]+)$/.test(error.message)?error.message:'POSTGRES_RESTORE_FAILED';
+  const safe=/^(?:RESTORE_[A-Z_]+|ISOLATED_RESTORE_TARGET_REQUIRED|INDEPENDENT_CHECKPOINT_REQUIRED|CURRENT_CHECKPOINT_[A-Z_]+|CHECKPOINT_RECOVERY_REQUIRED|ERASED_SUBJECT_PRESENT|SNAPSHOT_[A-Z_]+|LEDGER_[A-Z_]+|INVALID_[A-Z_]+|FUTURE_LEDGER|REGISTER_[A-Z_]+)$/.test(error.message)?error.message:'POSTGRES_RESTORE_FAILED';
   const sanitized=new Error(safe);
   if(typeof error.code==='string'&&/^[0-9A-Z]{5}$/.test(error.code))sanitized.sqlstate=error.code;
   throw sanitized;
