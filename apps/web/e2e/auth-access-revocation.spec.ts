@@ -1,6 +1,6 @@
 import { activate } from "./device-input.js";
 import { test, expect } from "./test.js";
-import { closeWorkspaceNavigation, openWorkspaceNavigation, origin } from "./auth-fixture.js";
+import { openWorkspaceNavigation, origin } from "./auth-fixture.js";
 import { mockLeads } from "./leads-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 
@@ -16,7 +16,7 @@ test("M06: warm Back keeps the CRM hidden until the native center read settles",
   await openWorkspaceNavigation(page);
   await activate(page.locator('[data-slot="sidebar-footer"]').getByRole("button"));
   await activate(page.getByRole("menuitem", { name: "Hesabım", exact: true }));
-  await closeWorkspaceNavigation(page);
+  await expect(page.getByRole("dialog", { name: "Ana menü", exact: true })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
 
   let release!: () => void;
@@ -103,18 +103,33 @@ test("M06: revoked center access clears live CRM, history and deep-link permissi
   await openWorkspaceNavigation(page);
   await activate(page.locator('[data-slot="sidebar-footer"]').getByRole("button"));
   await activate(page.getByRole("menuitem", { name: "Hesabım", exact: true }));
-  await closeWorkspaceNavigation(page);
+  await expect(page.getByRole("dialog", { name: "Ana menü", exact: true })).toHaveCount(0);
   await expect(page).toHaveURL(/\/account/);
-  await page.goBack();
+  await expect(page.getByRole("heading", { name: "Hesabım", exact: true })).toBeVisible();
+  const scopeRequired = page.getByText("Devam etmek için organizasyon ve merkez seç.", {
+    exact: true,
+  });
+  const revokedCenterResponse = () =>
+    page.waitForResponse(
+      (response) =>
+        response.url().endsWith("/functions/v1/backend-v1/centers_list_v1") &&
+        response.request().method() === "POST" &&
+        response.ok(),
+    );
+  const [historyRead] = await Promise.all([revokedCenterResponse(), page.goBack()]);
+  expect(await historyRead.json()).toMatchObject({ ok: true, data: { items: [] } });
+  await expect(scopeRequired).toBeVisible();
   await expect(privateRow).toHaveCount(0);
   await expect(page).not.toHaveURL(/\/login$/);
   expect(state.writes).toHaveLength(0);
 
   // A hard deep-link load must also honor the same inaccessible center.
-  await page.goto(`${origin}/o/${I.org}/c/${I.center}/leads`);
-  await expect(
-    page.getByText("Devam etmek için organizasyon ve merkez seç.", { exact: true }),
-  ).toBeVisible();
+  const [directRead] = await Promise.all([
+    revokedCenterResponse(),
+    page.goto(`${origin}/o/${I.org}/c/${I.center}/leads`),
+  ]);
+  expect(await directRead.json()).toMatchObject({ ok: true, data: { items: [] } });
+  await expect(scopeRequired).toBeVisible();
   await expect(privateRow).toHaveCount(0);
   await expect(page).not.toHaveURL(/\/login$/);
   expect(state.writes).toHaveLength(0);

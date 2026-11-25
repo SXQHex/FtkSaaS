@@ -182,8 +182,23 @@ for (const colorScheme of ["light", "dark"] as const)
     await activate(studioPicker);
     await expect(studioMenu).toBeVisible();
     if (hasTouchInput(page)) {
-      // React Aria's popover underlay receives the tap above the still-open drawer.
-      await page.getByTestId("underlay").tap({ position: { x: 8, y: 8 } });
+      // React Aria dispatches outside dismissal from the document while the underlay is inert.
+      const outside = await studioMenu.evaluate((menu) => {
+        const { ownerDocument } = menu;
+        const { clientWidth, clientHeight } = ownerDocument.documentElement;
+        const corners = [
+          { x: 8, y: 8 },
+          { x: clientWidth - 8, y: 8 },
+          { x: 8, y: clientHeight - 8 },
+          { x: clientWidth - 8, y: clientHeight - 8 },
+        ];
+        return corners.find(({ x, y }) => {
+          const hit = ownerDocument.elementFromPoint(x, y);
+          return hit && !menu.contains(hit) && !hit.closest("button, a, input");
+        });
+      });
+      expect(outside).toBeDefined();
+      await page.touchscreen.tap(outside!.x, outside!.y);
     } else {
       await closeWithDevice(studioPicker);
     }
