@@ -989,7 +989,7 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 - **Sınır/olumsuz durum:** Tek SQL veya dosya restore bütün kabul değildir; kaynak hedef ayrıdır.
 - **Doğrulama senaryosu:** DB mutabakatı, gerçek giriş, Storage checksum; Edge/config/secret envanteri ve worker binding doğrulaması.
 - **Kaynak alanı:** restore runbook ve mevcut araçlar
-- **Kalan:** Beş worker’ın [gerçek Cron kabulü](00-FtkSaaS-yeni-sohbet-devir.md#o08-o10-hedef-on-kontrol) tamamlandı. [Tam restore yapılandırma karşılaştırmasını](remote-backend-setup.md#izole-restore-on-kontrol) tamamla. Auth kurtarma kanıtı hazır. İzole davet çıkışı ve Resend olay webhook’u için hedefte beklenen ayarı ve sırların yeniden sağlanmasını doğrula.
+- **Kalan:** Beş worker’ın [gerçek Cron kabulü](00-FtkSaaS-yeni-sohbet-devir.md#o08-o10-hedef-on-kontrol) tamamlandı. [Tam restore yapılandırma karşılaştırmasını](remote-backend-setup.md#izole-restore-on-kontrol) tamamla. Auth kurtarma kanıtı hazır. İzole davet çıkışı ve Resend olay webhook’u [kapalı olarak doğrulandı](00-FtkSaaS-yeni-sohbet-devir.md#o08-hosted-auth-recovery). Bu iki kanalın canlı kabulü için testle sınırlı sağlayıcı ayarı gerekir.
 
 <a id="o09"></a>
 ### O09 — Backup non-resurrection kabulü
