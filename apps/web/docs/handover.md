@@ -4,7 +4,7 @@
 
 ## Kaynak ve kontrol noktası
 
-- **Güncel frontend kaynağı · 25 Kasım 2026.** `0cd41e60dd7bf359b1054c6f2d552a2d8093b457` için [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/45532649067), [merge doğrulaması](https://github.com/SXQHex/FtkSaaS/actions/runs/45532648870), [Cloudflare yayını](https://github.com/SXQHex/FtkSaaS/actions/runs/45532734192) başarılı. [Development delivery](https://github.com/SXQHex/FtkSaaS/actions/runs/45532734163) kaynak doğrulamasını tamamladı ve Supabase dağıtımını kapsam gereği atladı.
+- **Güncel frontend kaynağı · 26 Kasım 2026.** Main `9e32ab021cf10b61d422abbcb03bde6af40e4341` için [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/45710362725), [Cloudflare yayını](https://github.com/SXQHex/FtkSaaS/actions/runs/45710448344), [development dağıtımı](https://github.com/SXQHex/FtkSaaS/actions/runs/45710448135) ve [aday sözleşme uyumluluğu](https://github.com/SXQHex/FtkSaaS/actions/runs/45706176092) başarılı. Son frontend uygulama/test değişikliği [#464'ün 12/12 Ubuntu tarayıcı shard'ında](https://github.com/SXQHex/FtkSaaS/actions/runs/45638786514) geçti.
 - **M09 Stüdyo kaynak kabulü.** [PR #433](https://github.com/SXQHex/FtkSaaS/pull/433) head `c88098713fce7f4a34b9d148362571f67e9b6c41`, main `159bb12db01afa2e7af066748656a215bc26fab2`. [Frontend CI](https://github.com/SXQHex/FtkSaaS/actions/runs/45413355345) checks ve 12/12 Desktop Chromium başarılı.
 - **C-ortak ve Üyeler kaynak kabulü.** [PR #430](https://github.com/SXQHex/FtkSaaS/pull/430) head `f07cdfff70bd835a17a352e17e2977a05f08ac53`, main `d967ba1076852cd50ee511e468d9a28b6a8015ac`. [Frontend CI](https://github.com/SXQHex/FtkSaaS/actions/runs/45402238370) attempt 1, checks ve 12/12 Desktop Chromium başarılı. [Main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/45404113020)
 - **M09 PR #423 kaynak kabulü.** Head `c50152317077c147ba83bba45a27f2474547a07b`, base `5fa8ee30b396fe09be2cc9154bf08dfacf9bce61`, test edilen merge `2d4dafbf2b3b981c5f9797c698dfe9b2a710d18c`. Aday ve main aynı `0377b67863d15d31f5166c2aadcee407baf17332` Git ağacına sahip. [Frontend CI](https://github.com/SXQHex/FtkSaaS/actions/runs/45374829702) attempt 1 ve 12/12 Desktop Chromium başarılı. Kişi yazma reddi testi, tek istek ve sıfır kayıt kontrollerinden önce ekrandaki reddi bekliyor. [PR #423](https://github.com/SXQHex/FtkSaaS/pull/423)
@@ -166,11 +166,26 @@ Kontrollü Chromium koşusunda 1280×800 masaüstü profili, tek işçi ve her E
 | İlk onay                  | 10             | 339,4 / 355,1 → 256,6 / 284,7 | 527,3 / 601,4 → 440,7 / 469,4       | 7 → 6          |
 | Aynı oturumda ikinci onay | 10             | 338,1 / 340,5 → 255,4 / 264,2 | 519,2 / 524,0 → 437,8 / 447,8       | 7 → 6          |
 
-Ağ sırası hesap → bekleyen ödeme kaynağı → tek yazma/ACK → taze hesap → paralel kesin ödeme ve organizasyon okumasıdır. Kayıp ACK sonrası aynı-key kurtarmada kaynak kontrolü tekrarlanmaz. Bu ölçüm sabit gecikmeli fixture koşusuna aittir. [Canlı kabul](remaining-work.md#ortak-talep-kabulleri) için yetkili sentetik operatör ve kendisine ayrılmış bekleyen ödeme gerekir.
+Ağ sırası hesap → bekleyen ödeme kaynağı → tek yazma/ACK → taze hesap → paralel kesin ödeme ve organizasyon okumasıdır. Kayıp ACK sonrası aynı-key kurtarmada kaynak kontrolü tekrarlanmaz. Bu ölçüm sabit gecikmeli fixture koşusuna aittir.
+
+<a id="xreq-071-canli-kabul"></a>
+
+#### XREQ-071 canlı geliştirme kabulü
+
+26 Kasım 2026'da aynı Supabase geliştirme ortamında 40 gerçek bekleyen sentetik ödeme kaydı kullanıldı. Önceki sürüm `283cdb615dbd5185f51834fd49cfbf73e90e50fa` kaynağından üretim modunda derlendi. Sonraki sürüm, `9e32ab021cf10b61d422abbcb03bde6af40e4341` kaynağının Cloudflare yayın arşivinden alındı. İki uygulama aynı origin altında aynı 1280×800 Chrome 158 profili ve ağla sırayla çalıştırıldı. Sürüm sırası çiftler arasında değiştirildi. Her sürümde 10 yeni native oturumun ilk onayı ve aynı oturumda sayfa yeniden açıldıktan sonraki ikinci onay ölçüldü. Auth, Edge ve veritabanı gerçek geliştirme servisinde çalıştı. [Cloudflare yayını](https://github.com/SXQHex/FtkSaaS/actions/runs/45710448344) · [Development yayını](https://github.com/SXQHex/FtkSaaS/actions/runs/45710448135).
+
+| Profil                    | Örnek / kaynak | Onay → ACK p50 / p95 (ms)         | Onay → görünür sonuç p50 / p95 (ms)    | Edge istekleri |
+| ------------------------- | -------------- | --------------------------------- | -------------------------------------- | -------------- |
+| İlk onay                  | 10             | 860,4 / 5.801,3 → 686,4 / 2.640,5 | 1.432,4 / 10.427,4 → 1.117,1 / 3.875,5 | 7 → 6          |
+| Aynı oturumda ikinci onay | 10             | 798,8 / 2.759,9 → 664,1 / 1.333,3 | 1.248,6 / 3.902,4 → 1.093,7 / 2.145,6  | 7 → 6          |
+
+Onay tıklamasından başarılı yazma yanıtının sonuna kadar ACK, doğrulanmış durum görünene kadar ekran süresi kaydedildi. p95 en yakın sıra yöntemiyle hesaplandı. 10 örnekli her grubun en yavaş ölçümü hesaba katıldı. Bir eşleştirilmiş ilk onayda, tıklamadan itibaren Edge bitişleri önceki sürümde hesap 191 ms → ödeme 389 ms → hesap 574 ms → ACK 754 ms → hesap 932 ms → paralel ödeme ve organizasyon 1.134 ms oldu. Güncel sürümde hesap 183 ms → ödeme 362 ms → ACK 547 ms → hesap 729 ms → paralel ödeme ve organizasyon 937 ms oldu.
+
+Her onay tek başarılı yazma döndürdü. 40/40 ödeme aynı sentetik organizasyonda bekleyenden onaylandı durumuna geçti ve sürümü ilerledi. Doğrulanmış ödeme ve organizasyon okumasının ardından ekranda başarı görüldü. Test tutarları aboneliği etkinleştirme eşiğinin altında kaldı. Ölçüm organizasyonu native yaşam döngüsüyle kapatıldı. İlk hazırlıkta kullanılmayan 40 sentetik ödeme kendi kapalı organizasyonunda reddedildi ve bekleyen kuyruğun boşaldığı doğrulandı. Geçici sentetik Platform yetkisi kaldırıldı ve test oturumları kapatıldı. [Kabul kaydı](remaining-work.md#ortak-talep-kabulleri).
 
 ## Devam
 
-Kaynak değiştiyse `main` ve aktif dalın tam farkını incele. [İlk açık ve önkoşulu karşılanan iş](production-queue.md#aktif-sıra) ile devam et. Aynı SHA'nın unit/MSW, tarayıcı, kalite, merge/main ve gerekli hosted kanıtlarını birbirinden ayır. Başarısız test için assertion/timeout/politika gevşetme; bilinmeyen ACK için ikinci native writer açma. Yalnız gerçek yeni kaynak veya ortam kanıtıyla kayıt güncelle; mikro adım günlükleri ve tekrar eden kabul metni üretme.
+Kaynak değiştiyse `main` ve aktif dalın tam farkını incele. Yeni iş açıldığında [aktif sıradan](production-queue.md#aktif-sıra) devam et. Aynı SHA'nın unit/MSW, tarayıcı, kalite, merge/main ve gerekli hosted kanıtlarını birbirinden ayır. Başarısız test için assertion/timeout/politika gevşetme; bilinmeyen ACK için ikinci native writer açma. Yalnız gerçek yeni kaynak veya ortam kanıtıyla kayıt güncelle; mikro adım günlükleri ve tekrar eden kabul metni üretme.
 
 ## 22 Kasım 2026 · M01 bağımsız kapanışı
 

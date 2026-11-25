@@ -91,5 +91,5 @@
 
 ## Ortak talep kabulleri
 
-- [ ] **XREQ-071 · Platform ödeme onayı.** Yetkili sentetik Platform operatörüyle gerçek bekleyen test ödemesinde son onay → ACK ve doğrulanmış ekran sonucunu, eş koşullarda önce/sonra ölç. [Kabul sözleşmesi](../../../docs/requests.md#xreq-071) · [Kontrollü tarayıcı ölçümü](handover.md#xreq-071-olcumu).
+- [x] **XREQ-071 · Platform ödeme onayı.** Yetkili sentetik operatörle eş koşullarda gerçek bekleyen test ödemeleri onaylandı. Son onaydan ACK ve doğrulanmış ekran sonucuna kadar geçen süre ve Edge istek sayısı önce ve sonra ölçüldü. [Kabul sözleşmesi](../../../docs/requests.md#xreq-071) · [Canlı ölçüm](handover.md#xreq-071-canli-kabul).
 - [x] **XREQ-042 · Yayımlı public başvuru.** Sentetik formda gerçek Turnstile, Worker gönderimi ve yetkili merkez gelen kutusu doğrulandı. [Canlı kabul](handover.md#xreq-042-canli-kabul).
