@@ -126,10 +126,24 @@ export async function verifyOrganizationErasure(t){
   await assert.rejects(readOrganizationErasureReceipt({db,requestId,orgId:org}),/ORGANIZATION_ERASURE_RECEIPT_INCOMPLETE/);
   let request=await retry();
   await eraseManagedDraftDocument({db,worker,attestor,request,requestId,apiUrl:API_URL,serviceKey:SERVICE_ROLE_KEY,draft});
-  await execute(request);
-  assert.equal((await stage()).files.state,'completed');
-  request=await retry();await execute(request);
-  assert.equal((await stage()).db.state,'completed',JSON.stringify((await stage()).db));
+  const [heartbeat]=await rows("select last_org,last_error_code from private.ops_worker_health where lane='p07_privacy'");
+  try{
+   await db.query("update private.ops_worker_health set last_org=$1::uuid,last_error_code=$1::uuid::text where lane='p07_privacy'",[org]);
+   await execute(request);
+   assert.equal((await stage()).files.state,'completed');
+   const blocked=await stage();
+   assert.equal(blocked.db.state,'blocked');
+   assert.deepEqual(blocked.db.blocked_relations,['private.ops_worker_health']);
+
+   // The native scheduler retains the chosen organization's ID in its cursor.
+   await db.query("update private.ops_worker_health set last_error_code=null where lane='p07_privacy'");
+   request=await retry();await execute(request);
+   assert.equal((await stage()).db.state,'completed',JSON.stringify((await stage()).db));
+   assert.deepEqual(await rows("select last_org from private.ops_worker_health where lane='p07_privacy'"),[{last_org:org}]);
+  }finally{
+   await db.query("update private.ops_worker_health set last_org=$1,last_error_code=$2 where lane='p07_privacy'",
+    [heartbeat.last_org,heartbeat.last_error_code]);
+  }
   assert.equal((await must(owner,'account_get_v1')).id,account.id);
   assert.equal((await must(control,'account_get_v1')).id,controlAccount.id);
   assert.equal((await must(owner,'job_status_get_v1',{org_id:org,job_id:jobId})).privacy.request_state,'partial');
