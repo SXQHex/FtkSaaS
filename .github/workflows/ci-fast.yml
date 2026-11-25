@@ -77,10 +77,9 @@ jobs:
           node-version-file: 'source/.nvmrc'
       - if: needs.selection.outputs.setup == 'true'
         run: |
-          if [[ "$(node -p 'process.versions.node.split(".")[0]')" -ge 25 ]]; then
-            npm install --global corepack@0.36.0
-          fi
-          corepack enable
+          set -euo pipefail
+          corepack_bin="$(bash "$GITHUB_WORKSPACE/policy/apps/backend/scripts/ci/install-corepack.sh" "$RUNNER_TEMP/corepack")"
+          PATH="$corepack_bin:$PATH" corepack enable --install-directory "$(dirname "$(command -v node)")" pnpm
       - if: needs.selection.outputs.setup == 'true'
         run: pnpm --filter @ftksaas/backend... --filter ftksaas install --frozen-lockfile
         working-directory: source
@@ -131,10 +130,9 @@ jobs:
         with:
           node-version-file: 'source/.nvmrc'
       - run: |
-          if [[ "$(node -p 'process.versions.node.split(".")[0]')" -ge 25 ]]; then
-            npm install --global corepack@0.36.0
-          fi
-          corepack enable
+          set -euo pipefail
+          corepack_bin="$(bash "$GITHUB_WORKSPACE/policy/apps/backend/scripts/ci/install-corepack.sh" "$RUNNER_TEMP/corepack")"
+          PATH="$corepack_bin:$PATH" corepack enable --install-directory "$(dirname "$(command -v node)")" pnpm
       - run: pnpm --filter @ftksaas/backend... --filter ftksaas install --frozen-lockfile
         working-directory: source
       - name: Selected API shard

@@ -129,7 +129,26 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: '.nvmrc'
-      - run: npm install --global corepack@0.36.0 && corepack enable
+      - &checkout-bootstrap-policy
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: fromJSON(inputs.binding).kind == 'manual-full'
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          sparse-checkout: apps/backend/scripts/ci/install-corepack.sh
+          sparse-checkout-cone-mode: false
+          path: bootstrap
+      - &enable-corepack
+        env:
+          ACCEPTANCE_KIND: ${{ fromJSON(inputs.binding).kind }}
+        run: |
+          set -euo pipefail
+          bootstrap_root="$GITHUB_WORKSPACE"
+          if [[ "$ACCEPTANCE_KIND" == manual-full ]]; then
+            bootstrap_root="$bootstrap_root/bootstrap"
+          fi
+          corepack_bin="$(bash "$bootstrap_root/apps/backend/scripts/ci/install-corepack.sh" "$RUNNER_TEMP/corepack")"
+          PATH="$corepack_bin:$PATH" corepack enable --install-directory "$(dirname "$(command -v node)")" pnpm
       - run: pnpm --filter @ftksaas/backend... --filter ftksaas install --frozen-lockfile
         working-directory: .
       - &download-runtime-package
@@ -207,7 +226,8 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: '.nvmrc'
-      - run: npm install --global corepack@0.36.0 && corepack enable
+      - *checkout-bootstrap-policy
+      - *enable-corepack
       - run: pnpm --filter @ftksaas/backend... --filter ftksaas install --frozen-lockfile
         working-directory: .
       - *download-runtime-package
@@ -270,7 +290,8 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: '.nvmrc'
-      - run: npm install --global corepack@0.36.0 && corepack enable
+      - *checkout-bootstrap-policy
+      - *enable-corepack
       - run: pnpm --filter @ftksaas/backend... --filter ftksaas install --frozen-lockfile
         working-directory: .
       - *download-runtime-package
