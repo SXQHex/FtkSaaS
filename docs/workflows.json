@@ -321,8 +321,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "894ff0d5f1593f09bc5e7341f727f4650c337e2536f8b23ffd39a5a6f28fa2e7",
-        "reason": "Ortak katalogdaki AJV sürümleri ve kök Knip yönetişim testiyle kişi sayfasının alan ve sıra kabulü doğrulandı. P06 kabulü, finans yetkisi kaldırılınca aynı işlem anahtarıyla rapor isteğinin reddedildiğini denetliyor."
+        "fingerprint": "a6a2466551fee15011baac17a01a98c19e8985e3b716cf413c5343d89b866c69",
+        "reason": "Kişi birleşimi kabulünde kaynak kimlik ile asıl kimlik aynı kişi detayını döndürüyor."
       }
     },
     {
@@ -417,8 +417,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "9a5cf1d157a8dcca80365101b2d94b1ec3de8958c3de4b8ea8994b61d2fca8af",
-        "reason": "Mevcut hesap bağlantısı ve birleşim kabulü yeniden çalıştı. Yeni denetim yalnız kişi listesinin alan eşitliğini doğruluyor."
+        "fingerprint": "09a7b9d77bf2b466986d2a8a9d0638d9750c622f2ac28ff7c2a60cfab2fd25c3",
+        "reason": "Birleşmiş kimlikte oturum sahibinin kişi detayını her iki kimlikle okuması doğrulandı."
       }
     },
     {
@@ -660,7 +660,8 @@
         "apps/backend/supabase/migrations/20261124152000_scoped_consumer_followup.sql",
         "apps/backend/supabase/migrations/20261124220645_session_read_center_projection.sql",
         "apps/backend/supabase/migrations/20261125112000_share_person_calendar_read_locks.sql",
-        "apps/backend/supabase/migrations/20261125124800_calendar_read_projections.sql"
+        "apps/backend/supabase/migrations/20261125124800_calendar_read_projections.sql",
+        "apps/backend/supabase/migrations/20261126151242_reuse_person_detail_scope_and_family.sql"
       ],
       "operations": [
         "availability_save_v1",
@@ -683,8 +684,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "acf09eef7b55cd70cd64c48775386c537fcafeb623367115993e2f977a0014e6",
-        "reason": "Paylaşılan öğrenci filtre testine hesap bağlantısı ve merkez izolasyonu örneği eklendi. Takvim ve seans sınırları aynı."
+        "fingerprint": "e2ad2226b66659e1b17526a45d31e679b4d2f2de144e0e913566cd6d9053cb78",
+        "reason": "Takvim ve seans okuma dalları aynı erişim ve sayfalama adımlarıyla daha erken seçiliyor."
       }
     },
     {
@@ -790,7 +791,8 @@
         "apps/backend/supabase/migrations/20261125124000_selective_person_field_policy.sql",
         "apps/backend/supabase/migrations/20261125143626_people_page_operational_scope.sql",
         "apps/backend/supabase/migrations/20261126140500_batch_people_list_projection.sql",
-        "apps/backend/supabase/migrations/20261125144852_management_account_directory_reads.sql"
+        "apps/backend/supabase/migrations/20261125144852_management_account_directory_reads.sql",
+        "apps/backend/supabase/migrations/20261126151242_reuse_person_detail_scope_and_family.sql"
       ],
       "operations": [
         "account_access_send_v1",
@@ -809,8 +811,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "1d7f9bf6658f8eb6e847739beddad5781e201aa07d2b241076f26efd7341b7f0",
-        "reason": "Kişi sayfasının toplu ilişkileri, alan yetkisi, birleşmiş kimlikleri ve sayfalama sonucu önceki projeksiyonla karşılaştırıldı."
+        "fingerprint": "17b71ed22de30203707c8bbc490d802c708ca016302ffa77dc1badb662961ccb",
+        "reason": "Kişi detayında erişim bir kez hesaplanıyor. Bir kişinin yanıtını hazırlayan parametreli plan ilk çağrıdan itibaren kullanılıyor. Birleşmiş kimlik ve iletişim maskesi doğrulandı."
       }
     },
     {
