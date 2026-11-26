@@ -346,6 +346,13 @@ Aynı sentetik slug ve merkezle kaynak şemasından geçen klasik takvim, `conte
 
 25 Kasım 2026’da [main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/45496294438) doğrulanan `693e8f4fca949347a54cf8f94e0931a98fbe4134` kaynak tabanında `session_get_v1` yeni seçeneği `VALIDATION_FAILED` ile reddetti. [Append-only migration](../supabase/migrations/20261124220645_session_read_center_projection.sql) ve üretilen Edge paketiyle izole Auth → Edge → RPC seans okuma kökünde **30/30** test geçti. İki merkezli sahip, kendi kaydını okuyan öğrenci ve görevli eğitmen doğru merkezi aldı. Yanlış organizasyon/merkez, ilgisiz seans, görev ve hesap bağı kaybı, F08 reddi ve salt okuma sınırı doğrulandı. [Kabul kaynağı](../tests/schedule-reads.test.mjs) · [Açık teslim ölçütleri](remaining-work.md#xreq-074).
 
+<a id="xreq-075-backend-kabulu"></a>
+## XREQ-075 — Ekip davetinde rol atama
+
+Backend teslimi 27 Kasım 2026’da kapandı. [PR #480](https://github.com/SXQHex/FtkSaaS/pull/480) main `8fc1b59c891b7d3ae7a76a5123e16f3eac3c4400` üzerinde birleşti. Aday `da8c040efde60f04aee2d8d8684c66f4959e623c` core, 12 API shard ve [full clean](https://github.com/SXQHex/FtkSaaS/actions/runs/45909422833) kabulünü geçti. Native Auth ve yerel SMTP senaryosu eğitmen, personel ve merkez yöneticisi atamalarının kabulden önce yetki açmadığını, yanlış hesabın reddedildiğini ve doğru hesap kabulünde aynı atama kimliklerinin etkinleştiğini doğruladı. [Test kaynağı](../tests/api-acceptance.test.mjs).
+
+[Main kanıtı](https://github.com/SXQHex/FtkSaaS/actions/runs/45910489912) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/45910542715) başarılı. Development makbuzu [davet rolleri migration’ının](../supabase/migrations/20261126230219_pending_team_invitation_roles.sql) aynı main kaynağında uygulandığını, 271 migration içeriğinin eşleştiğini ve hosted smoke kontrollerinin geçtiğini doğruladı. Ekip ekranı kabulü [XREQ-075](../../../docs/requests.md#xreq-075-ekip-davetinde-rol-atama) üzerinden izlenir.
+
 <a id="web1-backend-canli-takip-kapanisi"></a>
 ## Web1 — Backend canlı tekrar kapanışı
 
