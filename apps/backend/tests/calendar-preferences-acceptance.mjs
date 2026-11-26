@@ -21,9 +21,9 @@ test('FD05 own interests and opt-in history only narrow and order authorized cal
   person=(await api('person_create_v1',{display_name:'Synthetic own preferences',contacts:[]})).primary_id;await api('student_activate_v1',{person_id:person});account=await must(member,'account_get_v1');
   await db.query("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[key(),org,account.id,person]);
   const policy=key();await db.query("insert into core.policy_versions(id,org_id,scope_center_id,key,effective_at,mandatory,value) values($1,$2,$3,'student_cancel_group',now(),false,$4)",[policy,org,center,JSON.stringify({kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'consume',no_show:'consume'}})]);
-  async function session(d,at,p=null,historical=false,attended=true){
-   const id=key(),end=new Date(Date.parse(at)+3600000).toISOString();await db.query("insert into core.sessions(id,org_id,center_id,discipline_id,format,starts_at,ends_at,nominal,maximum,state,attendance_state) values($1,$2,$3,$4,'group',$5,$6,10,10,$7,$8)",[id,org,center,d,at,end,historical?'occurred':'planned',historical?'closed':'open']);
-   if(p){const reservation=key();await db.query("insert into core.reservations(id,org_id,center_id,session_id,person_id,mode,state,policy_version_id) values($1,$2,$3,$4,$5,'flexible',$6,$7)",[reservation,org,center,id,p,historical?'completed':'active',policy]);if(historical)await db.query('insert into core.attendance_entries(id,org_id,center_id,reservation_id,result) values($1,$2,$3,$4,$5)',[key(),org,center,reservation,attended?'attended':'no_show']);}return id;
+  async function session(d,at,p=null,historical=false,attended=true,sessionCenter=center){
+   const id=key(),end=new Date(Date.parse(at)+3600000).toISOString();await db.query("insert into core.sessions(id,org_id,center_id,discipline_id,format,starts_at,ends_at,nominal,maximum,state,attendance_state) values($1,$2,$3,$4,'group',$5,$6,10,10,$7,$8)",[id,org,sessionCenter,d,at,end,historical?'occurred':'planned',historical?'closed':'open']);
+   if(p){const reservation=key();await db.query("insert into core.reservations(id,org_id,center_id,session_id,person_id,mode,state,policy_version_id) values($1,$2,$3,$4,$5,'flexible',$6,$7)",[reservation,org,sessionCenter,id,p,historical?'completed':'active',policy]);if(historical)await db.query('insert into core.attendance_entries(id,org_id,center_id,reservation_id,result) values($1,$2,$3,$4,$5)',[key(),org,sessionCenter,reservation,attended?'attended':'no_show']);}return id;
   }
   early=await session(discipline,'2030-01-01T10:00:00Z',person);later=await session(second,'2030-01-01T12:00:00Z',person);hidden=await session(second,'2030-01-01T11:00:00Z');
   const alias=(await api('person_create_v1',{display_name:'Synthetic merged own history',contacts:[]})).primary_id;await session(second,'2020-01-01T12:00:00Z',alias,true);await db.query("update core.people set state='merged',merged_into_id=$1 where org_id=$2 and id=$3",[person,org,alias]);await session(discipline,'2020-01-02T12:00:00Z',person,true,false);
@@ -44,6 +44,18 @@ test('FD05 own interests and opt-in history only narrow and order authorized cal
   });
   await t.test('reset clears interests/history without editing business records and old preference cursors close',async()=>{
    await change({interest_discipline_ids:[second]});const p=await must(member,'settings_reset_preview_v1',{scope:'member',org_id:org,fields:['interest_center_ids','interest_discipline_ids','history_recommendations']});await must(member,'settings_reset_apply_v1',{scope:'member',org_id:org,expected_version:p.version,preview:{id:p.id,token:p.token}},key());assert.deepEqual(ids(await calendar({interest_filter:true})),[early,later]);assert.equal(Number((await rows('select count(*) from core.attendance_entries where org_id=$1',[org]))[0].count),5);
+  });
+  await t.test('organization calendar evaluates manager and participant access per center on every read',async()=>{
+   await api('center_manager_assign_v1',{center_id:otherCenter,person_id:ownPerson});
+   await api('center_discipline_set_v1',{center_id:otherCenter,discipline_id:discipline,state:'active'});
+   const managed=await session(discipline,'2030-01-01T14:00:00Z',null,false,true,otherCenter);
+   const allCenters=()=>calendar({center_id:undefined});
+   assert.deepEqual(ids(await allCenters()),[early,later]);
+   await api('center_manager_assign_v1',{center_id:otherCenter,person_id:person});
+   assert.deepEqual(ids(await allCenters()),[early,later,managed]);
+   assert.deepEqual(ids(await calendar({center_id:otherCenter})),[managed]);
+   await api('center_manager_revoke_v1',{center_id:otherCenter,person_id:person,expected_version:1,reason:'End temporary calendar assignment'});
+   assert.deepEqual(ids(await allCenters()),[early,later]);
   });
   await t.test('preferences cannot select another account or widen current access; reads have no command side effects',async()=>{
    const snapshot=async()=>JSON.stringify(await rows('select (select count(*) from core.operation_receipts where org_id=$1) receipts,(select count(*) from core.audit_events where org_id=$1) audit,(select count(*) from core.reservations where org_id=$1) reservations',[org]));const before=await snapshot();await calendar({interest_filter:true,page:{sort:'recommendation_desc'}});assert.equal(await snapshot(),before);
