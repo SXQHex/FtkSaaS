@@ -73,6 +73,7 @@ Bu dosya alanlar arası talep ve teslim kabulünün tek kaydıdır. Sohbet devri
 | XREQ-072 | Backend · native CI boş 503 kanıtı | Yönetim | [WF00](workflows.md#wf00) · [Runtime kusuru ve kabul](#xreq-072) | Dış yanıtın ömrü, `oneshot` ve mevcut kaynak sınırları korunarak düzeltilir. | Kapalı · native CI ve paket yayını doğrulandı | [Kaynak, paket ve CI kanıtı](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#xreq-072-runtime-adayi). Hosted ödeme ölçümü [XREQ-071](#xreq-071) kapsamında izleniyor. |
 | XREQ-073 | Frontend · M09 okuma maliyeti | Backend | [Frontend M09](../apps/web/docs/remaining-work.md#router-query-birlesik) · [İstek ve kabul](#xreq-073) | Mevcut kaynak ve alan yetkileriyle sınırlı typed sayfa projeksiyonları, toplamlar ve kesin seçiciler. | Backend teslimi kapalı | [Uygulanan okumalar](#xreq-073-backend-uygulamasi) · [CI ve teslim kanıtı](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#xreq-073-backend-kabulu) · [Backend kapanışı](../apps/backend/docs/remaining-work.md#xreq-073) · [Takip teslimi](#xreq-073-backend-takip). |
 | XREQ-074 | Frontend · kişisel ICS seans bağlantısı | Backend | [WF03](workflows.md#wf03) · [WF09](workflows.md#wf09) · [Kesin merkez keşfi](#xreq-074) | Eski org + seans kimliğinden tek yetkili native okumayla seansın gerçek merkezini çöz. | Kapandı | [Backend uygulaması](#xreq-074-backend) · [Frontend canlı kabulü](#xreq-074-frontend). |
+| XREQ-075 | Backend, kullanıcı kararı | Frontend | [Ekip davetinde aynı kişi kimliğine önceden rol atama](#xreq-075-ekip-davetinde-rol-atama) | Ekip sayfası mevcut davet ve rol komutlarını sırayla kullanır. | Açık | [WF04](workflows.md#wf04) |
 
 Alanların kendi planlarındaki bağımlılık gözlemleri otomatik olarak talep, onay veya işe başlama yetkisi sayılmaz; somut talep bu tabloya kaydedildiğinde `XREQ-001` biçiminde sabit bir kimlik alır.
 
@@ -1122,3 +1123,7 @@ Kesin merkez `session_get_v1` çağrısındaki `include_center_id:true` seçene�
 ### Frontend talep eden kabulü
 
 25 Kasım 2026'da [PR #451](https://github.com/SXQHex/FtkSaaS/pull/451) ile [development'a yayımlanan](https://github.com/SXQHex/FtkSaaS/actions/runs/45500395186) kesin merkez alanının gerçek ICS tüketimi öğrenci ve eğitmenle kabul edildi. [MONO-02 kapanışı](../apps/web/docs/handover.md#mono-02-kaynak-ve-ortam) kaynak, rol, merkez ve istek kanıtının sahibidir.
+
+## XREQ-075 Ekip davetinde rol atama
+
+Ekip daveti sayfası aynı kişi ve merkez için mevcut davet ile rol atama komutlarını kullanabilir. Davet oluşturulduğunda rol atama düğmesi hesap bağlantısı beklemez. Davet kabulüne kadar atama bekler. Kabulden sonra ekip listesi mevcut okuyucusuyla etkin rolü aynı atama ID’siyle gösterir. Davet yenilenirse seçilen roller yeni davet için yeniden atanır. [Komut sırası ve kabul](workflows.md#wf04).

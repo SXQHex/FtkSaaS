@@ -3,7 +3,7 @@ import {invalidJsonResponseError} from '../scripts/native-runtime-diagnostics.mj
 import {stackStatus,connect} from '../scripts/db.mjs';import {newUuidV7} from '../scripts/uuid.mjs';import {randomBytes} from 'node:crypto';import fs from 'node:fs';
 async function responseJson(response,label){const body=await measured('http_body',label,()=>response.text());try{return JSON.parse(body);}catch{throw invalidJsonResponseError(response,label,Buffer.byteLength(body));}}
 let cachedContext;export function context(){if(!cachedContext){const s=stackStatus();cachedContext={s,env:s.env};}return cachedContext;}
-async function createAuthUser(label){const {env}=context();const email='dev+'+label+'-'+newUuidV7()+'@ftksaas.invalid',password=randomBytes(30).toString('base64url');
+async function createAuthUser(label,email='dev+'+label+'-'+newUuidV7()+'@ftksaas.invalid'){const {env}=context();const password=randomBytes(30).toString('base64url');
  const a=await timedFetch('auth.create',env.API_URL+'/auth/v1/admin/users',{method:'POST',headers:{apikey:env.SERVICE_ROLE_KEY,authorization:'Bearer '+env.SERVICE_ROLE_KEY,'content-type':'application/json'},body:JSON.stringify({email,password,email_confirm:true,user_metadata:{display_name:label}})});
  if(!a.ok)throw new Error('Auth fixture creation failed: '+a.status);const user=await responseJson(a,'Auth fixture create');
  const t=await timedFetch('auth.password_login',env.API_URL+'/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:env.ANON_KEY,'content-type':'application/json'},body:JSON.stringify({email,password})});const session=await responseJson(t,'Auth fixture login');if(!t.ok)throw new Error('Auth login failed');
@@ -19,6 +19,6 @@ async function createPlatformFixture(){const platform=await authUser('platform')
  await db.query("insert into core.saas_plan_versions(id,name,effective_at,price_minor,currency,period,limits,features) values($1,'business',now(),1000,'TRY','monthly',$2,$3)",[plan,{entries:[{key:'active_students',value:500},{key:'centers',value:10},{key:'instructors',value:50}]},Array.from({length:33},(_,i)=>'F'+String(i+1).padStart(2,'0'))]);
  return {platform,plan};}finally{await db.end();}}
 
-export const authUser=label=>measured('fixture','authUser',()=>createAuthUser(label));
+export const authUser=(label,email)=>measured('fixture','authUser',()=>createAuthUser(label,email));
 export const call=(user,operation,body={},key)=>measured('api',operation,()=>apiCall(user,operation,body,key));
 export const fixturePlatform=()=>measured('fixture','fixturePlatform',createPlatformFixture);

@@ -73503,7 +73503,7 @@
           "billing_gate_config",
           "same_key_same_payload_replay",
           "receipt_audit_outbox_atomic_domain_commit",
-          "target_account_link_active",
+          "target_verified_link_or_live_same_center_invitation_for_team_roles",
           "no_owner_assignment_customer",
           "center_manager_assignment_owner_only_except_org_manager_self",
           "required_feature_gates_separate_from_references"
@@ -73553,7 +73553,8 @@
           "read_operation": "management_state_get_v1",
           "atomic_effects": [
             "role_assignments.active",
-            "no_account_link_creation"
+            "no_account_link_creation",
+            "team_role_pending_verified_invitation_acceptance"
           ],
           "business_commit": true,
           "read_path_status": "implemented",
@@ -74466,7 +74467,7 @@
           "same_key_same_payload_replay",
           "receipt_audit_outbox_atomic_domain_commit",
           "existing_person_only",
-          "no_prerole_before_account_link",
+          "pending_team_role_activates_with_verified_account_link",
           "default_student_self_not_grant_privilege",
           "owner_without_center_role_denied",
           "invite7days_one_use_current_sender_permission",
@@ -74513,6 +74514,7 @@
           "atomic_effects": [
             "account_links.active",
             "student_self_role_only",
+            "previously_assigned_center_roles_for_exact_invitation",
             "invitations.accepted"
           ],
           "business_commit": true,
@@ -90835,7 +90837,7 @@
           "billing_gate_bootstrap",
           "same_key_same_payload_replay",
           "receipt_audit_outbox_atomic_domain_commit",
-          "target_account_link_active",
+          "target_verified_link_or_live_same_center_invitation_for_team_roles",
           "no_owner_assignment_customer",
           "center_manager_assignment_owner_only_except_org_manager_self",
           "required_feature_gates_separate_from_references"
@@ -90877,7 +90879,8 @@
           "read_operation": "management_state_get_v1",
           "atomic_effects": [
             "role_assignments.center_manager",
-            "center_relationship_scope"
+            "center_relationship_scope",
+            "team_role_pending_verified_invitation_acceptance"
           ],
           "business_commit": true,
           "read_path_status": "contract_only",
@@ -119280,7 +119283,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 270,
+      "migration_count": 271,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

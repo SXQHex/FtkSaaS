@@ -286,7 +286,7 @@
 | policies_get_v1 | read | none | None | contract_only |  |
 | policy_publish_v1 | command | append_or_current_scope_lock | policies_get_v1 | implemented | policy_versions.immutable, protected_reservation_obligations_if_affected, reservation_protections.append_causal_obligation_proof |
 | roles_list_v1 | read | none | None | contract_only |  |
-| role_assign_v1 | command | append_or_current_scope_lock | management_state_get_v1 | implemented | role_assignments.active, no_account_link_creation |
+| role_assign_v1 | command | append_or_current_scope_lock | management_state_get_v1 | implemented | role_assignments.active, no_account_link_creation, team_role_pending_verified_invitation_acceptance |
 | role_revoke_v1 | command | row_version | roles_list_v1 | implemented | role_assignments.inactive_live_next_request |
 | permission_set_v1 | command | row_version | management_state_get_v1 | implemented | permission_overrides, people.permission_aggregate_version |
 | org_manager_assign_v1 | command | append_or_current_scope_lock | management_state_get_v1 | contract_only | role_assignments.org_manager, no_implicit_center_operation_grant |
@@ -294,7 +294,7 @@
 | manager_self_assign_center_v1 | command | append_or_current_scope_lock | management_state_get_v1 | contract_only | manager_self_assign_center.authorized_result |
 | account_access_send_v1 | command | append_or_current_scope_lock | management_state_get_v1 | contract_only | invitations.versioned_domain_change |
 | account_access_revoke_v1 | command | row_version | management_state_get_v1 | implemented | invitations.versioned_domain_change |
-| account_access_accept_v1 | command | append_or_current_scope_lock | management_state_get_v1 | contract_only | account_links.active, student_self_role_only, invitations.accepted |
+| account_access_accept_v1 | command | append_or_current_scope_lock | management_state_get_v1 | contract_only | account_links.active, student_self_role_only, previously_assigned_center_roles_for_exact_invitation, invitations.accepted |
 | account_link_remove_v1 | command | row_version | management_state_get_v1 | implemented | account_links.versioned_domain_change, role_assignments.revoke_link_roles, permission_overrides.disable, settlement_grants.disable |
 | people_list_v1 | read | none | None | contract_only |  |
 | person_get_v1 | read | none | None | implemented |  |
@@ -429,7 +429,7 @@
 | event_attendance_mark_v1 | draft | row_version | management_state_get_v1 | contract_only | event_registrations.versioned_domain_change |
 | platform_owner_set_v1 | command | append_or_current_scope_lock | management_state_get_v1 | contract_only | organizations.owner_person, verified_target_link |
 | platform_owner_remove_v1 | command | append_or_current_scope_lock | management_state_get_v1 | contract_only | organizations.owner_person_removed, no_customer_owner_self_transfer |
-| center_manager_assign_v1 | command | append_or_current_scope_lock | management_state_get_v1 | contract_only | role_assignments.center_manager, center_relationship_scope |
+| center_manager_assign_v1 | command | append_or_current_scope_lock | management_state_get_v1 | contract_only | role_assignments.center_manager, center_relationship_scope, team_role_pending_verified_invitation_acceptance |
 | center_manager_revoke_v1 | command | row_version | roles_list_v1 | implemented | role_assignments.center_manager_inactive |
 | attendance_block_v1 | command | row_version | attendance_get_v1 | implemented | reservations.eligibility_snapshot, attendance_entries.blocked, reservations.actual_evaluation_snapshot_and_version, sessions.version |
 | event_attendance_close_v1 | closure | row_version | management_state_get_v1 | contract_only | event_registrations.completed, rights.consume_release_from_event_terms |
