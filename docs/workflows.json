@@ -321,8 +321,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "e7ef76d1ae197315b767109326f8ba86d0db491d260f48e823a73e8b0fbb2383",
-        "reason": "Birleşim kabulünde aynı sayfanın önceki alanları, sırası ve erişim bağlamı karşılaştırıldı. İstemci zarfı ve hata protokolü korunuyor."
+        "fingerprint": "48d113f8307a1088bd1809c81a23fe9d7c14c661318a33650893ce9e69c7e223",
+        "reason": "Birleşim kabulünün kaynak özeti güncellendi. Aynı sayfanın alanları ve sırası önceki kişi yanıtıyla karşılaştırıldı."
       }
     },
     {
