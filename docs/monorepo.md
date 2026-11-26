@@ -19,7 +19,7 @@ Kök dizin yalnız workspace yönetimi ve zorunlu araç yapılandırmalarını i
 | .devcontainer | Workspace geliştirme ortamı |
 | .artifacts | İzlenmeyen koşu çıktıları; ci/ ve backend/ altında ayrılır |
 
-Root package.json yalnız workspace komutları ve Turbo bağımlılığını taşır. pg/uuid/Supabase/AJV/esbuild gibi backend bağımlılıkları apps/backend/package.json sahibindedir. Dizinlere göre ikinci backend, sözleşme veya devir ağacı yoktur. İlk aktarımın artık çağrılmayan generate_schema/transfer_contract/ZIP araçları kaldırılmıştır; ilk kurulumun kaynağı değişmez migration zinciri ve Git geçmişidir.
+Root package.json, workspace komutlarını ve repo genelinde kullanılan Turbo ile Knip geliştirme bağımlılıklarını taşır. pg/uuid/Supabase/AJV/esbuild gibi backend bağımlılıkları apps/backend/package.json sahibindedir. Dizinlere göre ikinci backend, sözleşme veya devir ağacı yoktur. İlk aktarımın artık çağrılmayan generate_schema/transfer_contract/ZIP araçları kaldırılmıştır; ilk kurulumun kaynağı değişmez migration zinciri ve Git geçmişidir.
 
 ## Sürüm ve paket yönetimi
 

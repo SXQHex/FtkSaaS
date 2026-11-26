@@ -321,8 +321,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "48d113f8307a1088bd1809c81a23fe9d7c14c661318a33650893ce9e69c7e223",
-        "reason": "Birleşim kabulünün kaynak özeti güncellendi. Aynı sayfanın alanları ve sırası önceki kişi yanıtıyla karşılaştırıldı."
+        "fingerprint": "6e981878d965b9bdfd882174ba2f3f1e76354e36cd8edae95228ce14d8fc5d49",
+        "reason": "Kök katalog AJV pinlerini ve üretilmiş doğrulayıcı sözleşmesini korur. Workspace yönetişim testi Turbo ile elle çalıştırılan Knip listesini denetler. Main gelişiminde kişi sayfasının aynı alan ve sıra kabulü kaynak bağına dahildir."
       }
     },
     {
