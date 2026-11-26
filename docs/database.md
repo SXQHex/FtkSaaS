@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `8761b2b9b6996c8110b761a614a0fca20bb563e7d7eb6e18880a136dd19eb282`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `34ebbff8fd5781b5109e79e9036a38b503743652580da2c087f87d128d718ca7`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 271. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 273. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -279,3 +279,5 @@ Sıralı migration: 271. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261126151241_report_enqueue_resolved_scope.sql](../apps/backend/supabase/migrations/20261126151241_report_enqueue_resolved_scope.sql) | `88d830a493b9529751761a6a7801918657ec85e8ad34f224d7ecddcfd4708658` |
 | [20261126151242_reuse_person_detail_scope_and_family.sql](../apps/backend/supabase/migrations/20261126151242_reuse_person_detail_scope_and_family.sql) | `8327e05a15aa9592adeaf9190c8f300927bb6a675da0ac0785b0b2227723bb60` |
 | [20261126230219_pending_team_invitation_roles.sql](../apps/backend/supabase/migrations/20261126230219_pending_team_invitation_roles.sql) | `6eb7e97f5b55fe0c6bbe3474df29d88dcbce6b65f5be99590058574aab3ce37b` |
+| [20261126230220_reuse_person_field_policy_queries.sql](../apps/backend/supabase/migrations/20261126230220_reuse_person_field_policy_queries.sql) | `b6a2b40ab7dd2ea1409b1e23b403d6f21d418ee7947dbe63346d70c54e47eb3a` |
+| [20261126230221_reuse_calendar_center_scope.sql](../apps/backend/supabase/migrations/20261126230221_reuse_calendar_center_scope.sql) | `c2e56d75b1f3140b5214ff611b45c3a27d83edccf22ef344db0b4b16b451dde5` |

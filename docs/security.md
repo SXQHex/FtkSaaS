@@ -1,6 +1,6 @@
 # Güvenlik kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `8761b2b9b6996c8110b761a614a0fca20bb563e7d7eb6e18880a136dd19eb282`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `34ebbff8fd5781b5109e79e9036a38b503743652580da2c087f87d128d718ca7`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 İnsan istemci native Auth ile JWT doğrulanan Edge yolunu, düz merkez listesi ise [istemci protokolündeki](client-integration.md) Data API yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan denetlenir. İstemci erişimi core/private ve service-only RPC dışında kalır. Worker ve public credential transport ayrı yetki yollarıdır. [Teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
 
@@ -486,6 +486,8 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [20261126140500_batch_people_list_projection.sql](../apps/backend/supabase/migrations/20261126140500_batch_people_list_projection.sql) | `6e6327ac526e1d803301c5750dc162d7884e98984061a7492a73b61145d2bc80` |
 | [20261126151241_report_enqueue_resolved_scope.sql](../apps/backend/supabase/migrations/20261126151241_report_enqueue_resolved_scope.sql) | `88d830a493b9529751761a6a7801918657ec85e8ad34f224d7ecddcfd4708658` |
 | [20261126230219_pending_team_invitation_roles.sql](../apps/backend/supabase/migrations/20261126230219_pending_team_invitation_roles.sql) | `6eb7e97f5b55fe0c6bbe3474df29d88dcbce6b65f5be99590058574aab3ce37b` |
+| [20261126230220_reuse_person_field_policy_queries.sql](../apps/backend/supabase/migrations/20261126230220_reuse_person_field_policy_queries.sql) | `b6a2b40ab7dd2ea1409b1e23b403d6f21d418ee7947dbe63346d70c54e47eb3a` |
+| [20261126230221_reuse_calendar_center_scope.sql](../apps/backend/supabase/migrations/20261126230221_reuse_calendar_center_scope.sql) | `c2e56d75b1f3140b5214ff611b45c3a27d83edccf22ef344db0b4b16b451dde5` |
 | [member-profile-lifecycle.sql](../apps/backend/tests/fixtures/member-profile-lifecycle.sql) | `1cac25c1610482b03cb7e594e4c28a61903bd047ae86ff724623c600dbf858d0` |
 | [product-class-management-acceptance.sql](../apps/backend/tests/fixtures/product-class-management-acceptance.sql) | `52141944d8ff08008a71d20be6b69d79e55480fad3e387f4ad377ace15a274d1` |
 | [sale-discount-acceptance.sql](../apps/backend/tests/fixtures/sale-discount-acceptance.sql) | `c17253fcdcd3460048bc35bf31c752315e1b7d5092b6c4231ab9b5349b4afc29` |

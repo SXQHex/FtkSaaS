@@ -321,8 +321,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "b5664a17e4ffc5f9d338c452dda78de913bd2cf6302e378cb1dec735933c9aeb",
-        "reason": "Ekip rolü senaryosu mevcut native API suite bölümüne dahil. Diğer testlerin satır kapsamı ve davet sözleşmesi doğrulandı."
+        "fingerprint": "e39f617cd59130ede294ed77144b207d875af9aa5b12826e9063a7f53864aac6",
+        "reason": "Ekip davetinin test kapsamı ve takvimde merkez yetkisi verilip geri alındığında görünürlüğün değişmesi güncel kabul kaynaklarına bağlı."
       }
     },
     {
@@ -589,7 +589,8 @@
         "apps/backend/tests/fixtures/assigned-session-room-labels.sql",
         "apps/backend/tests/web1-review-unit.mjs",
         "apps/backend/tests/member-lesson-discovery-unit.mjs",
-        "apps/backend/tests/member-lesson-discovery-acceptance.mjs"
+        "apps/backend/tests/member-lesson-discovery-acceptance.mjs",
+        "apps/backend/tests/calendar-preferences-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -663,7 +664,8 @@
         "apps/backend/supabase/migrations/20261124220645_session_read_center_projection.sql",
         "apps/backend/supabase/migrations/20261125112000_share_person_calendar_read_locks.sql",
         "apps/backend/supabase/migrations/20261125124800_calendar_read_projections.sql",
-        "apps/backend/supabase/migrations/20261126151242_reuse_person_detail_scope_and_family.sql"
+        "apps/backend/supabase/migrations/20261126151242_reuse_person_detail_scope_and_family.sql",
+        "apps/backend/supabase/migrations/20261126230221_reuse_calendar_center_scope.sql"
       ],
       "operations": [
         "availability_save_v1",
@@ -686,8 +688,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "e2ad2226b66659e1b17526a45d31e679b4d2f2de144e0e913566cd6d9053cb78",
-        "reason": "Takvim ve seans okuma dalları aynı erişim ve sayfalama adımlarıyla daha erken seçiliyor."
+        "fingerprint": "837197bade3e6958e94248b389b1207b3bc9b053d2b9f6ab939b6b872762d763",
+        "reason": "Merkez yetkisi takvim aralığında merkez başına çözülüyor. Atama, rezervasyon, etkinlik ve merkez yetkisi iptali aynı satır görünürlüğünü koruyor."
       }
     },
     {
@@ -797,7 +799,8 @@
         "apps/backend/supabase/migrations/20261125144852_management_account_directory_reads.sql",
         "apps/backend/supabase/migrations/20261126151242_reuse_person_detail_scope_and_family.sql",
         "apps/backend/database/pending-team-invitation-roles.sql",
-        "apps/backend/supabase/migrations/20261126230219_pending_team_invitation_roles.sql"
+        "apps/backend/supabase/migrations/20261126230219_pending_team_invitation_roles.sql",
+        "apps/backend/supabase/migrations/20261126230220_reuse_person_field_policy_queries.sql"
       ],
       "operations": [
         "account_access_send_v1",
@@ -816,8 +819,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "f8e41b4aa44129223a01212b69e499b4a330ffafcc3b4744c7a890c9c868293f",
-        "reason": "Davet kabulünde doğrulanmış hesap aynı kişiye bağlanır ve yalnız aynı davetin önceden verilmiş rolleri etkinleşir."
+        "fingerprint": "8749e006ce4e022515d9f3e2a678dedadcf67bfa23d49567b728ceeff19eb0bd",
+        "reason": "Kişi detayında mevcut merkez yöneticisi kontrolü tekrar kullanılıyor. Ad ve iletişim alanı sahipliği canlı hesap ve bağlantı durumuna göre hesaplanıyor."
       }
     },
     {
