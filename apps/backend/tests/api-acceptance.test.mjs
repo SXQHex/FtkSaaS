@@ -180,6 +180,40 @@ async function apiFixture(t){
   await error(student,'event_save_v1',scoped(eventInput()),'FORBIDDEN');
   const stored=(await db.query('select token_hash from core.invitations where org_id=$1 and person_id=$2',[org,studentPerson])).rows[0];assert.notEqual(stored.token_hash,token);
  });
+ await t.test('team roles are assigned before signup and activate with the same IDs on verified invitation acceptance',async()=>{
+  const label='team-'+key();
+  const email=label+'@ftksaas.invalid';
+  const personId=(await mutate(owner,'person_create_v1',{display_name:'Team invitee',contacts:[{kind:'email',value:email}]})).primary_id;
+  const job=await mutate(owner,'account_access_send_v1',{person_id:personId});
+  const manager=await mutate(owner,'center_manager_assign_v1',{person_id:personId});
+  const assigned=new Map([['center_manager',manager.primary_id]]);
+  for(const role of ['instructor','staff']){
+   const body={person_id:personId,role,scope:{center_id:center}},operationKey=key();
+   const first=await mutate(owner,'role_assign_v1',body,operationKey);
+   const replay=await mutate(owner,'role_assign_v1',body,operationKey);
+   assert.equal(replay.primary_id,first.primary_id);assert.equal(replay.replayed,true);
+   assigned.set(role,first.primary_id);
+  }
+  const roles=async()=>(await db.query("select id,role,account_link_id from core.role_assignments where org_id=$1 and person_id=$2 and scope_center_id=$3 and state='active' order by role",[org,personId,center])).rows;
+  assert.deepEqual(await roles(),[]);
+  const inviteId=(await db.query('select invitation_id from private.invitation_deliveries where job_id=$1',[job.job_id])).rows[0].invitation_id;
+  assert.deepEqual(new Map((await db.query('select role,assignment_id from private.pending_team_invitation_roles where invitation_id=$1',[inviteId])).rows.map(row=>[row.role,row.assignment_id])),assigned);
+  await deliverDevInvitation(job.job_id);
+  const {env}=context();
+  const messages=await(await fetch(env.MAILPIT_URL+'/api/v1/messages')).json();
+  const message=messages.messages.find(m=>m.To.some(a=>a.Address===email));assert(message,'team invitation reached SMTP');
+  const detail=await(await fetch(env.MAILPIT_URL+'/api/v1/message/'+message.ID)).json();
+  const token=detail.Text.match(/Token: ([a-f0-9]{64})/)[1];
+  await error(stranger,'account_access_accept_v1',{token},'INVITATION_UNAVAILABLE');
+  assert.deepEqual(await roles(),[]);
+  const invitee=await authUser('team',email);
+  const acceptKey=key();
+  const link=await must(invitee,'account_access_accept_v1',{token},acceptKey);
+  const replay=await must(invitee,'account_access_accept_v1',{token},acceptKey);
+  assert.equal(replay.primary_id,link.primary_id);
+  assert.deepEqual((await roles()).map(row=>[row.role,row.id,row.account_link_id]),[...assigned].map(([role,id])=>[role,id,link.primary_id]));
+  await mutate(invitee,'person_create_v1',{display_name:'Manager access from accepted invite',contacts:[]});
+ });
  await t.test('staff grants and revocations are live; a center grant cannot target a different center',async()=>{
   const assignment=await mutate(owner,'role_assign_v1',{person_id:studentPerson,role:'staff',scope:{center_id:center}});
   await error(student,'person_create_v1',scoped({display_name:'denied',contacts:[]}),'FORBIDDEN');
