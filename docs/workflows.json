@@ -321,8 +321,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "066b117b62d03cff1f1938c9146b9d315ca7fd89540eb9fb4e45de7becca9df4",
-        "reason": "Aynı anahtarla tekrarda finans yetkisi iptal edilmişse erişim reddedilir. Mevcut P06 kabulünün kaynak özeti kayıtla eşleşir."
+        "fingerprint": "894ff0d5f1593f09bc5e7341f727f4650c337e2536f8b23ffd39a5a6f28fa2e7",
+        "reason": "Ortak katalogdaki AJV sürümleri ve kök Knip yönetişim testiyle kişi sayfasının alan ve sıra kabulü doğrulandı. P06 kabulü, finans yetkisi kaldırılınca aynı işlem anahtarıyla rapor isteğinin reddedildiğini denetliyor."
       }
     },
     {

@@ -6,7 +6,7 @@
 
 - `@ftksaas/ui` React Aria/shadcn bileşenlerini ve ortak UI yardımcılarını taşır. Sahiplik `packages/ui` altındadır. Uygulamanın Tailwind giriş dosyası oradaki sınıfları tarar.
 - `@ftksaas/api-contracts` DTO, operasyon ve hata tiplerini sağlar. Transport, browser Auth ve uygulamaya özel hata/indirme davranışı için Web'in Edge adapter'ını kullanır. Gerçek yetki, tenant ve plan kararı API'dedir. [İstemci protokolü](../../../docs/client-integration.md)
-- TypeScript pin'i kök workspace kataloğundan, ortak seçenekler `@ftksaas/typescript-config` paketinden gelir. pnpm tek kök lockfile ile kurar.
+- Web ve ortak UI, React ve Vitest dahil ortak sürüm pinleri için [kök workspace kataloğunu](../../../pnpm-workspace.yaml) kullanır. React ve React DOM için UI'ın peer bildirimi de aynı pini kullanır. TypeScript seçenekleri `@ftksaas/typescript-config` paketinden gelir. pnpm tek kök lockfile ile kurar.
 
 ## Router ve Query veri sahipliği
 
@@ -89,7 +89,7 @@ Kabul tek kaynak SHA'sına bağlıdır. [Önceki regression testleri](../src/fea
 
 Eski `/organizasyon/{org_id}/seans/{session_id}` bağlantısı native giriş ve gerekiyorsa MFA üzerinden devam eder. Devam adresi yalnız iki UUID içeren bu rotayı kabul eder. Google girişinde mevcut PKCE callback'i kullanılır ve devam adresi başlatan sekmede bir kez alınır.
 
-[WF03](../../../docs/workflows.md#wf03) kapsamındaki `session_get_v1` okuması `include_center_id:true` ile merkezi getirir. Aynı native oturumdaki eşzamanlı rota yükleyicileri devam eden isteği paylaşır. Rota hedef ekranın da kullandığı organizasyon kapsamını yeniler. Atanmış eğitmen veya asistan Eğitmen seansına gider.
+[WF03](../../../docs/workflows.md#wf03) kapsamındaki `session_get_v1` okuması `include_center_id:true` ile merkezi getirir. Aynı native oturumdaki eşzamanlı rota yükleyicileri seans okuması ve canlı üyelik kontrolünün tamamını tek Query üzerinden paylaşır. Rota, hedef ekranın da kullandığı organizasyon kapsamını yeniler. Sonraki ziyaret seansı ve üyeliği yeniden doğrular. Atanmış eğitmen veya asistan Eğitmen seansına gider.
 
 Öğrenci ekranı kendi kişi, merkez ve seans kimlikleriyle tek `reservation_list_v1` isteği yapar. Aynı sayfa hem sahipliği doğrular hem içeriği doldurur. Sunucu anı ve seans başlangıcı yaklaşan/geçmiş ayrımını belirler. Sürüm bağlı kendi rezervasyon özeti yeterliyse ek seans, takvim ve yoklama okuması gerekmez. Kesin rezervasyon görüntüsü bekleme listesi dizinlerini çağırmaz. Boş sonuçta erişilemeyen kayıt durumu gösterilir. [Kişisel takvim protokolü](../../../docs/client-integration.md#statik-spa-transportu)
 
