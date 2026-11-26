@@ -13,9 +13,12 @@ import { Button } from "@ftksaas/ui/components/button";
 import { Badge } from "@ftksaas/ui/components/badge";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { SettingsView, type SettingsViewData } from "./settings-view";
+import "./settings-team.css";
+import { SettingsTeamView, type TeamSection } from "./settings-team-view";
 import { readDisciplineCatalog, type DisciplineLevel } from "./discipline-reader";
 import { DisciplineEditor } from "./discipline-editor";
 import { OrganizationLifecyclePanel } from "./organization-lifecycle-panel";
+import { SettingsCenterAssignment } from "./settings-center-assignment";
 import { SettingsIdentityEditor } from "./settings-identity-editor";
 import { SettingsPublicEditor } from "./settings-public-editor";
 import {
@@ -120,6 +123,8 @@ export function SettingsContent({
       }
       canOrganization={canOrganization}
       owner={roles.includes("owner")}
+      organizationManager={roles.includes("org_manager")}
+      ownPersonId={organization.self_context?.person_id}
       canWriteOrganization={canWriteOrganization}
       readOnly={workspace.isError}
       organizationLoading={canReadOrganizationCatalog && (catalog.isPending || catalog.isFetching)}
@@ -137,6 +142,8 @@ function SettingsManagement({
   subscriptionSetup,
   canOrganization,
   owner,
+  organizationManager,
+  ownPersonId,
   canSubscription,
   canWriteOrganization,
   readOnly,
@@ -151,6 +158,8 @@ function SettingsManagement({
   subscriptionSetup: boolean;
   canOrganization: boolean;
   owner: boolean;
+  organizationManager: boolean;
+  ownPersonId?: string;
   canSubscription: boolean;
   canWriteOrganization: boolean;
   readOnly: boolean;
@@ -158,6 +167,7 @@ function SettingsManagement({
   canCenter: boolean;
   onLockChange: (locked: boolean) => void;
 }) {
+  const [teamSection, setTeamSection] = useState<TeamSection>("people");
   const [workCalendarOpen, setWorkCalendarOpen] = useState(false);
   const { t } = useTranslation(),
     router = useRouter(),
@@ -265,11 +275,13 @@ function SettingsManagement({
   });
   const team = useSettingsTeam({
     scope,
-    enabled: allowed && !readOnly,
-    level,
-    writable,
-    canManageManagers: canWriteOrganization,
+    centerLabel,
+    ownPersonId,
+    canReadOrganization: canOrganization && !readOnly,
+    canReadCenter: canCenter && !readOnly,
+    canManageManagers: owner && canWriteOrganization && !readOnly,
     visible: section === "ekip",
+    showPermissions: teamSection === "permissions",
     locked,
     onLockChange: publishLock,
     onAccessLost: accessLost,
@@ -394,7 +406,6 @@ function SettingsManagement({
           ),
         }
       : {}),
-    permissions: team.matrix,
     fields: {
       ...document.data.fields,
       ...notifications.fields,
@@ -447,7 +458,6 @@ function SettingsManagement({
         : undefined,
     tables: {
       politika: policies.table,
-      ekip: team.table,
       sablon: notifications.table,
       salonlar: rooms.table && {
         ...rooms.table,
@@ -542,8 +552,33 @@ function SettingsManagement({
       queryKey: ["studio", scope.accountId, scope.orgId],
     });
   }
+  const organizationPanel =
+    canOrganization &&
+    (section === "organizasyon" || (section === "plan" && level === "organization")) ? (
+      <OrganizationLifecyclePanel
+        scope={scope}
+        organizationLabel={organizationLabel}
+        locked={locked}
+        onLockChange={publishLock}
+        onSaved={async () => {
+          await Promise.all([
+            invalidateWorkspace(queries, scope.accountId, { throwOnError: true }),
+            queries.invalidateQueries({
+              queryKey: ["settings-subscription", scope.accountId, scope.orgId],
+            }),
+          ]);
+        }}
+        onAccessLost={accessLost}
+      />
+    ) : null;
   return (
-    <div className="flex flex-col gap-4 p-4 md:p-6">
+    <div
+      className={
+        section === "ekip"
+          ? "settings-team-page flex min-w-0 flex-col gap-4"
+          : "flex flex-col gap-4 p-4 md:p-6"
+      }
+    >
       {workCalendarOpen && (
         <WorkCalendarEditor
           key={`${scope.accountId}:${scope.orgId}:${scope.centerId}`}
@@ -578,7 +613,6 @@ function SettingsManagement({
         </Alert>
       )}
       {document.notice}
-      {team.notice}
       {notifications.notice}
       {section === "yayin" && (
         <p role="status" className="text-sm text-muted-foreground">
@@ -598,8 +632,26 @@ function SettingsManagement({
               replace: true,
             });
         }}
-        onPermission={team.onPermission}
-        teamActionLabel={t(($) => $.settings.teamNative.addRole)}
+        organizationPanel={section === "organizasyon" ? organizationPanel : undefined}
+        team={
+          <SettingsTeamView
+            team={team}
+            section={teamSection}
+            onSection={setTeamSection}
+            locked={locked}
+          >
+            {!readOnly && !canCenter && (owner || organizationManager) && (
+              <SettingsCenterAssignment
+                scope={scope}
+                centerLabel={centerLabel}
+                canAssignSelf
+                locked={locked}
+                onLockChange={publishLock}
+                onAccessLost={accessLost}
+              />
+            )}
+          </SettingsTeamView>
+        }
         onField={document.onField}
         onColor={document.onColor}
         onLogo={document.onLogo}
@@ -609,24 +661,26 @@ function SettingsManagement({
         onDiscard={document.onDiscard}
         data={data}
         locked={locked}
-        scope={{
-          selected: level,
-          organizationLabel,
-          centerLabel,
-          organizationAvailable: canOrganization,
-          centerAvailable: canCenter,
-        }}
+        scope={
+          section === "ekip" || section === "organizasyon"
+            ? undefined
+            : {
+                selected: level,
+                organizationLabel,
+                centerLabel,
+                organizationAvailable: canOrganization,
+                centerAvailable: canCenter,
+              }
+        }
         onScope={(next) => {
           if (!locked) {
             setSelection(undefined);
-            team.reset();
             setLevel(next);
           }
         }}
         availableActions={[
           ...(publicHref ? ["preview" as const] : []),
           ...(copyable ? ["copyLink" as const] : []),
-          ...(team.canCreate ? ["invite" as const] : []),
           ...(document.source?.catalog.fields.some(
             (row) =>
               publicSettingsKeys.some(
@@ -657,7 +711,6 @@ function SettingsManagement({
           if (locked) return;
           if (action.kind === "preview" && publicTarget) void router.navigate(publicTarget);
           if (action.kind === "copyLink" && publicHref && copyable) void copyPublicLink(publicHref);
-          if (action.kind === "invite") team.create();
           if (action.kind === "publicSettings" && document.source)
             setPublicSettings(structuredClone(document.source));
           if (action.kind === "changePlan" && subscription.downgradeSource)
@@ -681,23 +734,7 @@ function SettingsManagement({
           if (action.kind === "renameCenter" && level === "center") setIdentity("center");
         }}
       />
-      {section === "plan" && level === "organization" && canOrganization && (
-        <OrganizationLifecyclePanel
-          scope={scope}
-          organizationLabel={organizationLabel}
-          locked={locked}
-          onLockChange={publishLock}
-          onSaved={async () => {
-            await Promise.all([
-              invalidateWorkspace(queries, scope.accountId, { throwOnError: true }),
-              queries.invalidateQueries({
-                queryKey: ["settings-subscription", scope.accountId, scope.orgId],
-              }),
-            ]);
-          }}
-          onAccessLost={accessLost}
-        />
-      )}
+      {section === "plan" && organizationPanel}
       {team.dialog}
       {notifications.dialog}
       {publicSettings && (

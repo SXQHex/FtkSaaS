@@ -816,13 +816,25 @@ test("team permission unknown state blocks scope and retries exactly one frozen 
   const f = await mockSettingsCompletion(page, { permissionUnknown: true });
   await activate(page.getByRole("tab", { name: "Ekip", exact: true }));
   const panelStart = f.requests.length;
-  await activate(page.getByRole("button", { name: "İzinleri seç", exact: true }));
+  expect(
+    requestsFor(f.requests, "management_state_get_v1").filter(
+      ({ r }) => r.operation === "permission_set_v1",
+    ),
+  ).toHaveLength(0);
   await activate(page.getByRole("tab", { name: "İzinler", exact: true }));
-  await expect(
-    page.getByRole("checkbox", { name: "Sentetik personel: Satış", exact: true }),
-  ).toBeVisible();
+  const permissionPanel = page.getByRole("tabpanel", { name: "İzinler", exact: true });
+  const save = permissionPanel.getByRole("button", { name: common.settings.save, exact: true });
+  const sale = permissionPanel.getByRole("switch", {
+    name: "Sentetik personel: Satış",
+    exact: true,
+  });
+  await expect(sale).toBeVisible();
+  await expect(permissionPanel.getByRole("combobox")).toHaveCount(0);
   const panelReads = requestsFor(f.requests.slice(panelStart), "management_state_get_v1").filter(
-    (row) => row.r.operation === "permission_set_v1",
+    ({ r }) =>
+      r.operation === "permission_set_v1" &&
+      r.selector?.operation === "permission_set_v1" &&
+      r.selector.key.person_id === I.instructor,
   );
   expect(panelReads).toHaveLength(1);
   expect(panelReads[0]!.r).toMatchObject({
@@ -834,12 +846,13 @@ test("team permission unknown state blocks scope and retries exactly one frozen 
     },
     page: { limit: 1 },
   });
-  await activate(
-    page.getByRole("checkbox", { name: "Sentetik personel: Satış", exact: true }),
-    "Space",
-  );
+  await activate(sale, "Space");
+  expect(f.writes).toEqual([]);
+  await activate(save);
   const dialog = await confirm(page);
-  await expect(page.getByRole("combobox", { name: "Ayar kapsamı", exact: true })).toBeDisabled();
+  await expect(
+    page.getByRole("tab", { name: "Ekip", exact: true, includeHidden: true }),
+  ).toBeDisabled();
   await activate(dialog.getByRole("button", { name: "Aynı isteği yeniden dene", exact: true }));
   await expect.poll(() => f.writes.filter((row) => row.op === "permission_set_v1").length).toBe(2);
   const writes = f.writes.filter((row) => row.op === "permission_set_v1");
@@ -854,16 +867,18 @@ test("team permission unknown state blocks scope and retries exactly one frozen 
     dialog.getByRole("button", { name: "Onaylanan değişiklikleri uygula", exact: true }),
   ).toBeDisabled();
   await activate(dialog.getByRole("button", { name: "Vazgeç", exact: true }));
-  const manage = page.getByRole("checkbox", {
+  const manage = page.getByRole("switch", {
     name: "Sentetik personel: Kişi yönetimi",
     exact: true,
   });
   await activate(manage, "Space");
+  await activate(save);
   let manageReview = await confirm(page);
   await expect(manageReview.getByRole("status")).toContainText(common.events.commandStates.saved);
   await activate(manageReview.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(manage).toBeChecked();
   await activate(manage, "Space");
+  await activate(save);
   manageReview = await confirm(page);
   await expect(manageReview.getByRole("status")).toContainText(common.events.commandStates.saved);
   const changes = requestsFor(f.writes, "permission_set_v1").filter(
@@ -875,28 +890,33 @@ test("team permission unknown state blocks scope and retries exactly one frozen 
   expect(f.state.permissions["person.manage"]).toBe(false);
   await activate(manageReview.getByRole("button", { name: "Vazgeç", exact: true }));
   await expect(manage).not.toBeChecked();
-
-  await activate(page.getByRole("tab", { name: "Kişiler", exact: true }));
-  await page
-    .getByRole("combobox", { name: "Görev türü", exact: true })
-    .selectOption("center_manager");
+});
+test("team matrix shows staff and center manager while preserving the delegated limit", async ({
+  page,
+}) => {
+  const f = await mockSettingsCompletion(page, {
+    startUrl: `${origin}/o/${I.org}/c/${I.center}/settings?section=ekip`,
+  });
   const managerStart = f.requests.length;
-  await activate(
-    page
-      .getByRole("row")
-      .filter({ hasText: "Sentetik yönetici" })
-      .getByRole("button", { name: "İzinleri seç", exact: true }),
-  );
   await activate(page.getByRole("tab", { name: "İzinler", exact: true }));
   const managerPermissions = page.getByRole("tabpanel", { name: "İzinler", exact: true });
-  await expect(managerPermissions.getByRole("checkbox")).toHaveCount(1);
-  await expect(managerPermissions.getByRole("checkbox")).toHaveAccessibleName(
+  const managerSwitches = managerPermissions.getByRole("switch", { name: /^Sentetik yönetici:/ });
+  await expect(managerSwitches).toHaveCount(1);
+  await expect(managerSwitches).toHaveAccessibleName(
     `Sentetik yönetici: ${common.settings.teamNative.permissions.sale.discount}`,
   );
+  await expect(
+    managerPermissions.getByRole("switch", { name: "Sentetik personel: Satış", exact: true }),
+  ).toBeVisible();
   const managerReads = requestsFor(
     f.requests.slice(managerStart),
     "management_state_get_v1",
-  ).filter((row) => row.r.operation === "permission_set_v1");
+  ).filter(
+    ({ r }) =>
+      r.operation === "permission_set_v1" &&
+      r.selector?.operation === "permission_set_v1" &&
+      r.selector.key.person_id === uid(130),
+  );
   expect(managerReads).toHaveLength(1);
   expect(managerReads[0]!.r.selector.key).toEqual({
     person_id: uid(130),
@@ -909,10 +929,18 @@ test("operational team role is a separate reviewed command and native channel/te
   await page.setViewportSize({ width: 320, height: 900 });
   const f = await mockSettingsCompletion(page);
   await activate(page.getByRole("tab", { name: "Ekip", exact: true }));
-  await activate(page.getByRole("button", { name: "Görevi düzenle", exact: true }));
+  await activate(
+    page
+      .getByRole("row")
+      .filter({ hasText: "Sentetik personel" })
+      .getByRole("button", { name: common.settings.teamNative.edit, exact: true }),
+  );
   const editor = page.getByRole("dialog");
+  await activate(editor.getByText(common.settings.teamEditor.otherRoles, { exact: true }));
   await activate(editor.getByRole("checkbox", { name: /Asistan/ }), "Space");
-  await activate(editor.getByRole("button", { name: "Değişiklikleri önizle", exact: true }));
+  await activate(
+    editor.getByRole("button", { name: common.settings.teamEditor.save, exact: true }),
+  );
   const review = await confirm(page);
   await expect.poll(() => f.writes.some((row) => row.op === "role_assign_v1")).toBe(true);
   await expect(
@@ -954,10 +982,18 @@ test("failed role detail readback stays unread and recovers with one acknowledge
 }) => {
   const f = await mockSettingsCompletion(page, { roleDetailReadbackFailure: true });
   await activate(page.getByRole("tab", { name: "Ekip", exact: true }));
-  await activate(page.getByRole("button", { name: "Görevi düzenle", exact: true }));
+  await activate(
+    page
+      .getByRole("row")
+      .filter({ hasText: "Sentetik personel" })
+      .getByRole("button", { name: common.settings.teamNative.edit, exact: true }),
+  );
   const editor = page.getByRole("dialog");
+  await activate(editor.getByText(common.settings.teamEditor.otherRoles, { exact: true }));
   await activate(editor.getByRole("checkbox", { name: /Asistan/ }), "Space");
-  await activate(editor.getByRole("button", { name: "Değişiklikleri önizle", exact: true }));
+  await activate(
+    editor.getByRole("button", { name: common.settings.teamEditor.save, exact: true }),
+  );
   const review = await confirm(page);
   await expect(
     review.getByText(common.events.commandStates["saved-unread"], { exact: true }),
@@ -975,31 +1011,25 @@ test("failed role detail readback stays unread and recovers with one acknowledge
   await activate(review.getByRole("button", { name: "Vazgeç", exact: true }));
 });
 
-test("manager directory binds role and state to scope and revokes through the dedicated org command", async ({
+test("manager directory scopes each role and revokes through the dedicated org command", async ({
   page,
 }) => {
-  const f = await mockSettingsCompletion(page);
+  const f = await mockSettingsCompletion(page, { billingOwner: true });
   await activate(page.getByRole("tab", { name: "Ekip", exact: true }));
-  await page
-    .getByRole("combobox", { name: "Görev türü", exact: true })
-    .selectOption("center_manager");
-  const cm = page.getByRole("row").filter({ hasText: "Sentetik yönetici" });
-  await expect(cm).toContainText("Merkez yöneticisi");
+  const row = page.getByRole("row").filter({ hasText: "Sentetik yönetici" });
+  await expect(row).toContainText("Merkez yöneticisi");
   expect(
     f.requests.filter((row) => row.op === "roles_list_v1" && row.r.role === "center_manager").at(-1)
       ?.r,
   ).toMatchObject({ center_id: I.center, state: "active" });
-  await page
-    .getByRole("combobox", { name: "Ayar kapsamı", exact: true })
-    .selectOption("organization");
-  const om = page.getByRole("row").filter({ hasText: "Sentetik yönetici" });
-  await expect(om).toContainText("Organizasyon yöneticisi");
+  await expect(row).toContainText("Organizasyon yöneticisi");
   expect(
     f.requests.filter((row) => row.op === "roles_list_v1" && row.r.role === "org_manager").at(-1)
       ?.r,
   ).not.toHaveProperty("center_id");
-  await activate(om.getByRole("button", { name: "Görevi düzenle", exact: true }));
+  await activate(row.getByRole("button", { name: common.settings.teamNative.edit, exact: true }));
   const editor = page.getByRole("dialog");
+  await activate(editor.getByText(common.settings.teamEditor.otherRoles, { exact: true }));
   await activate(
     editor.getByRole("checkbox", { name: "Organizasyon yöneticisi", exact: true }),
     "Space",
@@ -1007,7 +1037,9 @@ test("manager directory binds role and state to scope and revokes through the de
   await editor
     .getByRole("textbox", { name: "Görev kaldırma gerekçesi", exact: true })
     .fill("Sentetik yönetici görevini kaldır");
-  await activate(editor.getByRole("button", { name: "Değişiklikleri önizle", exact: true }));
+  await activate(
+    editor.getByRole("button", { name: common.settings.teamEditor.review, exact: true }),
+  );
   const review = await confirm(page);
   await expect
     .poll(() => f.writes.filter((row) => row.op === "org_manager_revoke_v1").length)
@@ -1024,12 +1056,126 @@ test("manager directory binds role and state to scope and revokes through the de
     review.getByRole("button", { name: "Onaylanan değişiklikleri uygula", exact: true }),
   ).toBeDisabled();
   await activate(review.getByRole("button", { name: "Vazgeç", exact: true }));
-  await page.getByRole("combobox", { name: "Görev durumu", exact: true }).selectOption("inactive");
-  await expect(page.getByRole("row").filter({ hasText: "Sentetik yönetici" })).toContainText(
-    "Pasif",
-  );
+  await expect(row).not.toContainText("Organizasyon yöneticisi");
+  await expect(row).toContainText("Merkez yöneticisi");
   expect(
     f.requests.filter((row) => row.op === "roles_list_v1" && row.r.role === "org_manager").at(-1)
       ?.r,
-  ).toMatchObject({ state: "inactive", page: { limit: 20 } });
+  ).toMatchObject({ state: "active", page: { limit: 20 } });
+});
+
+test("team drawer finds a person at the bottom and uses the verified-account manager command", async ({
+  page,
+}) => {
+  const f = await mockSettingsCompletion(page, {
+    billingOwner: true,
+    startUrl: `${origin}/o/${I.org}/c/${I.center}/settings?section=ekip`,
+  });
+  const team = page.getByRole("tabpanel", { name: "Ekip", exact: true });
+  await expect(team.getByRole("tab", { name: "Kişiler", exact: true })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  await expect(team.getByRole("combobox")).toHaveCount(0);
+  const listReads = requestsFor(f.requests, "people_list_v1").length;
+  await activate(team.getByRole("button", { name: "Kişi davet et", exact: true }));
+  const drawer = page.getByRole("dialog", { name: "Kişi davet et", exact: true });
+  const name = drawer.getByRole("textbox", { name: "Ad soyad", exact: true });
+  const role = drawer.getByRole("checkbox", { name: "Merkez yöneticisi", exact: true });
+  const search = drawer.getByRole("searchbox", { name: "Mevcut kişiyi ara", exact: true });
+  await expect(name).toHaveAttribute("readonly", "");
+  await expect(role).toBeDisabled();
+  expect(
+    await search.evaluate((input) => {
+      const first = input.closest("form")?.querySelector('[name="name"]');
+      return !!first && Boolean(first.compareDocumentPosition(input) & 4);
+    }),
+  ).toBe(true);
+  expect(requestsFor(f.requests, "people_list_v1")).toHaveLength(listReads);
+  await search.fill("Sentetik");
+  await activate(drawer.getByRole("button", { name: "Kişileri bul", exact: true }));
+  await activate(drawer.getByRole("button", { name: /^Sentetik personel/ }));
+  await expect(name).toHaveValue("Sentetik personel");
+  await activate(role, "Space");
+  await activate(drawer.getByRole("button", { name: "Rol ata", exact: true }));
+  const review = page.getByRole("dialog", { name: "Kişi davet et", exact: true });
+  await expect(
+    review.getByText(common.settings.teamNative.targetCenter, { exact: true }),
+  ).toBeVisible();
+  await confirm(page);
+  await expect(review.getByRole("status")).toContainText(common.events.commandStates.saved);
+  const assignments = requestsFor(f.writes, "center_manager_assign_v1");
+  expect(assignments).toHaveLength(1);
+  expect(assignments[0]?.r).toMatchObject({
+    org_id: I.org,
+    center_id: I.center,
+    person_id: I.instructor,
+  });
+  expect(requestsFor(f.requests, "account_access_send_v1")).toHaveLength(0);
+});
+
+test("editing staff and a manager always shows both selected-center role options", async ({
+  page,
+}) => {
+  const f = await mockSettingsCompletion(page, {
+    billingOwner: true,
+    startUrl: `${origin}/o/${I.org}/c/${I.center}/settings?section=ekip`,
+  });
+  const edit = (person: string) =>
+    page
+      .getByRole("row")
+      .filter({ hasText: person })
+      .getByRole("button", { name: "Düzenle", exact: true });
+  const drawer = page.getByRole("dialog", { name: "Rolleri düzenle", exact: true });
+  const manager = drawer.getByRole("checkbox", { name: "Merkez yöneticisi", exact: true });
+  const staff = drawer.getByRole("checkbox", { name: "Personel", exact: true });
+
+  await activate(edit("Sentetik personel"));
+  await expect(manager).toBeEnabled();
+  await expect(manager).not.toBeChecked();
+  await expect(staff).toBeChecked();
+  await expect(drawer.getByRole("textbox", { name: "Ad soyad", exact: true })).toHaveValue(
+    "Sentetik personel",
+  );
+  await activate(drawer.getByRole("button", { name: "Kapat", exact: true }));
+
+  await activate(edit("Sentetik yönetici"));
+  await expect(manager).toBeChecked();
+  await expect(staff).toBeEnabled();
+  await expect(staff).not.toBeChecked();
+  const save = drawer.getByRole("button", { name: "Kaydet", exact: true });
+  await expect(save).toBeDisabled();
+  await activate(staff, "Space");
+  await expect(drawer.getByText("Eklenecek: Personel.", { exact: true })).toBeVisible();
+  await activate(save);
+  const review = await confirm(page);
+  await expect(review.getByRole("status")).toContainText(common.events.commandStates.saved);
+  expect(requestsFor(f.writes, "role_assign_v1").map(({ r }) => r)).toEqual([
+    expect.objectContaining({
+      org_id: I.org,
+      center_id: I.center,
+      person_id: uid(130),
+      role: "staff",
+      scope: { center_id: I.center },
+    }),
+  ]);
+  expect(requestsFor(f.writes, "center_manager_assign_v1")).toHaveLength(0);
+  await activate(review.getByRole("button", { name: "Vazgeç", exact: true }));
+});
+
+test("center manager can edit staff on the manager's row without changing manager authority", async ({
+  page,
+}) => {
+  const f = await mockSettingsCompletion(page, {
+    startUrl: `${origin}/o/${I.org}/c/${I.center}/settings?section=ekip`,
+  });
+  const row = page.getByRole("row").filter({ hasText: "Sentetik yönetici" });
+  await activate(row.getByRole("button", { name: "Düzenle", exact: true }));
+  const drawer = page.getByRole("dialog", { name: "Rolleri düzenle", exact: true });
+  const manager = drawer.getByRole("checkbox", { name: "Merkez yöneticisi", exact: true });
+  await expect(manager).toBeChecked();
+  await expect(manager).toBeDisabled();
+  await expect(drawer.getByRole("checkbox", { name: "Personel", exact: true })).toBeEnabled();
+  expect(f.writes).toEqual([]);
+  await activate(drawer.getByRole("button", { name: "Kapat", exact: true }));
 });

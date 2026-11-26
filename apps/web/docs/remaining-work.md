@@ -6,6 +6,10 @@
 
 **Kapanış kuralı:** Her `[ ]` ancak düzeltme + ilgili olumlu/olumsuz test + tam son kaynak ve zorunlu CI kanıtıyla `[x]` yapılır. Mock runtime/provider/hosted kabulünün yerine geçmez. `CONSTRAINTS.md`/CI politikası gevşetilemez. Başarılı önceki PR yeni davranış için otomatik kanıt değildir.
 
+## Ekip görsel ve native kabulü
+
+- [ ] **Ayarlar → Ekip.** Görsel kaynak [yerel HTML](../design-reference/index.html). Kişiler, İzinler ve kişi çekmecesinde etiket, ikon, sıra, ölçü, tema ve mobil davranış aynı viewport ve veri durumunda önce koyu temada karşılaştırılır. Kişiler’de görev/durum filtreleri ve ayrı ayar kapsamı seçicisi bulunmaz. İzin matrisi yalnız seçili merkezdeki yetkili kişi okumalarını gösterir. İzin veya rol komutu güncel sürüm, açık onay, hata kurtarması ve başarı sonrası yeniden okuma ile doğrulanır. Ad ve e-posta ile tek adımda rol daveti ile birden fazla izni tek yazıda uygulama için native sözleşme karşılığı gereklidir.
+
 <a id="router-query-birlesik"></a>
 
 ## Router + Query birleşik veri yaşam döngüsü (kapalı)

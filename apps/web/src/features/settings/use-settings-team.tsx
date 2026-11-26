@@ -9,14 +9,12 @@ import { BackendError } from "../../lib/backend";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { EventCommandNotice } from "../events/event-command-notice";
 import { Button } from "@ftksaas/ui/components/button";
-import { Field, FieldLabel } from "@ftksaas/ui/components/field";
-import { NativeSelect, NativeSelectOption } from "@ftksaas/ui/components/native-select";
+import { Badge } from "@ftksaas/ui/components/badge";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { SettingsTeamEditor } from "./settings-team-editor";
 import { SettingsReviewDialog } from "./settings-review-dialog";
-import type { SettingsViewData } from "./settings-view";
+import type { SettingsTableData } from "./settings-view";
 import {
-  teamRoles,
   readTeamPage,
   readTeamPerson,
   readTeamPermissions,
@@ -45,21 +43,25 @@ function lostScope(error: unknown) {
 }
 export function useSettingsTeam({
   scope,
-  level,
-  enabled,
-  writable,
+  centerLabel,
+  ownPersonId,
+  canReadOrganization,
+  canReadCenter,
   canManageManagers,
   visible,
+  showPermissions,
   locked,
   onLockChange,
   onAccessLost,
 }: {
   scope: ClientScope;
-  level: "center" | "organization";
-  enabled: boolean;
-  writable: boolean;
+  centerLabel: string;
+  ownPersonId?: string;
+  canReadOrganization: boolean;
+  canReadCenter: boolean;
   canManageManagers: boolean;
   visible: boolean;
+  showPermissions: boolean;
   locked: boolean;
   onLockChange: (value: boolean) => void;
   onAccessLost: (error: unknown) => boolean;
@@ -79,47 +81,109 @@ export function useSettingsTeam({
     ),
     "sale.discount": t(($) => $.settings.teamNative.permissions.sale.discount),
   };
-  const [centerRole, setCenterRole] = useState<TeamDirectoryRole>("staff"),
-    [state, setState] = useState<"active" | "inactive">("active");
-  const role = level === "organization" ? "org_manager" : centerRole;
-  const roleOptions: readonly TeamDirectoryRole[] =
-    level === "organization" ? ["org_manager"] : [...teamRoles, "center_manager"];
-  const [position, setPosition] = useState<{
-    key: string;
-    cursors: (string | undefined)[];
-    index: number;
-  }>({ key: "", cursors: [undefined], index: 0 });
-  const filterKey = `${level}:${role}:${state}`;
-  const frame =
-    position.key === filterKey ? position : { key: filterKey, cursors: [undefined], index: 0 };
-  const [person, setPerson] = useState<PersonView>(),
-    [permissionKeys, setPermissionKeys] = useState<readonly TeamPermission[]>(teamPermissions),
-    [editor, setEditor] = useState<{ person?: PersonView; manager?: ManagerRole }>(),
+  const enabled = canReadOrganization || canReadCenter;
+  const roleOptions: TeamDirectoryRole[] = [
+    ...(canReadOrganization ? ["org_manager" as const] : []),
+    ...(canReadCenter ? ["center_manager" as const, "staff" as const] : []),
+  ];
+  const directoryKey = ["settings-team-directory", scope, roleOptions] as const;
+  type Cursors = Partial<Record<TeamDirectoryRole, string | null>>;
+  const [frames, setFrames] = useState<Cursors[]>([{}]);
+  const cursors = frames.at(-1) ?? {};
+  async function readDirectory(
+    position: Cursors,
+    context: Parameters<typeof readTeamPage>[5],
+    history: Cursors[],
+  ) {
+    const pages = await Promise.all(
+      roleOptions.flatMap((role) =>
+        position[role] === null
+          ? []
+          : [
+              readTeamPage(
+                scope,
+                role,
+                position[role] ?? undefined,
+                role === "org_manager" ? "organization" : "center",
+                "active",
+                context,
+              ).then((result) => ({ role, ...result })),
+            ],
+      ),
+    );
+    const records = pages.flatMap((page) => page.records);
+    const next = { ...position };
+    for (const { role, next_cursor } of pages) {
+      if (next_cursor && history.some((frame) => frame[role] === next_cursor))
+        throw Error("TEAM_SOURCE_INVALID");
+      next[role] = next_cursor;
+    }
+    return { records, next, hasNext: pages.some((page) => !!page.next_cursor) };
+  }
+  const [draft, setDraft] = useState<{
+    personId: string;
+    permission: TeamPermission;
+    enabled: boolean;
+  }>();
+  const [editor, setEditor] = useState<{ person?: PersonView; manager?: ManagerRole }>(),
     [review, setReview] = useState<TeamIntent>(),
     [accepted, setAccepted] = useState(false),
     [preparing, setPreparing] = useState(false),
     [error, setError] = useState(false);
   const selectionRead = useRef<AbortController | null>(null);
-  useEffect(() => () => selectionRead.current?.abort(), [enabled, visible, filterKey]);
+  useEffect(() => () => selectionRead.current?.abort(), [enabled, visible]);
   const page = useQuery({
-    queryKey: ["settings-team-directory", scope, level, role, state, frame.cursors[frame.index]],
-    queryFn: (context) =>
-      readTeamPage(scope, role, frame.cursors[frame.index], level, state, context),
+    queryKey: [...directoryKey, cursors],
+    queryFn: (context) => readDirectory(cursors, context, frames),
     enabled: enabled && visible,
     retry: false,
     refetchOnWindowFocus: false,
   });
   const records = enabled && !page.isError ? page.data?.records : undefined;
+  const teamMembers = new Map<string, { id: string; name: string; role: TeamDirectoryRole }>();
+  for (const row of records ?? []) {
+    const id = row.person?.id ?? row.personId;
+    const current = teamMembers.get(id);
+    if (!current || row.role === "center_manager" || current.role === "org_manager")
+      teamMembers.set(id, { id, name: row.name, role: row.role });
+  }
+  const readableMembers = [...teamMembers.values()].filter(
+    (member) => member.role !== "org_manager",
+  );
   const permissions = useQuery({
-    queryKey: ["settings-team-permissions", scope, person?.id],
-    queryFn: (context) => readTeamPermissions(scope, person!.id, context),
-    enabled: enabled && visible && level === "center" && !!person,
+    queryKey: [
+      "settings-team-permissions",
+      scope,
+      readableMembers.map(({ id, role }) => [id, role]),
+    ],
+    queryFn: async (context) => {
+      const summaries = new Map<string, Awaited<ReturnType<typeof readTeamPermissions>>>();
+      for (let start = 0; start < readableMembers.length; start += 4) {
+        await Promise.all(
+          readableMembers.slice(start, start + 4).map(async ({ id, role }) => {
+            try {
+              const rows = await readTeamPermissions(scope, id, context);
+              summaries.set(
+                id,
+                role === "center_manager"
+                  ? rows.filter((row) => row.permission === "sale.discount")
+                  : rows,
+              );
+            } catch (cause) {
+              if (lostScope(cause) || context.signal.aborted) throw cause;
+              if (!(cause instanceof Error) || cause.message !== "TEAM_PERMISSION_UNAVAILABLE")
+                throw cause;
+            }
+          }),
+        );
+      }
+      return summaries;
+    },
+    enabled: canReadCenter && visible && showPermissions && readableMembers.length > 0,
     retry: false,
     refetchOnWindowFocus: false,
   });
-  const visiblePermissions = permissions.data?.filter((row) =>
-    permissionKeys.includes(row.permission),
-  );
+  if (draft && (!visible || !showPermissions)) setDraft(undefined);
   const denied = lostScope(page.error) || lostScope(permissions.error);
   useEffect(() => {
     for (const error of [page.error, permissions.error])
@@ -135,17 +199,18 @@ export function useSettingsTeam({
     ]);
     await invalidateWorkspace(queries, scope.accountId, { throwOnError: true });
     await queries.fetchQuery({
-      queryKey: ["settings-team-directory", scope, level, role, state, undefined],
-      queryFn: () => readTeamPage(scope, role, undefined, level, state),
+      queryKey: [...directoryKey, {}],
+      queryFn: (context) => readDirectory({}, context, []),
       staleTime: 0,
       retry: false,
     });
     // The selected person's permission matrix has a separate Query key.
     // Invalidation alone is not an authoritative readback for the checkbox.
-    if (person && level === "center" && visible) {
+    if (showPermissions && canReadCenter && visible && readableMembers.length) {
       await permissions.refetch({ throwOnError: true });
     }
-    setPosition({ key: filterKey, cursors: [undefined], index: 0 });
+    setDraft(undefined);
+    setFrames([{}]);
   }
   const command = useMemberCommand({
     write: writeTeam,
@@ -160,17 +225,8 @@ export function useSettingsTeam({
       return () => onLockChange(false);
     }
   }, [preparing, command.locked, onLockChange]);
-  function reset() {
-    if (locked || command.locked) return;
-    setPosition({ key: "", cursors: [undefined], index: 0 });
-    setPerson(undefined);
-    setEditor(undefined);
-    setReview(undefined);
-    command.reset();
-  }
   async function selectTeamPerson(
     row: Awaited<ReturnType<typeof readTeamPage>>["records"][number],
-    action: "edit" | "permissions",
   ) {
     if (locked || preparing || denied || selectionRead.current) return;
     const controller = new AbortController();
@@ -185,17 +241,13 @@ export function useSettingsTeam({
         (await readTeamPerson(
           scope,
           row.personId,
-          level === "organization" ? manager : undefined,
+          manager === "org_manager" ? manager : undefined,
           controller.signal,
         ));
       if (controller.signal.aborted) return;
       if (selected.id !== row.personId && !selected.linked_person_ids?.includes(row.personId))
         throw Error("TEAM_SOURCE_INVALID");
-      if (action === "edit") setEditor({ person: selected, manager });
-      else {
-        setPermissionKeys(row.role === "center_manager" ? ["sale.discount"] : teamPermissions);
-        setPerson(selected);
-      }
+      setEditor({ person: selected, manager });
     } catch (cause) {
       if (!controller.signal.aborted && !onAccessLost(cause)) setError(true);
     } finally {
@@ -203,22 +255,17 @@ export function useSettingsTeam({
       setPreparing(false);
     }
   }
-  async function changePermission(personId: string, key: string, value: boolean) {
-    const permission = visiblePermissions?.find((row) => row.permission === key)?.permission;
-    if (
-      locked ||
-      preparing ||
-      !writable ||
-      permissions.isError ||
-      !permission ||
-      personId !== person?.id ||
-      denied
-    )
-      return;
+  async function reviewPermission() {
+    if (locked || preparing || !canReadCenter || permissions.isError || !draft || denied) return;
     setPreparing(true);
     setError(false);
     try {
-      const intent = await prepareTeamPermission(scope, personId, permission, value);
+      const intent = await prepareTeamPermission(
+        scope,
+        draft.personId,
+        draft.permission,
+        draft.enabled,
+      );
       command.reset();
       setAccepted(false);
       setReview(intent);
@@ -228,193 +275,187 @@ export function useSettingsTeam({
       setPreparing(false);
     }
   }
-  const matrix: SettingsViewData["permissions"] =
-    enabled && level === "center" && person && !permissions.isError && visiblePermissions
-      ? {
-          people: [{ id: person.id, name: person.display_name }],
-          rows: visiblePermissions.map((row) => ({
-            id: row.permission,
-            label: permissionLabels[row.permission],
-            values: { [person.id]: { value: row.enabled ?? row.effectiveStaffGrant, writable } },
-          })),
-        }
-      : undefined;
-  const table: NonNullable<SettingsViewData["tables"]>["ekip"] = records
+  const permissionRows = teamPermissions.filter((key) =>
+    readableMembers.some(({ id }) =>
+      permissions.data?.get(id)?.some((row) => row.permission === key),
+    ),
+  );
+  const matrix = {
+    people: [...teamMembers.values()],
+    rows: permissionRows.map((key) => ({
+      id: key,
+      label: permissionLabels[key],
+      values: Object.fromEntries(
+        readableMembers.flatMap(({ id }) => {
+          const row = permissions.data?.get(id)?.find((value) => value.permission === key);
+          if (!row || permissions.isError) return [];
+          const value = row.enabled ?? row.effectiveStaffGrant;
+          const selected = draft?.personId === id && draft.permission === key;
+          return [
+            [
+              id,
+              {
+                value: selected ? draft.enabled : value,
+                writable: canReadCenter && !permissions.isFetching && (!draft || selected),
+                change: (enabled: boolean) =>
+                  setDraft(
+                    enabled === value ? undefined : { personId: id, permission: key, enabled },
+                  ),
+              },
+            ] as const,
+          ];
+        }),
+      ),
+    })),
+  };
+  const grouped = new Map<string, NonNullable<typeof records>>();
+  for (const row of records ?? []) {
+    const personId = row.person?.id ?? row.personId;
+    const rows = grouped.get(personId);
+    if (rows) rows.push(row);
+    else grouped.set(personId, [row]);
+  }
+  function canEditAssignment(role: TeamDirectoryRole) {
+    if (role === "org_manager") return canManageManagers;
+    return canReadCenter || (role === "center_manager" && canManageManagers);
+  }
+  const table: SettingsTableData | undefined = records
     ? {
         columns: ["person", "roles", "state", "action"],
-        rows: records.map((row) => ({
-          id: row.id,
-          cells: [
-            row.name,
-            t(($) => $.settings.teamNative.roles[row.role]),
-            `${t(($) => $.settings.teamNative.states[row.state])} · ${row.bound === null ? t(($) => $.settings.unknown) : row.bound ? t(($) => $.settings.teamNative.bound) : t(($) => $.settings.teamNative.unbound)}`,
-            <div key="actions" className="flex flex-wrap gap-2">
+        rows: Array.from(grouped, ([id, rows]) => {
+          const [first] = rows;
+          const edit = rows.find((row) => canEditAssignment(row.role));
+          const email = rows
+            .find((row) => row.person)
+            ?.person?.contacts?.find((contact) => contact.kind === "email")?.value;
+          const bound = rows.every((row) => row.bound === true);
+          const anyBound = rows.some((row) => row.bound === true);
+          return {
+            id,
+            cells: [
+              <div key="person">
+                <span className="font-medium">{first?.name}</span>
+                {email && <span className="block text-xs text-muted-foreground">{email}</span>}
+              </div>,
+              <div key="roles" className="flex flex-wrap gap-1">
+                {rows.map((row) => (
+                  <Badge key={row.id} variant={row.role === "staff" ? "secondary" : "outline"}>
+                    {t(($) => $.settings.teamNative.roles[row.role])}
+                  </Badge>
+                ))}
+              </div>,
+              <Badge
+                key="state"
+                variant={bound ? "outline" : "secondary"}
+                className={bound ? "text-success" : undefined}
+              >
+                {bound
+                  ? t(($) => $.settings.teamNative.states.active)
+                  : anyBound || rows.some((row) => row.bound === null)
+                    ? t(($) => $.settings.unknown)
+                    : t(($) => $.settings.teamNative.unbound)}
+              </Badge>,
               <Button
+                key="edit"
                 variant="outline"
                 size="sm"
-                isDisabled={
-                  locked ||
-                  !writable ||
-                  ((row.role === "org_manager" || row.role === "center_manager") &&
-                    !canManageManagers)
-                }
-                onPress={() => void selectTeamPerson(row, "edit")}
+                isDisabled={locked || !edit}
+                onPress={() => {
+                  if (edit) void selectTeamPerson(edit);
+                }}
               >
                 {t(($) => $.settings.teamNative.edit)}
+              </Button>,
+            ],
+          };
+        }),
+        after:
+          frames.length > 1 || page.data?.hasNext ? (
+            <div className="flex flex-wrap gap-2 pt-3">
+              <Button
+                variant="outline"
+                size="sm"
+                isDisabled={locked || frames.length === 1 || page.isFetching}
+                onPress={() => {
+                  setDraft(undefined);
+                  setFrames(frames.slice(0, -1));
+                }}
+              >
+                {t(($) => $.earnings.previousPage)}
               </Button>
               <Button
                 variant="outline"
                 size="sm"
-                isDisabled={
-                  locked || row.state !== "active" || row.role === "assistant" || level !== "center"
-                }
-                onPress={() => void selectTeamPerson(row, "permissions")}
+                isDisabled={locked || !page.data?.hasNext || page.isFetching}
+                onPress={() => {
+                  if (page.data?.hasNext) {
+                    setDraft(undefined);
+                    setFrames([...frames, page.data.next]);
+                  }
+                }}
               >
-                {t(($) => $.settings.teamNative.selectPermissions)}
+                {t(($) => $.earnings.nextPage)}
               </Button>
-            </div>,
-          ],
-        })),
-        after: (
-          <div className="flex flex-wrap gap-2 p-4">
-            <Button
-              variant="outline"
-              size="sm"
-              isDisabled={locked || frame.index === 0 || page.isFetching}
-              onPress={() => setPosition({ ...frame, index: frame.index - 1 })}
-            >
-              {t(($) => $.earnings.previousPage)}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              isDisabled={locked || !page.data?.next_cursor || page.isFetching}
-              onPress={() => {
-                const next = page.data?.next_cursor;
-                if (next)
-                  setPosition({
-                    key: filterKey,
-                    cursors: [...frame.cursors.slice(0, frame.index + 1), next],
-                    index: frame.index + 1,
-                  });
-              }}
-            >
-              {t(($) => $.earnings.nextPage)}
-            </Button>
-          </div>
-        ),
+            </div>
+          ) : undefined,
       }
     : undefined;
-  const canCreate =
-    enabled &&
-    writable &&
-    !denied &&
-    ((role !== "org_manager" && role !== "center_manager") || canManageManagers);
+  const canCreate = enabled && !denied && (canReadCenter || canManageManagers);
   return {
     table,
     matrix,
-    reset,
-    onPermission: (id: string, key: string, value: boolean) =>
-      void changePermission(id, key, value),
+    permissionLoading: permissions.isFetching,
+    permissionUnavailable: permissions.isError || !canReadCenter || !permissionRows.length,
+    permissionDraft: !!draft,
+    permissionIncomplete: !!permissions.data && permissions.data.size < readableMembers.length,
+    discardPermission: () => setDraft(undefined),
+    reviewPermission: () => void reviewPermission(),
     create: () => {
-      if (canCreate)
-        setEditor({
-          ...(role === "org_manager" || role === "center_manager" ? { manager: role } : {}),
-        });
+      if (!canCreate) return;
+      setEditor({});
     },
     canCreate,
-    notice: visible ? (
-      <div className="space-y-3">
-        <Alert>
+    notice:
+      visible && (error || page.isError || permissions.isError) ? (
+        <Alert variant="destructive">
           <AlertDescription>
-            {t(($) => $.settings.teamNative.directoryHint)}
-            {person ? ` · ${person.display_name}` : ""}
+            {t(($) => $.settings.teamNative.error)}
+            <Button
+              variant="outline"
+              isDisabled={locked}
+              onPress={() => {
+                void page.refetch();
+                if (showPermissions && readableMembers.length) void permissions.refetch();
+              }}
+            >
+              {t(($) => $.auth.retry)}
+            </Button>
           </AlertDescription>
         </Alert>
-        {enabled && (
-          <div className="flex flex-wrap gap-3">
-            <Field>
-              <FieldLabel htmlFor="team-role-filter">
-                {t(($) => $.settings.teamNative.roleFilter)}
-              </FieldLabel>
-              <NativeSelect
-                id="team-role-filter"
-                value={role}
-                disabled={locked}
-                onChange={(event) => {
-                  const value = event.target.value;
-                  if (roleOptions.includes(value as TeamDirectoryRole)) {
-                    setCenterRole(value as TeamDirectoryRole);
-                    reset();
-                  }
-                }}
-              >
-                {roleOptions.map((value) => (
-                  <NativeSelectOption key={value} value={value}>
-                    {t(($) => $.settings.teamNative.roles[value])}
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="team-state-filter">
-                {t(($) => $.settings.teamNative.stateFilter)}
-              </FieldLabel>
-              <NativeSelect
-                id="team-state-filter"
-                value={state}
-                disabled={locked}
-                onChange={(event) => {
-                  if (event.target.value === "active" || event.target.value === "inactive") {
-                    setState(event.target.value);
-                    reset();
-                  }
-                }}
-              >
-                {(["active", "inactive"] as const).map((value) => (
-                  <NativeSelectOption key={value} value={value}>
-                    {t(($) => $.settings.teamNative.states[value])}
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
-            </Field>
-          </div>
-        )}
-        {(error || page.isError || permissions.isError) && (
-          <Alert variant="destructive">
-            <AlertDescription>
-              {t(($) => $.settings.teamNative.error)}
-              <Button
-                variant="outline"
-                isDisabled={locked}
-                onPress={() => {
-                  void page.refetch();
-                  if (person) void permissions.refetch();
-                }}
-              >
-                {t(($) => $.auth.retry)}
-              </Button>
-            </AlertDescription>
-          </Alert>
-        )}
-      </div>
-    ) : null,
+      ) : null,
     dialog: (
       <>
-        {editor && enabled && !denied && (
-          <SettingsTeamEditor
-            key={`${editor.person?.id ?? "new"}:${editor.manager ?? "operational"}:${level}`}
-            scope={scope}
-            initial={editor.person}
-            manager={editor.manager}
-            onClose={() => {
-              if (!locked) setEditor(undefined);
-            }}
-            onSaved={refresh}
-            onLockChange={onLockChange}
-            onAccessLost={onAccessLost}
-          />
-        )}
+        {editor &&
+          visible &&
+          !denied &&
+          (editor.person ? canEditAssignment(editor.manager ?? "staff") : canCreate) && (
+            <SettingsTeamEditor
+              key={`${editor.person?.id ?? "new"}:${editor.manager ?? "operational"}`}
+              scope={scope}
+              initial={editor.person}
+              manager={editor.manager}
+              canManageManagers={canManageManagers}
+              canReadCenter={canReadCenter}
+              centerLabel={centerLabel}
+              ownPersonId={ownPersonId}
+              onClose={() => {
+                if (!locked) setEditor(undefined);
+              }}
+              onSaved={refresh}
+              onLockChange={onLockChange}
+              onAccessLost={onAccessLost}
+            />
+          )}
         {review && enabled && !denied && review.operation === "permission_set_v1" && (
           <SettingsReviewDialog
             open
@@ -424,7 +465,8 @@ export function useSettingsTeam({
               {
                 id: "person",
                 title: t(($) => $.settings.columns.person),
-                detail: person?.display_name ?? t(($) => $.settings.unknown),
+                detail:
+                  teamMembers.get(review.request.person_id)?.name ?? t(($) => $.settings.unknown),
               },
               {
                 id: "permission",
@@ -436,7 +478,10 @@ export function useSettingsTeam({
             onAccepted={setAccepted}
             locked={command.locked}
             onClose={() => {
-              if (!command.locked) setReview(undefined);
+              if (!command.locked) {
+                setReview(undefined);
+                setDraft(undefined);
+              }
             }}
             onApply={
               command.state === "ready" && !command.unavailable
@@ -453,6 +498,7 @@ export function useSettingsTeam({
                     command.reset();
                     setReview(undefined);
                     setAccepted(false);
+                    setDraft(undefined);
                     void permissions.refetch();
                   }
                 }}

@@ -1,5 +1,6 @@
 import { useId, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { XIcon } from "lucide-react";
 import { Text } from "react-aria-components";
 import {
   Sheet,
@@ -17,17 +18,15 @@ import {
   FieldLegend,
 } from "@ftksaas/ui/components/field";
 import { Input } from "@ftksaas/ui/components/input";
-import { Checkbox } from "@ftksaas/ui/components/checkbox";
-import { NativeSelect, NativeSelectOption } from "@ftksaas/ui/components/native-select";
 import { Button } from "@ftksaas/ui/components/button";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
-import {
-  ItemGroup,
-  Item,
-  ItemContent,
-  ItemTitle,
-  ItemDescription,
-} from "@ftksaas/ui/components/item";
+type TeamSheetRole = {
+  key: string;
+  label: string;
+  description: string;
+  selected: boolean;
+  writable: boolean;
+};
 
 export function TeamSheet({
   open,
@@ -35,47 +34,62 @@ export function TeamSheet({
   description,
   identity,
   roles,
-  staffType,
+  extraRoles,
+  rolesUnread,
   effects,
   locked = false,
   dirty = false,
-  onIdentity,
   onRole,
-  onStaffType,
   onReview,
   onClose,
   error,
-  notice,
   recoveryActions,
+  submitLabel,
 }: {
   open: boolean;
   title: string;
   description: string;
-  identity: { name: string; email: string; writable: boolean; description?: string };
-  roles:
-    | { key: string; label: string; description: string; selected: boolean; writable: boolean }[]
-    | null;
-  staffType?: {
-    value: string | null;
-    options: { value: string; label: string }[];
-    writable: boolean;
-  };
-  effects: { id: string; title: string; detail: string }[] | null;
+  identity: { name: string; email: string; description?: string };
+  roles: TeamSheetRole[];
+  extraRoles: TeamSheetRole[];
+  rolesUnread: boolean;
+  effects: string[];
   locked?: boolean;
   dirty?: boolean;
-  onIdentity?: (value: { name: string; email: string }) => void;
-  onRole?: (key: string, selected: boolean) => void;
-  onStaffType?: (value: string) => void;
-  onReview?: () => void;
+  onRole: (key: string, selected: boolean) => void;
+  onReview: () => void;
   onClose: () => void;
   error?: string;
-  notice?: string;
   recoveryActions?: ReactNode;
+  submitLabel: string;
 }) {
   const { t } = useTranslation(),
     id = useId();
+  function roleOption(role: TeamSheetRole) {
+    return (
+      <label key={role.key} className="team-role-option" data-slot="team-role-option">
+        <input
+          type="checkbox"
+          name={role.key}
+          checked={role.selected}
+          disabled={locked || !role.writable}
+          aria-labelledby={`${id}-${role.key}-label`}
+          aria-describedby={`${id}-${role.key}-hint`}
+          onChange={(event) => onRole(role.key, event.currentTarget.checked)}
+        />
+        <span>
+          <span id={`${id}-${role.key}-label`} className="team-role-label">
+            {role.label}
+          </span>
+          <small id={`${id}-${role.key}-hint`}>{role.description}</small>
+        </span>
+      </label>
+    );
+  }
   return (
     <Sheet
+      className="settings-team-sheet"
+      aria-labelledby={`${id}-title`}
       isOpen={open}
       onOpenChange={(value) => {
         if (!value && !locked) onClose();
@@ -85,10 +99,21 @@ export function TeamSheet({
       showCloseButton={false}
     >
       <SheetHeader>
-        <SheetTitle id={`${id}-title`}>{title}</SheetTitle>
-        <Text slot="description" elementType="div">
-          <SheetDescription>{description}</SheetDescription>
-        </Text>
+        <div>
+          <SheetTitle id={`${id}-title`}>{title}</SheetTitle>
+          <Text slot="description" elementType="div">
+            <SheetDescription>{description}</SheetDescription>
+          </Text>
+        </div>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-label={t(($) => $.settings.teamEditor.close)}
+          isDisabled={locked}
+          onPress={onClose}
+        >
+          <XIcon />
+        </Button>
       </SheetHeader>
       <form
         id={`${id}-form`}
@@ -98,24 +123,19 @@ export function TeamSheet({
         tabIndex={locked ? 0 : undefined}
         onSubmit={(event) => {
           event.preventDefault();
-          if (!locked && dirty && roles !== null) onReview?.();
+          if (!locked && dirty && !rolesUnread) onReview();
         }}
       >
-        <FieldGroup>
+        <FieldGroup className="gap-4">
           <Field>
             <FieldLabel htmlFor={`${id}-name`}>{t(($) => $.settings.teamEditor.name)}</FieldLabel>
             <Input
-              autoFocus
               id={`${id}-name`}
               name="name"
-              autoComplete="name"
-              required
+              autoComplete="off"
               value={identity.name}
-              readOnly={!identity.writable || !onIdentity}
+              readOnly
               disabled={locked}
-              onChange={(event) =>
-                onIdentity?.({ name: event.target.value, email: identity.email })
-              }
             />
           </Field>
           <Field>
@@ -124,101 +144,40 @@ export function TeamSheet({
               id={`${id}-email`}
               name="email"
               type="email"
-              autoComplete="email"
+              autoComplete="off"
               autoCapitalize="none"
               spellCheck={false}
-              required
               value={identity.email}
-              readOnly={!identity.writable || !onIdentity}
+              readOnly
               disabled={locked}
               aria-describedby={identity.description ? `${id}-identity-hint` : undefined}
-              onChange={(event) => onIdentity?.({ name: identity.name, email: event.target.value })}
             />
             {identity.description && (
               <FieldDescription id={`${id}-identity-hint`}>{identity.description}</FieldDescription>
             )}
           </Field>
-          <FieldSet>
+          <FieldSet className="gap-2">
             <FieldLegend>{t(($) => $.settings.teamEditor.roles)}</FieldLegend>
-            {roles === null ? (
-              <p>{t(($) => $.settings.unread)}</p>
-            ) : (
-              roles.map((role) => (
-                <Field key={role.key} orientation="horizontal">
-                  <Checkbox
-                    id={`${id}-${role.key}`}
-                    name={role.key}
-                    isSelected={role.selected}
-                    isDisabled={locked || !role.writable || !onRole}
-                    aria-labelledby={`${id}-${role.key}-label`}
-                    aria-describedby={`${id}-${role.key}-hint`}
-                    onChange={(selected) => onRole?.(role.key, selected)}
-                  />
-                  <div className="flex flex-col gap-1">
-                    <FieldLabel id={`${id}-${role.key}-label`} htmlFor={`${id}-${role.key}`}>
-                      {role.label}
-                    </FieldLabel>
-                    <FieldDescription id={`${id}-${role.key}-hint`}>
-                      {role.description}
-                    </FieldDescription>
-                  </div>
-                </Field>
-              ))
-            )}
+            {roles.map(roleOption)}
+            {rolesUnread && <p role="status">{t(($) => $.settings.unread)}</p>}
           </FieldSet>
-          {staffType && (
-            <Field>
-              <FieldLabel htmlFor={`${id}-staff`}>
-                {t(($) => $.settings.teamEditor.staffType)}
-              </FieldLabel>
-              <NativeSelect
-                id={`${id}-staff`}
-                name="staff_type"
-                value={staffType.value ?? ""}
-                required
-                disabled={locked || !staffType.writable || !onStaffType}
-                onChange={(event) => onStaffType?.(event.target.value)}
-              >
-                {staffType.value === null && (
-                  <NativeSelectOption value="" disabled>
-                    {t(($) => $.settings.policyEditor.choose)}
-                  </NativeSelectOption>
-                )}
-                {staffType.options.map((option) => (
-                  <NativeSelectOption key={option.value} value={option.value}>
-                    {option.label}
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
-            </Field>
+          <div>
+            <p className="team-effect-heading">{t(($) => $.settings.teamEditor.effects)}</p>
+            <ul className="team-effects">
+              {effects.map((effect) => (
+                <li key={effect}>{effect}</li>
+              ))}
+            </ul>
+          </div>
+          {extraRoles.length > 0 && (
+            <details className="team-extra-roles">
+              <summary>{t(($) => $.settings.teamEditor.otherRoles)}</summary>
+              <div className="mt-2 grid gap-2">{extraRoles.map(roleOption)}</div>
+            </details>
           )}
-          <FieldSet>
-            <FieldLegend>{t(($) => $.settings.teamEditor.effects)}</FieldLegend>
-            {effects === null ? (
-              <p>{t(($) => $.settings.unread)}</p>
-            ) : effects.length === 0 ? (
-              <p>{t(($) => $.settings.reviewEmpty)}</p>
-            ) : (
-              <ItemGroup>
-                {effects.map((effect) => (
-                  <Item key={effect.id} role="listitem" size="sm" variant="outline">
-                    <ItemContent>
-                      <ItemTitle>{effect.title}</ItemTitle>
-                      <ItemDescription>{effect.detail}</ItemDescription>
-                    </ItemContent>
-                  </Item>
-                ))}
-              </ItemGroup>
-            )}
-          </FieldSet>
           {error && (
             <Alert role="alert" variant="destructive">
               <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          {notice && (
-            <Alert role="status">
-              <AlertDescription>{notice}</AlertDescription>
             </Alert>
           )}
           {recoveryActions}
@@ -228,12 +187,8 @@ export function TeamSheet({
         <Button type="button" variant="outline" isDisabled={locked} onPress={onClose}>
           {t(($) => $.settings.discard)}
         </Button>
-        <Button
-          type="submit"
-          form={`${id}-form`}
-          isDisabled={locked || !dirty || roles === null || !onReview}
-        >
-          {t(($) => $.settings.teamEditor.review)}
+        <Button type="submit" form={`${id}-form`} isDisabled={locked || !dirty || rolesUnread}>
+          {submitLabel}
         </Button>
       </SheetFooter>
     </Sheet>

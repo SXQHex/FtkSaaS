@@ -27,6 +27,10 @@ export function SettingsTeamEditor({
   scope,
   initial,
   manager,
+  canManageManagers,
+  canReadCenter,
+  centerLabel,
+  ownPersonId,
   onSaved,
   onClose,
   onLockChange,
@@ -35,13 +39,23 @@ export function SettingsTeamEditor({
   scope: ClientScope;
   initial?: PersonView;
   manager?: ManagerRole;
+  canManageManagers: boolean;
+  canReadCenter: boolean;
+  centerLabel: string;
+  ownPersonId?: string;
   onSaved: () => Promise<void>;
   onClose: () => void;
   onLockChange: (value: boolean) => void;
   onAccessLost: (error: unknown) => boolean;
 }) {
   const { t } = useTranslation();
-  const roleOptions: readonly TeamDirectoryRole[] = manager ? [manager] : teamRoles;
+  const adding = !initial;
+  const organizationSearch = adding && canManageManagers ? "org_manager" : manager;
+  const roleOptions = ["center_manager", "staff"] as const satisfies readonly TeamDirectoryRole[];
+  const extraRoles: TeamDirectoryRole[] = [
+    ...((adding && canManageManagers) || manager === "org_manager" ? ["org_manager" as const] : []),
+    ...(!adding && canReadCenter ? teamRoles.filter((role) => role !== "staff") : []),
+  ];
   const [person, setPerson] = useState(initial),
     [search, setSearch] = useState(""),
     [query, setQuery] = useState(""),
@@ -62,15 +76,16 @@ export function SettingsTeamEditor({
     };
   }, []);
   const people = useQuery({
-    queryKey: ["settings-team-picker", scope, manager, query, cursors[index]],
-    queryFn: (context) => readTeamPeople(scope, query, cursors[index], manager, context),
+    queryKey: ["settings-team-picker", scope, organizationSearch, query, cursors[index]],
+    queryFn: (context) => readTeamPeople(scope, query, cursors[index], organizationSearch, context),
     enabled: !person && query.trim().length >= 2,
     retry: false,
     refetchOnWindowFocus: false,
   });
+  const rolesKey = ["settings-team-person-roles", scope, organizationSearch, person?.id] as const;
   const roles = useQuery({
-    queryKey: ["settings-team-person-roles", scope, manager, person?.id],
-    queryFn: (context) => readTeamPersonRoles(scope, person!.id, manager, context),
+    queryKey: rolesKey,
+    queryFn: (context) => readTeamPersonRoles(scope, person!.id, organizationSearch, context),
     enabled: !!person,
     retry: false,
     refetchOnWindowFocus: false,
@@ -81,8 +96,9 @@ export function SettingsTeamEditor({
     readReceipt: teamReceipt,
     readResult: teamResult,
     onAccessLost,
-    onRefresh: async () => {
+    onRefresh: async (_result, assertCurrent) => {
       await onSaved();
+      assertCurrent();
       await roles.refetch({ throwOnError: true });
     },
   });
@@ -100,18 +116,14 @@ export function SettingsTeamEditor({
     ) === true;
   async function prepare() {
     if (!person || !current || Object.keys(changes).length !== 1 || locked || busy.current) return;
+    const [role, enabled] = Object.entries(changes)[0]!;
+    const selectedRole = role as TeamDirectoryRole;
+    if (!canChangeRole(selectedRole) || enabled === undefined) return;
     busy.current = true;
     setPreparing(true);
     setError(false);
     try {
-      const [role, value] = Object.entries(changes)[0]!;
-      const intent = await prepareTeamRole(
-        scope,
-        person.id,
-        role as TeamDirectoryRole,
-        value!,
-        reason,
-      );
+      const intent = await prepareTeamRole(scope, person.id, selectedRole, enabled, reason);
       if (mounted.current) {
         command.reset();
         setAccepted(false);
@@ -130,7 +142,9 @@ export function SettingsTeamEditor({
     setPreparing(true);
     setError(false);
     try {
-      const result = await readTeamPerson(scope, id, manager);
+      const result = await readTeamPerson(scope, id, organizationSearch);
+      if (result.id !== id && !result.linked_person_ids?.includes(id))
+        throw Error("TEAM_SOURCE_INVALID");
       if (mounted.current) {
         setPerson(result);
         setChanges({});
@@ -142,7 +156,55 @@ export function SettingsTeamEditor({
       if (mounted.current) setPreparing(false);
     }
   }
-  const title = t(($) => $.settings.teamNative.title);
+  const title = adding ? t(($) => $.settings.invite) : t(($) => $.settings.teamNative.title);
+  const targetCenter = changes.center_manager !== undefined ? centerLabel : undefined;
+  const removal = Object.values(changes).includes(false);
+  const owner =
+    !!person &&
+    ((canManageManagers && person.id === ownPersonId) ||
+      current?.some(
+        (row) => row.role === "owner" && row.scope_center_id === null && row.state === "active",
+      ));
+  function canChangeRole(role: TeamDirectoryRole) {
+    if (role === "center_manager")
+      return canManageManagers && (!adding || person?.id !== ownPersonId);
+    if (role === "org_manager") return canManageManagers;
+    return canReadCenter;
+  }
+  const selected = (role: TeamDirectoryRole) => changes[role] ?? active(role);
+  const describeRole = (role: TeamDirectoryRole) => ({
+    key: role,
+    label: t(($) => $.settings.teamNative.roles[role]),
+    description:
+      role === "center_manager"
+        ? t(($) => $.settings.teamNative.centerManagerDescription)
+        : role === "staff"
+          ? t(($) => $.settings.teamNative.staffDescription)
+          : t(($) => $.settings.teamNative.roleScope),
+    selected: selected(role),
+    writable:
+      !!person &&
+      !!current &&
+      canChangeRole(role) &&
+      (!adding || !active(role)) &&
+      (Object.keys(changes).length === 0 || role in changes),
+  });
+  const effects = [
+    ...(adding ? [t(($) => $.settings.teamNative.verifiedEffect)] : []),
+    ...Object.entries(changes).map(([role, enabled]) => {
+      const label = t(($) => $.settings.teamNative.roles[role as TeamDirectoryRole]);
+      return enabled
+        ? t(($) => $.settings.teamNative.effectAdd, { role: label })
+        : t(($) => $.settings.teamNative.effectRemove, { role: label });
+    }),
+    ...(selected("center_manager") ? [t(($) => $.settings.teamNative.centerManagerEffect)] : []),
+    ...(selected("staff") && !selected("center_manager")
+      ? [t(($) => $.settings.teamNative.staffEffect)]
+      : []),
+    ...(owner && !selected("center_manager")
+      ? [t(($) => $.settings.teamNative.ownershipNote)]
+      : []),
+  ];
   if (review)
     return (
       <SettingsReviewDialog
@@ -150,6 +212,15 @@ export function SettingsTeamEditor({
         title={title}
         description={t(($) => $.settings.teamNative.review)}
         rows={[
+          ...(targetCenter
+            ? [
+                {
+                  id: "center",
+                  title: t(($) => $.settings.teamNative.targetCenter),
+                  detail: targetCenter,
+                },
+              ]
+            : []),
           {
             id: "person",
             title: t(($) => $.settings.columns.person),
@@ -213,30 +284,44 @@ export function SettingsTeamEditor({
     <TeamSheet
       open
       title={title}
-      description={t(($) => $.settings.teamNative.hint)}
+      description={
+        adding ? t(($) => $.settings.teamNative.inviteDescription) : (person?.display_name ?? "")
+      }
       identity={{
         name: person?.display_name ?? "",
         email: person?.contacts?.find((row) => row.kind === "email")?.value ?? "",
-        writable: false,
-        description: t(($) => $.settings.teamNative.identity),
+        description: adding ? undefined : t(($) => $.settings.teamNative.identity),
       }}
-      roles={
-        person && current
-          ? roleOptions.map((role) => ({
-              key: role,
-              label: t(($) => $.settings.teamNative.roles[role]),
-              description: t(($) => $.settings.teamNative.roleScope),
-              selected: changes[role] ?? active(role),
-              writable: Object.keys(changes).length === 0 || role in changes,
-            }))
-          : null
+      roles={[
+        ...(owner
+          ? [
+              {
+                key: "owner",
+                label: t(($) => $.settings.teamNative.owner),
+                description: t(($) => $.settings.teamNative.ownerDescription),
+                selected: true,
+                writable: false,
+              },
+            ]
+          : []),
+        ...roleOptions.map(describeRole),
+      ]}
+      extraRoles={extraRoles.map(describeRole)}
+      rolesUnread={!!person && !current}
+      effects={effects.length ? effects : [t(($) => $.settings.teamNative.noChanges)]}
+      submitLabel={
+        adding
+          ? t(($) => $.settings.teamNative.roleAction)
+          : removal
+            ? t(($) => $.settings.teamEditor.review)
+            : t(($) => $.settings.teamEditor.save)
       }
-      effects={null}
       dirty={!!person && !!current && Object.keys(changes).length === 1}
       locked={locked}
       onRole={(key, value) => {
-        if (!roleOptions.includes(key as TeamDirectoryRole) || locked) return;
+        if (locked || ![...roleOptions, ...extraRoles].includes(key as TeamDirectoryRole)) return;
         const role = key as TeamDirectoryRole;
+        if (!person || !current || !canChangeRole(role) || (adding && active(role))) return;
         setChanges((previous) => {
           const next = { ...previous };
           if (value === active(role)) delete next[role];
@@ -250,7 +335,23 @@ export function SettingsTeamEditor({
         error || roles.isError || people.isError ? t(($) => $.settings.teamNative.error) : undefined
       }
       recoveryActions={
-        <div className="space-y-3 px-5 pb-5">
+        <div className="grid gap-3">
+          {adding && person && (
+            <Button
+              variant="outline"
+              isDisabled={locked}
+              onPress={() => {
+                setPerson(undefined);
+                setChanges({});
+                setQuery("");
+                setSearch("");
+                setCursors([undefined]);
+                setIndex(0);
+              }}
+            >
+              {t(($) => $.settings.teamNative.chooseAnotherPerson)}
+            </Button>
+          )}
           {!person && (
             <>
               <Field>
@@ -289,33 +390,35 @@ export function SettingsTeamEditor({
                   {row.subscriber_number ? ` · ${row.subscriber_number}` : ""}
                 </Button>
               ))}
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  isDisabled={index === 0 || people.isFetching}
-                  onPress={() => setIndex((value) => value - 1)}
-                >
-                  {t(($) => $.earnings.previousPage)}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  isDisabled={!people.data?.next_cursor || people.isFetching}
-                  onPress={() => {
-                    const next = people.data?.next_cursor;
-                    if (next) {
-                      setCursors((values) => [...values.slice(0, index + 1), next]);
-                      setIndex((value) => value + 1);
-                    }
-                  }}
-                >
-                  {t(($) => $.earnings.nextPage)}
-                </Button>
-              </div>
+              {(index > 0 || people.data?.next_cursor) && (
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    isDisabled={index === 0 || people.isFetching}
+                    onPress={() => setIndex((value) => value - 1)}
+                  >
+                    {t(($) => $.earnings.previousPage)}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    isDisabled={!people.data?.next_cursor || people.isFetching}
+                    onPress={() => {
+                      const next = people.data?.next_cursor;
+                      if (next) {
+                        setCursors((values) => [...values.slice(0, index + 1), next]);
+                        setIndex((value) => value + 1);
+                      }
+                    }}
+                  >
+                    {t(($) => $.earnings.nextPage)}
+                  </Button>
+                </div>
+              )}
             </>
           )}
-          {!manager &&
+          {canReadCenter &&
             current
               ?.filter(
                 (row) =>
@@ -338,7 +441,7 @@ export function SettingsTeamEditor({
                   })}
                 </Button>
               ))}
-          {person && (
+          {person && removal && (
             <Field>
               <FieldLabel htmlFor="team-revocation-reason">
                 {t(($) => $.settings.teamNative.reason)}
