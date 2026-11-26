@@ -116,6 +116,12 @@ test('P07 account profile and manual cross-center alias merge',async t=>{
    const applied=await mut('person_merge_apply_v1',body,k);assert.equal(applied.primary_id,target);assert.equal((await mut('person_merge_apply_v1',body,k)).replayed,true);
    assert.deepEqual((await rows('select * from core.debts where id=$1',[debt]))[0],before);assert.equal((await rows('select person_id from core.account_links where org_id=$1 and account_id=$2',[org,memberAccount.id]))[0].person_id,target);
    const person=await must(member,'person_get_v1',scope({person_id:source}));assert.equal(person.id,target);assert(person.linked_person_ids.includes(source));assert(person.linked_person_ids.includes(target));
+   const page=await must(owner,'people_list_v1',scope({page:{limit:50}}));
+   assert(page.items.some(item=>item.id===target),'the merged family must remain on the owner page');
+   for(const item of page.items){
+    const [expected]=await rows('select private.person_projection($1,$2,$3,true,false) as item',[org,item.id,c1]);
+    assert.deepEqual(item,expected.item);
+   }
    for(const person_id of [source,target]){const f=await must(member,'finance_get_v1',scope({person_id,currency:'TRY',page:{}}));assert.equal(f.debts.find(x=>x.id===debt).remaining_minor,'1700');}
    await fail('person_merge_apply_v1',body,'PREVIEW_STALE');
   });

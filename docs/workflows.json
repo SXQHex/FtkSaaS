@@ -321,8 +321,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "7bcf74d5aaaf7fe70fcad6127e890d41cadc44c9d7b9b5d561e61ca88a7b9987",
-        "reason": "P06 native rapor başlatma, paylaşımlı organizasyon kilidi altında idempotent iş kaydını ve dış yazma kilidini doğruluyor."
+        "fingerprint": "48d113f8307a1088bd1809c81a23fe9d7c14c661318a33650893ce9e69c7e223",
+        "reason": "Birleşim kabulünün kaynak özeti güncellendi. Aynı sayfanın alanları ve sırası önceki kişi yanıtıyla karşılaştırıldı."
       }
     },
     {
@@ -417,8 +417,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "c108dcca5810eb8ce80be032c4fc0b3a6ff12ee9683f1552c96f667bc366dc32",
-        "reason": "Canlı görünen ad, native doğrulanmış ve bekleyen alanlar, silinmiş oturum retleri ve platform kapsamı korunur. Hesap projeksiyonu yinelenen kaynak okumalarını azaltır."
+        "fingerprint": "9a5cf1d157a8dcca80365101b2d94b1ec3de8958c3de4b8ea8994b61d2fca8af",
+        "reason": "Mevcut hesap bağlantısı ve birleşim kabulü yeniden çalıştı. Yeni denetim yalnız kişi listesinin alan eşitliğini doğruluyor."
       }
     },
     {
@@ -789,6 +789,7 @@
         "apps/backend/supabase/migrations/20261125112000_share_person_calendar_read_locks.sql",
         "apps/backend/supabase/migrations/20261125124000_selective_person_field_policy.sql",
         "apps/backend/supabase/migrations/20261125143626_people_page_operational_scope.sql",
+        "apps/backend/supabase/migrations/20261126140500_batch_people_list_projection.sql",
         "apps/backend/supabase/migrations/20261125144852_management_account_directory_reads.sql"
       ],
       "operations": [
@@ -808,8 +809,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "f08bf806f50799d3bee2674acbad9d2317bc9965bb7941917cdf136f1697c774",
-        "reason": "Kişi ve bağlantı dizinleri kanonik merkez ilişkisini yeniden kullanır. Seçici, sayfa, arama, özet, Starter kişi kontrolü ve ACL korunur."
+        "fingerprint": "1d7f9bf6658f8eb6e847739beddad5781e201aa07d2b241076f26efd7341b7f0",
+        "reason": "Kişi sayfasının toplu ilişkileri, alan yetkisi, birleşmiş kimlikleri ve sayfalama sonucu önceki projeksiyonla karşılaştırıldı."
       }
     },
     {
