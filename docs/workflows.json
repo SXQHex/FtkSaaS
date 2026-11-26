@@ -321,8 +321,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "48d113f8307a1088bd1809c81a23fe9d7c14c661318a33650893ce9e69c7e223",
-        "reason": "Birleşim kabulünün kaynak özeti güncellendi. Aynı sayfanın alanları ve sırası önceki kişi yanıtıyla karşılaştırıldı."
+        "fingerprint": "066b117b62d03cff1f1938c9146b9d315ca7fd89540eb9fb4e45de7becca9df4",
+        "reason": "Aynı anahtarla tekrarda finans yetkisi iptal edilmişse erişim reddedilir. Mevcut P06 kabulünün kaynak özeti kayıtla eşleşir."
       }
     },
     {
@@ -1387,7 +1387,8 @@
         "apps/backend/supabase/migrations/20261118213000_studio_calendar_import_results_report_retry.sql",
         "apps/backend/supabase/migrations/20261119170003_sql_report_pagination.sql",
         "apps/backend/supabase/migrations/20261125080144_crm_import_source_storage_erasure.sql",
-        "apps/backend/supabase/migrations/20261125213056_report_enqueue_shared_organization_lock.sql"
+        "apps/backend/supabase/migrations/20261125213056_report_enqueue_shared_organization_lock.sql",
+        "apps/backend/supabase/migrations/20261126151241_report_enqueue_resolved_scope.sql"
       ],
       "operations": [
         "report_get_v1",
@@ -1401,8 +1402,8 @@
         "import_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "f21e4a1b2648f4001c653c4dd5be28f65ad91e3f9a460b6421a05406725fb294",
-        "reason": "Rapor başlatma organizasyon için paylaşımlı kilit kullanıyor. İş makbuzu, tekil tekrar ve yetki kontrolleri aynı işlemde korunuyor."
+        "fingerprint": "16470c6179d4296c42d0dc5ca908084210e4fd1b7d06de8fb6ba780ea85daef1",
+        "reason": "Yeni CSV isteği yetkili merkez kümesini aynı transaction içinde bir kez çözer. Yeniden deneme özgün rapor kapsamını, önceki makbuzu ve worker doğrulamasını korur."
       }
     },
     {
@@ -2351,8 +2352,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "30cb7c91749f8d9346d0006dbdb5c8c1ff5c773ba458f7a236f8dd2e675973ff",
-        "reason": "Rapor kuyruğuna aynı anahtarla tek iş giriyor. Organizasyon kapatma kilidi ve P06 worker işleyişi korunuyor."
+        "fingerprint": "8545fbff20b9c1629ebf2824dc254ed4c5ff793454b4ca7b01ca195ebfb6c9e8",
+        "reason": "Rapor kuyruğu, kayıt bağlamı ve outbox aynı işlemde kalıyor. CSV çalışanı canlı erişimi ve kapsamı teslim sırasında yeniden denetliyor."
       }
     }
   ]
