@@ -265,5 +265,6 @@
   "20261125143626_people_page_operational_scope.sql": "9035d94f9e0cf33511a60168b10b3759b59639c97f05f2c9f2935a5318b55984",
   "20261125144852_management_account_directory_reads.sql": "f9748023411fc5cc2ecfcff04e6ac4eb4c24419019f5dc73ff125644d34255c1",
   "20261125213056_report_enqueue_shared_organization_lock.sql": "4843793382f163521fb737c766c14fb2c8867fad233e33915d8e7fb6369065ca",
-  "20261125213301_hide_erased_organization_from_account_directory.sql": "4eff9a621aa8d2f13189e67b908a5fb5021e34cc70af31fe6407be7d6bf0e3b1"
+  "20261125213301_hide_erased_organization_from_account_directory.sql": "4eff9a621aa8d2f13189e67b908a5fb5021e34cc70af31fe6407be7d6bf0e3b1",
+  "20261126140500_batch_people_list_projection.sql": "6e6327ac526e1d803301c5750dc162d7884e98984061a7492a73b61145d2bc80"
 }
