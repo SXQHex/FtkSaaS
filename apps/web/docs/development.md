@@ -6,7 +6,7 @@
 
 - `@ftksaas/ui` React Aria/shadcn bileşenlerini ve ortak UI yardımcılarını taşır. Sahiplik `packages/ui` altındadır. Uygulamanın Tailwind giriş dosyası oradaki sınıfları tarar.
 - `@ftksaas/api-contracts` DTO, operasyon ve hata tiplerini sağlar. Transport, browser Auth ve uygulamaya özel hata/indirme davranışı için Web'in Edge adapter'ını kullanır. Gerçek yetki, tenant ve plan kararı API'dedir. [İstemci protokolü](../../../docs/client-integration.md)
-- TypeScript pin'i kök workspace kataloğundan, ortak seçenekler `@ftksaas/typescript-config` paketinden gelir. pnpm tek kök lockfile ile kurar.
+- Web ve ortak UI, React ve Vitest dahil ortak sürüm pinleri için [kök workspace kataloğunu](../../../pnpm-workspace.yaml) kullanır. React ve React DOM için UI'ın peer bildirimi de aynı pini kullanır. TypeScript seçenekleri `@ftksaas/typescript-config` paketinden gelir. pnpm tek kök lockfile ile kurar.
 
 ## Router ve Query veri sahipliği
 

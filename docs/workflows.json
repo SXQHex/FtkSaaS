@@ -321,8 +321,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "7bcf74d5aaaf7fe70fcad6127e890d41cadc44c9d7b9b5d561e61ca88a7b9987",
-        "reason": "P06 native rapor başlatma, paylaşımlı organizasyon kilidi altında idempotent iş kaydını ve dış yazma kilidini doğruluyor."
+        "fingerprint": "ec4f9da0a22efe7113bda9241781c837af819394f7316ec59e67f47bf629e333",
+        "reason": "API Contracts manifestindeki ajv ve ajv-formats pinleri kök pnpm kataloğuna taşındı. Çözülen sürümler ve üretilmiş doğrulayıcılar aynı. WF00 rehberi mevcut sözleşmeyi karşılıyor."
       }
     },
     {
