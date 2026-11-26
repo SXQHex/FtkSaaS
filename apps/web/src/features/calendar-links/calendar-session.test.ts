@@ -4,15 +4,17 @@ import { BackendError } from "../../lib/backend";
 import { observeQueryAccessFailures } from "../auth/query-access-recovery";
 import { resolveCalendarSession } from "./calendar-session";
 
-const { getSession, call } = vi.hoisted(() => ({ getSession: vi.fn(), call: vi.fn() }));
+const { getSession, call, refreshWorkspace } = vi.hoisted(() => ({
+  getSession: vi.fn(),
+  call: vi.fn(),
+  refreshWorkspace: vi.fn(),
+}));
 vi.mock("../../lib/supabase", () => ({ getSupabaseClient: () => ({ auth: { getSession } }) }));
 vi.mock("../../lib/scoped-backend", () => ({ scopedBackend: async () => ({ call }) }));
 vi.mock("../auth/account-query", () => ({
   verifiedWorkspaceAccount: async () => ({ id: "domain-account" }),
 }));
-vi.mock("../workspace/workspace-query", () => ({
-  refreshWorkspace: async () => ({ centers: [] }),
-}));
+vi.mock("../workspace/workspace-query", () => ({ refreshWorkspace }));
 
 const userId = "019a7b00-0000-7000-8000-000000000001";
 const orgId = "019a7b00-0000-7000-8000-000000000002";
@@ -35,6 +37,7 @@ const revoked = new BackendError({
 beforeEach(() => {
   getSession.mockReset().mockResolvedValue(nativeSession(sessionId));
   call.mockReset();
+  refreshWorkspace.mockReset().mockResolvedValue({ centers: [] });
 });
 
 it("evicts warm private data when the pinned calendar lookup reports session revocation", async () => {
@@ -90,4 +93,32 @@ it("shares the in-flight center lookup when authentication reloads the route", a
   await canceled;
   await expect(second).resolves.toEqual({ kind: "unavailable" });
   expect(call).toHaveBeenCalledOnce();
+});
+
+it("shares the finished center lookup through workspace validation and rereads on a later visit", async () => {
+  const queries = new QueryClient();
+  const fetch = vi.spyOn(queries, "query");
+  const workspace = Promise.withResolvers<{ centers: [] }>();
+  refreshWorkspace.mockReturnValue(workspace.promise);
+  call.mockResolvedValue({ id: sessionId, center_id: orgId, assignments: [] });
+
+  const previous = new AbortController();
+  const first = resolveCalendarSession(queries, userId, orgId, sessionId, previous.signal);
+  const canceled = expect(first).rejects.toHaveProperty("name", "AbortError");
+  await vi.waitFor(() => expect(refreshWorkspace).toHaveBeenCalledOnce());
+  previous.abort();
+
+  const visit = () =>
+    resolveCalendarSession(queries, userId, orgId, sessionId, new AbortController().signal);
+  const replacement = visit();
+  await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+  workspace.resolve({ centers: [] });
+  await canceled;
+  await expect(replacement).resolves.toEqual({ kind: "unavailable" });
+  expect(call).toHaveBeenCalledOnce();
+  expect(refreshWorkspace).toHaveBeenCalledOnce();
+
+  await expect(visit()).resolves.toEqual({ kind: "unavailable" });
+  expect(call).toHaveBeenCalledTimes(2);
+  expect(refreshWorkspace).toHaveBeenCalledTimes(2);
 });

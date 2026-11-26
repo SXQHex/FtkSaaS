@@ -40,7 +40,7 @@ export async function resolveCalendarSession(
   try {
     const account = await verifiedWorkspaceAccount(queries, authUserId);
     await confirmSession();
-    const readDiscovery = async (readContext: AccountReadContext) => {
+    const readTarget = async (readContext: AccountReadContext): Promise<Target> => {
       try {
         await confirmSession(readContext.signal);
         const backend = await scopedBackend({ accountId: account.id }, undefined, readContext);
@@ -51,51 +51,51 @@ export async function resolveCalendarSession(
           session_id: sessionId,
           include_center_id: true,
         });
-        return { session };
+        await confirmSession(readContext.signal);
+        const center = z.uuid().parse(session.center_id);
+        if (session.id !== sessionId) throw new Error("CALENDAR_SESSION_PROJECTION_INVALID");
+
+        // The destination shares this workspace Query. A role that can read
+        // the session still needs live personal membership to follow the link.
+        const workspace = await refreshWorkspace(queries, account.id, org);
+        await confirmSession(readContext.signal);
+        const self = workspace.selected?.self_context;
+        const membership = self?.centers.find((row) => row.center_id === center);
+        if (
+          !self ||
+          !membership ||
+          !workspace.centers.some((row) => row.id === center && row.accessible)
+        )
+          return { kind: "unavailable" };
+
+        const assigned = session.assignments.some(
+          ({ person_id, duty }) => person_id === self.person_id && membership[duty] === true,
+        );
+        if (assigned) return { kind: "instructor", center };
+        // The destination's exact reservation reads verify ownership.
+        if (membership.student) return { kind: "student", center };
+        return { kind: "unavailable" };
       } catch (error) {
         // Let this loader preserve its validated return path on session loss.
-        if (classifyAccessFailure(error) === "session") return { error };
+        if (classifyAccessFailure(error) === "session") return { kind: "signedOut" };
         throw error;
       }
     };
-    // Auth can invalidate the route while its first loader is still pending.
-    // Share the exact read only within an identified native session.
+    // Auth can restart the loader after the session response has arrived.
+    // Share the entire pending decision within the identified native session.
     const nativeId = nativeSessionId(nativeSession);
-    const discovery = nativeId
+    const target = nativeId
       ? await queries.query({
           queryKey: ["calendar-session", account.id, authUserId, nativeId, org, sessionId],
-          queryFn: readDiscovery,
+          queryFn: readTarget,
           gcTime: 0,
           staleTime: 0,
           retry: false,
         })
-      : await readDiscovery({ client: queries, signal });
+      : await readTarget({ client: queries, signal });
     await confirmSession();
-    if (!discovery.session) throw discovery.error;
-    const { session } = discovery;
-    const center = z.uuid().parse(session.center_id);
-    if (session.id !== sessionId) throw new Error("CALENDAR_SESSION_PROJECTION_INVALID");
-
-    // Refresh the same workspace Query used by the destination. Current
-    // membership is required even when a separate role can read the session.
-    const workspace = await refreshWorkspace(queries, account.id, org);
-    await confirmSession();
-    const self = workspace.selected?.self_context;
-    const membership = self?.centers.find((row) => row.center_id === center);
-    if (
-      !self ||
-      !membership ||
-      !workspace.centers.some((row) => row.id === center && row.accessible)
-    )
-      return { kind: "unavailable" };
-
-    const assigned = session.assignments.some(
-      ({ person_id, duty }) => person_id === self.person_id && membership[duty] === true,
-    );
-    if (assigned) return { kind: "instructor", center };
-    // The destination's exact reservation reads verify ownership.
-    if (membership.student) return { kind: "student", center };
-    return { kind: "unavailable" };
+    if (target.kind === "signedOut") clearPrivateQueries(queries);
+    return target;
   } catch (error) {
     await confirmSession();
     if (classifyAccessFailure(error) === "session") {
