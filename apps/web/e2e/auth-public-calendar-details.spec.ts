@@ -127,13 +127,17 @@ test("native unavailable publication uses the closed view while an empty availab
 test("malformed consent metadata fails closed without collecting data or exposing a form link", async ({
   page,
 }) => {
-  const state = await prepare(page);
+  const state = await mockPublicCalendar(page);
   const form = structuredClone(publicForm);
   form.consents[0]!.source_version = "stale";
   state.packet.application = { state: "open", form };
-  await reload(page);
+  await page.goto(`/public/test-studio/calendar?center_id=${id}`);
+  await expect(page.locator("main h1")).toBeVisible();
   await expect(page.getByText("Program yüklenemedi.", { exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: /başvur/i })).toHaveCount(0);
+  expect(state.calls).toEqual([
+    expect.objectContaining({ slug: "test-studio", center_id: id, include_details: true }),
+  ]);
 });
 test("long published text and large native counts fit a dark 320px public page", async ({
   page,
