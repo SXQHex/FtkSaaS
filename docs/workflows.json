@@ -321,8 +321,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "ec4f9da0a22efe7113bda9241781c837af819394f7316ec59e67f47bf629e333",
-        "reason": "API Contracts manifestindeki ajv ve ajv-formats pinleri kök pnpm kataloğuna taşındı. Çözülen sürümler ve üretilmiş doğrulayıcılar aynı. WF00 rehberi mevcut sözleşmeyi karşılıyor."
+        "fingerprint": "0369ea5ee7fd087150f2856f273879acd75efa970b9e94a60ec1a5a9327cf55d",
+        "reason": "API Contracts AJV pinleri aynı sürümlerle kök kataloğa taşındı ve üretilmiş doğrulayıcılar karşılaştırıldı. Workspace yönetişim testi kökte Turbo ve elle çalıştırılan Knip için kesin listeyi denetliyor. WF00 sözleşmesi geçerliliğini koruyor."
       }
     },
     {
