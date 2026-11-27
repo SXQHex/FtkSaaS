@@ -321,8 +321,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "d0a8104e1d16df13a127a2d4c0dd23609fd52fa2805849eb82fb92055381eda5",
-        "reason": "P06 kabulü muhasebe okuma yetkisi eksik ve başka merkezi içeren CSV isteklerini doğruluyor."
+        "fingerprint": "2b253903d1c709a7f949af8dccf6dd1994d330af2bf5e31294e0085933dad66f",
+        "reason": "Yeni UUID yolları ve göç envanteri sınıflandırıldı. CRM iş devri kabulü mevcut tam CI kapsamına bağlandı."
       }
     },
     {
@@ -430,6 +430,7 @@
       "tests": [
         "apps/backend/tests/registry.test.mjs",
         "apps/backend/tests/room-role-registry.test.mjs",
+        "apps/backend/tests/staff-role-revocation-acceptance.mjs",
         "apps/backend/tests/starter-plan-gates-acceptance.mjs",
         "apps/backend/tests/api-acceptance.test.mjs",
         "apps/backend/tests/p07-account-revocation-acceptance.mjs",
@@ -535,7 +536,9 @@
         "apps/backend/database/pending-team-invitation-roles.sql",
         "apps/backend/supabase/migrations/20261126230219_pending_team_invitation_roles.sql",
         "apps/backend/database/team-permission-matrix.sql",
-        "apps/backend/supabase/migrations/20261126235944_team_permission_matrix.sql"
+        "apps/backend/supabase/migrations/20261126235944_team_permission_matrix.sql",
+        "apps/backend/database/staff-role-revocation.sql",
+        "apps/backend/supabase/migrations/20261127131817_staff_role_revocation.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -563,8 +566,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "3f7447cf916b3e77b5a48f1acf0f68a51c05237f7dc9446c75626a009edcfbb2",
-        "reason": "Merkez izin matrisi kişi izin özetini kullanır. Sayfalama, yazma sürümü, F05 ve canlı merkez yetkisi native senaryoda doğrulanır."
+        "fingerprint": "dfb216f318e5d6dca590e8b4bc86ddf494fd33bd8cc6ccc17dfd752658bc97f0",
+        "reason": "Personel önizlemesi güncel atama ve açık CRM işiyle sınırlı. Devir, rol kaldırma, audit hatasında rollback ve aynı anahtarlı tekrar native kaynak üzerinde doğrulandı."
       }
     },
     {

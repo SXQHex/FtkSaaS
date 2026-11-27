@@ -1,5 +1,14 @@
 # Güncel kaynak ve kabul
 
+<a id="xreq-079-backend-adayi"></a>
+## XREQ-079 — Personel rolü kaldırma adayı
+
+27 Kasım 2026’da taban `5ee7cc01ea2f107d05b697f0c3420226a3eb8499` ve [aynı kaynağın main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/45983886248) doğrulandı. [Frontend talebi](https://github.com/SXQHex/FtkSaaS/pull/484) için mevcut rol önizleme ve kaldırma işlemlerine [Personel etkisi ve açık CRM iş devri](../../../docs/workflows.md#wf02) eklendi.
+
+[Native kabul](../tests/staff-role-revocation-acceptance.mjs) tabanda Personel önizlemesinin bulunmadığını gösterdi. Adayda oda, rol ve CRM doğrulaması Auth → Edge → RPC yolunda **41/41** geçti. Eski önizleme ve geçersiz alıcı reddedildi. Audit hatası devir ve rol kaldırmayı birlikte geri aldı. Aynı komut anahtarı ikinci devir üretmedi. Tam aday CI, main ve development kabulü bekleniyor.
+
+Yerel backend `verify` koşusunda sözleşme, yönetişim ve restore testleri **489/489**, CI aracı testleri **149/150** geçti. Linux `/proc` örneğini bekleyen gözlemci testi macOS’ta aynı taban SHA’sında da başarısız oldu. Kalite ve belge denetimleri geçti.
+
 <a id="backend-arac-zinciri-node26"></a>
 ## Backend ve kök araç zinciri — Node 26 LTS
 

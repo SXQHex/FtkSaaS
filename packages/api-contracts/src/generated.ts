@@ -5545,6 +5545,10 @@ ReservationSelfSummary?: ReservationSelfSummary
 EarningPeriodTotal?: EarningPeriodTotal
 ClassPageInstructorAssignment?: ClassPageInstructorAssignment
 PersonReadLabel?: PersonReadLabel
+StaffRevocationFollowup?: StaffRevocationFollowup
+StaffRevocationLead?: StaffRevocationLead
+StaffRevocationRecipient?: StaffRevocationRecipient
+StaffRevocationImpact?: StaffRevocationImpact
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -11037,6 +11041,10 @@ expected_version: PositiveInt
 assignment_id: string
 reason: Text
 impact_approval?: PreviewToken
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+handover_person_id?: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -31104,6 +31112,56 @@ expires_at: Instant
 assignment_id: string
 assignment_version: PositiveInt
 sessions: InstructorRevocationSession[]
+staff_impact?: StaffRevocationImpact
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "StaffRevocationImpact".
+ */
+export interface StaffRevocationImpact {
+lost_permissions: Permission[]
+open_leads: StaffRevocationLead[]
+handover_required: Bool
+recipients: StaffRevocationRecipient[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "StaffRevocationLead".
+ */
+export interface StaffRevocationLead {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lead_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+version: PositiveInt
+followups: StaffRevocationFollowup[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "StaffRevocationFollowup".
+ */
+export interface StaffRevocationFollowup {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+activity_id: string
+version: PositiveInt
+due_at: (Instant | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "StaffRevocationRecipient".
+ */
+export interface StaffRevocationRecipient {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+display_name: Text
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
