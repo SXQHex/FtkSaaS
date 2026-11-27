@@ -550,14 +550,9 @@ Alarmlar SaaS işletim sorumlusunadır; müşteri owner’ına teknik müdahale 
 
 Aşağıdaki yük/performans ve RPO/RTO ölçümleri mevcut plan tesliminin kabul şartı değildir. Mevcut fonksiyon, güvenlik, CI ve kaynak bütçesi testleri değişmez.
 
-| İşlem | İsteklerin %95’i için backend hedefi |
-|---|---|
-| Sayfalı liste / kişi-paket detayı | 1 saniye |
-| Merkezin bir haftalık takvimi | 2 saniye |
-| Rezervasyon/iptal/tahsilat/yoklama kapatma | 2 saniye |
-| Büyük rapor/dışa aktarım/toplu içe aktarma | Arka plan; başlatma yanıtı 2 saniye |
+Pilot yük profili 10 organizasyon ve organizasyon başına 500 aktif öğrencidir. Her organizasyondan bir kullanıcıyla toplam **10 eşzamanlı kullanıcı** ölçülür. Yük profilindeki her işlemin yanıtı için **backend p95 < 1 saniye** hedeflenir. Bu hedef sayfalı liste ve kişi-paket detayını, haftalık takvimi, rezervasyon, iptal, tahsilat ve yoklama kapatmayı, ayrıca büyük rapor, dışa aktarım ve içe aktarma başlatma yanıtlarını kapsar.
 
-Ölçüm backend’e varıştan yanıt çıkışına kadardır; istemci interneti ve ekran çizimi dahil değildir. Geçici pilot yük profili 10 organizasyon × organizasyon başına 500 aktif öğrenci, toplam 50 eşzamanlı kullanıcıdır; ticari plan limiti değildir. Gerçek istek karışımı ve veri hacmi yük testinde belgelenecek. Hız için bütünlük gevşetilmez; doğru ret geçerli sonuçtur. Büyük işler ilerleme/sonuç durumuyla sorgulanır, bağlantı kopması işi yeniden başlatmaz. Sağlanmazsa sorgu/indeks/işlem tasarımı iyileştirilir, gerekirse altyapı yükseltilir.
+Backend süresi isteğin varışından yanıtın çıkışına kadar ölçülür. İstemci ağ süresi ve ekran çizimi ayrı ölçümlerdir. Pilot bir ticari plan limiti veya SLA tanımlamaz. Gerçek istek karışımı ve veri hacmi yük testinde kaydedilir. Hız için bütünlük gevşetilmez. Doğru ret geçerli sonuçtur. Büyük işler arka planda sürer ve ilerleme ya da sonuç durumundan izlenir. Bağlantı kopması işi yeniden başlatmaz. Hedef aşılırsa sorgu, indeks ve işlem tasarımı incelenir. Altyapı kapasitesi gerekirse ayrıca değerlendirilir.
 
 Resmî dayanak (15 Ekim 2026’da kontrol edildi): https://supabase.com/docs/guides/platform/backups — Free için düzenli dışa aktarım ve bağımsız yedek önerilir; Storage içeriği ayrıca yedeklenir. Bu doküman bizim RPO/RTO hedefimizi kendiliğinden garanti etmez.
 

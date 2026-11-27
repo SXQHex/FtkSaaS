@@ -1014,7 +1014,7 @@ G03 backend kabulünün ardından O03–O10 aktif işletim paketidir. [Kaynak ve
 - **Sınır/olumsuz durum:** Öğrenci sayısı eşzamanlı kullanıcı sayısı değildir; onaylanmamış SLA/eşik uydurulmaz.
 - **Doğrulama senaryosu:** Yük profili ve eşikler koşudan önce kaydedilir; pilot RPO≤24saat/RTO≤8saat hedefleri ölçülür, ticari SLA sayılmaz.
 - **Kaynak alanı:** yük senaryoları; query/worker ölçümleri; runbook
-- **Ölçüm tabanı:** [Pilot performans hedefleri](../../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md#performans--business-sonrası-ölçüm-hedefleri) 10 organizasyon × 500 aktif öğrenci ve 50 eşzamanlı kullanıcı tanımlar. Backend p95 hedefi liste/detay için 1 saniye, haftalık takvim, kritik yazmalar ve büyük iş başlatma için 2 saniyedir. [Hazırlanan istek dağılımı ve ölçüm aracıyla](remote-backend-setup.md#o10-pilot-olcum) izole hosted pilotun test verisini ve sonuçlarını kaydet; kuyruğu ve finansı mutabık kıl, aynı kurtarma tatbikatından RPO/RTO çıkar.
+- **Ölçüm tabanı** [Teknik sözleşmedeki güncel pilot profilini ve performans eşiğini](../../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md#performans--business-sonrası-ölçüm-hedefleri) uygula. [Ölçüm aracıyla](remote-backend-setup.md#o10-pilot-olcum) izole hosted pilotun test verisini ve sonuçlarını kaydet. Kuyruğu ve finansı mutabık kıl. Aynı kurtarma tatbikatından RPO/RTO çıkar.
 
 ## Plan bazlı son kabul
 
