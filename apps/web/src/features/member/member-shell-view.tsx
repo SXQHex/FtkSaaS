@@ -1,6 +1,7 @@
-import type { ReactNode } from "react";
+import { useLayoutEffect, useRef, type ReactNode } from "react";
 import { LinkButton } from "@ftksaas/ui/components/button";
 export function MemberShellView({
+  contentKey,
   brand,
   subtitle,
   navigationLabel,
@@ -9,6 +10,7 @@ export function MemberShellView({
   linksDisabled = false,
   children,
 }: {
+  contentKey?: string;
   brand: string;
   subtitle: string;
   navigationLabel: string;
@@ -17,6 +19,10 @@ export function MemberShellView({
   linksDisabled?: boolean;
   children: ReactNode;
 }) {
+  const content = useRef<HTMLElement>(null);
+  useLayoutEffect(() => {
+    if (content.current) content.current.scrollTop = 0;
+  }, [contentKey]);
   return (
     <div className="mx-auto grid h-dvh max-w-5xl grid-cols-1 grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden text-sm lg:grid-cols-[auto_1fr] lg:grid-rows-[auto_1fr]">
       <header className="flex min-w-0 flex-wrap items-center justify-between gap-3 border-b px-4 py-3 lg:col-start-1 lg:row-start-1">
@@ -47,7 +53,10 @@ export function MemberShellView({
           ))}
         </ul>
       </nav>
-      <main className="col-start-1 row-start-2 min-h-0 min-w-0 overflow-y-auto overscroll-contain lg:col-span-2">
+      <main
+        ref={content}
+        className="col-start-1 row-start-2 min-h-0 min-w-0 overflow-y-auto overscroll-contain lg:col-span-2"
+      >
         {children}
       </main>
     </div>

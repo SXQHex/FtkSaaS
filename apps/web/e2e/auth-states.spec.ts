@@ -154,12 +154,18 @@ test("states SPA navigation shares account cache while direct URL reload recheck
   await signIn(page);
   await expect(page.getByRole("heading", { name: "Profil", exact: true })).toBeVisible();
   const before = calls.account;
+  const toolbar = await page.locator(".workspace-topbar").elementHandle();
   await page.evaluate("globalThis.__spaMarker = true");
   await openWorkspaceNavigation(page);
   const helpNavigation = page.getByRole("navigation", { name: "Yardım", exact: true });
   await activate(helpNavigation.getByRole("link", { name: "Yardım", exact: true }));
   await expect(page).toHaveURL(`${origin}/help`);
   await expect(page.getByRole("heading", { name: "Yardım", exact: true })).toBeVisible();
+  expect(
+    await toolbar.evaluate(
+      (node) => node === node.ownerDocument.querySelector(".workspace-topbar"),
+    ),
+  ).toBe(true);
   const spaMarker = await page.evaluate("globalThis.__spaMarker");
   expect(spaMarker).toBe(true);
   // The first non-platform route creates one ordinary projection. Workspace

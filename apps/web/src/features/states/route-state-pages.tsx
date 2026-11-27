@@ -31,7 +31,11 @@ export function RouteNotFoundPage() {
     </main>
   );
 }
-export function RouteErrorPage({ error }: ErrorComponentProps) {
+export function RouteErrorPage({
+  error,
+  inPanel = false,
+}: ErrorComponentProps & { inPanel?: boolean }) {
+  const Container = inPanel ? "div" : "main";
   const { t } = useTranslation(),
     router = useRouter(),
     main = useRef<HTMLElement>(null);
@@ -59,8 +63,10 @@ export function RouteErrorPage({ error }: ErrorComponentProps) {
     heading.focus();
   }
   return (
-    <main
-      ref={main}
+    <Container
+      ref={(element) => {
+        main.current = element;
+      }}
       className="mx-auto flex min-h-[50dvh] w-full max-w-2xl items-center p-4 [&_h1]:outline-none [&_h1]:focus-visible:underline"
     >
       <StateView
@@ -88,7 +94,7 @@ export function RouteErrorPage({ error }: ErrorComponentProps) {
           </>
         }
       />
-    </main>
+    </Container>
   );
 }
 export function RoutePendingPage() {
@@ -96,5 +102,17 @@ export function RoutePendingPage() {
     <main className="mx-auto mt-10 w-full max-w-2xl p-4">
       <StateView kind="loading" headingLevel={1} />
     </main>
+  );
+}
+
+export function PanelError(props: ErrorComponentProps) {
+  return <RouteErrorPage {...props} inPanel />;
+}
+
+export function PanelPending() {
+  return (
+    <div className="mx-auto mt-10 w-full max-w-2xl p-4">
+      <StateView kind="loading" headingLevel={1} />
+    </div>
   );
 }

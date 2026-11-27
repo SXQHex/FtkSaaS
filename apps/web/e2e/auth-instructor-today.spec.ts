@@ -181,6 +181,14 @@ test("instructor agenda replaces moved session dates and keeps a closed roll cal
   page,
 }) => {
   const { reads, sessions } = await fixture(page);
+  const toolbar = await page.locator(".workspace-topbar").elementHandle();
+  const expectSameToolbar = async () => {
+    expect(
+      await toolbar.evaluate(
+        (node) => node === node.ownerDocument.querySelector(".workspace-topbar"),
+      ),
+    ).toBe(true);
+  };
   await page.setViewportSize({ width: 390, height: 844 });
   await activate(page.getByRole("button", { name: "Haftalık programım", exact: true }));
   const views = page.getByRole("radiogroup", { name: "Takvim görünümü", exact: true });
@@ -189,6 +197,7 @@ test("instructor agenda replaces moved session dates and keeps a closed roll cal
   const session = (index: number) =>
     agenda.getByRole("button", { name: new RegExp(`Sentetik atanmış ${index} ·`) });
   await expect(session(1)).toHaveAccessibleName(/Yoklama kapandı/);
+  await expectSameToolbar();
   await expect(session(2)).toContainText("18:00");
   await expect(session(3)).toContainText("18:00");
   const reread = page.getByRole("button", { name: "Yeniden oku", exact: true });
@@ -218,6 +227,7 @@ test("instructor agenda replaces moved session dates and keeps a closed roll cal
     `${origin}/instructor/sessions/${sessions[0]!.id}?org=${I.org}&center=${I.center}`,
   );
   await expect(page.getByText("Yoklama kapalı", { exact: true })).toBeVisible();
+  await expectSameToolbar();
   await expect(page.getByRole("button", { name: "Yoklamayı başlat", exact: true })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Yoklamayı kapat", exact: true })).toHaveCount(0);
   expect(

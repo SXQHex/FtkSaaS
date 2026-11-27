@@ -3,7 +3,7 @@ import { test, expect } from "./test.js";
 import { mockStudio, openStudio } from "./studio-fixture.js";
 import { clickWorkspaceLink, mockNative, origin } from "./auth-fixture.js";
 
-test("sidebar navigation preserves the document and cached studio reads", async ({
+test("sidebar navigation preserves the document, panel and cached studio reads", async ({
   page,
 }, info) => {
   const reads: Record<string, number> = {};
@@ -35,6 +35,11 @@ test("sidebar navigation preserves the document and cached studio reads", async 
   });
   await mockStudio(page);
   await openStudio(page);
+  const expectMobileMenuClosed = async () => {
+    if (hasTouchInput(page))
+      await expect(page.getByRole("navigation", { name: "Ana menü", exact: true })).toBeHidden();
+  };
+  await expectMobileMenuClosed();
   recordPhase("login-and-studio");
   const lifetime = await page.evaluate("window.__spaLifetime = performance.timeOrigin");
   const before = { ...reads };
@@ -42,18 +47,55 @@ test("sidebar navigation preserves the document and cached studio reads", async 
   expect(before.organizations_list_v1).toBe(1);
   expect(before.roles_list_v1).toBe(1);
   const initialDocuments = documents;
+  const toolbar = await page.locator(".workspace-topbar").elementHandle();
+  const expectSameToolbar = async () => {
+    expect(
+      await toolbar.evaluate(
+        (node) => node === node.ownerDocument.querySelector(".workspace-topbar"),
+      ),
+    ).toBe(true);
+  };
   await clickWorkspaceLink(page, "Üyeler");
   await expect(page.getByRole("heading", { name: "Üyeler", exact: true })).toBeVisible();
+  await expectSameToolbar();
+  await expectMobileMenuClosed();
   recordPhase("members");
   expect(reads.centers_list_v1 ?? 0).toBe(before.centers_list_v1 ?? 0);
   await clickWorkspaceLink(page, "Stüdyo");
   await expect(page.getByRole("button", { name: /Örnek Eğitmen/ })).toBeVisible();
+  await expectSameToolbar();
+  await expectMobileMenuClosed();
   recordPhase("studio");
-  await page.goBack();
+  let releaseAuthority!: () => void;
+  const authorityGate = new Promise<void>((resolve) => {
+    releaseAuthority = resolve;
+  });
+  const authorityRead = "**/functions/v1/backend-v1/organizations_list_v1";
+  await page.route(
+    authorityRead,
+    async (route) => {
+      await authorityGate;
+      await route.fallback();
+    },
+    { times: 1 },
+  );
+  const verifyingAuthority = page.waitForRequest(authorityRead);
+  const back = page.goBack();
+  try {
+    await verifyingAuthority;
+    await expect(page.locator("main").getByRole("progressbar")).toBeVisible();
+    await expect(page.locator(".workspace-topbar")).toBeVisible();
+    await expectSameToolbar();
+  } finally {
+    releaseAuthority();
+    await back;
+  }
   await expect(page.getByRole("heading", { name: "Üyeler", exact: true })).toBeVisible();
+  await expectSameToolbar();
   recordPhase("back-to-members");
   await page.goForward();
   await expect(page.getByRole("heading", { name: "Stüdyo", exact: true })).toBeVisible();
+  await expectSameToolbar();
   recordPhase("forward-to-studio");
   await info.attach("navigation-read-counts", {
     body: JSON.stringify({

@@ -13,6 +13,7 @@ import type {
 import { mockOwnReservations } from "./member-reservations-fixture.js";
 import { studioIds as I } from "./studio-fixture.js";
 import { origin } from "./auth-fixture.js";
+import common from "../src/locales/tr/common.json" with { type: "json" };
 const id = (n: number) => `019ab7b0-0000-7000-8000-${String(n).padStart(12, "0")}`;
 type MemberClass = CalendarItem & {
   member_lesson: MemberLessonDiscovery;
@@ -514,6 +515,46 @@ test("member discovery shows safe labels and one semantic menu across a narrow v
   expect(state.reads.filter((row) => row.op === "calendar_get_v1")).toHaveLength(1);
   await activate(page.getByRole("button", { name: "Sonraki hafta", exact: true }));
   await expect.poll(() => state.reads.filter((row) => row.op === "calendar_get_v1").length).toBe(2);
+});
+test("member navigation keeps the header, navigation and organization controls on the same document", async ({
+  page,
+}) => {
+  await fixture(page);
+  const header = await page.locator("header").first().elementHandle();
+  const navigation = page.getByRole("navigation");
+  const navNode = await navigation.elementHandle();
+  const scope = page.getByRole("combobox", { name: common.memberReservations.chooseOrg });
+  const scopeNode = await scope.elementHandle();
+  const assertPanel = async () => {
+    expect(
+      await header.evaluate((node) => node === node.ownerDocument.querySelector("header")),
+    ).toBe(true);
+    expect(await navNode.evaluate((node) => node === node.ownerDocument.querySelector("nav"))).toBe(
+      true,
+    );
+    expect(await scopeNode.evaluate((node) => node.isConnected)).toBe(true);
+  };
+
+  await activate(
+    navigation.getByRole("link", {
+      name: common.memberReservations.links.entitlements,
+      exact: true,
+    }),
+  );
+  await expect(
+    navigation.getByRole("link", {
+      name: common.memberReservations.links.entitlements,
+      exact: true,
+    }),
+  ).toHaveAttribute("aria-current", "page");
+  await assertPanel();
+
+  await page.goBack();
+  await expect(navigation.getByRole("link", { name: "Dersler", exact: true })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
+  await assertPanel();
 });
 test("member classes use the saved Sunday week and move the same native session after reread", async ({
   page,

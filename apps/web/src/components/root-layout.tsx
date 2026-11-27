@@ -1,3 +1,4 @@
+import { PanelOutlet } from "./panel-outlet";
 import {
   Dialog,
   I18nProvider,
@@ -103,7 +104,9 @@ export function RootLayout() {
                   <FormPreview />
                 ) : (
                   <PrivateSessionRevision value={sessionRevision}>
-                    <Outlet />
+                    <PanelOutlet>
+                      <Outlet />
+                    </PanelOutlet>
                   </PrivateSessionRevision>
                 )}
               </Suspense>

@@ -1,12 +1,14 @@
+import { workspacePanel, PanelError, PanelPending } from "../features/workspace/panel-routes";
 import { z } from "zod";
 import { createFileRoute } from "@tanstack/react-router";
 import { requireAccountSession, loadScopedAccount } from "../features/auth/account-guard";
-import { AccountErrorPage } from "../features/auth/account-page";
 import { LessonRequestsRoutePage } from "../features/lesson-requests/lesson-requests-page";
 export const Route = createFileRoute("/o/$orgId/c/$centerId/requests")({
+  staticData: workspacePanel,
+  pendingComponent: PanelPending,
   validateSearch: (input) => z.object({ request: z.uuid().optional() }).parse(input),
   beforeLoad: requireAccountSession,
   loader: ({ context, params }) => loadScopedAccount(context, params.orgId),
   component: LessonRequestsRoutePage,
-  errorComponent: AccountErrorPage,
+  errorComponent: PanelError,
 });

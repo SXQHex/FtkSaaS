@@ -52,6 +52,9 @@ export function AppSidebar({
 }) {
   const { t } = useTranslation();
   const { isMobile, setOpenMobile } = useSidebar();
+  const closeMobileNavigation = () => {
+    if (isMobile) setOpenMobile(false);
+  };
   return (
     <Sidebar
       id="workspace-sidebar"
@@ -100,6 +103,7 @@ export function AppSidebar({
             <NavMain
               key={group.key}
               title={t(($) => $.workspace.groups[group.key])}
+              onNavigate={closeMobileNavigation}
               items={group.items.map((item) => ({
                 title: t(($) => $.workspace.links[item.key]),
                 url: item.url,
@@ -114,6 +118,7 @@ export function AppSidebar({
         <nav aria-label={t(($) => $.workspace.links.help)}>
           <NavMain
             className="p-0"
+            onNavigate={closeMobileNavigation}
             items={[
               { title: t(($) => $.workspace.links.help), url: "/help", icon: <CircleHelpIcon /> },
             ]}
