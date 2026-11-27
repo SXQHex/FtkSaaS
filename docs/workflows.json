@@ -321,8 +321,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "bb0f6b954a0b3092ebc2bde13f55e971a27c6a0ecd71444a57beb037d9a499ce",
-        "reason": "Ekip izin matrisi seçicisi ve üretilen doğrulayıcılar incelendi. 26 Kasım’da süresi dolan altı kalite istisnası kullanıcı onayıyla kaldırıldı."
+        "fingerprint": "2b253903d1c709a7f949af8dccf6dd1994d330af2bf5e31294e0085933dad66f",
+        "reason": "Yeni UUID yolları ve göç envanteri sınıflandırıldı. CRM iş devri kabulü mevcut tam CI kapsamına bağlandı."
       }
     },
     {
@@ -430,6 +430,7 @@
       "tests": [
         "apps/backend/tests/registry.test.mjs",
         "apps/backend/tests/room-role-registry.test.mjs",
+        "apps/backend/tests/staff-role-revocation-acceptance.mjs",
         "apps/backend/tests/starter-plan-gates-acceptance.mjs",
         "apps/backend/tests/api-acceptance.test.mjs",
         "apps/backend/tests/p07-account-revocation-acceptance.mjs",
@@ -535,7 +536,9 @@
         "apps/backend/database/pending-team-invitation-roles.sql",
         "apps/backend/supabase/migrations/20261126230219_pending_team_invitation_roles.sql",
         "apps/backend/database/team-permission-matrix.sql",
-        "apps/backend/supabase/migrations/20261126235944_team_permission_matrix.sql"
+        "apps/backend/supabase/migrations/20261126235944_team_permission_matrix.sql",
+        "apps/backend/database/staff-role-revocation.sql",
+        "apps/backend/supabase/migrations/20261127131817_staff_role_revocation.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -563,8 +566,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "3f7447cf916b3e77b5a48f1acf0f68a51c05237f7dc9446c75626a009edcfbb2",
-        "reason": "Merkez izin matrisi kişi izin özetini kullanır. Sayfalama, yazma sürümü, F05 ve canlı merkez yetkisi native senaryoda doğrulanır."
+        "fingerprint": "dfb216f318e5d6dca590e8b4bc86ddf494fd33bd8cc6ccc17dfd752658bc97f0",
+        "reason": "Personel önizlemesi güncel atama ve açık CRM işiyle sınırlı. Devir, rol kaldırma, audit hatasında rollback ve aynı anahtarlı tekrar native kaynak üzerinde doğrulandı."
       }
     },
     {
@@ -1401,7 +1404,8 @@
         "apps/backend/supabase/migrations/20261119170003_sql_report_pagination.sql",
         "apps/backend/supabase/migrations/20261125080144_crm_import_source_storage_erasure.sql",
         "apps/backend/supabase/migrations/20261125213056_report_enqueue_shared_organization_lock.sql",
-        "apps/backend/supabase/migrations/20261126151241_report_enqueue_resolved_scope.sql"
+        "apps/backend/supabase/migrations/20261126151241_report_enqueue_resolved_scope.sql",
+        "apps/backend/supabase/migrations/20261127005753_consolidate_p06_report_scope_reads.sql"
       ],
       "operations": [
         "report_get_v1",
@@ -1415,8 +1419,8 @@
         "import_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "16470c6179d4296c42d0dc5ca908084210e4fd1b7d06de8fb6ba780ea85daef1",
-        "reason": "Yeni CSV isteği yetkili merkez kümesini aynı transaction içinde bir kez çözer. Yeniden deneme özgün rapor kapsamını, önceki makbuzu ve worker doğrulamasını korur."
+        "fingerprint": "04ca5421c062ccabe7784eb1be20ba76e90a6ea96a2a3185b8d577c84df95bed",
+        "reason": "Rapor planı ve merkez rolleri çağrı içinde bir kez okunur. Tür, finans yetkisi, merkez kapsamı ve aynı işlem anahtarıyla tekrar kabulü doğrulanır."
       }
     },
     {
@@ -2365,8 +2369,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "8545fbff20b9c1629ebf2824dc254ed4c5ff793454b4ca7b01ca195ebfb6c9e8",
-        "reason": "Rapor kuyruğu, kayıt bağlamı ve outbox aynı işlemde kalıyor. CSV çalışanı canlı erişimi ve kapsamı teslim sırasında yeniden denetliyor."
+        "fingerprint": "f416d0a4dfb3c3ce73adbc18a14175bb870ed19e9a042692f04a0ce449b52c4b",
+        "reason": "Rapor çalışanı aynı canlı P06 kapsam çözümünü kullanır. İptal edilen yetki, tekrar ve iş gövdesi native kabulde denetlenir."
       }
     }
   ]

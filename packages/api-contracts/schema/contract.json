@@ -8809,6 +8809,9 @@
         },
         "impact_approval": {
           "$ref": "#/$defs/PreviewToken"
+        },
+        "handover_person_id": {
+          "$ref": "#/$defs/FtkUuid"
         }
       },
       "required": [
@@ -56423,6 +56426,9 @@
           "items": {
             "$ref": "#/$defs/InstructorRevocationSession"
           }
+        },
+        "staff_impact": {
+          "$ref": "#/$defs/StaffRevocationImpact"
         }
       },
       "required": [
@@ -69193,6 +69199,109 @@
         "name"
       ],
       "additionalProperties": false
+    },
+    "StaffRevocationFollowup": {
+      "type": "object",
+      "properties": {
+        "activity_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "due_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "activity_id",
+        "version",
+        "due_at"
+      ],
+      "additionalProperties": false
+    },
+    "StaffRevocationLead": {
+      "type": "object",
+      "properties": {
+        "lead_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "followups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/StaffRevocationFollowup"
+          }
+        }
+      },
+      "required": [
+        "lead_id",
+        "person_id",
+        "version",
+        "followups"
+      ],
+      "additionalProperties": false
+    },
+    "StaffRevocationRecipient": {
+      "type": "object",
+      "properties": {
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "display_name": {
+          "$ref": "#/$defs/Text"
+        }
+      },
+      "required": [
+        "person_id",
+        "display_name"
+      ],
+      "additionalProperties": false
+    },
+    "StaffRevocationImpact": {
+      "type": "object",
+      "properties": {
+        "lost_permissions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Permission"
+          }
+        },
+        "open_leads": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/StaffRevocationLead"
+          }
+        },
+        "handover_required": {
+          "$ref": "#/$defs/Bool"
+        },
+        "recipients": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/StaffRevocationRecipient"
+          }
+        }
+      },
+      "required": [
+        "lost_permissions",
+        "open_leads",
+        "handover_required",
+        "recipients"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -73687,7 +73796,7 @@
           "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "org_limit",
-        "transaction_guarantee": "Atomic role_assignments.inactive_live_next_request; audit + in-app outbox + receipt. External delivery never determines domain commit.",
+        "transaction_guarantee": "Atomic role deactivation, confirmed open CRM lead reassignment when needed, audit, in-app outbox and receipt.",
         "transition": {
           "effect": "role_revoke_append_or_explicit_update",
           "from": [],
@@ -73728,7 +73837,8 @@
         "runtime_limits": [
           "Starter instructor assignment ID/version is discoverable with management_state_get_v1 role_assign_v1 selector. Instructor revoke requires an account-bound impact_approval when future unstarted sessions are affected; exact replay does not detach twice.",
           "Confirmed revoke preserves sessions, rooms, student reservations and completed/begun history; removes future instructor duties with explicit overrides and increments session versions. No automatic replacement.",
-          "Missing instructor imposes no additional restriction on the existing session lifecycle: normal reservation, schedule, capacity and attendance operations keep their existing authorization, plan, rights and time rules. No automatic cancellation, suspension or replacement; the revoking manager is responsible for arranging an instructor."
+          "Missing instructor imposes no additional restriction on the existing session lifecycle: normal reservation, schedule, capacity and attendance operations keep their existing authorization, plan, rights and time rules. No automatic cancellation, suspension or replacement; the revoking manager is responsible for arranging an instructor.",
+          "Staff CRM handover requires a current impact_approval and an eligible same-center handover_person_id. Open follow-ups inherit the new lead assignee. Roles without affected work retain the existing command path."
         ],
         "required_features": [
           "F04"
@@ -73736,7 +73846,13 @@
         "runtime_required_features": [
           "F04"
         ],
-        "conditional_features": [],
+        "conditional_features": [
+          {
+            "feature": "F21",
+            "when": "staff_revocation_has_crm_handover",
+            "mode": "required_if_selected"
+          }
+        ],
         "operation_contract": {
           "kind": "command",
           "target_entity": "role_assignments",
@@ -73744,7 +73860,8 @@
           "version_field": "assignment_id",
           "read_operation": "roles_list_v1",
           "atomic_effects": [
-            "role_assignments.inactive_live_next_request"
+            "role_assignments.inactive_live_next_request",
+            "affected_open_crm_leads_reassigned_with_approval"
           ],
           "business_commit": true,
           "read_path_status": "implemented",
@@ -97271,7 +97388,7 @@
           "VERSION_CONFLICT"
         ],
         "transaction_class": "preview",
-        "transaction_guarantee": "Compute current instructor-revocation session impact and a source-bound confirmation token; no business mutation.",
+        "transaction_guarantee": "Compute current role-revocation impact and a source-bound confirmation token without business mutation.",
         "transition": {
           "effect": "technical_preview_only",
           "from": [],
@@ -97322,7 +97439,13 @@
         "runtime_required_features": [
           "F04"
         ],
-        "conditional_features": [],
+        "conditional_features": [
+          {
+            "feature": "F21",
+            "when": "staff_revocation_has_crm_handover",
+            "mode": "required_if_selected"
+          }
+        ],
         "operation_contract": {
           "kind": "preview",
           "target_entity": "role_assignments",
@@ -97347,7 +97470,8 @@
         "runtime_rpc": "api_v1.role_revoke_preview_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_limits": [
-          "Preview is account/organization/center/assignment/version and complete affected-session snapshot bound; no role, session or reservation mutation."
+          "Preview is account/organization/center/assignment/version and complete affected-session snapshot bound; no role, session or reservation mutation.",
+          "For staff, staff_impact shows lost center-wide permissions, affected open CRM leads and unfinished follow-ups, and live eligible recipients."
         ]
       },
       {
@@ -118840,6 +118964,36 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_role_revoke/properties/handover_person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/StaffRevocationFollowup/properties/activity_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/StaffRevocationLead/properties/lead_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/StaffRevocationLead/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/StaffRevocationRecipient/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -119350,7 +119504,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 274,
+      "migration_count": 276,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

@@ -1,6 +1,6 @@
 # Güvenlik kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `8138c7e3a6b1d29ac6cfd925d6ccbcc4e573b66b6006564507eda6e62d988de6`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `6f21435ef6c687f069ac6a96fd7b57d0c5c58fe60622c1e4bf6cf3fb0d14750d`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 İnsan istemci native Auth ile JWT doğrulanan Edge yolunu, düz merkez listesi ise [istemci protokolündeki](client-integration.md) Data API yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan denetlenir. İstemci erişimi core/private ve service-only RPC dışında kalır. Worker ve public credential transport ayrı yetki yollarıdır. [Teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
 
@@ -235,6 +235,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [settings-waitlist-opt-in.sql](../apps/backend/database/settings-waitlist-opt-in.sql) | `5120fa89dae9ece48e80c4c57679dadaea72f09052860c7b6be7cffdc45a3207` |
 | [settings-work-alerts.sql](../apps/backend/database/settings-work-alerts.sql) | `0987310f7ce60b9ef4c94b1d726bcf8000349fe4c699fad57cc2e4c35dd58335` |
 | [settings-work-calendar.sql](../apps/backend/database/settings-work-calendar.sql) | `4e75c9c9ebf3b789646a16fa1fbcb318259d75be6c6b646372808bf7ae484e38` |
+| [staff-role-revocation.sql](../apps/backend/database/staff-role-revocation.sql) | `49b2aed9e36a7077f96bf9ea0bc3727965931e828c8471e8bdba82e0458787c5` |
 | [starter-attendance-protection-wrappers.sql](../apps/backend/database/starter-attendance-protection-wrappers.sql) | `083c1358ce0ff3c0cfa141794763fc5aa9f9ca1b5aeeb91757888c013532ea9e` |
 | [starter-attendance-protection.sql](../apps/backend/database/starter-attendance-protection.sql) | `e927bc1c89cf99c20e6bab270693c81c56f5a1c4b4ec14e59c9d04cae39e5708` |
 | [starter-availability-day-boundaries.sql](../apps/backend/database/starter-availability-day-boundaries.sql) | `35b53f5de97897a7e0dbbcc395e20d1e64b7b0de9cb7dd3d5745398a694d6fee` |
@@ -490,6 +491,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [20261126230220_reuse_person_field_policy_queries.sql](../apps/backend/supabase/migrations/20261126230220_reuse_person_field_policy_queries.sql) | `b6a2b40ab7dd2ea1409b1e23b403d6f21d418ee7947dbe63346d70c54e47eb3a` |
 | [20261126230221_reuse_calendar_center_scope.sql](../apps/backend/supabase/migrations/20261126230221_reuse_calendar_center_scope.sql) | `c2e56d75b1f3140b5214ff611b45c3a27d83edccf22ef344db0b4b16b451dde5` |
 | [20261126235944_team_permission_matrix.sql](../apps/backend/supabase/migrations/20261126235944_team_permission_matrix.sql) | `48e39e12975fc187093e8af88da94bc86e9e09d6e9056eaab6e1d2cf70d9c0f6` |
+| [20261127131817_staff_role_revocation.sql](../apps/backend/supabase/migrations/20261127131817_staff_role_revocation.sql) | `49b2aed9e36a7077f96bf9ea0bc3727965931e828c8471e8bdba82e0458787c5` |
 | [member-profile-lifecycle.sql](../apps/backend/tests/fixtures/member-profile-lifecycle.sql) | `1cac25c1610482b03cb7e594e4c28a61903bd047ae86ff724623c600dbf858d0` |
 | [product-class-management-acceptance.sql](../apps/backend/tests/fixtures/product-class-management-acceptance.sql) | `52141944d8ff08008a71d20be6b69d79e55480fad3e387f4ad377ace15a274d1` |
 | [sale-discount-acceptance.sql](../apps/backend/tests/fixtures/sale-discount-acceptance.sql) | `c17253fcdcd3460048bc35bf31c752315e1b7d5092b6c4231ab9b5349b4afc29` |

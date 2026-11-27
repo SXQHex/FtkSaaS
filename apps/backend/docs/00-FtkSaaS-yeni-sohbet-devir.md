@@ -1,5 +1,14 @@
 # Güncel kaynak ve kabul
 
+<a id="xreq-079-backend-adayi"></a>
+## XREQ-079 — Personel rolü kaldırma adayı
+
+27 Kasım 2026’da taban `5ee7cc01ea2f107d05b697f0c3420226a3eb8499` ve [aynı kaynağın main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/45983886248) doğrulandı. [Frontend talebi](https://github.com/SXQHex/FtkSaaS/pull/484) için mevcut rol önizleme ve kaldırma işlemlerine [Personel etkisi ve açık CRM iş devri](../../../docs/workflows.md#wf02) eklendi.
+
+[Native kabul](../tests/staff-role-revocation-acceptance.mjs) tabanda Personel önizlemesinin bulunmadığını gösterdi. Adayda oda, rol ve CRM doğrulaması Auth → Edge → RPC yolunda **41/41** geçti. Eski önizleme ve geçersiz alıcı reddedildi. Audit hatası devir ve rol kaldırmayı birlikte geri aldı. Aynı komut anahtarı ikinci devir üretmedi. Tam aday CI, main ve development kabulü bekleniyor.
+
+Yerel backend `verify` koşusunda sözleşme, yönetişim ve restore testleri **489/489**, CI aracı testleri **149/150** geçti. Linux `/proc` örneğini bekleyen gözlemci testi macOS’ta aynı taban SHA’sında da başarısız oldu. Kalite ve belge denetimleri geçti.
+
 <a id="backend-arac-zinciri-node26"></a>
 ## Backend ve kök araç zinciri — Node 26 LTS
 
@@ -149,6 +158,8 @@ Snapshot ile doğrulanmış hosted uygulama okuması arasında 26 dakika 27 sani
 26 Kasım 2026’da Recovery’de `person_get_v1` için dört sentetik tenant üzerinde, sürüm başına 12 ayrı PostgreSQL oturumunda ilk çağrı ve 72 sıcak çağrı karşılaştırıldı. Erişim kontrolünün ilk/sıcak medyanları 6,39/2,26 ms’den 4,39/1,11 ms’ye, kişi yanıtının hazırlanması 9,90/4,83 ms’den 8,27/2,94 ms’ye indi. İlk çağrıda iki adımın ayırdığı ek PostgreSQL bağlam belleği sırasıyla 1,520 → 1,452 MiB ve 2,196 → 1,477 MiB oldu. Sayaçlar adım sonunda ayrılmış belleği ölçtü. Aday yalnız ölçüm oturumunda çalıştı. Kalıcı hedef 269 migration’da kaldı. Yerelde kişi detayının 36 yanıt çifti ile 12 birleşmiş kişi örneğinde 192 projeksiyon karşılaştırması eşleşti. Gerçek Auth/Edge üzerinden kişi, takvim, rezervasyon ve rapor yollarında 100 test geçti. 50 eşzamanlı aktörle hosted 503 kabulü açıktır.
 
 Recovery’de ikinci karşılaştırma #477’yi taban aldı. Sürüm başına 12 ayrı PostgreSQL bağlantısında, kişi detayının sıcak erişim medyanı 1,118 → 0,175 ms ve yanıt hazırlama medyanı 2,928 → 0,364 ms oldu. İlk çağrıda erişim 1,465 → 1,266 MiB ve yanıt hazırlama 1,446 → 1,661 MiB ek PostgreSQL bağlam belleği ayırdı. Kendi kaydını okuyan yönetici örneklerinde sıcak yanıt hazırlama 3,982 → 0,974 ms, ilk çağrıda yanıt hazırlama belleği 1,544 → 1,868 MiB ölçüldü. Takvim sayfasının sıcak medyanı 33,758 → 21,986 ms ve ilk çağrıdaki ek bellek 2,093 → 1,072 MiB oldu. Takvimin haftalık sorgusunda sıcak paylaşımlı blok erişimi 468,5 → 113,5 düştü. Aday işlevleri ölçüm oturumunda çalıştırıldı. 50 eşzamanlı aktörle karma çağrı kabulü açıktır.
+
+27 Kasım 2026’da kişi detayı ve takvim güncel kaynakla yeniden profillendi. Rapor başlatmada aynı işlemde plan özellikleri ve merkez rolü tekrar okunuyordu. Dört sentetik Recovery aktöründe sıcak rapor erişim medyanı 4,292 → 2,422 ms, ilk çağrının ek PostgreSQL bağlam belleği 1,606 → 1,079 MiB oldu. Sıcak kuyruk hazırlığı 0,601 → 0,584 ms ölçüldü. Kuyruk yazılarını birleştiren deneme tutarlı kazanç vermedi ve geri alındı. Yerelde 64 farklı rapor RPC vakası, aynı anahtarla tekrar ve kuyruk kayıtları eşleşti. Plan özellikleri, rapor türü ve rol matrisi 2.016 karşılaştırmada aynı sonucu verdi. Recovery ölçüm işlemleri geri alındı. 50 aktörle eşzamanlı karma yük kabulü açıktır.
 
 Rapor kuyruğu için Recovery’de aynı 10 sentetik aktörle dört karma koşu yapıldı. Yeni dışa aktarım merkez yetkisini makbuzdan önce bir kez çözüyor. İlk iki komutta yinelenen kapsam sorgusu 1,53 ve 2,10 saniye sürdü. İşlem seçiminden rapor koduna geçiş önce 569–1.050 ms, adayda 0,1–14,7 ms sürdü. `20261126151241` migration’ının içeriği ve ölçülen fonksiyonlar Recovery’de doğrulandı. İlk denemelerde başarılı okuma 13/16’dan 16/16’ya, tüm çağrılar 15/20’den 20/20’ye çıktı. İki tarafta da başarılı aynı okumaların istemci medyanı ilk çiftte 8,65 → 2,08 sn (8 aktör), ikinci çiftte 8,74 → 6,59 sn (5 aktör) oldu. Önceki beş HTTP 503’ün her biri aynı izde PostgreSQL `57014` ile eşleşti ve seri tekrarda başarılı oldu. Sekiz rapor birer kez işlendi, sekiz CSV doğrulandı. İşletim durumu ve bağlantı sıcaklığı koşular arasında değişebildiğinden yüzdeler bu koşulara özgüdür. Ayrıntılar `.artifacts/q503-enqueue-20261126T1208Z/` altındadır.
 
