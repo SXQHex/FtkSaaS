@@ -123,7 +123,6 @@ export function SettingsContent({
       }
       canOrganization={canOrganization}
       owner={roles.includes("owner")}
-      organizationManager={roles.includes("org_manager")}
       ownPersonId={organization.self_context?.person_id}
       canWriteOrganization={canWriteOrganization}
       readOnly={workspace.isError}
@@ -142,7 +141,6 @@ function SettingsManagement({
   subscriptionSetup,
   canOrganization,
   owner,
-  organizationManager,
   ownPersonId,
   canSubscription,
   canWriteOrganization,
@@ -158,7 +156,6 @@ function SettingsManagement({
   subscriptionSetup: boolean;
   canOrganization: boolean;
   owner: boolean;
-  organizationManager: boolean;
   ownPersonId?: string;
   canSubscription: boolean;
   canWriteOrganization: boolean;
@@ -273,10 +270,19 @@ function SettingsManagement({
     locked,
     onEdit: (value) => setPolicy(structuredClone(value)),
   });
+  const centerAssignment =
+    section === "ekip" && !readOnly && !canCenter && owner ? (
+      <SettingsCenterAssignment
+        scope={scope}
+        locked={locked}
+        onLockChange={publishLock}
+        onAccessLost={accessLost}
+      />
+    ) : null;
   const team = useSettingsTeam({
     scope,
-    centerLabel,
-    ownPersonId,
+    ownerPersonId: owner && !readOnly ? ownPersonId : undefined,
+    ownerAction: owner ? centerAssignment : undefined,
     canReadOrganization: canOrganization && !readOnly,
     canReadCenter: canCenter && !readOnly,
     canManageManagers: owner && canWriteOrganization && !readOnly,
@@ -639,18 +645,7 @@ function SettingsManagement({
             section={teamSection}
             onSection={setTeamSection}
             locked={locked}
-          >
-            {!readOnly && !canCenter && (owner || organizationManager) && (
-              <SettingsCenterAssignment
-                scope={scope}
-                centerLabel={centerLabel}
-                canAssignSelf
-                locked={locked}
-                onLockChange={publishLock}
-                onAccessLost={accessLost}
-              />
-            )}
-          </SettingsTeamView>
+          />
         }
         onField={document.onField}
         onColor={document.onColor}

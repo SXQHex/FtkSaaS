@@ -152,6 +152,10 @@
   text-align: left;
 }
 
+.team-table thead th {
+  white-space: nowrap;
+}
+
 .team-table td,
 .team-table th[scope="row"] {
   padding: 0.75rem 0.75rem 0.75rem 0;
@@ -170,12 +174,41 @@
   white-space: nowrap;
 }
 
+.team-row-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
+.team-person-email {
+  display: block;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+}
+
+.team-matrix-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  gap: 0.75rem;
+}
+
 .team-permission-table :is(th, td):not(:first-child) {
   text-align: center;
 }
 
 .team-permission-table tbody tr {
   height: 3.5rem;
+}
+
+.team-permission-table td {
+  position: relative;
+}
+
+.team-permission-table td > svg {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
 }
 
 .team-permission-table [data-slot="switch"] {
@@ -353,8 +386,7 @@
   border-color: var(--foreground);
 }
 
-.team-role-option:has(input:enabled),
-.team-extra-roles summary {
+.team-role-option:has(input:enabled) {
   cursor: pointer;
 }
 
@@ -376,8 +408,7 @@
   font-size: 0.75rem;
 }
 
-.team-effect-heading,
-.team-extra-roles summary {
+.team-effect-heading {
   font-size: 0.8125rem;
   font-weight: 500;
 }
@@ -396,6 +427,55 @@
 
 .team-effects li + li {
   border-top: 1px solid var(--border);
+}
+
+.team-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid color-mix(in oklab, var(--destructive) 40%, var(--border));
+  border-radius: 0.5rem;
+  color: var(--destructive);
+  font-size: 0.8125rem;
+}
+
+.team-warning svg {
+  flex: none;
+  width: 0.875rem;
+  height: 0.875rem;
+  margin-top: 2px;
+}
+
+.team-removal-dialog {
+  width: min(26rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  gap: 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--card-foreground);
+  box-shadow: 0 1rem 3rem oklch(0 0 0 / 25%);
+}
+
+.team-removal-dialog .team-card-footer {
+  justify-content: flex-end;
+}
+
+.team-toast {
+  position: fixed;
+  z-index: 40;
+  left: 50%;
+  bottom: 1.5rem;
+  transform: translateX(-50%);
+  padding: 0.625rem 1rem;
+  border-radius: 0.5rem;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: 500;
+  box-shadow: 0 0.5rem 1.5rem oklch(0 0 0 / 20%);
 }
 
 .settings-team-sheet [data-slot="sheet-footer"] [data-slot="button"] {
@@ -462,7 +542,26 @@
 }
 
 .settings-team-sheet [data-slot="field"]:has(input[type="email"]) {
-  min-height: 4.0625rem;
+  min-width: 0;
+}
+
+.settings-team-invite [data-slot="field"]:has(input[type="email"]) {
+  padding-bottom: 0.25rem;
+}
+
+.settings-team-invite [data-slot="input"],
+.settings-team-invite [data-slot="sheet-footer"] [data-variant="outline"] {
+  border-color: var(--team-readonly-border, var(--input));
+}
+
+.settings-team-invite [data-slot="input"]:focus-visible {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 0.1875rem color-mix(in oklab, var(--ring) 40%, transparent);
+}
+
+.settings-team-invite .team-warning svg {
+  width: 1rem;
+  height: 1rem;
 }
 
 .settings-team-sheet [data-slot="input"] {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { v7 as uuidv7 } from "uuid";
@@ -6,10 +6,8 @@ import type { RequestManagerSelfAssignCenter } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
 import { scopedBackend, scopedCommandBackend, type ClientScope } from "../../lib/scoped-backend";
 import { capturePrivateReadback, invalidateCachedFamilies } from "../../lib/cache-invalidation";
-import { EventCommandNotice } from "../events/event-command-notice";
 import { useMemberCommand } from "../member-profile/use-member-command";
 import { refreshWorkspace, workspaceKeys } from "../workspace/workspace-query";
-import { SettingsReviewDialog } from "./settings-review-dialog";
 
 type SelfAssignment = {
   scope: ClientScope;
@@ -19,23 +17,17 @@ const operation = "manager_self_assign_center_v1";
 
 export function SettingsCenterAssignment({
   scope,
-  centerLabel,
-  canAssignSelf,
   locked,
   onLockChange,
   onAccessLost,
 }: {
   scope: ClientScope;
-  centerLabel: string;
-  canAssignSelf: boolean;
   locked: boolean;
   onLockChange: (locked: boolean) => void;
   onAccessLost: (error: unknown) => boolean;
 }) {
   const { t } = useTranslation();
   const queries = useQueryClient();
-  const [review, setReview] = useState<SelfAssignment>(),
-    [accepted, setAccepted] = useState(false);
   const command = useMemberCommand({
     write: async (intent: SelfAssignment) => {
       const backend = await scopedCommandBackend(intent.scope);
@@ -89,59 +81,37 @@ export function SettingsCenterAssignment({
   function invalidateCenterDirectory() {
     return invalidateCachedFamilies(queries, [["settings-team-directory", scope]]);
   }
-  function closeReview() {
-    if (command.locked) return;
-    setReview(undefined);
-    setAccepted(false);
-    command.reset();
-  }
   const selfAction = t(($) => $.settings.teamNative.assignSelf);
+  const recover = ["unknown", "pending", "saved-unread"].includes(command.state);
   return (
     <>
-      {canAssignSelf && (
-        <Button
-          variant="outline"
-          isDisabled={locked}
-          onPress={() =>
-            setReview({
-              scope: { ...scope },
-              request: {
-                client_api_version: 1,
-                org_id: scope.orgId,
-                target_center_id: scope.centerId,
-                operation_key: uuidv7(),
-              },
-            })
+      <Button
+        size="sm"
+        variant="outline"
+        isDisabled={command.busy || (locked && !recover)}
+        onPress={() => {
+          if (recover) {
+            void command.readReceipt();
+            return;
           }
-        >
-          {selfAction}
-        </Button>
-      )}
-      {review && (
-        <SettingsReviewDialog
-          open
-          title={selfAction}
-          description={t(($) => $.settings.teamNative.review)}
-          rows={[
-            {
-              id: "center",
-              title: t(($) => $.settings.teamNative.targetCenter),
-              detail: centerLabel,
+          command.reset();
+          void command.start({
+            scope: { ...scope },
+            request: {
+              client_api_version: 1,
+              org_id: scope.orgId,
+              target_center_id: scope.centerId,
+              operation_key: uuidv7(),
             },
-          ]}
-          accepted={accepted}
-          onAccepted={setAccepted}
-          locked={command.locked}
-          onClose={closeReview}
-          onApply={
-            canAssignSelf && command.state === "ready" && !command.unavailable
-              ? () => {
-                  if (accepted) void command.start(review);
-                }
-              : undefined
-          }
-          recoveryActions={<EventCommandNotice command={command} onReload={closeReview} />}
-        />
+          });
+        }}
+      >
+        {selfAction}
+      </Button>
+      {command.state !== "ready" && command.state !== "saved" && (
+        <p role="status" className="team-toast">
+          {t(($) => $.events.commandStates[command.state])}
+        </p>
       )}
     </>
   );

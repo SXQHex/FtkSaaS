@@ -801,8 +801,7 @@ export function SettingsView({
                   if (card.key === "plan-billing" && !data.forms?.[card.key]?.read) return null;
                   const form =
                     panel.key !== "gecmis" &&
-                    (card.fields.length > 0 ||
-                      ["ay-marka", "ay-salon"].includes(card.key));
+                    (card.fields.length > 0 || ["ay-marka", "ay-salon"].includes(card.key));
                   const table = ["politika", "salonlar", "sablon", "gecmis"].includes(panel.key);
                   const heading = `${prefix}-${card.key}-title`;
                   const content = (

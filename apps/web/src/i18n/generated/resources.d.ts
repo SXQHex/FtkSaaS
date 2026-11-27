@@ -4966,14 +4966,43 @@ export default interface Resources {
       },
       "teamEditor": {
         "close": "Kapat",
+        "duplicateEmail": "Bu e-posta zaten ekipte.",
         "effects": "Etki",
         "email": "E-posta",
+        "handover": "Açık işleri devret",
+        "handoverRequired": "Zorunlu",
+        "invalidEmail": "Geçerli bir e-posta gir.",
+        "inviteEffect": "Davet e-postası gider, kişi kabul edene kadar erişimi yoktur.",
+        "inviteRoleUnread": "Davet oluşturuldu. Rol atamasının sonucu doğrulanamadı. Davet gönder ile aynı atamayı yeniden dene.",
+        "inviteRolesRejected": "Davet oluşturuldu, ancak seçilen rollerin tamamı atanamadı.",
+        "inviteUnread": "Davetin sonucu doğrulanamadı. Davet gönder ile aynı isteği yeniden dene.",
+        "lostPermissions": "Kaybedilecek yetkiler ({{count}})" | "Kaybedilecek yetkiler ({{count}})",
+        "managerShort": "M. yöneticisi",
         "name": "Ad soyad",
-        "otherRoles": "Diğer roller",
+        "noHandoverRecipient": "Bu merkezde işleri devralabilecek uygun bir kişi bulunamadı.",
+        "noLostPermissions": "Yetki kaybı yok.",
+        "noOpenWork": "Açık iş yok.",
+        "openCrmLeads": "{{count}} açık CRM adayı" | "{{count}} açık CRM adayı",
+        "openFollowups": "{{count}} tamamlanmamış takip" | "{{count}} tamamlanmamış takip",
+        "openWork": "Açık işler ({{count}})" | "Açık işler ({{count}})",
+        "ownerEffect": "Sahip rolü tek başına finans ya da merkez yetkisi vermez.",
+        "ownerManagerShort": "Sahip, M. yöneticisi",
+        "ownerOnly": "Yalnız Sahip",
+        "reloadPreview": "Önizlemeyi yenile",
+        "removalDescription": "{{person}}: {{role}} rolü kaldırılacak.",
+        "removalTitle": "Rol kaldırma önizlemesi",
+        "removalUnavailable": "Kaybedilecek yetkiler ve devredilecek açık işler okunamıyor.",
+        "removeRole": "Rolü kaldır",
+        "requiredName": "Ad soyad gerekli.",
         "review": "Önizlemeye geç",
         "roles": "Roller",
+        "rolesSaved": "Roller kaydedildi",
         "save": "Kaydet",
-        "staffType": "Personel türü"
+        "sendInvite": "Davet gönder",
+        "staffInviteEffect": "Personel izinleri İzinler sekmesinden ayarlanır, yeni personelde yalnız görüntüleme ve rezervasyon açıktır.",
+        "staffPreviewError": "Personel rolü kaldırma önizlemesi okunamadı.",
+        "staffRemovalSeparate": "Rol eklemeyi ayrı kaydet. Ardından Personel rolünü kaldır.",
+        "verifiedAccountRequired": "Rolü atamak için kişinin doğrulanmış hesabını organizasyona bağlaması gerekir."
       },
       "teamHint": "Eğitmenler Stüdyo sayfasında yönetilir. Roller ve izinler ayrı işlemlerdir.",
       "teamNative": {
@@ -4987,7 +5016,7 @@ export default interface Resources {
         "chooseAnotherPerson": "Başka kişi seç",
         "edit": "Düzenle",
         "effectAdd": "Eklenecek: {{role}}.",
-        "effectRemove": "Kaldırılacak: {{role}}.",
+        "effectRemove": "Kaldırılacak: {{role}}. Kaybedilecek yetkiler ve açık işler bir sonraki adımda görünür.",
         "error": "Ekip/izin kaynağı okunamadı veya görev durumu değişti. Güncel kaynağı okuyup yeniden incele.",
         "find": "Kişileri bul",
         "hint": "Mevcut kişiye seçili merkezde tek bir görev değişikliği uygula. Hesap daveti ve doğrulama ayrı süreçtir.",
@@ -5000,9 +5029,13 @@ export default interface Resources {
         "permissionDraft": "Kaydedilmemiş değişiklikler var",
         "permissionHint": "Tek kişinin seçili merkezdeki izni güncel kişi sürümüyle değiştirilir. Bir görev veya yönetici yetkisi verilmez.",
         "permissionTitle": "Devredilen izni değiştir",
+        "permissionUnavailable": "Bu izin bu kişi için matriste düzenlenemiyor.",
         "permissions": {
           "attendance": {
             "draft": "Yoklama taslağı"
+          },
+          "crm": {
+            "daily": "Aday ve CRM işlemleri"
           },
           "finance": {
             "collect": "Tahsilat"
@@ -5014,6 +5047,10 @@ export default interface Resources {
             "activate": "Öğrencilik etkinleştirme",
             "manage": "Kişi yönetimi"
           },
+          "request": {
+            "resolve": "Özel ders talebi değerlendirme",
+            "write": "Özel ders talebi oluşturma"
+          },
           "reservation": {
             "capacity_override": "Kapasite istisnası",
             "write": "Rezervasyon işlemleri"
@@ -5023,13 +5060,16 @@ export default interface Resources {
             "write": "Satış"
           }
         },
+        "permissionsChanged": "Güncel izinler okundu. Bazı değerler kaydetme sırasında değişti.",
         "permissionsIncomplete": "Bazı izinler okunamadı.",
+        "permissionsRejected": "Bazı değişiklikler kaydedilemedi. Güncel izinleri kontrol et.",
+        "permissionsReread": "Değişiklikler alındı. Güncel izinleri yeniden okumak için Kaydet’e bas.",
+        "permissionsRetry": "Bir değişikliğin sonucu kesinleşmedi. Kaydet ile aynı isteği yeniden dene.",
         "permissionsSaved": "Tüm değişiklikler kaydedildi",
         "reason": "Görev kaldırma gerekçesi",
         "replacementNeeded": "Yeni eğitmen ataması gerekecek",
         "review": "Tek görev değişikliğini ve varsa ders etkisini inceleyip ayrı onayla. Görev ataması doğrulanmış hesap erişimi yerine geçmez.",
         "roleAction": "Rol ata",
-        "roleScope": "Yalnız seçili merkezin operasyonel görevi.",
         "roles": {
           "assistant": "Asistan",
           "center_manager": "Merkez yöneticisi",
@@ -5041,6 +5081,7 @@ export default interface Resources {
         "sessionCount": "{{count}} ders" | "{{count}} ders",
         "staffDescription": "İzinleri İzinler sekmesinden ayarlanır.",
         "staffEffect": "Personel izinleri İzinler sekmesinden ayarlanır.",
+        "staffSaveAuthority": "Personel rolünü kaydetmek için seçili merkezde Merkez yöneticisi yetkisi gerekir.",
         "states": {
           "active": "Aktif",
           "inactive": "Pasif"

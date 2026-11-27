@@ -1,6 +1,6 @@
-import { useId, type ReactNode } from "react";
+import { useId } from "react";
 import { useTranslation } from "react-i18next";
-import { XIcon } from "lucide-react";
+import { BanIcon, XIcon } from "lucide-react";
 import { Text } from "react-aria-components";
 import {
   Sheet,
@@ -19,7 +19,6 @@ import {
 } from "@ftksaas/ui/components/field";
 import { Input } from "@ftksaas/ui/components/input";
 import { Button } from "@ftksaas/ui/components/button";
-import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 type TeamSheetRole = {
   key: string;
   label: string;
@@ -33,43 +32,49 @@ export function TeamSheet({
   title,
   description,
   identity,
+  onNameChange,
+  onEmailChange,
   roles,
-  extraRoles,
   rolesUnread,
   effects,
   locked = false,
   dirty = false,
+  canCheckResult = false,
+  invite = false,
   onRole,
   onReview,
   onClose,
   error,
-  recoveryActions,
   submitLabel,
 }: {
   open: boolean;
   title: string;
   description: string;
   identity: { name: string; email: string; description?: string };
+  onNameChange?: (value: string) => void;
+  onEmailChange?: (value: string) => void;
   roles: TeamSheetRole[];
-  extraRoles: TeamSheetRole[];
   rolesUnread: boolean;
   effects: string[];
   locked?: boolean;
   dirty?: boolean;
+  canCheckResult?: boolean;
+  invite?: boolean;
   onRole: (key: string, selected: boolean) => void;
   onReview: () => void;
   onClose: () => void;
   error?: string;
-  recoveryActions?: ReactNode;
   submitLabel: string;
 }) {
   const { t } = useTranslation(),
     id = useId();
+  const canSubmit = canCheckResult || (!locked && dirty && !rolesUnread);
   function roleOption(role: TeamSheetRole) {
     return (
       <label key={role.key} className="team-role-option" data-slot="team-role-option">
         <input
           type="checkbox"
+          autoFocus={!onNameChange && role.key === "center_manager" && role.writable}
           name={role.key}
           checked={role.selected}
           disabled={locked || !role.writable}
@@ -88,7 +93,7 @@ export function TeamSheet({
   }
   return (
     <Sheet
-      className="settings-team-sheet"
+      className={invite ? "settings-team-sheet settings-team-invite" : "settings-team-sheet"}
       aria-labelledby={`${id}-title`}
       isOpen={open}
       onOpenChange={(value) => {
@@ -118,12 +123,13 @@ export function TeamSheet({
       <form
         id={`${id}-form`}
         method="post"
+        noValidate={invite}
         aria-labelledby={`${id}-title`}
-        className="min-h-0 flex-1 overflow-y-auto px-5 py-4"
+        className="team-sheet-form min-h-0 flex-1 overflow-y-auto px-5 py-4"
         tabIndex={locked ? 0 : undefined}
         onSubmit={(event) => {
           event.preventDefault();
-          if (!locked && dirty && !rolesUnread) onReview();
+          if (!invite && canSubmit) onReview();
         }}
       >
         <FieldGroup className="gap-4">
@@ -132,9 +138,11 @@ export function TeamSheet({
             <Input
               id={`${id}-name`}
               name="name"
+              autoFocus={!!onNameChange}
               autoComplete="off"
               value={identity.name}
-              readOnly
+              readOnly={!onNameChange}
+              onChange={(event) => onNameChange?.(event.target.value)}
               disabled={locked}
             />
           </Field>
@@ -148,7 +156,8 @@ export function TeamSheet({
               autoCapitalize="none"
               spellCheck={false}
               value={identity.email}
-              readOnly
+              readOnly={!onEmailChange}
+              onChange={(event) => onEmailChange?.(event.target.value)}
               disabled={locked}
               aria-describedby={identity.description ? `${id}-identity-hint` : undefined}
             />
@@ -156,11 +165,13 @@ export function TeamSheet({
               <FieldDescription id={`${id}-identity-hint`}>{identity.description}</FieldDescription>
             )}
           </Field>
-          <FieldSet className="gap-2">
-            <FieldLegend>{t(($) => $.settings.teamEditor.roles)}</FieldLegend>
-            {roles.map(roleOption)}
-            {rolesUnread && <p role="status">{t(($) => $.settings.unread)}</p>}
-          </FieldSet>
+          {roles.length > 0 && (
+            <FieldSet className="gap-2">
+              <FieldLegend>{t(($) => $.settings.teamEditor.roles)}</FieldLegend>
+              {roles.map(roleOption)}
+              {rolesUnread && <p role="status">{t(($) => $.settings.unread)}</p>}
+            </FieldSet>
+          )}
           <div>
             <p className="team-effect-heading">{t(($) => $.settings.teamEditor.effects)}</p>
             <ul className="team-effects">
@@ -169,25 +180,24 @@ export function TeamSheet({
               ))}
             </ul>
           </div>
-          {extraRoles.length > 0 && (
-            <details className="team-extra-roles">
-              <summary>{t(($) => $.settings.teamEditor.otherRoles)}</summary>
-              <div className="mt-2 grid gap-2">{extraRoles.map(roleOption)}</div>
-            </details>
-          )}
           {error && (
-            <Alert role="alert" variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
+            <p className="team-warning" role="alert">
+              <BanIcon aria-hidden="true" />
+              <span>{error}</span>
+            </p>
           )}
-          {recoveryActions}
         </FieldGroup>
       </form>
       <SheetFooter className="flex-wrap">
         <Button type="button" variant="outline" isDisabled={locked} onPress={onClose}>
           {t(($) => $.settings.discard)}
         </Button>
-        <Button type="submit" form={`${id}-form`} isDisabled={locked || !dirty || rolesUnread}>
+        <Button
+          type={invite ? "button" : "submit"}
+          form={invite ? undefined : `${id}-form`}
+          onPress={invite ? onReview : undefined}
+          isDisabled={!canSubmit}
+        >
           {submitLabel}
         </Button>
       </SheetFooter>

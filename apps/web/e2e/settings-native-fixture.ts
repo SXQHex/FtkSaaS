@@ -16,8 +16,15 @@ export async function mockSettingsCompletion(
   page: Page,
   options: {
     permissionUnknown?: boolean;
+    permissionStaleReadback?: boolean;
     roleDetailReadbackFailure?: boolean;
+    roleAssignmentTransportFailure?: boolean;
+    invitationReadbackFailure?: boolean;
+    teamRoleResponseFailure?: boolean;
+    staffRemoval?: "handover-stale" | "handover-unavailable" | "empty" | "forbidden";
+    onStaffRemovalDirectoryRead?: () => Promise<void>;
     billingOwner?: boolean;
+    ownerWithoutCenterManagement?: boolean;
     businessDowngrade?: boolean;
     bootstrapBilling?: "owner" | "member";
     startUrl?: string | null;
@@ -77,8 +84,6 @@ export async function mockSettingsCompletion(
       },
     } as Record<string, NativeRequest>,
     policy: undefined as NativeRequest | undefined,
-    personVersion: 3,
-    permissions: {} as Record<string, boolean>,
     subVersion: 2,
     pending: false,
     transitioned: false,
@@ -86,7 +91,39 @@ export async function mockSettingsCompletion(
     keptCenterId: undefined as string | null | undefined,
     failed: false,
   };
+  const staffPermissions = [
+    "person.manage",
+    "person.activate",
+    "invite.student",
+    "reservation.write",
+    "attendance.draft",
+    "sale.write",
+    "finance.collect",
+    "sale.discount",
+    "reservation.capacity_override",
+    "request.write",
+    "request.resolve",
+    "crm.daily",
+  ];
+  const permissionVersions = new Map<string, number>();
+  const permissionSelections = new Map<string, boolean>([[`${I.self}:sale.discount`, true]]);
+  const permissionResults = new Map<string, ReturnType<typeof nativeMutation>>();
+  const personVersion = (id: string) => permissionVersions.get(id) ?? 3;
+  const permissionCells = (id: string, permissions: string[]) =>
+    permissions.map((permission) => {
+      const enabled = permissionSelections.get(`${id}:${permission}`) ?? null;
+      return {
+        permission,
+        override_exists: enabled !== null,
+        enabled,
+        override_version: enabled === null ? null : personVersion(id),
+        effective_staff_grant: enabled ?? (id === I.instructor && permission === "person.manage"),
+      };
+    });
+  let returnedStalePermissionVersion = false;
   let assignedRoleReads = 0;
+  let roleAssignmentFailed = false;
+  let invitationReads = 0;
   const target = {
     plan: "starter",
     target: { id: uid(101), period: "monthly", amount_minor: "50000", currency: "TRY" },
@@ -118,6 +155,10 @@ export async function mockSettingsCompletion(
     { ...staff, id: uid(121), person_id: uid(130), role: "center_manager" },
     { ...staff, id: uid(122), person_id: uid(130), role: "org_manager", scope_center_id: null },
   ];
+  const invitedPeople = new Set<string>();
+  const pendingTeamRoles = new Map<string, (typeof roles)[number]>();
+  let teamRoleResponseFailed = false;
+  let staffPreviewReads = 0;
   const policy = {
     key: "reservation_window",
     scope: { kind: "organization" },
@@ -178,6 +219,52 @@ export async function mockSettingsCompletion(
   const directMemberEntry =
     options.bootstrapBilling === "member" ? (options.startUrl ?? undefined) : undefined;
   const handle: Parameters<typeof mockCompletion>[1] = async ({ op, r, send, fail, abort }) => {
+    if (op === "account_access_send_v1") {
+      writes.push({ op, r });
+      invitedPeople.add(r.person_id);
+      return send({ job_id: uid(770), state: "pending" });
+    }
+    if (
+      (op === "role_assign_v1" || op === "center_manager_assign_v1") &&
+      invitedPeople.has(r.person_id)
+    ) {
+      writes.push({ op, r } as RecordedRequest);
+      const role = "role" in r ? r.role : "center_manager";
+      let assignment = pendingTeamRoles.get(r.operation_key);
+      if (!assignment) {
+        if (
+          [...pendingTeamRoles.values()].some(
+            (row) => row.person_id === r.person_id && row.role === role,
+          )
+        )
+          return fail("INVALID_STATE_TRANSITION");
+        assignment = {
+          ...staff,
+          id: uid(771 + pendingTeamRoles.size),
+          person_id: r.person_id,
+          role,
+          version: 1,
+        };
+        pendingTeamRoles.set(r.operation_key, assignment);
+      }
+      if (role === "staff" && options.teamRoleResponseFailure && !teamRoleResponseFailed) {
+        teamRoleResponseFailed = true;
+        return abort();
+      }
+      return send(nativeMutation(assignment.id));
+    }
+    if (op === "job_status_get_v1" && r.job_id === uid(770)) {
+      invitationReads++;
+      if (options.invitationReadbackFailure && invitationReads === 1) return abort();
+      return send({
+        id: uid(770),
+        state: "pending",
+        progress_count: 0,
+        total_count: null,
+        result_reference: null,
+        safe_error_code: null,
+      });
+    }
     if (options.bootstrapBilling) {
       if (op === "organizations_list_v1") {
         return send(
@@ -231,16 +318,16 @@ export async function mockSettingsCompletion(
       await send(nativePage([center, { ...center, id: uid(141), name: "İkinci merkez" }]));
     }
     if (op === "roles_list_v1") {
+      if (staff.state === "inactive" && r.role === "staff" && r.state === "active")
+        await options.onStaffRemovalDirectoryRead?.();
       if (
         options.roleDetailReadbackFailure &&
-        r.person_id === I.instructor &&
         r.page?.limit === 100 &&
-        writes.some((entry) => entry.op === "role_assign_v1")
+        writes.some((entry) => entry.op === "role_assign_v1" && entry.r.person_id === r.person_id)
       ) {
-        // The first scoped list authenticates the write result. The second is
-        // the editor's independent readback and can fail after acknowledgment.
+        // The write is acknowledged. Fail its first authoritative readback.
         assignedRoleReads++;
-        if (assignedRoleReads === 2) return abort();
+        if (assignedRoleReads === 1) return abort();
       }
       const self = {
         id: uid(103),
@@ -255,7 +342,7 @@ export async function mockSettingsCompletion(
         nativePage(
           [
             ...roles,
-            self,
+            ...(options.ownerWithoutCenterManagement ? [] : [self]),
             ...(options.billingOwner
               ? [{ ...self, id: uid(104), role: "owner", scope_center_id: null }]
               : []),
@@ -466,6 +553,10 @@ export async function mockSettingsCompletion(
     }
     if (op === "role_assign_v1") {
       writes.push({ op, r });
+      if (options.roleAssignmentTransportFailure && !roleAssignmentFailed) {
+        roleAssignmentFailed = true;
+        return abort();
+      }
       roles.push({
         id: uid(111),
         person_id: r.person_id,
@@ -477,16 +568,81 @@ export async function mockSettingsCompletion(
       });
       await send(nativeMutation(uid(111)));
     }
+    if (op === "role_revoke_preview_v1" && options.staffRemoval) {
+      if (options.staffRemoval === "forbidden") return fail("FORBIDDEN");
+      if (
+        r.assignment_id !== staff.id ||
+        r.expected_version !== staff.version ||
+        staff.state !== "active"
+      )
+        return fail("VERSION_CONFLICT");
+      staffPreviewReads++;
+      const handover = options.staffRemoval !== "empty";
+      return send({
+        id: uid(790 + staffPreviewReads),
+        token: `staff-removal-${staffPreviewReads}`,
+        expires_at: "2099-01-01T00:00:00Z",
+        assignment_id: staff.id,
+        assignment_version: staff.version,
+        sessions: [],
+        staff_impact: {
+          lost_permissions: handover ? ["crm.daily"] : [],
+          open_leads: handover
+            ? [
+                {
+                  lead_id: uid(796),
+                  person_id: uid(797),
+                  version: staffPreviewReads,
+                  followups: [{ activity_id: uid(798), version: 1, due_at: null }],
+                },
+              ]
+            : [],
+          handover_required: handover,
+          recipients:
+            options.staffRemoval === "handover-stale"
+              ? [
+                  { person_id: I.self, display_name: "Sentetik hesap" },
+                  { person_id: uid(130), display_name: "Sentetik yönetici" },
+                ]
+              : [],
+        },
+      });
+    }
+    if (op === "role_revoke_v1" && options.staffRemoval) {
+      writes.push({ op, r });
+      if (
+        r.assignment_id !== staff.id ||
+        staff.state !== "active" ||
+        r.expected_version !== staff.version
+      )
+        return fail("VERSION_CONFLICT");
+      if (
+        (options.staffRemoval === "handover-stale" && staffPreviewReads === 1) ||
+        r.impact_approval?.id !== uid(790 + staffPreviewReads) ||
+        r.impact_approval?.token !== `staff-removal-${staffPreviewReads}`
+      )
+        return fail("PREVIEW_STALE");
+      if (options.staffRemoval === "handover-stale" && r.handover_person_id !== uid(130))
+        return fail("FORBIDDEN");
+      staff.state = "inactive";
+      staff.version++;
+      return send({ ...nativeMutation(staff.id), version: staff.version });
+    }
     if (op === "permission_set_v1") {
       writes.push({ op, r });
-      if (options.permissionUnknown && !state.failed) {
+      const receipt = permissionResults.get(r.operation_key);
+      if (receipt) return send({ ...receipt, replayed: true });
+      const version = personVersion(r.person_id);
+      if (r.expected_version !== version) return fail("VERSION_CONFLICT");
+      permissionSelections.set(`${r.person_id}:${r.permission}`, r.enabled);
+      permissionVersions.set(r.person_id, version + 1);
+      const result = { ...nativeMutation(uid(112)), version: version + 1 };
+      permissionResults.set(r.operation_key, result);
+      if (options.permissionUnknown && !state.failed && permissionResults.size === 2) {
         state.failed = true;
-        await abort();
-      } else {
-        state.permissions[r.permission] = r.enabled;
-        state.personVersion++;
-        await send(nativeMutation(uid(112)));
+        return abort();
       }
+      return send(result);
     }
     if (op === "management_state_get_v1") {
       const operation = r.operation,
@@ -497,6 +653,7 @@ export async function mockSettingsCompletion(
           role?: string;
           permission?: string;
           permission_summary?: boolean;
+          directory?: string;
         };
       const resources = "resources" in r.selector ? r.selector.resources : undefined;
       if (operation === "policy_publish_v1")
@@ -599,40 +756,65 @@ export async function mockSettingsCompletion(
               })),
           ),
         );
+      if (operation === "permission_set_v1" && key.directory === "center") {
+        const stale =
+          options.permissionStaleReadback &&
+          !r.page?.cursor &&
+          permissionResults.size === 3 &&
+          !returnedStalePermissionVersion;
+        if (stale) returnedStalePermissionVersion = true;
+        const member = (
+          personId: string,
+          displayName: string,
+          teamRoles: string[],
+          permissions: string[],
+        ) =>
+          metadata(
+            operation,
+            "people",
+            personId,
+            {
+              person_id: personId,
+              display_name: displayName,
+              team_roles: teamRoles,
+              permission_overrides: permissionCells(personId, permissions).map((cell) => ({
+                ...cell,
+                writable: true,
+              })),
+            },
+            personVersion(personId) - (stale && personId === I.instructor ? 1 : 0),
+          );
+        return send(
+          r.page?.cursor
+            ? nativePage([
+                member(uid(130), "Canlı yönetici", ["center_manager"], ["sale.discount"]),
+                member(I.self, "Sentetik hesap", ["center_manager", "staff"], staffPermissions),
+                member(uid(132), "İkinci personel", ["staff"], staffPermissions),
+                member(uid(131), "Stüdyo eğitmeni", ["instructor"], ["attendance.draft"]),
+              ])
+            : nativePage(
+                [
+                  member(
+                    I.instructor,
+                    "Sentetik personel",
+                    ["instructor", "staff"],
+                    staffPermissions,
+                  ),
+                ],
+                "team-matrix-page-2",
+              ),
+        );
+      }
       if (operation === "permission_set_v1" && key.permission_summary) {
         const selected = key.person_id;
         if (selected !== I.instructor && selected !== uid(130)) {
           await send(nativePage([]));
           return;
         }
-        const permissions =
-          selected === I.instructor
-            ? [
-                "person.manage",
-                "person.activate",
-                "invite.student",
-                "reservation.write",
-                "attendance.draft",
-                "sale.write",
-                "finance.collect",
-                "reservation.capacity_override",
-                "sale.discount",
-                "request.write",
-                "request.resolve",
-                "crm.daily",
-              ]
-            : ["sale.discount"];
-        const overrides = permissions.map((permission) => {
-          const enabled =
-            selected === I.instructor ? (state.permissions[permission] ?? null) : null;
-          return {
-            permission,
-            override_exists: enabled !== null,
-            enabled,
-            override_version: enabled === null ? null : state.personVersion,
-            effective_staff_grant: enabled ?? false,
-          };
-        });
+        const overrides = permissionCells(
+          selected,
+          selected === I.instructor ? staffPermissions : ["sale.discount"],
+        );
         await send(
           nativePage([
             metadata(
@@ -640,26 +822,27 @@ export async function mockSettingsCompletion(
               "people",
               selected,
               { person_id: selected, permission_overrides: overrides },
-              state.personVersion,
+              personVersion(selected),
             ),
           ]),
         );
       }
-      if (operation === "permission_set_v1" && key.permission) {
-        const enabled = state.permissions[key.permission];
+      if (operation === "permission_set_v1" && key.permission && key.person_id) {
+        const selected = key.person_id;
+        const enabled = permissionSelections.get(`${selected}:${key.permission}`);
         await send(
           nativePage([
             metadata(
               operation,
               "people",
-              I.instructor,
+              selected,
               {
-                person_id: I.instructor,
+                person_id: selected,
                 permission: key.permission,
                 ...(enabled === undefined ? {} : { enabled }),
                 override_exists: enabled !== undefined,
               },
-              state.personVersion,
+              personVersion(selected),
             ),
           ]),
         );
@@ -693,5 +876,14 @@ export async function mockSettingsCompletion(
   f.studio.people.push({ ...f.studio.people[0]!, id: uid(130), display_name: "Sentetik yönetici" });
   const startUrl = options.startUrl === undefined ? completionUrl("settings") : options.startUrl;
   if (startUrl !== null && !directMemberEntry) await page.goto(startUrl);
-  return { ...f, writes, state };
+  return {
+    ...f,
+    writes,
+    state,
+    pendingTeamRoles,
+    acceptTeamInvitation(personId: string) {
+      if (!invitedPeople.delete(personId)) throw Error("FIXTURE_INVITATION_UNAVAILABLE");
+      for (const row of pendingTeamRoles.values()) if (row.person_id === personId) roles.push(row);
+    },
+  };
 }
