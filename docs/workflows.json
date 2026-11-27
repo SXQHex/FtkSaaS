@@ -321,8 +321,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "2b253903d1c709a7f949af8dccf6dd1994d330af2bf5e31294e0085933dad66f",
-        "reason": "Yeni UUID yolları ve göç envanteri sınıflandırıldı. CRM iş devri kabulü mevcut tam CI kapsamına bağlandı."
+        "fingerprint": "3d79f7e12d8849a14b17e87fff4f3de8bfdc55fc46d7402ee4714c570affe7e8",
+        "reason": "Onaylanan Ekip kapsam değişikliklerinde 21 kesin assertion parmak izi bağımsız incelendi. Yeni senaryolar işlem anahtarı, sürüm, kapsam ve yerel doğrulama sınırlarını koruyor."
       }
     },
     {
