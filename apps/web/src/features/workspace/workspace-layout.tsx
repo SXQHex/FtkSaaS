@@ -1,5 +1,5 @@
 // Page composition from official @shadcn/sidebar-07.
-import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { skipToken, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useRouterState } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
@@ -10,12 +10,9 @@ import { workspaceNavigation, workspacePersonalHref, type NavigationView } from 
 import { NavigationSearch } from "./navigation-search";
 import { BackendError } from "../../lib/backend";
 import { AppSidebar } from "../../components/app-sidebar";
-import {
-  SidebarProvider,
-  SidebarInset,
-  SidebarTrigger,
-  useSidebar,
-} from "@ftksaas/ui/components/sidebar";
+import { SidebarTrigger, useSidebar } from "@ftksaas/ui/components/sidebar";
+import { WorkspaceFrame } from "./panel-frame";
+import { usePanelView, usePanelChrome } from "./panel-context";
 import { Button, LinkButton } from "@ftksaas/ui/components/button";
 import { ToggleGroup, ToggleGroupItem } from "@ftksaas/ui/components/toggle-group";
 import { Separator } from "@ftksaas/ui/components/separator";
@@ -85,7 +82,6 @@ export function WorkspaceLayout({
   const [localCenterId, setSelectedCenterId] = useState<string>();
   const organizationId = scopeControl ? scopeControl.organizationId : localOrganizationId;
   const selectedCenterId = scopeControl ? scopeControl.centerId : localCenterId;
-  const [preferredView, setPreferredView] = useState<NavigationView>();
   const queries = useQueryClient();
   const scope = useWorkspaceQuery(accountId, organizationId);
   useEffect(() => {
@@ -105,6 +101,11 @@ export function WorkspaceLayout({
       ? selectedCenterId
       : undefined) ?? (view?.centers.length === 1 ? view.centers[0]?.id : undefined);
   const resolvedOrganizationId = view?.selected?.id;
+  const [preferredView, setPreferredView] = usePanelView(
+    accountId,
+    resolvedOrganizationId,
+    centerId,
+  );
   const onResolved = scopeControl?.onResolved;
   useEffect(() => {
     onResolved?.({ organizationId: resolvedOrganizationId, centerId });
@@ -197,19 +198,22 @@ export function WorkspaceLayout({
     if (value === "management" || value === "instructor" || value === "account")
       setPreferredView(value);
   };
-  return (
-    <SidebarProvider style={{ "--sidebar-width-icon": "3.5rem" } as CSSProperties}>
+  const renderChrome = (interactive: boolean) => ({
+    kind: "workspace" as const,
+    sidebar: (
       <AppSidebar
         key={accountId}
         name={name}
         accountHref={accountHref}
-        pending={pending}
-        scopeLocked={scopeLocked || scopeControl?.locked}
+        pending={!interactive || pending}
+        scopeLocked={!interactive || scopeLocked || scopeControl?.locked}
         onSignOut={onSignOut}
         view={view}
         loading={scope.isPending}
         failed={scope.isError}
-        onRefresh={() => void scope.refetch()}
+        onRefresh={() => {
+          if (interactive) void scope.refetch();
+        }}
         centerId={centerId}
         onOrganization={(id) => {
           if (scopeLocked || scopeControl?.locked) return;
@@ -230,125 +234,135 @@ export function WorkspaceLayout({
         roleLabel={roleLabel}
         pathname={pathname}
       />
-      <SidebarInset className="min-w-0">
-        <header className="workspace-topbar @container/workspace sticky top-0 z-10 flex min-h-14 shrink-0 items-center gap-2 border-b bg-background/95 px-4 py-1 backdrop-blur">
-          <NavigationTrigger />
-          <Separator
-            orientation="vertical"
-            className="mx-1 data-vertical:h-4 data-vertical:self-auto"
-          />
-          <Breadcrumb
-            className="hidden min-w-0 flex-1 min-[361px]:block"
-            aria-label={t(($) => $.workspace.breadcrumb)}
-          >
-            <BreadcrumbList className="flex-nowrap">
-              <BreadcrumbItem className="hidden @min-[901px]/workspace:inline-flex">
-                <BreadcrumbLink href={groups[0]?.items[0]?.url}>{caption}</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbItem className="min-w-0">
-                <BreadcrumbPage className="block min-w-0 truncate">
-                  {pageTitle ?? t(($) => $.auth.account)}
-                </BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-          <div className="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-2 min-[641px]:shrink-0 min-[641px]:flex-nowrap">
-            {setupScope &&
-              !subscription.isError &&
-              !subscription.isFetching &&
-              subscription.data?.subscription.state === "pending_payment" && (
-                <LinkButton
-                  href={`/o/${setupScope.orgId}/c/${setupScope.centerId}/settings?section=plan`}
-                  variant="outline"
-                  size="sm"
-                  isDisabled={pending || scopeLocked || scopeControl?.locked}
-                >
-                  {t(($) => $.settings.tabs.plan)}
-                </LinkButton>
-              )}
-            {modes.length > 1 && (
-              <>
-                <ToggleGroup
-                  className="flex shrink-0"
-                  variant="segmented"
-                  size="segmented"
-                  selectionMode="single"
-                  disallowEmptySelection
-                  isDisabled={scopeLocked || scopeControl?.locked}
-                  selectedKeys={new Set([mode])}
-                  aria-label={t(($) => $.workspace.viewMode)}
-                  onSelectionChange={(keys) => {
-                    const first = [...keys][0];
-                    if (typeof first === "string") chooseMode(first);
-                  }}
-                >
-                  {modes.map((value) => (
-                    <ToggleGroupItem
-                      className="h-[26px] px-2 text-[0.8125rem] min-[641px]:px-2.5"
-                      key={value}
-                      id={value}
-                    >
-                      {t(($) => $.workspace.viewLabels[value])}
-                    </ToggleGroupItem>
-                  ))}
-                </ToggleGroup>
-              </>
+    ),
+    toolbar: (
+      <header
+        inert={!interactive}
+        className="workspace-topbar @container/workspace sticky top-0 z-10 flex min-h-14 shrink-0 items-center gap-2 border-b bg-background/95 px-4 py-1 backdrop-blur"
+      >
+        <NavigationTrigger />
+        <Separator
+          orientation="vertical"
+          className="mx-1 data-vertical:h-4 data-vertical:self-auto"
+        />
+        <Breadcrumb
+          className="hidden min-w-0 flex-1 min-[361px]:block"
+          aria-label={t(($) => $.workspace.breadcrumb)}
+        >
+          <BreadcrumbList className="flex-nowrap">
+            <BreadcrumbItem className="hidden @min-[901px]/workspace:inline-flex">
+              <BreadcrumbLink href={groups[0]?.items[0]?.url}>{caption}</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbItem className="min-w-0">
+              <BreadcrumbPage className="block min-w-0 truncate">
+                {pageTitle ?? t(($) => $.auth.account)}
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <div className="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-2 min-[641px]:shrink-0 min-[641px]:flex-nowrap">
+          {setupScope &&
+            !subscription.isError &&
+            !subscription.isFetching &&
+            subscription.data?.subscription.state === "pending_payment" && (
+              <LinkButton
+                href={`/o/${setupScope.orgId}/c/${setupScope.centerId}/settings?section=plan`}
+                variant="outline"
+                size="sm"
+                isDisabled={pending || scopeLocked || scopeControl?.locked}
+              >
+                {t(($) => $.settings.tabs.plan)}
+              </LinkButton>
             )}
-            <div className="inline-flex">
-              <NavigationSearch
-                settingsUrl={settingsUrl}
-                memberScope={memberSearchScope}
-                showActions={
-                  !pending && !scopeLocked && !scopeControl?.locked && mode === "management"
-                }
-                managementActions={Boolean(manager)}
-                onThemeChange={onThemeChange}
-                onSignOut={onSignOut}
-                groups={[
-                  ...groups,
-                  {
-                    key: "personal",
-                    items: [
-                      ...(groups.some((group) => group.items.some((item) => item.key === "account"))
-                        ? []
-                        : [
-                            { key: "account" as const, url: accountHref, icon: <UsersRoundIcon /> },
-                          ]),
-                      { key: "help", url: "/help", icon: <UsersRoundIcon /> },
-                    ],
-                  },
-                ]}
-              />
-            </div>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={t(($) => $.workspace.changeTheme)}
-              isDisabled={!onThemeChange}
-              onPress={onThemeChange}
-            >
-              <MoonIcon />
-            </Button>
-            <LinkButton
-              href={workspacePersonalHref("/inbox", resolvedOrganizationId, centerId)}
-              variant="ghost"
-              size="icon-sm"
-              aria-label={t(($) => $.workspace.notifications)}
-            >
-              <BellIcon />
-            </LinkButton>
+          {modes.length > 1 && (
+            <>
+              <ToggleGroup
+                className="flex shrink-0"
+                variant="segmented"
+                size="segmented"
+                selectionMode="single"
+                disallowEmptySelection
+                isDisabled={scopeLocked || scopeControl?.locked}
+                selectedKeys={new Set([mode])}
+                aria-label={t(($) => $.workspace.viewMode)}
+                onSelectionChange={(keys) => {
+                  const first = [...keys][0];
+                  if (typeof first === "string") chooseMode(first);
+                }}
+              >
+                {modes.map((value) => (
+                  <ToggleGroupItem
+                    className="h-[26px] px-2 text-[0.8125rem] min-[641px]:px-2.5"
+                    key={value}
+                    id={value}
+                  >
+                    {t(($) => $.workspace.viewLabels[value])}
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
+            </>
+          )}
+          <div className="inline-flex">
+            <NavigationSearch
+              key={pathname}
+              disabled={!interactive}
+              settingsUrl={settingsUrl}
+              memberScope={memberSearchScope}
+              showActions={
+                !pending && !scopeLocked && !scopeControl?.locked && mode === "management"
+              }
+              managementActions={Boolean(manager)}
+              onThemeChange={onThemeChange}
+              onSignOut={onSignOut}
+              groups={[
+                ...groups,
+                {
+                  key: "personal",
+                  items: [
+                    ...(groups.some((group) => group.items.some((item) => item.key === "account"))
+                      ? []
+                      : [{ key: "account" as const, url: accountHref, icon: <UsersRoundIcon /> }]),
+                    { key: "help", url: "/help", icon: <UsersRoundIcon /> },
+                  ],
+                },
+              ]}
+            />
           </div>
-        </header>
-        {view?.selected?.access_mode === "closed" && <StateBanner kind="readOnly" />}
-        {typeof children === "function"
-          ? children({
-              organizationId: resolvedOrganizationId,
-              centerId,
-              workspace: view,
-              loading: scope.isPending,
-            })
-          : children}
-      </SidebarInset>
-    </SidebarProvider>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label={t(($) => $.workspace.changeTheme)}
+            isDisabled={!onThemeChange}
+            onPress={onThemeChange}
+          >
+            <MoonIcon />
+          </Button>
+          <LinkButton
+            href={workspacePersonalHref("/inbox", resolvedOrganizationId, centerId)}
+            variant="ghost"
+            size="icon-sm"
+            aria-label={t(($) => $.workspace.notifications)}
+          >
+            <BellIcon />
+          </LinkButton>
+        </div>
+      </header>
+    ),
+    banner: view?.selected?.access_mode === "closed" && <StateBanner kind="readOnly" />,
+  });
+  const shared = usePanelChrome(
+    "workspace",
+    { organizationId: resolvedOrganizationId, centerId },
+    renderChrome,
   );
+  const content =
+    typeof children === "function"
+      ? children({
+          organizationId: resolvedOrganizationId,
+          centerId,
+          workspace: view,
+          loading: scope.isPending,
+        })
+      : children;
+  return shared ? content : <WorkspaceFrame chrome={renderChrome(true)}>{content}</WorkspaceFrame>;
 }

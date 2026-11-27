@@ -370,6 +370,10 @@ export const settingsLayout = [
     ],
   },
   {
+    key: "organizasyon",
+    cards: [],
+  },
+  {
     key: "gecmis",
     cards: [
       {

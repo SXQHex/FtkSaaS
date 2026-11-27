@@ -29,10 +29,30 @@ export const teamPermissions = [
   "attendance.draft",
   "sale.write",
   "finance.collect",
-  "reservation.capacity_override",
   "sale.discount",
+  "reservation.capacity_override",
+  "request.write",
+  "request.resolve",
+  "crm.daily",
 ] as const satisfies readonly Permission[];
 export type TeamPermission = (typeof teamPermissions)[number];
+export type TeamPermissionMember = {
+  id: string;
+  name: string | null;
+  manager: boolean;
+  staff: boolean;
+  version: number;
+  cells: Partial<
+    Record<
+      TeamPermission,
+      {
+        enabled: boolean | null;
+        effective: boolean;
+        writable: boolean;
+      }
+    >
+  >;
+};
 const common = (scope: ClientScope) => ({
   client_api_version: 1 as const,
   org_id: scope.orgId,
@@ -49,6 +69,7 @@ export async function readTeamPage(
   level: "center" | "organization" = "center",
   state: "active" | "inactive" = "active",
   readContext?: AccountReadContext,
+  includePersonDetails = false,
 ) {
   const backend = await scopedBackend(scope, undefined, readContext);
   const organization = level === "organization" || role === "org_manager";
@@ -95,7 +116,11 @@ export async function readTeamPage(
   });
   const people = new Map<string, Awaited<ReturnType<typeof backend.call<"person_get_v1">>>>();
   const ids = [
-    ...new Set(records.filter((row) => row.name === undefined).map((row) => row.personId)),
+    ...new Set(
+      records
+        .filter((row) => includePersonDetails || row.name === undefined)
+        .map((row) => row.personId),
+    ),
   ];
   for (let start = 0; start < ids.length; start += 4)
     await Promise.all(
@@ -177,6 +202,87 @@ export async function readTeamPersonRoles(
     throw Error("TEAM_SOURCE_INVALID");
   return items;
 }
+export async function readTeamPermissionDirectory(
+  scope: ClientScope,
+  readContext: AccountReadContext,
+) {
+  const backend = await scopedBackend(scope, undefined, readContext);
+  const limit = 50;
+  const people = new Map<string, TeamPermissionMember>();
+  const cursors = new Set<string>();
+  let cursor: string | undefined;
+  do {
+    const page = await queryBackendRead(
+      backend,
+      "management_state_get_v1",
+      {
+        ...common(scope),
+        request_id: uuidv7(),
+        operation: "permission_set_v1",
+        selector: { operation: "permission_set_v1", key: { directory: "center" } },
+        page: { limit, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
+      },
+      readContext.signal,
+    );
+    if (page.items.length > limit || (page.next_cursor && !page.items.length))
+      throw Error("TEAM_SOURCE_INVALID");
+    for (const row of page.items) {
+      if (
+        !row.exists ||
+        row.state !== "active" ||
+        row.operation !== "permission_set_v1" ||
+        row.entity?.type !== "people" ||
+        row.current?.operation !== "permission_set_v1"
+      )
+        throw Error("TEAM_SOURCE_INVALID");
+      const {
+        person_id: id,
+        display_name: name,
+        team_roles: roles,
+        permission_overrides: overrides,
+      } = row.current.values;
+      if (!id || id !== row.entity.id || name === undefined || !roles?.length || people.has(id))
+        throw Error("TEAM_SOURCE_INVALID");
+      const versions = row.versions.filter(
+        (item) => item.entity.type === "people" && item.entity.id === id,
+      );
+      if (versions.length !== 1) throw Error("TEAM_SOURCE_INVALID");
+      const version = z.number().int().positive().safe().parse(versions[0]!.version);
+      const summary = parseTeamPermissionCells(overrides);
+      people.set(id, {
+        id,
+        name,
+        manager: roles.includes("center_manager"),
+        staff: roles.includes("staff"),
+        version,
+        cells: Object.fromEntries(
+          teamPermissions.flatMap((permission) => {
+            const cell = summary.get(permission);
+            return cell
+              ? [
+                  [
+                    permission,
+                    {
+                      enabled: cell.enabled,
+                      effective: cell.effective_staff_grant,
+                      writable: cell.writable === true,
+                    },
+                  ] as const,
+                ]
+              : [];
+          }),
+        ),
+      });
+    }
+    cursor = page.next_cursor ?? undefined;
+    if (cursor) {
+      if (cursors.has(cursor)) throw Error("TEAM_SOURCE_INVALID");
+      cursors.add(cursor);
+    }
+  } while (cursor);
+  return [...people.values()].filter(({ manager, staff }) => manager || staff);
+}
+
 async function readTeamPermissionSource(
   scope: ClientScope,
   key: ManagementSelectorPermissionSetV1["key"],
@@ -243,20 +349,12 @@ const permissionSummary = z.array(
     enabled: z.boolean().nullable(),
     override_version: z.number().int().positive().safe().nullable(),
     effective_staff_grant: z.boolean(),
+    writable: z.boolean().optional(),
   }),
 );
 
-export async function readTeamPermissions(
-  scope: ClientScope,
-  personId: string,
-  readContext?: AccountReadContext,
-) {
-  const { values, version } = await readTeamPermissionSource(
-    scope,
-    { person_id: personId, permission_summary: true },
-    readContext,
-  );
-  const source = permissionSummary.safeParse(values.permission_overrides);
+function parseTeamPermissionCells(overrides: unknown) {
+  const source = permissionSummary.safeParse(overrides);
   if (!source.success) throw Error("TEAM_PERMISSION_UNAVAILABLE");
   const byPermission = new Map(source.data.map((row) => [row.permission, row]));
   if (
@@ -268,6 +366,20 @@ export async function readTeamPermissions(
     )
   )
     throw Error("TEAM_PERMISSION_UNAVAILABLE");
+  return byPermission;
+}
+
+export async function readTeamPermissions(
+  scope: ClientScope,
+  personId: string,
+  readContext?: AccountReadContext,
+) {
+  const { values, version } = await readTeamPermissionSource(
+    scope,
+    { person_id: personId, permission_summary: true },
+    readContext,
+  );
+  const byPermission = parseTeamPermissionCells(values.permission_overrides);
   return teamPermissions.flatMap((permission) => {
     const row = byPermission.get(permission);
     return row
@@ -324,6 +436,25 @@ export type TeamIntent =
       request: Omit<RequestCenterManagerRevoke, "request_id">;
       assignmentId: string;
     };
+export function teamRoleAssignment(
+  scope: ClientScope,
+  personId: string,
+  role: "center_manager" | "staff",
+) {
+  const request = {
+    ...common(scope),
+    operation_key: uuidv7(),
+    person_id: z.uuid().parse(personId),
+  };
+  return role === "center_manager"
+    ? { scope: { ...scope }, operation: "center_manager_assign_v1" as const, request }
+    : {
+        scope: { ...scope },
+        operation: "role_assign_v1" as const,
+        request: { ...request, role, scope: { center_id: scope.centerId } },
+      };
+}
+
 async function prepareManagerRole(
   scope: ClientScope,
   personId: string,
@@ -457,6 +588,75 @@ export async function prepareTeamRole(
     ...(preview ? { preview } : {}),
   };
 }
+
+export async function readStaffRemovalPreview(
+  scope: ClientScope,
+  personId: string,
+  assignmentId: string,
+  context: AccountReadContext,
+) {
+  const roles = await readTeamPersonRoles(scope, personId, undefined, context);
+  const staff = roles.find(
+    (row) =>
+      row.id === assignmentId &&
+      row.role === "staff" &&
+      row.state === "active" &&
+      row.scope_center_id === scope.centerId,
+  );
+  if (!staff) throw Error("TEAM_ROLE_NOT_ACTIVE");
+  const preview = await queryBackendRead(
+    await scopedBackend(scope, undefined, context),
+    "role_revoke_preview_v1",
+    {
+      ...common(scope),
+      request_id: uuidv7(),
+      assignment_id: staff.id,
+      expected_version: staff.version,
+    },
+    context.signal,
+  );
+  const impact = preview.staff_impact;
+  if (
+    preview.assignment_id !== staff.id ||
+    preview.assignment_version !== staff.version ||
+    !z.uuid().safeParse(preview.id).success ||
+    !preview.token ||
+    !(Date.parse(preview.expires_at) > Date.now()) ||
+    !impact ||
+    !Array.isArray(impact.lost_permissions) ||
+    !Array.isArray(impact.open_leads) ||
+    !Array.isArray(impact.recipients) ||
+    impact.handover_required !== impact.open_leads.length > 0
+  )
+    throw Error("TEAM_REVOCATION_PREVIEW_INVALID");
+  return { ...preview, staff_impact: impact };
+}
+
+export function confirmedStaffRemoval(
+  scope: ClientScope,
+  preview: Awaited<ReturnType<typeof readStaffRemovalPreview>>,
+  recipientId?: string,
+) {
+  const handover = preview.staff_impact.handover_required;
+  if (
+    handover &&
+    !preview.staff_impact.recipients.some((person) => person.person_id === recipientId)
+  )
+    throw Error("TEAM_REVOCATION_RECIPIENT_INVALID");
+  return {
+    scope: { ...scope },
+    operation: "role_revoke_v1" as const,
+    request: {
+      ...common(scope),
+      operation_key: uuidv7(),
+      assignment_id: preview.assignment_id,
+      expected_version: preview.assignment_version,
+      reason: "Ekip önizlemesinde onaylanan Personel rolü kaldırma işlemi.",
+      impact_approval: { id: preview.id, token: preview.token },
+      ...(handover ? { handover_person_id: recipientId } : {}),
+    },
+  } satisfies TeamIntent;
+}
 export async function prepareTeamPermission(
   scope: ClientScope,
   personId: string,
@@ -464,16 +664,26 @@ export async function prepareTeamPermission(
   enabled: boolean,
 ): Promise<TeamIntent> {
   const current = await readTeamPermission(scope, personId, permission);
+  return teamPermissionIntent(scope, personId, permission, enabled, current.version);
+}
+
+export function teamPermissionIntent(
+  scope: ClientScope,
+  personId: string,
+  permission: TeamPermission,
+  enabled: boolean,
+  version: number,
+) {
   return {
     scope: { ...scope },
-    operation: "permission_set_v1",
+    operation: "permission_set_v1" as const,
     request: {
       ...common(scope),
       operation_key: uuidv7(),
       person_id: personId,
       permission,
       enabled,
-      expected_version: current.version,
+      expected_version: version,
     },
   };
 }
@@ -550,7 +760,7 @@ export async function teamResult(intent: TeamIntent, id?: string) {
       )
     )
       throw Error("TEAM_RESULT_UNAVAILABLE");
-    return;
+    return roles;
   }
   if (intent.operation === "role_assign_v1") {
     const roles = await readTeamPersonRoles(intent.scope, intent.request.person_id);
@@ -564,7 +774,7 @@ export async function teamResult(intent: TeamIntent, id?: string) {
       )
     )
       throw Error("TEAM_RESULT_UNAVAILABLE");
-    return;
+    return roles;
   }
   if (id !== intent.request.assignment_id) throw Error("TEAM_RESULT_UNAVAILABLE");
   const page = await (

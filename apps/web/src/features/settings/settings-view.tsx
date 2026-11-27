@@ -2,9 +2,7 @@ import { useId, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Building2Icon,
-  CalendarDaysIcon,
   ShieldIcon,
-  LayoutGridIcon,
   BellIcon,
   MailIcon,
   MonitorIcon,
@@ -14,6 +12,7 @@ import {
   PlusIcon,
   UploadIcon,
 } from "lucide-react";
+import { BuildingIcon, CalendarIcon, DashboardIcon } from "../../components/studiom-icons";
 import { cn } from "@ftksaas/ui/lib/utils";
 import { useIsMobile } from "@ftksaas/ui/hooks/use-mobile";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@ftksaas/ui/components/tabs";
@@ -54,7 +53,6 @@ import {
   TableHead,
   TableCell,
 } from "@ftksaas/ui/components/table";
-import { Checkbox } from "@ftksaas/ui/components/checkbox";
 import { ToggleGroup, ToggleGroupItem } from "@ftksaas/ui/components/toggle-group";
 import {
   settingsLayout,
@@ -64,15 +62,16 @@ import {
 } from "./settings-layout";
 
 const icons = {
-  genel: Building2Icon,
-  kurallar: CalendarDaysIcon,
+  genel: BuildingIcon,
+  kurallar: CalendarIcon,
   politika: ShieldIcon,
-  salonlar: LayoutGridIcon,
+  salonlar: DashboardIcon,
   bildirim: BellIcon,
   sablon: MailIcon,
   yayin: MonitorIcon,
   ekip: UsersIcon,
   plan: PackageIcon,
+  organizasyon: BuildingIcon,
   gecmis: ClockIcon,
 };
 type ColumnKey =
@@ -147,14 +146,6 @@ export interface SettingsViewData {
     pendingDescription?: string | null;
     renewalActionLabel?: string;
   };
-  permissions?: {
-    people: { id: string; name: string }[];
-    rows: {
-      id: string;
-      label: string;
-      values: Record<string, { value: boolean | null; writable: boolean }>;
-    }[];
-  };
   reminderPreview?: { id: string; lesson: string; delivery: string | null }[];
   preparationManagement?: ReactNode;
   billingTax?: ReactNode;
@@ -202,8 +193,8 @@ export interface SettingsViewProps {
   onLogo?: (file: File) => void;
   logoAccept?: string;
   resetCards?: readonly SettingsCardKey[];
-  onPermission?: (personId: string, permission: string, value: boolean) => void;
-  teamActionLabel?: string;
+  team?: ReactNode;
+  organizationPanel?: ReactNode;
 }
 function SettingsTable({ data, label }: { data?: SettingsTableData; label: string }) {
   const { t } = useTranslation();
@@ -261,15 +252,14 @@ export function SettingsView({
   onLogo,
   logoAccept,
   resetCards,
-  onPermission,
-  teamActionLabel,
+  team,
+  organizationPanel,
   scope,
   onScope,
 }: SettingsViewProps) {
   const { t } = useTranslation(),
     mobile = useIsMobile(),
     prefix = useId();
-  const [teamSection, setTeamSection] = useState("ekip-0");
   const [localSection, setLocalSection] = useState<SettingsSection>("genel");
   const current = section ?? localSection;
   const canAction = (kind: SettingsAction["kind"]) =>
@@ -728,56 +718,6 @@ export function SettingsView({
       </section>
     </FieldGroup>
   );
-  const permissions = (
-    <Table
-      aria-label={t(($) => $.settings.permissions)}
-      className={data.permissions?.people.length ? "min-w-[30rem]" : undefined}
-    >
-      <TableHeader>
-        <TableHead id="permission" isRowHeader>
-          {t(($) => $.settings.columns.permission)}
-        </TableHead>
-        {data.permissions?.people.map((person) => (
-          <TableHead key={person.id} id={person.id}>
-            {person.name}
-          </TableHead>
-        ))}
-      </TableHeader>
-      <TableBody
-        items={data.permissions?.rows ?? []}
-        renderEmptyState={() => (
-          <Empty>
-            <EmptyDescription>
-              {data.permissions
-                ? t(($) => $.settings.empty)
-                : t(($) => $.settings.permissionUnavailable)}
-            </EmptyDescription>
-          </Empty>
-        )}
-      >
-        {(row) => (
-          <TableRow id={row.id}>
-            <TableCell>{row.label}</TableCell>
-            {data.permissions?.people.map((person) => (
-              <TableCell key={person.id} focusMode="child" className="py-6">
-                <Checkbox
-                  aria-label={`${person.name}: ${row.label}`}
-                  isSelected={row.values[person.id]?.value === true}
-                  isDisabled={
-                    locked ||
-                    !onPermission ||
-                    !row.values[person.id]?.writable ||
-                    row.values[person.id]?.value == null
-                  }
-                  onChange={(value) => onPermission?.(person.id, row.id, value)}
-                />
-              </TableCell>
-            ))}
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
-  );
   return (
     <div className="@container flex min-w-0 flex-col gap-4">
       <header>
@@ -826,7 +766,7 @@ export function SettingsView({
           variant="sidebar"
           aria-label={t(($) => $.settings.sectionsLabel)}
           className={cn(
-            "shrink-0 p-0!",
+            "settings-section-tabs shrink-0 p-0!",
             mobile
               ? "h-auto! min-h-14 w-full max-w-full flex-row! flex-wrap justify-start"
               : "sticky top-4 w-44 self-start",
@@ -849,17 +789,20 @@ export function SettingsView({
         </TabsList>
         <div className="min-w-0 flex-1">
           {settingsLayout.map((panel) => {
+            if (panel.key === "ekip")
+              return (
+                <TabsContent key={panel.key} id={panel.key}>
+                  {team}
+                </TabsContent>
+              );
             const content = (
               <div className="flex min-w-0 flex-col gap-4">
-                {panel.cards.map((card, index) => {
+                {panel.cards.map((card) => {
                   if (card.key === "plan-billing" && !data.forms?.[card.key]?.read) return null;
                   const form =
                     panel.key !== "gecmis" &&
-                    (card.fields.length > 0 ||
-                      ["ay-marka", "ay-salon", "ay-izin"].includes(card.key));
-                  const table =
-                    ["politika", "salonlar", "sablon", "ekip", "gecmis"].includes(panel.key) &&
-                    !(panel.key === "ekip" && index === 1);
+                    (card.fields.length > 0 || ["ay-marka", "ay-salon"].includes(card.key));
+                  const table = ["politika", "salonlar", "sablon", "gecmis"].includes(panel.key);
                   const heading = `${prefix}-${card.key}-title`;
                   const content = (
                     <Card key={card.key} className="min-w-0 gap-4">
@@ -870,18 +813,6 @@ export function SettingsView({
                         <CardDescription>
                           {t(($) => $.settings.cards[card.key].description)}
                         </CardDescription>
-                        {panel.key === "ekip" && index === 0 && (
-                          <CardAction>
-                            <Button
-                              type="button"
-                              isDisabled={locked || !canAction("invite")}
-                              onPress={() => action("invite")}
-                            >
-                              <PlusIcon data-icon="inline-start" />
-                              {teamActionLabel ?? t(($) => $.settings.invite)}
-                            </Button>
-                          </CardAction>
-                        )}
                         {panel.key === "yayin" && (
                           <CardAction>
                             <Button
@@ -936,8 +867,6 @@ export function SettingsView({
                                 data={data.tables?.[panel.key]}
                                 label={t(($) => $.settings.cards[card.key].title)}
                               />
-                            ) : panel.key === "ekip" ? (
-                              permissions
                             ) : (
                               fields(
                                 card,
@@ -990,8 +919,6 @@ export function SettingsView({
                             label={t(($) => $.settings.cards[card.key].title)}
                           />
                         </CardContent>
-                      ) : panel.key === "ekip" ? (
-                        <CardContent className="px-0">{permissions}</CardContent>
                       ) : card.key === "plan-0" ? (
                         <CardContent className="flex flex-col gap-5">
                           {data.metrics?.map((metric) => (
@@ -1056,7 +983,6 @@ export function SettingsView({
                       {form && card.key !== "bildirim-0" && footer(card.key)}
                       {card.key === "plan-billing" && data.billingTax}
                       {card.key === "plan-1" && data.invoiceHistory}
-                      {panel.key === "ekip" && index === 1 && !form && footer(card.key)}
                       {(card.key === "plan-0" || card.key === "plan-2") && (
                         <CardFooter className="flex-wrap justify-between gap-3">
                           <p className="text-xs text-muted-foreground">
@@ -1116,13 +1042,7 @@ export function SettingsView({
                       )}
                     </Card>
                   );
-                  return panel.key === "ekip" ? (
-                    <TabsContent key={card.key} id={card.key}>
-                      {content}
-                    </TabsContent>
-                  ) : (
-                    content
-                  );
+                  return content;
                 })}
                 {panel.key === "sablon" && data.preparationManagement}
                 {panel.key === "genel" && (
@@ -1163,26 +1083,9 @@ export function SettingsView({
             );
             return (
               <TabsContent key={panel.key} id={panel.key}>
-                {panel.key === "ekip" ? (
-                  <Tabs
-                    selectedKey={teamSection}
-                    onSelectionChange={(key) => {
-                      if (!locked && (key === "ekip-0" || key === "ay-izin")) setTeamSection(key);
-                    }}
-                  >
-                    <TabsList aria-label={t(($) => $.settings.teamSections)}>
-                      <TabsTrigger id="ekip-0" isDisabled={locked}>
-                        {t(($) => $.settings.teamPeople)}
-                      </TabsTrigger>
-                      <TabsTrigger id="ay-izin" isDisabled={locked}>
-                        {t(($) => $.settings.teamPermissions)}
-                      </TabsTrigger>
-                    </TabsList>
-                    {content}
-                  </Tabs>
-                ) : (
-                  content
-                )}
+                {panel.key === "organizasyon"
+                  ? (organizationPanel ?? <p role="status">{t(($) => $.settings.unavailable)}</p>)
+                  : content}
               </TabsContent>
             );
           })}

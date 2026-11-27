@@ -153,6 +153,7 @@ export function InboxView({
           className="flex flex-wrap items-center gap-2"
         >
           <Checkbox
+            className="bg-input/70"
             isSelected={visibleChecked > 0 && visibleChecked === rows?.length}
             isIndeterminate={visibleChecked > 0 && visibleChecked < (rows?.length ?? 0)}
             isDisabled={locked || !rows?.length}

@@ -16,7 +16,8 @@ import { getSupabaseClient } from "../../lib/supabase";
 import { BackendError } from "../../lib/backend";
 import { workspaceQuery } from "../workspace/workspace-query";
 import { useAccountAppearance } from "../account/use-account-appearance";
-import { MemberShellView } from "./member-shell-view";
+import { MemberFrame } from "../workspace/panel-frame";
+import { usePanelChrome } from "../workspace/panel-context";
 import { NativeSelect, NativeSelectOption } from "@ftksaas/ui/components/native-select";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { Button } from "@ftksaas/ui/components/button";
@@ -119,46 +120,46 @@ export function MemberLayout({
     await navigate({ to: "/login", replace: true });
     await router.invalidate();
   }
-  return (
-    <MemberShellView
-      brand={org?.name ?? t(($) => $.app.title)}
-      subtitle={center?.name ?? t(($) => $.memberReservations.shell)}
-      navigationLabel={t(($) => $.memberReservations.navigation)}
-      links={links}
-      linksDisabled={locked || signingOut}
-      actions={
-        <div className="flex flex-wrap gap-2">
-          {org && center && student && (
-            <MemberInboxLink
-              scope={{ accountId: account.id, orgId: org.id, centerId: center.id }}
-              current={active === "inbox"}
-              disabled={locked || signingOut}
-            />
-          )}
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label={t(($) => $.workspace.changeTheme)}
-            onPress={() => {
-              document.documentElement.dataset.theme =
-                document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-            }}
-          >
-            <MoonIcon aria-hidden="true" />
-          </Button>
-          <Button
-            variant="ghost"
-            isDisabled={locked || signingOut}
-            onPress={() => {
-              void signOut();
-            }}
-          >
-            {t(($) => $.auth.signout)}
-          </Button>
-        </div>
-      }
-    >
-      <div className="mx-auto flex max-w-5xl flex-wrap gap-3 px-4 pt-4">
+  const renderChrome = (interactive: boolean) => ({
+    kind: "member" as const,
+    brand: org?.name ?? t(($) => $.app.title),
+    subtitle: center?.name ?? t(($) => $.memberReservations.shell),
+    navigationLabel: t(($) => $.memberReservations.navigation),
+    links,
+    linksDisabled: !interactive || locked || signingOut,
+    actions: (
+      <div className="flex flex-wrap gap-2" inert={!interactive}>
+        {org && center && student && (
+          <MemberInboxLink
+            scope={{ accountId: account.id, orgId: org.id, centerId: center.id }}
+            current={active === "inbox"}
+            disabled={locked || signingOut}
+          />
+        )}
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={t(($) => $.workspace.changeTheme)}
+          onPress={() => {
+            document.documentElement.dataset.theme =
+              document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+          }}
+        >
+          <MoonIcon aria-hidden="true" />
+        </Button>
+        <Button
+          variant="ghost"
+          isDisabled={locked || signingOut}
+          onPress={() => {
+            void signOut();
+          }}
+        >
+          {t(($) => $.auth.signout)}
+        </Button>
+      </div>
+    ),
+    scopeSelectors: (
+      <div className="mx-auto flex max-w-5xl flex-wrap gap-3 px-4 pt-4" inert={!interactive}>
         <NativeSelect
           aria-label={t(($) => $.memberReservations.chooseOrg)}
           className="w-full sm:w-56"
@@ -190,6 +191,15 @@ export function MemberLayout({
           ))}
         </NativeSelect>
       </div>
+    ),
+  });
+  const shared = usePanelChrome(
+    "member",
+    { organizationId: org?.id, centerId: center?.id },
+    renderChrome,
+  );
+  const content = (
+    <>
       {signOutError && (
         <Alert variant="destructive">
           <AlertDescription>{t(($) => $.auth.readError)}</AlertDescription>
@@ -234,6 +244,7 @@ export function MemberLayout({
           )}
         </div>
       )}
-    </MemberShellView>
+    </>
   );
+  return shared ? content : <MemberFrame chrome={renderChrome(true)}>{content}</MemberFrame>;
 }

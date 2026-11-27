@@ -6,7 +6,7 @@ Cache doğruluğu ve oturum kapsamı [kabul edildi](remaining-work.md#final-cach
 
 ## Aktif sıra
 
-Aktif frontend işi yok. [Kabul kaydı](remaining-work.md).
+Önce [Ayarlar → Ekip](remaining-work.md#ekip-görsel-ve-native-kabulü).
 
 Her teslim ayrı branch ve Draft PR ile başlar. Kod, test ve kabul aynı kaynak SHA'sına bağlıdır. Merge ve production değişikliği açık yetkiye bağlıdır.
 

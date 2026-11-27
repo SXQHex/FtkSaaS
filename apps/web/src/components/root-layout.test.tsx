@@ -44,7 +44,11 @@ vi.mock("../features/auth/query-access-recovery", () => ({
 }));
 vi.mock("@tanstack/react-router", () => ({
   useRouter: () => state.router,
-  useRouterState: () => state.pathname,
+  useRouterState: ({
+    select,
+  }: {
+    select: (snapshot: { location: { pathname: string }; matches: [] }) => unknown;
+  }) => select({ location: { pathname: state.pathname }, matches: [] }),
   Outlet: () =>
     state.pathname === "/mfa" || state.pathname === "/reset-password" ? (
       <p>native-auth-gate</p>

@@ -12,9 +12,11 @@ export function NavMain({
   title,
   items,
   className,
+  onNavigate,
 }: {
   title?: string;
   className?: string;
+  onNavigate?: () => void;
   items: { title: string; url?: string; icon: ReactNode; isActive?: boolean; count?: number }[];
 }) {
   return (
@@ -33,6 +35,10 @@ export function NavMain({
               isDisabled={!item.url}
               isActive={item.isActive}
               aria-current={item.isActive ? "page" : undefined}
+              onPress={(event) => {
+                if (!event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey)
+                  onNavigate?.();
+              }}
               tooltip={item.title}
             >
               {item.icon}

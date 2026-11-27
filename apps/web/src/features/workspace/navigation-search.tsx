@@ -19,6 +19,7 @@ import {
   CommandItem,
 } from "@ftksaas/ui/components/command";
 export function NavigationSearch({
+  disabled = false,
   groups,
   settingsUrl,
   memberScope,
@@ -27,6 +28,7 @@ export function NavigationSearch({
   onThemeChange,
   onSignOut,
 }: {
+  disabled?: boolean;
   groups: NavigationGroup[];
   settingsUrl?: string;
   memberScope?: ClientScope;
@@ -47,7 +49,7 @@ export function NavigationSearch({
   const reportsUrl = managementActions
     ? links.find(({ key }) => key === "reports")?.url
     : undefined;
-  const canSearchMembers = open && !!memberScope && query.length >= 2;
+  const canSearchMembers = !disabled && open && !!memberScope && query.length >= 2;
   useEffect(() => {
     if (!canSearchMembers) return;
     const timer = setTimeout(() => setSettled(query), 250);
@@ -109,6 +111,7 @@ export function NavigationSearch({
     { key: "sign-out", label: t(($) => $.auth.signout), run: onSignOut },
   ];
   useEffect(() => {
+    if (disabled) return;
     function shortcut(event: KeyboardEvent) {
       if (
         !event.isComposing &&
@@ -122,7 +125,7 @@ export function NavigationSearch({
     }
     document.addEventListener("keydown", shortcut);
     return () => document.removeEventListener("keydown", shortcut);
-  }, []);
+  }, [disabled]);
   return (
     <>
       <Button
@@ -130,6 +133,7 @@ export function NavigationSearch({
         size="sm"
         className="pointer-coarse:min-h-11 pointer-coarse:min-w-11 @min-[1000px]/workspace:min-w-56"
         aria-label={t(($) => $.workspace.searchButtonLabel)}
+        isDisabled={disabled}
         onPress={() => setOpen(true)}
       >
         <SearchIcon />
@@ -141,7 +145,7 @@ export function NavigationSearch({
         </span>
       </Button>
       <CommandDialog
-        open={open}
+        open={open && !disabled}
         onOpenChange={changeOpen}
         title={t(($) => $.workspace.searchTitle)}
         description={t(($) => $.workspace.searchDescription)}
