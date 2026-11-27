@@ -321,8 +321,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "a6a2466551fee15011baac17a01a98c19e8985e3b716cf413c5343d89b866c69",
-        "reason": "Kişi birleşimi kabulünde kaynak kimlik ile asıl kimlik aynı kişi detayını döndürüyor."
+        "fingerprint": "bb0f6b954a0b3092ebc2bde13f55e971a27c6a0ecd71444a57beb037d9a499ce",
+        "reason": "Ekip izin matrisi seçicisi ve üretilen doğrulayıcılar incelendi. 26 Kasım’da süresi dolan altı kalite istisnası kullanıcı onayıyla kaldırıldı."
       }
     },
     {
@@ -446,7 +446,8 @@
         "apps/backend/tests/role-directory-filter-unit.mjs",
         "apps/backend/tests/role-directory-filter-acceptance.mjs",
         "apps/backend/tests/starter-studio-acceptance.mjs",
-        "apps/backend/tests/student-status-filter-acceptance.mjs"
+        "apps/backend/tests/student-status-filter-acceptance.mjs",
+        "apps/backend/tests/schedule-reads.test.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -530,7 +531,11 @@
         "apps/backend/supabase/migrations/20261124134857_share_center_configuration_read_locks.sql",
         "apps/backend/supabase/migrations/20261124152000_scoped_consumer_followup.sql",
         "apps/backend/supabase/migrations/20261125124800_calendar_read_projections.sql",
-        "apps/backend/supabase/migrations/20261125213301_hide_erased_organization_from_account_directory.sql"
+        "apps/backend/supabase/migrations/20261125213301_hide_erased_organization_from_account_directory.sql",
+        "apps/backend/database/pending-team-invitation-roles.sql",
+        "apps/backend/supabase/migrations/20261126230219_pending_team_invitation_roles.sql",
+        "apps/backend/database/team-permission-matrix.sql",
+        "apps/backend/supabase/migrations/20261126235944_team_permission_matrix.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -558,8 +563,8 @@
         "studio_setup_open_v1"
       ],
       "review": {
-        "fingerprint": "d2463b64ad2750b3b725739f182b9c7533adf8665ccc88396ca91cf517e73a57",
-        "reason": "Organizasyon dizini eşleşen DB ve Storage imha makbuzuyla tamamlanan organizasyonu ve kendi kişi bağını göstermiyor."
+        "fingerprint": "3f7447cf916b3e77b5a48f1acf0f68a51c05237f7dc9446c75626a009edcfbb2",
+        "reason": "Merkez izin matrisi kişi izin özetini kullanır. Sayfalama, yazma sürümü, F05 ve canlı merkez yetkisi native senaryoda doğrulanır."
       }
     },
     {
@@ -587,7 +592,8 @@
         "apps/backend/tests/fixtures/assigned-session-room-labels.sql",
         "apps/backend/tests/web1-review-unit.mjs",
         "apps/backend/tests/member-lesson-discovery-unit.mjs",
-        "apps/backend/tests/member-lesson-discovery-acceptance.mjs"
+        "apps/backend/tests/member-lesson-discovery-acceptance.mjs",
+        "apps/backend/tests/calendar-preferences-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -661,7 +667,8 @@
         "apps/backend/supabase/migrations/20261124220645_session_read_center_projection.sql",
         "apps/backend/supabase/migrations/20261125112000_share_person_calendar_read_locks.sql",
         "apps/backend/supabase/migrations/20261125124800_calendar_read_projections.sql",
-        "apps/backend/supabase/migrations/20261126151242_reuse_person_detail_scope_and_family.sql"
+        "apps/backend/supabase/migrations/20261126151242_reuse_person_detail_scope_and_family.sql",
+        "apps/backend/supabase/migrations/20261126230221_reuse_calendar_center_scope.sql"
       ],
       "operations": [
         "availability_save_v1",
@@ -684,8 +691,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "e2ad2226b66659e1b17526a45d31e679b4d2f2de144e0e913566cd6d9053cb78",
-        "reason": "Takvim ve seans okuma dalları aynı erişim ve sayfalama adımlarıyla daha erken seçiliyor."
+        "fingerprint": "ffd1bbff53839366c776b3be647fb0c43437e83b778a0e8e55870e312ced3e26",
+        "reason": "Merkez yetkisi takvim aralığında merkez başına çözülüyor. Atama, rezervasyon, etkinlik ve merkez yetkisi iptali aynı satır görünürlüğünü koruyor. Ortak native test dosyasına WF02 izin matrisi senaryosu eklendi. Bu akışın mevcut senaryoları korunuyor."
       }
     },
     {
@@ -716,7 +723,8 @@
         "apps/backend/tests/fixtures/sale-discount-acceptance.sql",
         "apps/backend/tests/product-class-management-acceptance.mjs",
         "apps/backend/tests/fixtures/product-class-management-acceptance.sql",
-        "apps/backend/tests/schedule-reads.test.mjs"
+        "apps/backend/tests/schedule-reads.test.mjs",
+        "apps/backend/tests/api-acceptance.test.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -792,7 +800,10 @@
         "apps/backend/supabase/migrations/20261125143626_people_page_operational_scope.sql",
         "apps/backend/supabase/migrations/20261126140500_batch_people_list_projection.sql",
         "apps/backend/supabase/migrations/20261125144852_management_account_directory_reads.sql",
-        "apps/backend/supabase/migrations/20261126151242_reuse_person_detail_scope_and_family.sql"
+        "apps/backend/supabase/migrations/20261126151242_reuse_person_detail_scope_and_family.sql",
+        "apps/backend/database/pending-team-invitation-roles.sql",
+        "apps/backend/supabase/migrations/20261126230219_pending_team_invitation_roles.sql",
+        "apps/backend/supabase/migrations/20261126230220_reuse_person_field_policy_queries.sql"
       ],
       "operations": [
         "account_access_send_v1",
@@ -811,8 +822,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "17b71ed22de30203707c8bbc490d802c708ca016302ffa77dc1badb662961ccb",
-        "reason": "Kişi detayında erişim bir kez hesaplanıyor. Bir kişinin yanıtını hazırlayan parametreli plan ilk çağrıdan itibaren kullanılıyor. Birleşmiş kimlik ve iletişim maskesi doğrulandı."
+        "fingerprint": "c2b1484717a4ce5f5dc3052e2cefe9a8398a50cc4f0ab50cdc71a4868cd08ffe",
+        "reason": "Kişi detayında mevcut merkez yöneticisi kontrolü tekrar kullanılıyor. Ad ve iletişim alanı sahipliği canlı hesap ve bağlantı durumuna göre hesaplanıyor. Ortak native test dosyasına WF02 izin matrisi senaryosu eklendi. Bu akışın mevcut senaryoları korunuyor."
       }
     },
     {
@@ -1055,8 +1066,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "1983445e2ded4d0e2fab5f95ae476f1864a179acbc7eba5b0ede1ec6d44599d6",
-        "reason": "Rezervasyon ve takvim keşfinin kapsamı, cursor ve canlı retleri ortak seans testinde korunuyor."
+        "fingerprint": "24faa1a2732c1bc33e364f36b3687689a5c580d4942c0b90dab376d3f045d960",
+        "reason": "Paylaşılan Auth test fixture varsayılan doğrulanmış e-posta ve mevcut satın alma akışını koruyor. Ortak native test dosyasına WF02 izin matrisi senaryosu eklendi. Bu akışın mevcut senaryoları korunuyor."
       }
     },
     {
@@ -1129,8 +1140,8 @@
         "attendance_correction_request_v1"
       ],
       "review": {
-        "fingerprint": "8ca71453b34a27729b011d19fec437168422824381b682322dec2c5822ffaea2",
-        "reason": "Yoklama projeksiyonu, seans sürümü ve izinli eğitmen okuması ortak native regresyonda doğrulandı."
+        "fingerprint": "d4bc947f9821255f6e9e999ed1cd41d600654ab44b532a853a431b0b456db6d9",
+        "reason": "Yoklama projeksiyonu, seans sürümü ve izinli eğitmen okuması ortak native regresyonda doğrulandı. Ortak native test dosyasına WF02 izin matrisi senaryosu eklendi. Bu akışın mevcut senaryoları korunuyor."
       }
     },
     {
@@ -1204,8 +1215,8 @@
         "member_finance_currencies_get_v1"
       ],
       "review": {
-        "fingerprint": "76fbbdc82ab09c953ff3b9ca72263141bbdd0b79260c80a477459dd4c48ae5d0",
-        "reason": "XREQ-073 paylaşılan sözleşme ve test kaynağı incelendi. Bu akışın komutları, mevcut alanları ve yetki koşulları aynı."
+        "fingerprint": "625dbffeb3524d89c71a8d155a37edeb9917e54953ed673c251238062c0e18fe",
+        "reason": "Paylaşılan API kabulüne ekip daveti testi eklendi. Mevcut event yetki, kayıt ve ödeme senaryoları korunuyor."
       }
     },
     {
@@ -1866,8 +1877,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "e1d1c1186229ca833571cb1acf691277bad394c85496c74fbc534ff2c494ac33",
-        "reason": "Etkin oda etiketi ve özgün oda etiketi ayrı doğrulanıyor. Önceki assertion gövdesi korunuyor."
+        "fingerprint": "64aa10867c8e8243de9ccabe5b0bbd9065ab8fa85dd2cb174687c30dcef1c247",
+        "reason": "API fixture doğrulanmış e-posta varsayılanını koruyor. Etkinlik kaynak ve kabul sınırları aynı."
       }
     },
     {
@@ -2120,8 +2131,8 @@
         "platform_operator_access_set_v1"
       ],
       "review": {
-        "fingerprint": "2dffb0cdfabf1c3a056171fda0bdac002663eff86517ee57e4fa49b9e5403ddc",
-        "reason": "Tamamlanan fiziksel DB ve dosya imhasından sonra organizasyon dizinde görünmüyor. Bekleyen iş ve kontrol organizasyonunun erişimi sürüyor."
+        "fingerprint": "78b20193bf03abb460279a5187f3d2bd480caf0b120c34703b9c6f5fe61dfa57",
+        "reason": "Paylaşılan Auth fixture e-posta seçeneğini ekliyor ve mevcut hesap yaşam döngüsü test girdilerini koruyor."
       }
     },
     {
@@ -2194,8 +2205,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "d8e2757916421d5a428d169f0e3a53014c733af47c6847c61e3179297390f917",
-        "reason": "Bekleme ve kaynak özeti ortak seans regresyonunda mevcut rol ve plan sınırlarıyla doğrulandı."
+        "fingerprint": "905d8a54acedb9eadcbb55f21792e9dad1d27f2db2ffa9505da10410aa8adf31",
+        "reason": "Bekleme ve kaynak özeti ortak seans regresyonunda mevcut rol ve plan sınırlarıyla doğrulandı. Ortak native test dosyasına WF02 izin matrisi senaryosu eklendi. Bu akışın mevcut senaryoları korunuyor."
       }
     },
     {

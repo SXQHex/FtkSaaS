@@ -4,15 +4,15 @@
   "suites": [
     {
       "path": "apps/backend/tests/api-acceptance.test.mjs",
-      "sha256": "bd909a90e9bf2f9fa4e1f090e8a9cac7d11b878e4a1fd665ad3c01d764ad09d2",
+      "sha256": "9f161e024b575469705a8c86b1294682dcac12e7a304995ae47e88c65852cb61",
       "shared": [
         [
           2,
           50
         ],
         [
-          354,
-          355
+          388,
+          389
         ]
       ],
       "parts": [
@@ -24,8 +24,8 @@
               77
             ],
             [
-              356,
-              356
+              390,
+              390
             ]
           ]
         },
@@ -37,8 +37,8 @@
               159
             ],
             [
-              357,
-              357
+              391,
+              391
             ]
           ]
         },
@@ -47,11 +47,11 @@
           "ranges": [
             [
               160,
-              249
+              283
             ],
             [
-              358,
-              358
+              392,
+              392
             ]
           ]
         },
@@ -59,12 +59,12 @@
           "id": "api-event-finance",
           "ranges": [
             [
-              250,
-              353
+              284,
+              387
             ],
             [
-              359,
-              359
+              393,
+              393
             ]
           ]
         }
@@ -1274,7 +1274,7 @@
     },
     {
       "path": "apps/backend/tests/schedule-reads.test.mjs",
-      "sha256": "799337861b3a627eaaaeb69006e76205f234e7124b93f7508951b8a91e82bdbf",
+      "sha256": "3f9748924f397cbe8e0c99257ea68b2448b7954cfbf3abac0a5fd7fe78049323",
       "shared": [
         [
           6,
@@ -1287,7 +1287,7 @@
           "ranges": [
             [
               12,
-              494
+              559
             ]
           ]
         }
@@ -1301,7 +1301,7 @@
         {
           "line": 2,
           "path": "apps/backend/tests/calendar-preferences-acceptance.mjs",
-          "sha256": "1edc9cb92239b8313813701cfe48530644c11fe5b9d18cb072deb98f771fb3f6"
+          "sha256": "f8ec0fc9a3570f71530d31620fc476502edac1fe6426351ab346d3a211d2aea5"
         },
         {
           "line": 3,
@@ -1319,7 +1319,7 @@
           "sha256": "711436cf2c71cef5abef536f5537b157cacc3f5b2e527cce0f542f4eaef3ec0f"
         },
         {
-          "line": 495,
+          "line": 560,
           "path": "apps/backend/tests/member-lesson-discovery-acceptance.mjs",
           "sha256": "2696ee36b0cdbfd66bf6ae363bd3638a4cbba2d7a7adff9d6a5ffc1e180817d0"
         }

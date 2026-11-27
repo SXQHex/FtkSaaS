@@ -34677,6 +34677,10 @@
         "effective_staff_grant": {
           "type": "boolean",
           "description": "Result of the native staff grant check for this person, center and permission. Command-specific authorization still applies."
+        },
+        "writable": {
+          "type": "boolean",
+          "description": "Matrix only. The existing command allows this permission for this target and the caller passed its live authority checks. The command rechecks authority and the person version."
         }
       },
       "required": [
@@ -34714,6 +34718,31 @@
               "items": {
                 "$ref": "#/$defs/TeamPermissionOverrideSummary"
               }
+            },
+            "display_name": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Text"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Matrix only. Null when the original person reader does not disclose the name."
+            },
+            "team_roles": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "center_manager",
+                  "instructor",
+                  "staff"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 3,
+              "uniqueItems": true,
+              "description": "Matrix only. Live center roles with a verified link; does not imply a separate grant."
             }
           },
           "required": [],
@@ -39635,22 +39664,60 @@
             "permission_summary": {
               "const": true,
               "description": "Read all settable overrides for the canonical person in the selected center."
+            },
+            "directory": {
+              "const": "center",
+              "description": "Page the live permission matrix for the selected center."
             }
           },
-          "required": [
-            "person_id"
-          ],
+          "required": [],
           "additionalProperties": false,
           "oneOf": [
             {
               "required": [
+                "person_id",
                 "permission"
-              ]
+              ],
+              "not": {
+                "required": [
+                  "directory"
+                ]
+              }
             },
             {
               "required": [
+                "person_id",
                 "permission_summary"
-              ]
+              ],
+              "not": {
+                "required": [
+                  "directory"
+                ]
+              }
+            },
+            {
+              "required": [
+                "directory"
+              ],
+              "not": {
+                "anyOf": [
+                  {
+                    "required": [
+                      "person_id"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "permission"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "permission_summary"
+                    ]
+                  }
+                ]
+              }
             }
           ]
         }
@@ -73503,7 +73570,7 @@
           "billing_gate_config",
           "same_key_same_payload_replay",
           "receipt_audit_outbox_atomic_domain_commit",
-          "target_account_link_active",
+          "target_verified_link_or_live_same_center_invitation_for_team_roles",
           "no_owner_assignment_customer",
           "center_manager_assignment_owner_only_except_org_manager_self",
           "required_feature_gates_separate_from_references"
@@ -73553,7 +73620,8 @@
           "read_operation": "management_state_get_v1",
           "atomic_effects": [
             "role_assignments.active",
-            "no_account_link_creation"
+            "no_account_link_creation",
+            "team_role_pending_verified_invitation_acceptance"
           ],
           "business_commit": true,
           "read_path_status": "implemented",
@@ -74466,7 +74534,7 @@
           "same_key_same_payload_replay",
           "receipt_audit_outbox_atomic_domain_commit",
           "existing_person_only",
-          "no_prerole_before_account_link",
+          "pending_team_role_activates_with_verified_account_link",
           "default_student_self_not_grant_privilege",
           "owner_without_center_role_denied",
           "invite7days_one_use_current_sender_permission",
@@ -74513,6 +74581,7 @@
           "atomic_effects": [
             "account_links.active",
             "student_self_role_only",
+            "previously_assigned_center_roles_for_exact_invitation",
             "invitations.accepted"
           ],
           "business_commit": true,
@@ -90835,7 +90904,7 @@
           "billing_gate_bootstrap",
           "same_key_same_payload_replay",
           "receipt_audit_outbox_atomic_domain_commit",
-          "target_account_link_active",
+          "target_verified_link_or_live_same_center_invitation_for_team_roles",
           "no_owner_assignment_customer",
           "center_manager_assignment_owner_only_except_org_manager_self",
           "required_feature_gates_separate_from_references"
@@ -90877,7 +90946,8 @@
           "read_operation": "management_state_get_v1",
           "atomic_effects": [
             "role_assignments.center_manager",
-            "center_relationship_scope"
+            "center_relationship_scope",
+            "team_role_pending_verified_invitation_acceptance"
           ],
           "business_commit": true,
           "read_path_status": "contract_only",
@@ -92964,7 +93034,7 @@
           "role_assign_v1 selector supports instructor only, explicit matching center/scope and live center manager authority; optional person_id discovers active/inactive assignment IDs and row versions. No account link IDs or general F05 personnel listing.",
           "session_assignment_set_v1 selector key={} or {session_id} lists open unstarted sessions requiring instructor assignment, including overdue; explicit center/live manager, starts_at_asc keyset, real session version and session_detail. No implicit appointment or calendar time window.",
           "Six action-discovery selectors return one authorized source entity with current.values limited to the typed selector key: collection_record, reservation_capacity_override, student_credit_refund/offset, debt_adjust and sale_refund_preview. Original live writer authorization is reused without executing its domain branch; no prior transaction, preview, receipt or amount is invented. Explicit center required; source/person/alias scope and plan gates remain live. This is authority discovery, not a promise that capacity, balance, documents or other write-time conditions will pass.",
-          "permission_set_v1: center CM/F05 reads the target staff/instructor person version and stored override_exists plus enabled only when a stored override exists. No synthetic contextual effective permission.",
+          "permission_set_v1: live center manager and original plan/writer gates. An exact permission or permission_summary reads one canonical person. The directory:center selector returns a keyset page of active verified center-role targets with their person version, stored override, native effective staff grant and writable cells.",
           "Instructor assignment rows expose account_access_granted independently of duty state; no account identity or credentials. False includes legacy offline duties. Existing role_assign_v1 write/replay semantics remain unchanged.",
           "account_access_revoke_v1/account_link_remove_v1 selector.key.directory=center discovers center invitations/account links without prior IDs. Optional name query/status filter precedes keyset page; access_summary counts authorized searched scope before status plus filtered total. Link discovery requires live CM and same native person center relation/invitation/role scope; invitation rows require native can_invite. Delivery facts original-sender-only; sent_at null when no native timestamp, can_resend is conservative fresh-send preflight hint, not command authority. No native account/Auth ID, recipient or token.",
           "W1-BE-04/05: additive review/lifecycle support is specified in WF02/WF04; exact typed action, reason and source/version controls apply. No automatic merge, fabricated dates or native identity projection.",
@@ -119280,7 +119350,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 270,
+      "migration_count": 274,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

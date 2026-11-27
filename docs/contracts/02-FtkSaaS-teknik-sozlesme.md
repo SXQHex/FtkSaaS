@@ -577,6 +577,8 @@ Uyumlu yeni alan eklenebilir; mevcut alan anlamı sessizce değişmez. Bozucu de
 
 Davet 7 gün geçerli, tek kullanımlık, hedef e-postaya bağlıdır. Aynı kişi/hedef adres için tek aktif davet vardır; yeniden gönderim eskisini geçersizleştirir, yeni 7 günlük süre başlar. Süre dolumu kişi/paket/rezervasyonu silmez. Kabulde güncel organizasyon erişimi ve başlatanın ilgili yetki/kapsamı kontrol edilir; kaldırılmış yetki veya kapalı hizmet erişim kazandırmaz. Gecikmenin ilk 7 günündeki açık davet istisnası aşağıdaki matrise tabidir.
 
+Mevcut kişi kaydına aynı merkezde geçerli bir e-posta daveti açıldığında yetkili kullanıcı eğitmen, personel veya merkez yöneticisi atayabilir. Atama kimliği hemen üretilir. Rol, davet kabul edilene kadar oturum yetkisi veya aktif ekip üyeliği vermez. Daveti hedef e-postayla doğrulanmış hesap kabul ettiğinde bağlantı ve davete atanmış roller aynı işlemde etkinleşir. Canlı merkez, plan ve rol atama yetkisi uygulanır. İptal edilen, süresi dolan veya yenisiyle değiştirilen davetten rol taşınmaz. Sonradan kaldırılmış hesap bağlantısındaki roller yeni bir davette kendiliğinden açılmaz.
+
 | Rol | Davet kapsamı |
 |---|---|
 | Merkez yöneticisi | Kendi merkezindeki kişi kayıtları; mevcut rol/bağlantı sınırları korunur. |
