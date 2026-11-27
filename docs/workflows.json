@@ -321,8 +321,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "b17747ee7cfb6992c6169d5f7a602ad7d56c07dc0a8abb37fd9391c92e32ca4c",
-        "reason": "Yönetim okumasının mevcut adresi ve kimlik protokolü korunurken merkez matrisi seçicisi ve ilgili doğrulayıcılar eklendi."
+        "fingerprint": "bb0f6b954a0b3092ebc2bde13f55e971a27c6a0ecd71444a57beb037d9a499ce",
+        "reason": "Ekip izin matrisi seçicisi ve üretilen doğrulayıcılar incelendi. 26 Kasım’da süresi dolan altı kalite istisnası kullanıcı onayıyla kaldırıldı."
       }
     },
     {
