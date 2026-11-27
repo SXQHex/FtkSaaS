@@ -355,6 +355,11 @@ Backend teslimi 27 Kasım 2026’da kapandı. [PR #480](https://github.com/SXQHe
 
 [Main kanıtı](https://github.com/SXQHex/FtkSaaS/actions/runs/45910489912) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/45910542715) başarılı. Development makbuzu [davet rolleri migration’ının](../supabase/migrations/20261126230219_pending_team_invitation_roles.sql) aynı main kaynağında uygulandığını, 271 migration içeriğinin eşleştiğini ve hosted smoke kontrollerinin geçtiğini doğruladı. Ekip ekranı kabulü [XREQ-075](../../../docs/requests.md#xreq-075-ekip-davetinde-rol-atama) üzerinden izlenir.
 
+<a id="xreq-077-backend-adayi"></a>
+## XREQ-077 — Ekip izin matrisi
+
+Backend adayı [WF02’deki](../../../docs/workflows.md#wf02) merkez seçicisini mevcut yönetim okumasına ekler. İzole native Auth → Edge → RPC takvim ve yetki süiti 31/31 geçti. İzin matrisi senaryosu bir sayfadaki kişi sınırını, başka aktör veya merkezde imleç reddini, izin kaydından okunan kişi sürümüyle yazmayı ve rol veya F05 yetkisi kaybında erişimin kapanmasını doğruladı. Aday CI ve development teslimi [XREQ-077](../../../docs/requests.md#xreq-077) kapsamında izlenir.
+
 <a id="web1-backend-canli-takip-kapanisi"></a>
 ## Web1 — Backend canlı tekrar kapanışı
 

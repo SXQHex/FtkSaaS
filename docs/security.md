@@ -1,6 +1,6 @@
 # Güvenlik kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `34ebbff8fd5781b5109e79e9036a38b503743652580da2c087f87d128d718ca7`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `68b4861e7aba537431db3b16486c03a2419f71bedc9402946af6998d69bd6ace`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 İnsan istemci native Auth ile JWT doğrulanan Edge yolunu, düz merkez listesi ise [istemci protokolündeki](client-integration.md) Data API yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan denetlenir. İstemci erişimi core/private ve service-only RPC dışında kalır. Worker ve public credential transport ayrı yetki yollarıdır. [Teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
 
@@ -263,6 +263,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [studio-setup-requests.sql](../apps/backend/database/studio-setup-requests.sql) | `16739bf94ec2317478e2c1f2f0862e11f8bbad013eb0c2e412016177adffbd66` |
 | [subscriber-numbers.sql](../apps/backend/database/subscriber-numbers.sql) | `52684678ed0a4dc4356d9b538c6073323e7d700465e342aeb5613830a3976eb6` |
 | [subscription-period-change.sql](../apps/backend/database/subscription-period-change.sql) | `44642e971242c9927b976d55407ffe80d71b852ccfaae7475602d6ddd889461d` |
+| [team-permission-matrix.sql](../apps/backend/database/team-permission-matrix.sql) | `48e39e12975fc187093e8af88da94bc86e9e09d6e9056eaab6e1d2cf70d9c0f6` |
 | [tracking-discovery.sql](../apps/backend/database/tracking-discovery.sql) | `e6f3a22c2d773c098be14ac2cde5943f1e6e1ef4b29f95d8ad1da658acc61c68` |
 | [transactional-email.sql](../apps/backend/database/transactional-email.sql) | `a4a044188761eeb96ea0231399ea27a31bde0b5dc2be91b24363f24ec7ac2257` |
 | [user-settings-context.sql](../apps/backend/database/user-settings-context.sql) | `5e8db303c5e326ca40e18a7dd232b4c27cbbf4007eef0dcbbf987ac95784f183` |
@@ -488,6 +489,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [20261126230219_pending_team_invitation_roles.sql](../apps/backend/supabase/migrations/20261126230219_pending_team_invitation_roles.sql) | `6eb7e97f5b55fe0c6bbe3474df29d88dcbce6b65f5be99590058574aab3ce37b` |
 | [20261126230220_reuse_person_field_policy_queries.sql](../apps/backend/supabase/migrations/20261126230220_reuse_person_field_policy_queries.sql) | `b6a2b40ab7dd2ea1409b1e23b403d6f21d418ee7947dbe63346d70c54e47eb3a` |
 | [20261126230221_reuse_calendar_center_scope.sql](../apps/backend/supabase/migrations/20261126230221_reuse_calendar_center_scope.sql) | `c2e56d75b1f3140b5214ff611b45c3a27d83edccf22ef344db0b4b16b451dde5` |
+| [20261126235944_team_permission_matrix.sql](../apps/backend/supabase/migrations/20261126235944_team_permission_matrix.sql) | `48e39e12975fc187093e8af88da94bc86e9e09d6e9056eaab6e1d2cf70d9c0f6` |
 | [member-profile-lifecycle.sql](../apps/backend/tests/fixtures/member-profile-lifecycle.sql) | `1cac25c1610482b03cb7e594e4c28a61903bd047ae86ff724623c600dbf858d0` |
 | [product-class-management-acceptance.sql](../apps/backend/tests/fixtures/product-class-management-acceptance.sql) | `52141944d8ff08008a71d20be6b69d79e55480fad3e387f4ad377ace15a274d1` |
 | [sale-discount-acceptance.sql](../apps/backend/tests/fixtures/sale-discount-acceptance.sql) | `c17253fcdcd3460048bc35bf31c752315e1b7d5092b6c4231ab9b5349b4afc29` |

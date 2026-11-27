@@ -276,3 +276,5 @@ assert next(Path('supabase/migrations').glob('*_person_field_policy.sql')).read_
 assert next(Path('supabase/migrations').glob('*_student_status_filter.sql')).read_text()==Path('database/student-status-filter.sql').read_text()+Path('database/member-page-summary.sql').read_text()+Path('database/access-directory.sql').read_text(),'Member list and access directory source drift'
 
 assert next(Path('supabase/migrations').glob('*_web1_review_lifecycle.sql')).read_text()=='-- W1-BE-03/04/05: additive scoped review and explicit resource lifecycle.\nbegin;\n'+''.join(Path('database',n+'.sql').read_text().removeprefix('begin;\n').removesuffix('commit;\n') for n in ['availability-lifecycle','person-merge-review','account-person-directory','person-detail-summary'])+'commit;\n','Web1 request lifecycle source drift'
+
+assert next(Path('supabase/migrations').glob('*_team_permission_matrix.sql')).read_bytes()==Path('database/team-permission-matrix.sql').read_bytes(),'Team permission matrix source drift'
