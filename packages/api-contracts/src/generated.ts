@@ -19772,6 +19772,17 @@ permission?: Permission
 enabled?: Bool
 override_exists?: boolean
 permission_overrides?: TeamPermissionOverrideSummary[]
+/**
+ * Matrix only. Null when the original person reader does not disclose the name.
+ */
+display_name?: (Text | null)
+/**
+ * Matrix only. Live center roles with a verified link; does not imply a separate grant.
+ *
+ * @minItems 1
+ * @maxItems 3
+ */
+team_roles?: [("center_manager" | "instructor" | "staff")]|[("center_manager" | "instructor" | "staff"), ("center_manager" | "instructor" | "staff")]|[("center_manager" | "instructor" | "staff"), ("center_manager" | "instructor" | "staff"), ("center_manager" | "instructor" | "staff")]
 }
 }
 /**
@@ -19787,6 +19798,10 @@ override_version: (PositiveInt | null)
  * Result of the native staff grant check for this person, center and permission. Command-specific authorization still applies.
  */
 effective_staff_grant: boolean
+/**
+ * Matrix only. The existing command allows this permission for this target and the caller passed its live authority checks. The command rechecks authority and the person version.
+ */
+writable?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -22974,12 +22989,16 @@ key: ({
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
-person_id: string
+person_id?: string
 permission?: Permission
 /**
  * Read all settable overrides for the canonical person in the selected center.
  */
 permission_summary?: true
+/**
+ * Page the live permission matrix for the selected center.
+ */
+directory?: "center"
 })
 }
 /**

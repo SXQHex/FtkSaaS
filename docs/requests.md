@@ -74,6 +74,7 @@ Bu dosya alanlar arası talep ve teslim kabulünün tek kaydıdır. Sohbet devri
 | XREQ-073 | Frontend · M09 okuma maliyeti | Backend | [Frontend M09](../apps/web/docs/remaining-work.md#router-query-birlesik) · [İstek ve kabul](#xreq-073) | Mevcut kaynak ve alan yetkileriyle sınırlı typed sayfa projeksiyonları, toplamlar ve kesin seçiciler. | Backend teslimi kapalı | [Uygulanan okumalar](#xreq-073-backend-uygulamasi) · [CI ve teslim kanıtı](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#xreq-073-backend-kabulu) · [Backend kapanışı](../apps/backend/docs/remaining-work.md#xreq-073) · [Takip teslimi](#xreq-073-backend-takip). |
 | XREQ-074 | Frontend · kişisel ICS seans bağlantısı | Backend | [WF03](workflows.md#wf03) · [WF09](workflows.md#wf09) · [Kesin merkez keşfi](#xreq-074) | Eski org + seans kimliğinden tek yetkili native okumayla seansın gerçek merkezini çöz. | Kapandı | [Backend uygulaması](#xreq-074-backend) · [Frontend canlı kabulü](#xreq-074-frontend). |
 | XREQ-075 | Backend, kullanıcı kararı | Frontend | [Ekip davetinde aynı kişi kimliğine önceden rol atama](#xreq-075-ekip-davetinde-rol-atama) | Ekip sayfası mevcut davet ve rol komutlarını sırayla kullanır. | Backend teslimi kapalı · Frontend kabulü açık | [Backend kabulü](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#xreq-075-backend-kabulu) · [WF04](workflows.md#wf04) |
+| XREQ-077 | Frontend · Ekip izin matrisi | Backend | [Ekip izinlerinin sayfalı okuması](#xreq-077) · [WF02](workflows.md#wf02) | Seçili merkezdeki yetkili kişilerin izin özetleri bir sayfa isteğinde okunur. | Backend adayı hazır · teslim doğrulaması bekleniyor | [Backend adayı](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#xreq-077-backend-adayi) · [Frontend kabulü](../apps/web/docs/remaining-work.md) |
 
 Alanların kendi planlarındaki bağımlılık gözlemleri otomatik olarak talep, onay veya işe başlama yetkisi sayılmaz; somut talep bu tabloya kaydedildiğinde `XREQ-001` biçiminde sabit bir kimlik alır.
 
@@ -1129,3 +1130,13 @@ Kesin merkez `session_get_v1` çağrısındaki `include_center_id:true` seçene�
 Ekip daveti sayfası aynı kişi ve merkez için mevcut davet ile rol atama komutlarını kullanabilir. Davet oluşturulduğunda rol atama düğmesi hesap bağlantısı beklemez. Davet kabulüne kadar atama bekler. Kabulden sonra ekip listesi mevcut okuyucusuyla etkin rolü aynı atama ID’siyle gösterir. Davet yenilenirse seçilen roller yeni davet için yeniden atanır. [Komut sırası ve kabul](workflows.md#wf04).
 
 **Backend teslimi.** Rol ataması isteğe bağlıdır. Önceden rol atanmadan davet kabul edilebilir. Hesabı bağlı kişiye mevcut komutlarla doğrudan rol atanabilir. [Kaynak, native CI ve development kanıtı](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#xreq-075-backend-kabulu).
+
+**Frontend kapsamı.** Ekip ekranı daveti oluşturur ve seçilen rollerin atamasını yapar. Ekip listesi kayıtlı rollerden beslenir.
+
+## XREQ-077
+
+**Frontend talebi · Ekip izin matrisi.** İzinler sekmesi birden fazla kişinin izinini yan yana gösterir. [WF02](workflows.md#wf02) içindeki `management_state_get_v1` izin özeti tek `person_id` kabul eder. İzin matrisi bu okuyucuyla kişi başına ayrı istek gerektirir.
+
+**Kabul.** Seçili merkezde matrise uygun ve çağırana görünür kişilerin güncel izin özetlerini aynı yetkili, sayfalı okumada döndür. Kayıtlı seçim, etkili izin ve düzenlenebilirlik ayırt edilebilsin. Mevcut canlı yetki, plan ve yazma sürümü sınırları korunsun. Yanlış organizasyon, merkez veya sayfa imleci yetkisiz sonuç döndürmesin. Backend sahibi okuma biçimini belirler. [Frontend kabulü](../apps/web/docs/remaining-work.md).
+
+**Backend uygulaması.** `management_state_get_v1` üzerindeki `permission_set_v1` seçicisi `key:{directory:'center'}` ile mevcut kişi özetlerini seçili merkezde sayfalar. Çağrı, alanlar ve yazma sonrası yeniden okuma [WF02](workflows.md#wf02) kapsamındadır.

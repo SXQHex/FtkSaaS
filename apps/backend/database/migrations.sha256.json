@@ -271,5 +271,6 @@
   "20261126151242_reuse_person_detail_scope_and_family.sql": "8327e05a15aa9592adeaf9190c8f300927bb6a675da0ac0785b0b2227723bb60",
   "20261126230219_pending_team_invitation_roles.sql": "6eb7e97f5b55fe0c6bbe3474df29d88dcbce6b65f5be99590058574aab3ce37b",
   "20261126230220_reuse_person_field_policy_queries.sql": "b6a2b40ab7dd2ea1409b1e23b403d6f21d418ee7947dbe63346d70c54e47eb3a",
-  "20261126230221_reuse_calendar_center_scope.sql": "c2e56d75b1f3140b5214ff611b45c3a27d83edccf22ef344db0b4b16b451dde5"
+  "20261126230221_reuse_calendar_center_scope.sql": "c2e56d75b1f3140b5214ff611b45c3a27d83edccf22ef344db0b4b16b451dde5",
+  "20261126235944_team_permission_matrix.sql": "48e39e12975fc187093e8af88da94bc86e9e09d6e9056eaab6e1d2cf70d9c0f6"
 }

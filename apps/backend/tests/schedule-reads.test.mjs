@@ -312,6 +312,71 @@ test('Schedule reads through real Auth -> Edge -> RPC',async t=>{
   await fail(staff.u,'session_get_v1',{session_id:s3},'FORBIDDEN');
   await fail(staff.u,'calendar_get_v1',{center_id:c2,interval,page:{}},'FORBIDDEN');
  });
+ await t.test('team permission matrix pages eligible people with live scoped authority and write versions',async()=>{
+  const writerTarget=await linked('matrix-writer-target','staff');
+  const op='management_state_get_v1';
+  const request={center_id:c1,operation:'permission_set_v1',selector:{
+   operation:'permission_set_v1',key:{directory:'center'}},page:{limit:1}};
+  const read=(actor=owner,input=request)=>must(actor,op,scope(input));
+  const first=await read();
+  assert.equal(first.items.length,1);assert(first.next_cursor);
+  const people=[...first.items],seen=new Set([first.next_cursor]);
+  let cursor=first.next_cursor;
+  while(cursor){
+   const page=await read(owner,{...request,page:{limit:1,cursor}});
+   assert.equal(page.items.length,1);
+   people.push(...page.items);
+   cursor=page.next_cursor;
+   if(cursor){assert(!seen.has(cursor));seen.add(cursor);}
+  }
+  assert.deepEqual(people.map(row=>row.entity.id).sort(),[ownerPerson,cm.p,instructor.p,staff.p,writerTarget.p].sort());
+  const staffRow=people.find(row=>row.entity.id===staff.p);
+  const matrixValues=staffRow.current.values;
+  const summary=(await read(owner,{...request,selector:{...request.selector,key:{person_id:staff.p,permission_summary:true}}})).items[0];
+  assert.deepEqual(staffRow.versions,summary.versions);
+  assert.equal(matrixValues.person_id,staff.p);
+  assert.equal(matrixValues.display_name,'schedule-staff');
+  assert.deepEqual(matrixValues.team_roles,['staff']);
+  assert.deepEqual(matrixValues.permission_overrides,
+   summary.current.values.permission_overrides.map(cell=>({...cell,writable:true})));
+  const permissionsFor=id=>people.find(row=>row.entity.id===id).current.values.permission_overrides;
+  assert.deepEqual(permissionsFor(cm.p).map(cell=>cell.permission),['sale.discount']);
+  assert(!permissionsFor(instructor.p).some(cell=>cell.permission==='reservation.capacity_override'));
+  const writerVersion=people.find(row=>row.entity.id===writerTarget.p).versions[0].version;
+  await mut('permission_set_v1',{center_id:c1,person_id:writerTarget.p,expected_version:writerVersion,
+   permission:'request.write',enabled:false});
+  const refreshed=(await read(owner,{...request,page:{}})).items.find(row=>row.entity.id===writerTarget.p);
+  assert.equal(refreshed.versions[0].version,writerVersion+1);
+  assert.deepEqual(refreshed.current.values.permission_overrides.find(cell=>cell.permission==='request.write'),{
+   permission:'request.write',override_exists:true,enabled:false,override_version:1,effective_staff_grant:false,writable:true,
+  });
+
+  const continuation={...request,page:{limit:1,cursor:first.next_cursor}};
+  assert.deepEqual((await read(owner,{...request,center_id:c2})).items.map(row=>row.entity.id),[ownerPerson]);
+  await fail(owner,op,{...continuation,center_id:c2},'VALIDATION_FAILED');
+  await fail(cm.u,op,continuation,'VALIDATION_FAILED');
+  await fail(cm.u,op,{...request,center_id:c2},'FORBIDDEN');
+  await fail(staff.u,op,request,'FORBIDDEN');
+  await fail(stranger,op,request,'NOT_FOUND');
+  await fail(owner,op,{...request,org_id:key()},'NOT_FOUND');
+  await fail(owner,op,{...request,selector:{...request.selector,key:{directory:'center',person_id:staff.p}}},'VALIDATION_FAILED');
+  await fail(owner,op,{...request,entity:{type:'people',id:staff.p}},'VALIDATION_FAILED');
+
+  const cmPage=await read(cm.u);
+  assert(cmPage.next_cursor);
+  await db.query("update core.role_assignments set state='inactive' where id=$1",[cm.grant.primary_id]);
+  try{
+   await fail(cm.u,op,{...request,page:{limit:1,cursor:cmPage.next_cursor}},'FORBIDDEN');
+  }finally{
+   await db.query("update core.role_assignments set state='active' where id=$1",[cm.grant.primary_id]);
+  }
+  await db.query("update core.saas_plan_versions set features=array_remove(features,'F05') where id=$1",[plan]);
+  try{
+   await fail(owner,op,request,'PLAN_FEATURE_UNAVAILABLE');
+  }finally{
+   await db.query("update core.saas_plan_versions set features=array_append(features,'F05') where id=$1",[plan]);
+  }
+ });
  await t.test('org owner reads all centers without a center-manager grant; unlinked tenant is hidden',async()=>{
   await mut('center_manager_revoke_v1',{center_id:c2,person_id:ownerPerson,expected_version:1,reason:'Read only owner'});
   assert.equal((await get(owner,s3)).id,s3);assert(ids(await cal(owner)).includes(s3));
