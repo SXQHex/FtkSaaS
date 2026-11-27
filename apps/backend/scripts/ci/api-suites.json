@@ -1235,7 +1235,7 @@
     },
     {
       "path": "apps/backend/tests/room-role-registry.test.mjs",
-      "sha256": "e30ffa45022e918d508d0a15eb1e42132e00a0f899f34188ab9a45154e545435",
+      "sha256": "1b572513190ba6f8fed5e602439faccefa68724e1d9d6c717de592179dc27da2",
       "shared": [
         [
           2,
@@ -1268,6 +1268,11 @@
           "line": 317,
           "path": "apps/backend/tests/role-directory-filter-acceptance.mjs",
           "sha256": "f46c75b3f7664a0daf5a00c89690d74d03575373166e3f88b335b957a975a9a1"
+        },
+        {
+          "line": 318,
+          "path": "apps/backend/tests/staff-role-revocation-acceptance.mjs",
+          "sha256": "54717b5c9355cbe3ee33901b681515f83151e9399ea9b4559efe49d93ad9c027"
         }
       ],
       "estimated_seconds": 211

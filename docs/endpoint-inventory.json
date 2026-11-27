@@ -628,7 +628,8 @@
       "limits": [
         "Starter instructor assignment ID/version is discoverable with management_state_get_v1 role_assign_v1 selector. Instructor revoke requires an account-bound impact_approval when future unstarted sessions are affected; exact replay does not detach twice.",
         "Confirmed revoke preserves sessions, rooms, student reservations and completed/begun history; removes future instructor duties with explicit overrides and increments session versions. No automatic replacement.",
-        "Missing instructor imposes no additional restriction on the existing session lifecycle: normal reservation, schedule, capacity and attendance operations keep their existing authorization, plan, rights and time rules. No automatic cancellation, suspension or replacement; the revoking manager is responsible for arranging an instructor."
+        "Missing instructor imposes no additional restriction on the existing session lifecycle: normal reservation, schedule, capacity and attendance operations keep their existing authorization, plan, rights and time rules. No automatic cancellation, suspension or replacement; the revoking manager is responsible for arranging an instructor.",
+        "Staff CRM handover requires a current impact_approval and an eligible same-center handover_person_id. Open follow-ups inherit the new lead assignee. Roles without affected work retain the existing command path."
       ]
     },
     {
@@ -5987,7 +5988,8 @@
       },
       "billing_class": "config",
       "limits": [
-        "Preview is account/organization/center/assignment/version and complete affected-session snapshot bound; no role, session or reservation mutation."
+        "Preview is account/organization/center/assignment/version and complete affected-session snapshot bound; no role, session or reservation mutation.",
+        "For staff, staff_impact shows lost center-wide permissions, affected open CRM leads and unfinished follow-ups, and live eligible recipients."
       ]
     },
     {

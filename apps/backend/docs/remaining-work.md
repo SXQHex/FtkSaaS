@@ -2,6 +2,11 @@
 
 Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin tek sahibidir**. [Sıra ve kontrol noktaları](production-queue.md), [kaynak/test/hosted kabulü](00-FtkSaaS-yeni-sohbet-devir.md), [ürün kapsamı](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md), [domain davranışı](../../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md) ve [P08](../../../docs/decisions/P08-accepted-scope.md) kendi sahiplerinde tutulur. Buradaki ölçülebilir kabul senaryoları yeni ürün kuralı değildir. F01–F33/14 modül kapsamı korunur; mevcut sağlam kod yeniden yazılmaz.
 
+<a id="xreq-079-backend"></a>
+## XREQ-079 — Personel rolünü kaldırma
+
+- [ ] Güncel Personel atamasıyla önizlemeyi, açık CRM işlerinin uygun alıcıya devrini, güncellik ve kapsam retlerini [WF02](../../../docs/workflows.md#wf02) üzerinden doğrula. Tam aday CI, main ve development kanıtı [backend devrindedir](00-FtkSaaS-yeni-sohbet-devir.md#xreq-079-backend-adayi). [Frontend talebi](https://github.com/SXQHex/FtkSaaS/pull/484).
+
 <a id="hosted-api-gecikmesi"></a>
 ## Hosted API gecikmesi
 

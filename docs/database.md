@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `615f999cf61eb7ffa57014aaca932c358e32621835c9566b48a73ada3b92cc6d`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `6f21435ef6c687f069ac6a96fd7b57d0c5c58fe60622c1e4bf6cf3fb0d14750d`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 275. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 276. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -283,3 +283,4 @@ Sıralı migration: 275. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261126230221_reuse_calendar_center_scope.sql](../apps/backend/supabase/migrations/20261126230221_reuse_calendar_center_scope.sql) | `c2e56d75b1f3140b5214ff611b45c3a27d83edccf22ef344db0b4b16b451dde5` |
 | [20261126235944_team_permission_matrix.sql](../apps/backend/supabase/migrations/20261126235944_team_permission_matrix.sql) | `48e39e12975fc187093e8af88da94bc86e9e09d6e9056eaab6e1d2cf70d9c0f6` |
 | [20261127005753_consolidate_p06_report_scope_reads.sql](../apps/backend/supabase/migrations/20261127005753_consolidate_p06_report_scope_reads.sql) | `f3fb3002d70ba38e1f64b4bf9658f04ed9cdbc1b29bbe2f1b32900400a3a5838` |
+| [20261127131817_staff_role_revocation.sql](../apps/backend/supabase/migrations/20261127131817_staff_role_revocation.sql) | `49b2aed9e36a7077f96bf9ea0bc3727965931e828c8471e8bdba82e0458787c5` |
