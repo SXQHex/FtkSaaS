@@ -321,8 +321,8 @@
         "audit_center_export_v1"
       ],
       "review": {
-        "fingerprint": "bb0f6b954a0b3092ebc2bde13f55e971a27c6a0ecd71444a57beb037d9a499ce",
-        "reason": "Ekip izin matrisi seçicisi ve üretilen doğrulayıcılar incelendi. 26 Kasım’da süresi dolan altı kalite istisnası kullanıcı onayıyla kaldırıldı."
+        "fingerprint": "d0a8104e1d16df13a127a2d4c0dd23609fd52fa2805849eb82fb92055381eda5",
+        "reason": "P06 kabulü muhasebe okuma yetkisi eksik ve başka merkezi içeren CSV isteklerini doğruluyor."
       }
     },
     {
@@ -1401,7 +1401,8 @@
         "apps/backend/supabase/migrations/20261119170003_sql_report_pagination.sql",
         "apps/backend/supabase/migrations/20261125080144_crm_import_source_storage_erasure.sql",
         "apps/backend/supabase/migrations/20261125213056_report_enqueue_shared_organization_lock.sql",
-        "apps/backend/supabase/migrations/20261126151241_report_enqueue_resolved_scope.sql"
+        "apps/backend/supabase/migrations/20261126151241_report_enqueue_resolved_scope.sql",
+        "apps/backend/supabase/migrations/20261127005753_consolidate_p06_report_scope_reads.sql"
       ],
       "operations": [
         "report_get_v1",
@@ -1415,8 +1416,8 @@
         "import_directory_get_v1"
       ],
       "review": {
-        "fingerprint": "16470c6179d4296c42d0dc5ca908084210e4fd1b7d06de8fb6ba780ea85daef1",
-        "reason": "Yeni CSV isteği yetkili merkez kümesini aynı transaction içinde bir kez çözer. Yeniden deneme özgün rapor kapsamını, önceki makbuzu ve worker doğrulamasını korur."
+        "fingerprint": "04ca5421c062ccabe7784eb1be20ba76e90a6ea96a2a3185b8d577c84df95bed",
+        "reason": "Rapor planı ve merkez rolleri çağrı içinde bir kez okunur. Tür, finans yetkisi, merkez kapsamı ve aynı işlem anahtarıyla tekrar kabulü doğrulanır."
       }
     },
     {
@@ -2365,8 +2366,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "8545fbff20b9c1629ebf2824dc254ed4c5ff793454b4ca7b01ca195ebfb6c9e8",
-        "reason": "Rapor kuyruğu, kayıt bağlamı ve outbox aynı işlemde kalıyor. CSV çalışanı canlı erişimi ve kapsamı teslim sırasında yeniden denetliyor."
+        "fingerprint": "f416d0a4dfb3c3ce73adbc18a14175bb870ed19e9a042692f04a0ce449b52c4b",
+        "reason": "Rapor çalışanı aynı canlı P06 kapsam çözümünü kullanır. İptal edilen yetki, tekrar ve iş gövdesi native kabulde denetlenir."
       }
     }
   ]
